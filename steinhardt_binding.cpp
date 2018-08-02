@@ -117,9 +117,149 @@ PYBIND11_MODULE(steinhardt, m) {
 
                     )doc"
             )
-        ;
-      
 
+        .def("gatom",&System::gatom,
+            R"doc(
+                Access function that returns the Atom object at the queried position.
+
+                Parameters
+                ----------
+                index : int
+                        index of required atom
+
+                Returns
+                -------
+                atom : Atom object
+                    atom object at the queried position
+
+                    )doc"
+            )
+
+        .def("glargestclusterid",&System::glargestclusterid,
+            R"doc(
+                Access function that returns the id of largest cluster. This can be used in 
+                combination with gid() method of Atom to find if an atom belongs to the 
+                largest cluster. eg - if( atom.gbelongsto()==system.glargestclusterid() )
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                cluster id  : int
+                    id of the largest cluster.
+
+                    )doc"
+            )
+
+        ;
+
+//bindings for Atom class
+//------------------------------------------------------------------
+
+    py::class_<Atom>(m,"Atom")
+        .def(py::init< >())     
+        .def("gx",&Atom::gx,
+            R"doc(
+                Returns the coordinates of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                x : vector double
+                    position coordinates
+                )doc")
+
+        .def("gneighbors",&Atom::gneighbors,
+            R"doc(
+                Returns the neighbors of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                x : vector int
+                    neighbor indices
+                )doc")
+
+        .def("gn_neighbors",&Atom::gn_neighbors,
+            R"doc(
+                Returns the number of neighbors of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                n_neighbors : int 
+                    number of neighbors
+                )doc")
+
+        .def("gfrenkelnumber",&Atom::gfrenkelnumber,
+            R"doc(
+                Returns the frenkelnumber of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                frenkelnumber : int
+                    frenkelnumber
+                )doc")
+
+        .def("gissolid",&Atom::gissolid,
+            R"doc(
+                returns the solidity of an atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                issolid : int
+                    A value of 1 is returned if the atom is solid, 0 otherwise.
+                )doc")
+
+        .def("gid",&Atom::gid,
+            R"doc(
+                Returns the id of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                id : int
+                    id of the atom
+                )doc")
+
+        .def("gbelongsto",&Atom::gbelongsto,
+            R"doc(
+                Returns the cluster id of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                id : int
+                    cluster id of the atom. A value of -1 means that the atom is liquid.
+                )doc")
+
+
+    ;
 /*
     m.def("get_absDistance",&get_absDistance,
         R"pbdoc(Calculate distance between two atoms with PBC

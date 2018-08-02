@@ -6,6 +6,7 @@
 System::System(){
     
     nop = -1;
+    maxclusterid = -1;
 }
 
 System::~System(){
@@ -349,7 +350,11 @@ int System::largest_cluster(){
         int max=0;
         for (int ti= 0;ti<nop;ti++)
         {
-            if (freq[ti]>max) max=freq[ti];
+            if (freq[ti]>max){
+                max=freq[ti];
+                maxclusterid = ti+1;
+            } 
+                
         }
 
         return max;
@@ -376,14 +381,43 @@ int System::calculate_nucsize()
 
 
 
-Atom::Atom(){
 
-}
-
-Atom::~Atom(){
-        
-}
-
+//access functions for system
+//------------------------------------------------------------------------------------------------------------------------
 void System::set_inputfile(string nn) { inputfile = nn; }
 void System::set_neighbordistance(double nn) { neighbordistance = nn; }
 void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
+Atom System::gatom(int i) { return atoms[i]; }
+int System::glargestclusterid() { return maxclusterid; }
+//functions for atoms
+//-------------------------------------------------------------------------------------------------------------------------
+Atom::Atom(){ }
+Atom::~Atom(){ }
+
+
+vector<double> Atom::gx(){ 
+    vector<double> pos;
+    pos.reserve(3);
+    pos.emplace_back(posx);
+    pos.emplace_back(posy);
+    pos.emplace_back(posz);
+    return pos; 
+}
+
+vector<int> Atom::gneighbors(){
+    vector<int> nn;
+    nn.reserve(n_neighbors);
+    for(int i=0;i<n_neighbors;i++){
+        nn.emplace_back(neighbors[i]);
+    }
+    return nn;
+}
+
+int Atom::gn_neighbors() { return n_neighbors; }
+int Atom::gfrenkelnumber() { return frenkelnumber; }
+int Atom::gissolid() { return issolid; }
+int Atom::gid() { return id; }
+int Atom::gbelongsto() { return belongsto; }
+
+//double Atom::gy( return posy; )
+//double Atom::gz( return posz; )

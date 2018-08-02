@@ -8,6 +8,7 @@
 #include <string>
 #include <sstream>
 #include <time.h>
+#include <vector>
 
 using namespace std;
 
@@ -38,13 +39,31 @@ class Atom{
         double arealQ4[9],aimgQ4[9];
         double arealQ6[13],aimgQ6[13];
     
-        double frenkelnumber;
+        int frenkelnumber;
         double avq6q6;
 
         int belongsto;
         int issolid;
         int structure;
         int id;
+
+        //we need some functions to fetch atom properties
+        vector<double> gx();
+        //int* gx();
+        //double gy();
+        //double gz();
+        //probably wont work
+        //in that case will have to return a vector
+        //its probably expensive
+        //but that doesnt matter because we wont use it regularly
+        vector<int> gneighbors();
+        int gn_neighbors();
+        int gfrenkelnumber();
+        int gissolid();
+        int gid();
+        int gbelongsto();
+
+
 };
 
 
@@ -85,5 +104,10 @@ class System{
         double neighbordistance;
         double threshold;
         double avgthreshold;
+        int maxclusterid;
+
+        //some access functions for system
+        Atom gatom(int);
+        int glargestclusterid();
 
 };
