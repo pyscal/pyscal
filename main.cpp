@@ -21,11 +21,9 @@ int main(int argc, char *argv[])
         //CParameter *param = new CParameter(3.63,7);
         //CParameter param(3.63,7);
         System m_MolSys;
-        m_MolSys.set_minfrenkel(7);
+        m_MolSys.set_nucsize_parameters(7,0.5,0.5);
         m_MolSys.set_inputfile(filename);
         m_MolSys.set_neighbordistance(3.63);
-        m_MolSys.set_threshold(0.5);
-        m_MolSys.set_avgthreshold(0.5);
 
         int res;
 

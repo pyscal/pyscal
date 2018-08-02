@@ -34,33 +34,93 @@ PYBIND11_MODULE(steinhardt, m) {
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")
         .def(py::init< >())
-        .def("set_minfrenkel",&System::set_minfrenkel)
-        .def("set_inputfile",&System::set_inputfile)
-        .def("set_neighbordistance",&System::set_neighbordistance)
-        .def("set_threshold",&System::set_threshold)
-        .def("set_avgthreshold",&System::set_avgthreshold)
-        .def("calculate_nucsize",&System::calculate_nucsize)
-        ;
-    /*  
-    m.def("get_diff",&get_diff,
-        R"pbdoc(Calculate the diff in cordinate between two atoms with PBC
+
+        //minfrenkel function
+        .def("set_nucsize_parameters",&System::set_nucsize_parameters,
+            R"doc(
+                Set the value of parameters for calculating the largest cluster in the
+                liquid, a detailed description of the order parameter can be found in  
+                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082 .
+
+                Parameters
+                ----------
+                minfrenkel : int
+                    Minimum number of solid connections for an atom to be identified as
+                    a solid.
+                threshold : double
+                    The cutoff value of connection between two atoms for them to be def
+                    ined as having a bond.
+                avgthreshold : double
+                    Averaged value of connection between an atom and its neighbors for 
+                    an atom to be solid.
+
+                Returns
+                -------
+                None
+
+                See Also
+                --------
+                set_inputfile - sets the input file for reading inc
+                set_neighbordistance - sets the cutoff distance for neighbors of an atom.
+
+                Examples
+                --------
+                >>> st.set_nucsize_parameters(7,0.5,0.5)
+
+                )doc")
         
-        Parameters
-        ------------
-        atom1 : Atom object
-                first atom
-        atom2 : Atom object
-                second atom
-        box   : simulation box
+        .def("set_inputfile",&System::set_inputfile,
+            R"doc(
+                Set the inputfile for reading in for calculations. Currently, only a lammps
+                dump file can be used.
 
-        Returns
-        ------------
-        diff   : diff between coordinates of the atoms 
+                Parameters
+                ----------
+                inputfile : string
+                    filename of the file to be read
 
-        )pbdoc"
-        );
+                Returns
+                -------
+                None
+                )doc")
 
+        .def("set_neighbordistance",&System::set_neighbordistance,
+            R"doc(
+                Set the cutoff distance for determining the neighbours of an atom.
 
+                Parameters
+                ----------
+                cutoff : double
+                    neighbor distance
+
+                Returns
+                -------
+                None
+                    )doc"
+            )
+        .def("calculate_nucsize",&System::calculate_nucsize,
+            R"doc(
+                Calculate the size of the largest cluster in the given system. Calculation
+                the size of the largest cluster needs various prerequisites that can be set
+                by the functions set_neighbordistance and set_nucsize_parameters. 
+                For a detailed description of how the calculation works see-
+                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                cluster size : int
+                    size of the largest cluster in number of atoms
+
+                    )doc"
+            )
+        ;
+      
+
+/*
     m.def("get_absDistance",&get_absDistance,
         R"pbdoc(Calculate distance between two atoms with PBC
         

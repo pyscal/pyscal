@@ -71,11 +71,10 @@ class System{
         void find_solids();
         void find_clusters();
         int largest_cluster();
-        void set_minfrenkel(int);
+        void set_nucsize_parameters(int,double,double);
         void set_inputfile(string);
         void set_neighbordistance(double);
-        void set_threshold(double);
-        void set_avgthreshold(double);
+
     
         //old params
         int nop;

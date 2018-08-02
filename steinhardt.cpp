@@ -384,8 +384,6 @@ Atom::~Atom(){
         
 }
 
-void System::set_minfrenkel(int nn) { minfrenkel = nn; }
 void System::set_inputfile(string nn) { inputfile = nn; }
 void System::set_neighbordistance(double nn) { neighbordistance = nn; }
-void System::set_threshold(double nn) { threshold = nn; }
-void System::set_avgthreshold(double nn) { avgthreshold = nn; }
+void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
