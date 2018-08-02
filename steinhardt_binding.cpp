@@ -9,28 +9,7 @@ using namespace std;
 
 PYBIND11_MODULE(steinhardt, m) {
     
-    //bindings for Atom class
-    //nothing to bind right now;
-    //its internal to system
-    /*
-    py::class_<Atom>(m,"Atom")
-        .def(py::init<vector<double>,vector<double>,int>())
-        .def("gx",&Atom::gx)
-        .def("gv",&Atom::gv)
-        .def("gid",&Atom::gid)
-        .def("gr",&Atom::gr)
-        .def("gtheta",&Atom::gtheta)
-        .def("gphi",&Atom::gphi)
-        .def("gaq",&Atom::gaq)
-        .def("gneighdist",&Atom::gneighdist)
-        .def("gneighbors",&Atom::gneighbors)
-        .def("gneighborcount",&Atom::gneighborcount)
-        .def("gneighborcount",&Atom::gneighborcount)
-        .def("gfrenkelcons",&Atom::gfrenkelcons)
-        .def("gissolid",&Atom::gissolid)
-        .def("gcluster",&Atom::gcluster)
-        ;
-    */
+
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")
         .def(py::init< >())
@@ -78,6 +57,24 @@ PYBIND11_MODULE(steinhardt, m) {
                 ----------
                 inputfile : string
                     filename of the file to be read
+
+                Returns
+                -------
+                None
+                )doc")
+
+        .def("assign_particles",&System::assign_particles,
+            R"doc(
+                Assign atoms directly. Receive a vector of atom objects which is stored instead
+                of reading in the input file. If this method is used, there is no need of using
+                read_inputfile method.
+
+                Parameters
+                ----------
+                atoms : vector Atoms
+                    vector of Atom class instances
+                box   : vector double
+                    vector of box dimensions
 
                 Returns
                 -------
@@ -258,6 +255,34 @@ PYBIND11_MODULE(steinhardt, m) {
                     cluster id of the atom. A value of -1 means that the atom is liquid.
                 )doc")
 
+        .def("sx",&Atom::sx,
+            R"doc(
+                Set the coordinates of the atom.
+
+                Parameters
+                ----------
+                pos : vector double
+                    a vector containing x,y and z coordinates of the atom
+                
+                Returns
+                -------
+                None
+
+                )doc")
+
+        .def("sid",&Atom::sid,
+            R"doc(
+                sets the id of the atom.
+
+                Parameters
+                ----------
+                n : int
+                    id of the atom
+
+                Returns
+                -------
+                None.
+                )doc")
 
     ;
 /*

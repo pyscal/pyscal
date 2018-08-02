@@ -62,7 +62,8 @@ class Atom{
         int gissolid();
         int gid();
         int gbelongsto();
-
+        void sx(vector<double>);
+        void sid(int);
 
 };
 
@@ -93,7 +94,7 @@ class System{
         void set_nucsize_parameters(int,double,double);
         void set_inputfile(string);
         void set_neighbordistance(double);
-
+        void assign_particles( vector<Atom>, vector<double>);
     
         //old params
         int nop;

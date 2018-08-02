@@ -73,6 +73,32 @@ void System::read_particle_file(){
   
  }
 
+void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
+//dont know if this will be faster-
+//what it does would be to recieve a 
+//vector of atoms and then process it
+//add it to the normal list we have.
+    nop = atomitos.size();
+    atoms = new Atom[nop];
+
+    boxx = boxd[0];
+    boxy = boxd[1];
+    boxz = boxd[2];
+
+    for(int ti=0;ti<nop;ti++){
+        atoms[ti].posx = atomitos[ti].posx;
+        atoms[ti].posy = atomitos[ti].posy;
+        atoms[ti].posz = atomitos[ti].posz;
+        atoms[ti].id = atomitos[ti].id;
+        atoms[ti].belongsto = -1;
+        atoms[ti].issolid = 0;
+    }
+
+    atomitos.shrink_to_fit();
+
+
+}
+
 double System::get_abs_distance(int ti ,int tj,double &diffx ,double &diffy,double &diffz){
   
     double abs;
@@ -418,6 +444,12 @@ int Atom::gfrenkelnumber() { return frenkelnumber; }
 int Atom::gissolid() { return issolid; }
 int Atom::gid() { return id; }
 int Atom::gbelongsto() { return belongsto; }
+void Atom::sx(vector<double> xx){
+    posx = xx[0];
+    posy = xx[1];
+    posz = xx[2];
+}
 
+void Atom::sid(int n){ id = n; }
 //double Atom::gy( return posy; )
 //double Atom::gz( return posz; )
