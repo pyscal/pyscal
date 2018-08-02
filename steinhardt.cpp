@@ -93,10 +93,10 @@ double System::get_abs_distance(int ti ,int tj,double &diffx ,double &diffy,doub
 
 void System::get_all_neighbors(){
 
-    double nd,d;
+    double d;
     double diffx,diffy,diffz;
     double r,theta,phi;
-    int ccount[nop];
+
 
     for (int ti = 0;ti<nop;ti++){
         
@@ -274,7 +274,7 @@ void System::calculate_frenkel_numbers(){
         for (int c = 0;c<atoms[ti].n_neighbors;c++){
                         
             scalar = get_number_from_bond(ti,atoms[ti].neighbors[c]);
-            if (scalar > 0.5) frenkelcons += 1;
+            if (scalar > threshold) frenkelcons += 1;
             atoms[ti].avq6q6 += scalar;
         }
         
@@ -291,7 +291,7 @@ int System::cluster_criteria(int ti,int criterium){
           
     if (criterium == 0){
                 
-        if ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > 0.5) ){ 
+        if ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > avgthreshold) ){ 
             value = 1; 
         }  
         else{
@@ -304,7 +304,6 @@ int System::cluster_criteria(int ti,int criterium){
 
 void System::find_solids(){
 
-    int val;
     int criteria = 0;
 
     for (int ti= 0;ti<nop;ti++){
@@ -359,7 +358,7 @@ int System::largest_cluster(){
 
 int System::calculate_nucsize()
 {
-        int criterium;
+
         int greatestbelongsto;
         //Find all particles within a radius of neighbourdistancess
         read_particle_file();
@@ -388,3 +387,5 @@ Atom::~Atom(){
 void System::set_minfrenkel(int nn) { minfrenkel = nn; }
 void System::set_inputfile(string nn) { inputfile = nn; }
 void System::set_neighbordistance(double nn) { neighbordistance = nn; }
+void System::set_threshold(double nn) { threshold = nn; }
+void System::set_avgthreshold(double nn) { avgthreshold = nn; }

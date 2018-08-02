@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
         m_MolSys.set_minfrenkel(7);
         m_MolSys.set_inputfile(filename);
         m_MolSys.set_neighbordistance(3.63);
+        m_MolSys.set_threshold(0.5);
+        m_MolSys.set_avgthreshold(0.5);
 
         int res;
 

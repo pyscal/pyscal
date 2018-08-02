@@ -37,7 +37,9 @@ PYBIND11_MODULE(steinhardt, m) {
         .def("set_minfrenkel",&System::set_minfrenkel)
         .def("set_inputfile",&System::set_inputfile)
         .def("set_neighbordistance",&System::set_neighbordistance)
-        .def("calculate_largestClusterparameter_Full",&System::calculate_largestClusterparameter_Full)
+        .def("set_threshold",&System::set_threshold)
+        .def("set_avgthreshold",&System::set_avgthreshold)
+        .def("calculate_nucsize",&System::calculate_nucsize)
         ;
     /*  
     m.def("get_diff",&get_diff,

@@ -74,6 +74,8 @@ class System{
         void set_minfrenkel(int);
         void set_inputfile(string);
         void set_neighbordistance(double);
+        void set_threshold(double);
+        void set_avgthreshold(double);
     
         //old params
         int nop;
