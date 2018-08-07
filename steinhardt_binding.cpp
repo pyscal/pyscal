@@ -275,6 +275,37 @@ PYBIND11_MODULE(steinhardt, m) {
                     )doc"
             )
 
+        .def("gallatoms",&System::gallatoms,
+            R"doc(
+                Access function that returns the a vector of Atom objects.
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                allatoms : vctor of Atom objects
+                    all atoms in the system
+
+                    )doc"
+            )
+
+        .def("gnop",&System::gnop,
+            R"doc(
+                Access function that returns the Atom object at the queried position.
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                nop : int
+                    number of atoms in the system.
+                    )doc"
+            )
+
 
         .def("satom",&System::satom,
             R"doc(
@@ -288,7 +319,7 @@ PYBIND11_MODULE(steinhardt, m) {
                 Returns
                 -------
                 None
-                
+
                     )doc"
             )
 

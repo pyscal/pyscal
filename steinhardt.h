@@ -114,6 +114,8 @@ class System{
         Atom gatom(int);
         void satom(Atom);
         int glargestclusterid();
+        int gnop();
+        vector<Atom> gallatoms();
 
 };
 

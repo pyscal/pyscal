@@ -465,7 +465,17 @@ void System::satom(Atom atom1) {
 }
 
 //add function to return nop
+int System::gnop() { return nop; } 
 //add function to pack and return the whole set of atoms
+vector<Atom> System::gallatoms(){
+    vector<Atom> allatoms;
+    allatoms.reserve(nop);
+    for(int i=0;i<nop;i++){
+        allatoms.emplace_back(atoms[i]);
+    }
+
+    return allatoms;
+}
 
 int System::glargestclusterid() { return maxclusterid; }
 //functions for atoms
