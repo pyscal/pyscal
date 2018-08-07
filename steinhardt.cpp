@@ -67,6 +67,7 @@ void System::read_particle_file(){
             atoms[ti].id = id;
             atoms[ti].belongsto = -1;
             atoms[ti].issolid = 0; 
+            atoms[ti].loc = ti;
         }
   
     }
@@ -354,7 +355,8 @@ void System::calculate_frenkel_numbers(){
     }
 }
 
-
+//again to be overloaded?
+//maybe not now-im lazy
 int System::cluster_criteria(int ti,int criterium){
         
     int value=0;
@@ -457,6 +459,14 @@ void System::set_inputfile(string nn) { inputfile = nn; }
 void System::set_neighbordistance(double nn) { neighbordistance = nn; }
 void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
 Atom System::gatom(int i) { return atoms[i]; }
+void System::satom(Atom atom1) { 
+    int idd = atom1.loc;
+    atoms[idd] = atom1;
+}
+
+//add function to return nop
+//add function to pack and return the whole set of atoms
+
 int System::glargestclusterid() { return maxclusterid; }
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------

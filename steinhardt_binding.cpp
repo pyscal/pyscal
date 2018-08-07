@@ -275,6 +275,24 @@ PYBIND11_MODULE(steinhardt, m) {
                     )doc"
             )
 
+
+        .def("satom",&System::satom,
+            R"doc(
+                return the atom to its original location after modification.
+
+                Parameters
+                ----------
+                atom : Atom
+                        atom to be replaced
+
+                Returns
+                -------
+                None
+                
+                    )doc"
+            )
+
+
         .def("glargestclusterid",&System::glargestclusterid,
             R"doc(
                 Access function that returns the id of largest cluster. This can be used in 

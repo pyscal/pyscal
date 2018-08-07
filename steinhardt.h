@@ -46,6 +46,7 @@ class Atom{
         int issolid;
         int structure;
         int id;
+        int loc;
 
         //we need some functions to fetch atom properties
         vector<double> gx();
@@ -111,6 +112,7 @@ class System{
 
         //some access functions for system
         Atom gatom(int);
+        void satom(Atom);
         int glargestclusterid();
 
 };
