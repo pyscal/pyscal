@@ -78,8 +78,10 @@ class System{
         void get_all_neighbors();
         void calculate_complexQLM_6();
         double get_number_from_bond(int,int);
+        double get_number_from_bond(Atom ,Atom );
         void calculate_frenkel_numbers();
         double get_abs_distance(int,int,double&,double&,double&);
+        double get_abs_distance(Atom , Atom );
         System();
         virtual ~System();
 
@@ -112,3 +114,12 @@ class System{
         int glargestclusterid();
 
 };
+
+/*
+class Filehandling{
+
+    public:
+        vector<vector<Atoms>> read_whole_file(string);  
+
+}
+*/

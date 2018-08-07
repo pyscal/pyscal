@@ -8,149 +8,6 @@ namespace py = pybind11;
 using namespace std;
 
 PYBIND11_MODULE(steinhardt, m) {
-    
-
-    //bindings and documentation for individual functions
-    py::class_<System>(m,"System")
-        .def(py::init< >())
-
-        //minfrenkel function
-        .def("set_nucsize_parameters",&System::set_nucsize_parameters,
-            R"doc(
-                Set the value of parameters for calculating the largest cluster in the
-                liquid, a detailed description of the order parameter can be found in  
-                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082 .
-
-                Parameters
-                ----------
-                minfrenkel : int
-                    Minimum number of solid connections for an atom to be identified as
-                    a solid.
-                threshold : double
-                    The cutoff value of connection between two atoms for them to be def
-                    ined as having a bond.
-                avgthreshold : double
-                    Averaged value of connection between an atom and its neighbors for 
-                    an atom to be solid.
-
-                Returns
-                -------
-                None
-
-                See Also
-                --------
-                set_inputfile - sets the input file for reading inc
-                set_neighbordistance - sets the cutoff distance for neighbors of an atom.
-
-                Examples
-                --------
-                >>> st.set_nucsize_parameters(7,0.5,0.5)
-
-                )doc")
-        
-        .def("set_inputfile",&System::set_inputfile,
-            R"doc(
-                Set the inputfile for reading in for calculations. Currently, only a lammps
-                dump file can be used.
-
-                Parameters
-                ----------
-                inputfile : string
-                    filename of the file to be read
-
-                Returns
-                -------
-                None
-                )doc")
-
-        .def("assign_particles",&System::assign_particles,
-            R"doc(
-                Assign atoms directly. Receive a vector of atom objects which is stored instead
-                of reading in the input file. If this method is used, there is no need of using
-                read_inputfile method.
-
-                Parameters
-                ----------
-                atoms : vector Atoms
-                    vector of Atom class instances
-                box   : vector double
-                    vector of box dimensions
-
-                Returns
-                -------
-                None
-                )doc")
-
-        .def("set_neighbordistance",&System::set_neighbordistance,
-            R"doc(
-                Set the cutoff distance for determining the neighbours of an atom.
-
-                Parameters
-                ----------
-                cutoff : double
-                    neighbor distance
-
-                Returns
-                -------
-                None
-                    )doc"
-            )
-        .def("calculate_nucsize",&System::calculate_nucsize,
-            R"doc(
-                Calculate the size of the largest cluster in the given system. Calculation
-                the size of the largest cluster needs various prerequisites that can be set
-                by the functions set_neighbordistance and set_nucsize_parameters. 
-                For a detailed description of how the calculation works see-
-                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082
-
-                Parameters
-                ----------
-                None
-
-                Returns
-                -------
-                cluster size : int
-                    size of the largest cluster in number of atoms
-
-                    )doc"
-            )
-
-        .def("gatom",&System::gatom,
-            R"doc(
-                Access function that returns the Atom object at the queried position.
-
-                Parameters
-                ----------
-                index : int
-                        index of required atom
-
-                Returns
-                -------
-                atom : Atom object
-                    atom object at the queried position
-
-                    )doc"
-            )
-
-        .def("glargestclusterid",&System::glargestclusterid,
-            R"doc(
-                Access function that returns the id of largest cluster. This can be used in 
-                combination with gid() method of Atom to find if an atom belongs to the 
-                largest cluster. eg - if( atom.gbelongsto()==system.glargestclusterid() )
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                cluster id  : int
-                    id of the largest cluster.
-
-                    )doc"
-            )
-
-        ;
 
 //bindings for Atom class
 //------------------------------------------------------------------
@@ -284,223 +141,293 @@ PYBIND11_MODULE(steinhardt, m) {
                 None.
                 )doc")
 
-    ;
-/*
-    m.def("get_absDistance",&get_absDistance,
-        R"pbdoc(Calculate distance between two atoms with PBC
+    ; 
+
+    //bindings and documentation for individual functions
+    py::class_<System>(m,"System")
+        .def(py::init< >())
+
+        //minfrenkel function
+        .def("set_nucsize_parameters",&System::set_nucsize_parameters,
+            R"doc(
+                Set the value of parameters for calculating the largest cluster in the
+                liquid, a detailed description of the order parameter can be found in  
+                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082 .
+
+                Parameters
+                ----------
+                minfrenkel : int
+                    Minimum number of solid connections for an atom to be identified as
+                    a solid.
+                threshold : double
+                    The cutoff value of connection between two atoms for them to be def
+                    ined as having a bond.
+                avgthreshold : double
+                    Averaged value of connection between an atom and its neighbors for 
+                    an atom to be solid.
+
+                Returns
+                -------
+                None
+
+                See Also
+                --------
+                set_inputfile - sets the input file for reading inc
+                set_neighbordistance - sets the cutoff distance for neighbors of an atom.
+
+                Examples
+                --------
+                >>> st.set_nucsize_parameters(7,0.5,0.5)
+
+                )doc")
         
-        Parameters
-        ------------
-        atom1 : Atom object
-                first atom
-        atom2 : Atom object
-                second atom
-        box   : simulation box
+        .def("set_inputfile",&System::set_inputfile,
+            R"doc(
+                Set the inputfile for reading in for calculations. Currently, only a lammps
+                dump file can be used.
 
-        Returns
-        ------------
-        abs   : Distance between the atoms 
+                Parameters
+                ----------
+                inputfile : string
+                    filename of the file to be read
 
-        )pbdoc"
-        );
+                Returns
+                -------
+                None
 
-    m.def("convert_SphericalCoordinates",&convert_SphericalCoordinates,
-        R"pbdoc(Find spherical coordinates
-        
-        Parameters
-        ------------
-        diff : double vector
-               diff in coordinates between two atoms
+                See Also
+                --------
+                assign_particles - assign without reading a file
 
-        Returns
-        ------------
-        res   : The spherical coordinates 
+                )doc")
 
-        )pbdoc"
-        );
+        .def("assign_particles",&System::assign_particles,
+            R"doc(
+                Assign atoms directly. Receive a vector of atom objects which is stored instead
+                of reading in the input file. If this method is used, there is no need of using
+                read_inputfile method.
 
-    m.def("get_AllNeighborsandDistances",&get_AllNeighborsandDistances,
-        R"pbdoc(get all neighbors, neighbor distances, theta, phi and r values
-        
-        Parameters
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
+                Parameters
+                ----------
+                atoms : vector Atoms
+                    vector of Atom class instances
+                box   : vector double
+                    vector of box dimensions
 
-        Returns
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
+                Returns
+                -------
+                None
 
-        )pbdoc"
-        );
+                See Also
+                --------
+                read_inputfile - read an input file
 
-    m.def("calculate_complexQLM",&calculate_complexQLM,
-        R"pbdoc(calculate q component value for all atoms
-        
-        Parameters
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
-        box   : Simbox class
-        param : params class
+                )doc")
 
-        Returns
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
+        .def("set_neighbordistance",&System::set_neighbordistance,
+            R"doc(
+                Set the cutoff distance for determining the neighbours of an atom.
 
-        )pbdoc"
-        );
+                Parameters
+                ----------
+                cutoff : double
+                    neighbor distance
 
-    m.def("calculate_aQ",&calculate_aQ,
-        R"pbdoc(calculate average q values
-        
-        Parameters
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
-        box   : Simbox class
-        param : params class
+                Returns
+                -------
+                None
+                    )doc"
+            )
+        .def("calculate_nucsize",&System::calculate_nucsize,
+            R"doc(
+                Calculate the size of the largest cluster in the given system. Calculation
+                the size of the largest cluster needs various prerequisites that can be set
+                by the functions set_neighbordistance and set_nucsize_parameters. 
+                For a detailed description of how the calculation works see-
+                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082
 
-        Returns
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
+                Parameters
+                ----------
+                None
 
-        )pbdoc"
-        );
+                Returns
+                -------
+                cluster size : int
+                    size of the largest cluster in number of atoms
 
-    m.def("QLM",&QLM,
-        R"pbdoc(calculate QLM values
-        
-        Parameters
-        ------------
-        q       :int
-                        qvalue
-        m       :int
-                        m value
-        theta   :double - angle
-        phi     :double - angle
-        
-        Returns
-        ------------
-        rqlm : double vector
-                real and imaginary values of qlm
+                    )doc"
+            )
 
-        )pbdoc"
-        );
+        .def("gatom",&System::gatom,
+            R"doc(
+                Access function that returns the Atom object at the queried position.
 
-    m.def("YLM",&YLM,
-        R"pbdoc(calculate YLM values
-        
-        Parameters
-        ------------
-        q       :int
-                        qvalue
-        m       :int
-                        m value
-        theta   :double - angle
-        phi     :double - angle
-        
-        Returns
-        ------------
-        rqlm : double vector
-                real and imaginary values of ylm
+                Parameters
+                ----------
+                index : int
+                        index of required atom
 
-        )pbdoc"
-        );
-    
-    m.def("PLM",&PLM,
-        R"pbdoc(calculate PLM values
-        
-        Parameters
-        ------------
-        q       :int
-                        qvalue
-        m       :int
-                        m value
-        cos(theta)   :double - cos of angle
-        
-        Returns
-        ------------
-        mplm : double 
-                       
-        )pbdoc"
-        );
-    
-    m.def("find_solids",&find_solids,
-        R"pbdoc(calculate average q values
-        
-        Parameters
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
-        box   : Simbox class
-        param : params class
+                Returns
+                -------
+                atom : Atom object
+                    atom object at the queried position
 
-        Returns
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
+                    )doc"
+            )
 
-        )pbdoc"
-        );    
-    m.def("find_clusters",&find_clusters,
-        R"pbdoc(calculate average q values
-        
-        Parameters
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
-        box   : Simbox class
-        param : params class
+        .def("glargestclusterid",&System::glargestclusterid,
+            R"doc(
+                Access function that returns the id of largest cluster. This can be used in 
+                combination with gid() method of Atom to find if an atom belongs to the 
+                largest cluster. eg - if( atom.gbelongsto()==system.glargestclusterid() )
 
-        Returns
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                cluster id  : int
+                    id of the largest cluster.
 
-        )pbdoc"
-        );  
-    
-    m.def("largest_cluster",&largest_cluster,
-        R"pbdoc(calculate average q values
-        
-        Parameters
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
-        box   : Simbox class
-        param : params class
+                    )doc"
+            )
 
-        Returns
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
 
-        )pbdoc"
-        );  
+        .def("read_particle_file",&System::read_particle_file,
+            R"doc(
+                Read a single snapshot of the lammps dump file and assign the positions
+                and ids to an array of Atom objects stored in the parent class.
 
-    m.def("nucsize",&nucsize,
-        R"pbdoc(calculate average q values
-        
-        Parameters
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
-        box   : Simbox class
-        param : params class
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
 
-        Returns
-        ------------
-        atoms : atom vector
-                vector of all atoms in the system
+                    )doc"
+            )
 
-        )pbdoc"
-        );
+        .def("get_abs_distance", (double (System::*) (Atom, Atom))  &System::get_abs_distance,
+            R"doc(
+                Get the distance between two atoms.
 
-*/
+                Parameters
+                ----------
+                atom1 : Atom object
+                        first atom
+                atom2 : Atom object
+                        second atom
+                
+                Returns
+                -------
+                distance : double
+                        distance between the first and second atom.
+                
+                    )doc"
+            )
+
+        .def("get_all_neighbors",&System::get_all_neighbors,
+            R"doc(
+                Find neighbors of all atoms in the system.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
+        .def("calculate_complexQLM_6",&System::calculate_complexQLM_6,
+            R"doc(
+                Find complex qlm 6 values for all atoms.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
+        .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond,
+            R"doc(
+                Get the connection between two atoms. Connection is defined by Qlm(i).Qlm(j)
+
+                Parameters
+                ----------
+                atom1 : Atom object
+                        first atom
+                atom2 : Atom object
+                        second atom
+                
+                Returns
+                -------
+                connection : double
+                        connection between the first and second atom.
+                
+                    )doc"
+            )
+
+        .def("calculate_frenkel_numbers",&System::calculate_frenkel_numbers,
+            R"doc(
+                Find frenkel numbers of all atoms in the system.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
+        .def("find_clusters",&System::find_clusters,
+            R"doc(
+                Find he clusters of all atoms in the system.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
+        .def("largest_cluster",&System::largest_cluster,
+            R"doc(
+                Find the largest in the system.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                cluster : int
+                    the size of the largest cluster
+
+                    )doc"
+            )
+
+
+        ;
+
+
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
 #else

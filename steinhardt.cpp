@@ -99,6 +99,9 @@ void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
 
 }
 
+//needs two version of the function; one for fast inbuilt calculation.
+//the other for being accessed to the python interface
+
 double System::get_abs_distance(int ti ,int tj,double &diffx ,double &diffy,double &diffz){
   
     double abs;
@@ -117,6 +120,24 @@ double System::get_abs_distance(int ti ,int tj,double &diffx ,double &diffy,doub
     return abs;
 }
 
+//function for binding
+double System::get_abs_distance(Atom atom1 , Atom atom2 ){
+  
+    double abs;
+    double diffx = atom1.posx - atom2.posx;
+    double diffy = atom1.posy - atom2.posy;
+    double diffz = atom1.posz - atom2.posz;
+        
+    //nearest image
+    if (diffx> boxx/2.0) {diffx-=boxx;};
+    if (diffx<-boxx/2.0) {diffx+=boxx;};
+    if (diffy> boxy/2.0) {diffy-=boxy;};
+    if (diffy<-boxy/2.0) {diffy+=boxy;};
+    if (diffz> boxz/2.0) {diffz-=boxz;};
+    if (diffz<-boxz/2.0) {diffz+=boxz;};
+    abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+    return abs;
+}
 
 void System::get_all_neighbors(){
 
@@ -265,7 +286,7 @@ void System::calculate_complexQLM_6(){
     }
 }
 
-
+//also has to be overloaded - could be a useful function
 double System::get_number_from_bond(int ti,int tj){
 
     double sumSquareti,sumSquaretj;
@@ -288,6 +309,28 @@ double System::get_number_from_bond(int ti,int tj){
     return connection;
 }
 
+//overloaded version 
+double System::get_number_from_bond(Atom atom1,Atom atom2){
+
+    double sumSquareti,sumSquaretj;
+    double realdotproduct,imgdotproduct;
+    double connection;
+    sumSquareti = 0.0;
+    sumSquaretj = 0.0;
+    realdotproduct = 0.0;
+    imgdotproduct = 0.0;
+
+    for (int mi = 0;mi < 13;mi++){
+                
+        sumSquareti += atom1.realQ6[mi]*atom1.realQ6[mi] + atom1.imgQ6[mi] *atom1.imgQ6[mi];
+        sumSquaretj += atom2.realQ6[mi]*atom2.realQ6[mi] + atom2.imgQ6[mi] *atom2.imgQ6[mi];
+        realdotproduct += atom1.realQ6[mi]*atom2.realQ6[mi];
+        imgdotproduct  += atom1.imgQ6[mi] *atom2.imgQ6[mi];
+    }
+        
+    connection = (realdotproduct+imgdotproduct)/(sqrt(sumSquaretj)*sqrt(sumSquareti));
+    return connection;
+}
 
 void System::calculate_frenkel_numbers(){
         
@@ -453,3 +496,73 @@ void Atom::sx(vector<double> xx){
 void Atom::sid(int n){ id = n; }
 //double Atom::gy( return posy; )
 //double Atom::gz( return posz; )
+//
+//
+/*
+void Filehandling::read_whole_file(string inputfile){
+    
+    double posx,posy,posz;
+    int id;
+    double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
+    double dummy;                        //dummy variable
+    char dummy_char[256];
+    string dummystr;                //dummy line
+    ifstream confFile(inputfile.c_str());
+  
+    vector<Atom> atoms;
+    vector<double> simbox;
+    vector<vector<Atom>> all_atoms;
+
+
+    int count=0;
+
+    while(getline(confFile,dummystr)){ 
+        
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+        confFile >> nop;
+       
+        atoms.reserve(nop);
+    
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+        confFile >> xsizeinf;
+        confFile >> xsizesup;
+        confFile >> ysizeinf;
+        confFile >> ysizesup;
+        confFile >> zsizeinf;
+        confFile >> zsizesup;;
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+  
+        boxx = xsizesup - xsizeinf;
+        boxy = ysizesup - ysizeinf;
+        boxz = zsizesup - zsizeinf;
+
+        //so lets read the particles positions
+        for (int ti = 0;ti<nop;ti++){
+            confFile>>id;
+            confFile>>dummy;
+            confFile>>dummy;
+            confFile>>posx;
+            confFile>>posy;
+            confFile>>posz;
+            confFile>>dummy;
+            confFile>>dummy;
+            confFile>>dummy;
+      
+            atoms[ti].posx = posx;
+            atoms[ti].posy = posy;
+            atoms[ti].posz = posz;
+            atoms[ti].id = id;
+            atoms[ti].belongsto = -1;
+            atoms[ti].issolid = 0; 
+        }
+
+        //reset stuff here
+  
+    }
+  
+ }
+ */
