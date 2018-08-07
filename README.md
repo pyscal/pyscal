@@ -1,261 +1,157 @@
 
+# Steinhardt Tools
+
+Steinhardt tools is a python library written in C++ to calculate and analyse Steinhardts parameters[1]. It provides the necessary tools to easily calculate and extend upon the Steinhardt parameters calculations.
+
+### Compilation
+
+The module has certain dependencies-
+
+* [pybind11](https://github.com/pybind/pybind11)
+  can be installed by pip using `pip install pybind11`
+
+* [pytest](https://docs.pytest.org/en/latest/)
+  can be installed by pip using `pip install pytest`
+
+After meeting dependencies, clone the Steinhardt tools repository.
+
+> Since a build is not released, as of now the module location needs to be added to PYTHONPATH
+
+The code can be compiled by using `make lib`.
+You can verify if everything works by typing `pytest` from the code folder.
+
+The module can be imported as-
+
 
 ```python
 import steinhardt as st
 ```
 
+### Documentation
 
-```python
-import numpy as np
-```
+This module has two main member classes - `Atom` and `System`. `Atom` class is used for storing the properties of a single atom whereas `System` has all the properties of the system. The functions in each modules can be accessed by
+`dir(st.Atom)` or `dir(st.System)`. The documentation for a member function can be accessed by `help(function_name)`. 
 
-
-```python
-%load_ext memory_profiler
-```
+##### Example
 
 
 ```python
-help(np.arange)
+help(st.System.calculate_nucsize)
 ```
 
-    Help on built-in function arange in module numpy.core.multiarray:
+    Help on method calculate_nucsize in module steinhardt:
     
-    arange(...)
-        arange([start,] stop[, step,], dtype=None)
+    calculate_nucsize(...) unbound steinhardt.System method
+        calculate_nucsize(self: steinhardt.System) -> int
         
-        Return evenly spaced values within a given interval.
         
-        Values are generated within the half-open interval ``[start, stop)``
-        (in other words, the interval including `start` but excluding `stop`).
-        For integer arguments the function is equivalent to the Python built-in
-        `range <http://docs.python.org/lib/built-in-funcs.html>`_ function,
-        but returns an ndarray rather than a list.
-        
-        When using a non-integer step, such as 0.1, the results will often not
-        be consistent.  It is better to use ``linspace`` for these cases.
+        Calculate the size of the largest cluster in the given system. Calculation
+        the size of the largest cluster needs various prerequisites that can be set
+        by the functions set_neighbordistance and set_nucsize_parameters. 
+        For a detailed description of how the calculation works see-
+        Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082
         
         Parameters
         ----------
-        start : number, optional
-            Start of interval.  The interval includes this value.  The default
-            start value is 0.
-        stop : number
-            End of interval.  The interval does not include this value, except
-            in some cases where `step` is not an integer and floating point
-            round-off affects the length of `out`.
-        step : number, optional
-            Spacing between values.  For any output `out`, this is the distance
-            between two adjacent values, ``out[i+1] - out[i]``.  The default
-            step size is 1.  If `step` is specified, `start` must also be given.
-        dtype : dtype
-            The type of the output array.  If `dtype` is not given, infer the data
-            type from the other input arguments.
+        None
         
         Returns
         -------
-        arange : ndarray
-            Array of evenly spaced values.
-        
-            For floating point arguments, the length of the result is
-            ``ceil((stop - start)/step)``.  Because of floating point overflow,
-            this rule may result in the last element of `out` being greater
-            than `stop`.
-        
-        See Also
-        --------
-        linspace : Evenly spaced numbers with careful handling of endpoints.
-        ogrid: Arrays of evenly spaced numbers in N-dimensions.
-        mgrid: Grid-shaped arrays of evenly spaced numbers in N-dimensions.
-        
-        Examples
-        --------
-        >>> np.arange(3)
-        array([0, 1, 2])
-        >>> np.arange(3.0)
-        array([ 0.,  1.,  2.])
-        >>> np.arange(3,7)
-        array([3, 4, 5, 6])
-        >>> np.arange(3,7,2)
-        array([3, 5])
+        cluster size : int
+            size of the largest cluster in number of atoms
     
 
 
+### Examples
 
-```python
-%%timeit -o -n 5
-%memit
-! python calculate_opmofast.py traj.light
-```
-
-    peak memory: 31.71 MiB, increment: 0.00 MiB
-    peak memory: 31.71 MiB, increment: 0.00 MiB
-    peak memory: 31.71 MiB, increment: 0.00 MiB
-    peak memory: 31.71 MiB, increment: 0.00 MiB
-    peak memory: 31.71 MiB, increment: 0.00 MiB
-    peak memory: 31.71 MiB, increment: 0.00 MiB
-    peak memory: 31.71 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    peak memory: 31.72 MiB, increment: 0.00 MiB
-    5 loops, best of 3: 691 ms per loop
-
-
-
-
-
-    <TimeitResult : 5 loops, best of 3: 691 ms per loop>
-
-
+The first step involved is creating a system.
 
 
 ```python
-%%timeit -o -n 5
-%memit
-! python calculate_opmofast2.py traj.light
+sys = st.System()
 ```
 
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    peak memory: 31.74 MiB, increment: 0.00 MiB
-    5 loops, best of 3: 798 ms per loop
-
-
-
-
-
-    <TimeitResult : 5 loops, best of 3: 798 ms per loop>
-
-
-
-
-```python
-%%timeit -o -n 5
-%memit
-! python calculate_opmolib.py traj.light
-```
-
-    peak memory: 31.75 MiB, increment: 0.01 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    peak memory: 31.75 MiB, increment: 0.00 MiB
-    5 loops, best of 3: 589 ms per loop
-
-
-
-
-
-    <TimeitResult : 5 loops, best of 3: 589 ms per loop>
-
-
-
-
-```python
-%%timeit -o -n 5
-%memit
-! python calculate_opmolib2.py traj.light
-```
-
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    peak memory: 31.77 MiB, increment: 0.00 MiB
-    5 loops, best of 3: 569 ms per loop
-
-
-
-
-
-    <TimeitResult : 5 loops, best of 3: 569 ms per loop>
-
-
-
-
-```python
-%%timeit -o -n 5
-%memit
-! python calculate_opmolib3.py traj.light
-```
-
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    peak memory: 31.78 MiB, increment: 0.00 MiB
-    5 loops, best of 3: 601 ms per loop
-
-
-
-
-
-    <TimeitResult : 5 loops, best of 3: 601 ms per loop>
-
-
-
-
-```python
-sys =st.System()
-```
+The system created now is empty and we need to fill it with data about atomic positions and simulation box. A sample [LAMMPS](https://lammps.sandia.gov/) dump file is given in `tests/conf.dump`. This file can be specified as the input file by 
 
 
 ```python
 sys.set_inputfile('tests/conf.dump')
 ```
 
+After setting the name of the input file, it needs to be read in, which is done using-
+
+
+```python
+sys.read_particle_file()
+```
+
+** Accessing atom information **  
+All access functions start with the letter 'g' for get and all the functions used to set values start with the letter 's' for set. Atom class has access functions for the position and id. However, we need to get an atom from the system. This can be done as follows- 
+
+
+
+```python
+atom1 = sys.gatom(2)
+type(atom1)
+```
+
+
+
+
+    steinhardt.Atom
+
+
+
+The `gatom` function return the atom from the list index that is given as the argument. Now we have the atom, and we can check its coordinates and id. There are more features of the atom that can be checked, which will be discussed further in the examples.
+
+
+```python
+coordinates = atom1.gx()
+coordinates
+```
+
+
+
+
+    [-0.947172, 10.3193, 11.3033]
+
+
+
+Now the coordinates of the atom can be modified, for example to check how the value of $\bar{q}$ parameters changes and it can be put back in its original location.
+
+
+```python
+coordinates[0] += 2.00
+atom1.sx(coordinates)
+sys.satom(atom1)
+```
+
+Now it is possible to extract another atom and calculate the distance between two atoms.
+
+
+```python
+atom2 = sys.gatom(3)
+sys.get_abs_distance(atom1,atom2)
+```
+
+
+
+
+    2.7748271598685195
+
+
+
+** Calculating the size of the largest cluster **  
+Next we will take a look at the calculation of the largest cluster size. A detailed description of each parameter and the method is available in [2], hence, we will skip the explanation here. There are certain parameters we need to set - namely cutoff distance to find neighbors, minimum number of solid neighbors, threshold and average threshold which can be set by-
+
+
 
 ```python
 sys.set_neighbordistance(3.63)
 sys.set_nucsize_parameters(7,0.5,0.5)
 ```
+
+Now the largest cluster size can be calculated.
 
 
 ```python
@@ -270,38 +166,76 @@ nuc
 
 
 
-
-```python
-a = st.Atom() 
-b = st.Atom()
-```
+There were a lot of properties that can be accessed. We can, for example, find the neighbors of an atom.
 
 
 ```python
-a = sys.gatom(1)
-b = sys.gatom(3)
-print a.gneighbors()
-print b.gx()
-```
-
-    [0L, 11L, 14L, 15L, 60L, 62L, 71L, 73L, 74L, 75L, 84L, 421L, 422L]
-    [-0.10301, -6.35752, -6.44787]
-
-
-
-```python
-sys.get_abs_distance(a,b)
-
+atom1 = sys.gatom(2)
+atom1.gneighbors()
 ```
 
 
 
 
-    3.71396015167099
+    [3L, 62L, 64L, 421L, 422L, 424L, 473L, 487L, 488L, 490L, 492L, 493L]
 
 
+
+It is possible to check if an atom is solid or not by the `gissolid` function which return a value of 1 if it is solid or 0 if it is not. 
 
 
 ```python
-
+atom1.gissolid()
 ```
+
+
+
+
+    0L
+
+
+
+This makes it very easy to calculate further properties, for example, the centre of mass of the solid cluster(assuming mass as unity). Start by getting all the atoms-
+
+
+```python
+atoms = sys.gallatoms()
+```
+
+Now we can loop over the solid ones
+
+
+```python
+#define sum variables
+count=0
+com = [0,0,0]
+
+#loop over all atoms
+for atom in atoms:
+    #check if it is a solid
+    if atom.gissolid():
+        #then add the coordinates
+        coord = atom.gx()
+        com[0]+=coord[0]
+        com[1]+=coord[1]
+        com[2]+=coord[2]
+        count+=1
+com[0]/=float(count)
+com[1]/=float(count)
+com[2]/=float(count)
+com
+```
+
+
+
+
+    [-3.918379215384615, 1.2204852923076925, 1.225490959076923]
+
+
+
+
+
+### References
+
+[1] Steinhardt, P. J., Nelson, D. R., & Ronchetti, M. (1983). Bond-orientational order in liquids and glasses. Physical Review B, 28(2), 784–805. http://doi.org/10.1103/PhysRevB.28.784  
+[2] Díaz Leines, G., Drautz, R., & Rogal, J. (2017). Atomistic insight into the non-classical nucleation mechanism during solidification in Ni. Journal of Chemical Physics, 146(15). http://doi.org/10.1063/1.4980082
