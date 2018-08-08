@@ -16,6 +16,7 @@ The module has certain dependencies-
 After meeting dependencies, clone the Steinhardt tools repository.
 
 > Since a build is not released, as of now the module location needs to be added to PYTHONPATH
+> or you can run from the same folder that the module is in.
 
 The code can be compiled by using `make lib`.
 You can verify if everything works by typing `pytest` from the code folder.
