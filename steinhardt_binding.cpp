@@ -359,6 +359,22 @@ PYBIND11_MODULE(steinhardt, m) {
                     )doc"
             )
 
+        .def("read_particle_instance",&System::read_particle_instance,
+            R"doc(
+                Read a single snapshot of the lammps dump file and assign the positions
+                and ids to an array of Atom objects stored in the parent class.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
         .def("get_abs_distance", (double (System::*) (Atom, Atom))  &System::get_abs_distance,
             R"doc(
                 Get the distance between two atoms.

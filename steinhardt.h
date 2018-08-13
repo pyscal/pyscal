@@ -89,6 +89,7 @@ class System{
         Atom* atoms;
     
         void read_particle_file();
+        void read_particle_instance(int,int);
         int calculate_nucsize();	//variant of function above
         int cluster_criteria(int,int );
         void find_solids();
