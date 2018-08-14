@@ -141,6 +141,100 @@ PYBIND11_MODULE(steinhardt, m) {
                 None.
                 )doc")
 
+        .def("gq",&Atom::gq,
+            R"doc(
+                get the qvalue of an atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                qval : double
+                    the corresponding qvalue.
+                )doc")
+
+        .def("sq",&Atom::sq,
+            R"doc(
+                sets the qvalue of an atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+                qval : double
+                    the corresponding qvalue.
+
+                Returns
+                -------
+                None.
+                )doc")
+
+        .def("gqlm",&Atom::gqlm,
+            R"doc(
+                get the real and imaginary qlm values of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                qlms : 2D array of 2q+1 values
+                    the first part of the array is the 2q+1 real values
+                    second part is the 2q+1 imaginary values.
+                )doc")
+
+        .def("gaq",&Atom::gaq,
+            R"doc(
+                get the aqvalue of an atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                qval : double
+                    the corresponding qvalue.
+                )doc")
+
+        .def("saq",&Atom::saq,
+            R"doc(
+                sets the aqvalue of an atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+                qval : double
+                    the corresponding qvalue.
+
+                Returns
+                -------
+                None.
+                )doc")
+
+        .def("gaqlm",&Atom::gaqlm,
+            R"doc(
+                get the real and imaginary aqlm values of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                qlms : 2D array of 2q+1 values
+                    the first part of the array is the 2q+1 real values
+                    second part is the 2q+1 imaginary values.
+                )doc")
+
     ; 
 
     //bindings and documentation for individual functions
@@ -343,6 +437,42 @@ PYBIND11_MODULE(steinhardt, m) {
             )
 
 
+        .def("gqvals",&System::gqvals,
+            R"doc(
+                return the required q values of all atoms.
+
+                Parameters
+                ----------
+                q : int
+                    required q value from 2-12
+
+                Returns
+                -------
+                qvals : list of double
+                    list of qth qvalue of all atoms.
+
+                    )doc"
+            )
+
+
+        .def("gaqvals",&System::gaqvals,
+            R"doc(
+                return the required aq values of all atoms.
+
+                Parameters
+                ----------
+                q : int
+                    required q value from 2-12
+
+                Returns
+                -------
+                qvals : list of double
+                    list of qth aqvalue of all atoms.
+
+                    )doc"
+            )
+
+
         .def("read_particle_file",&System::read_particle_file,
             R"doc(
                 Read a single snapshot of the lammps dump file and assign the positions
@@ -407,6 +537,57 @@ PYBIND11_MODULE(steinhardt, m) {
 
                     )doc"
             )
+
+
+        .def("calculate_q",&System::calculate_q,
+            R"doc(
+                Find the q  value for all atoms. The required q indices(2-12) should be set
+                using the set_reqd_qs function.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
+        .def("calculate_aq",&System::calculate_aq,
+            R"doc(
+                Find the averaged q  value for all atoms. The required q indices(2-12) should be set
+                using the set_reqd_qs function.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
+        .def("set_reqd_qs",&System::set_reqd_qs,
+            R"doc(
+                Set the list of qvalues to be calculated which will be done through 
+                calculate_q function.
+
+                Parameters
+                ----------
+                qlist : array of int
+                    a list of q values to be calculated from 2-12
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
 
         .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond,
             R"doc(
