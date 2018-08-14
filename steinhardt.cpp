@@ -1,7 +1,8 @@
 #include "steinhardt.h"
 #include <iostream>
 #include <iomanip>
-
+#include <algorithm>
+#include <stdio.h>
 
 System::System(){
     
@@ -73,6 +74,69 @@ void System::read_particle_file(){
     }
   
  }
+
+void System::read_particle_instance(int startblock,int natoms){
+    
+
+    string line,str;
+    //stringstream ss;
+    int count = 1;
+    int minc = 0;
+    double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
+    nop = natoms;
+    atoms = new Atom[nop];
+    int block = natoms +9;
+    double posx,posy,posz;
+    int id;
+    double dummy;
+    int idummy;
+    //cout<<startblock*block<<endl;
+    ifstream infile(inputfile.c_str());
+    
+    if (infile.is_open()){
+        while(getline(infile,line)){
+            //now we have to skip everything until the lines we need
+            if (count>startblock*block){
+                //this is in the reading range
+                if (count==6+startblock*block){
+                    sscanf(line.c_str(),"%lf %lf", &xsizeinf, &xsizesup);
+                    boxx = xsizesup - xsizeinf;
+                }
+                else if (count==7+startblock*block){
+                    sscanf(line.c_str(),"%lf %lf", &ysizeinf, &ysizesup);
+                    boxy = ysizesup - ysizeinf;
+                }
+                else if (count==8+startblock*block){
+                    sscanf(line.c_str(),"%lf %lf", &zsizeinf, &zsizesup);
+                    boxz = zsizesup - zsizeinf;
+                }
+
+                else if (count>9+startblock*block){
+                    sscanf(line.c_str(),"%d %d %lf %lf %lf %lf %lf %lf %lf", &id, &idummy, &dummy, &posx, &posy, &posz, &dummy, &dummy, &dummy);
+                    atoms[minc].posx = posx;
+                    atoms[minc].posy = posy;
+                    atoms[minc].posz = posz;
+                    atoms[minc].id = id;
+                    atoms[minc].belongsto = -1;
+                    atoms[minc].issolid = 0; 
+                    atoms[minc].loc = minc-9;
+                    minc++;
+
+                }
+
+                
+
+                if (count==block+startblock*block) { break; }
+
+
+            }
+            //cout<<"count "<<count<<endl;
+            //break loop if exceeded
+            count++;
+        }
+    }  
+}
+
 
 void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
 //dont know if this will be faster-
@@ -437,7 +501,7 @@ int System::calculate_nucsize()
 
         int greatestbelongsto;
         //Find all particles within a radius of neighbourdistancess
-        read_particle_file();
+        //read_particle_file();
         get_all_neighbors();
         //Get Q6 values
         calculate_complexQLM_6();
