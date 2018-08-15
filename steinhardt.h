@@ -15,7 +15,9 @@ using namespace std;
 const int MAXNUMBEROFNEIGHBORS = 100;
 const double PI = 3.141592653589793;
 const int NILVALUE = 33333333;
-const long int FACTORIALS[17] = {1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600,6227020800,87178291200,1307674368000,20922789888000};
+//const long int FACTORIALS[25] = {1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600,6227020800,87178291200,1307674368000,20922789888000};
+
+
 
 
 class Atom{
@@ -34,10 +36,8 @@ class Atom{
         double n_theta[MAXNUMBEROFNEIGHBORS];
         int n_neighbors;
 
-        double realQ4[9],imgQ4[9];
+
         double realQ6[13],imgQ6[13];
-        double arealQ4[9],aimgQ4[9];
-        double arealQ6[13],aimgQ6[13];
     
         int frenkelnumber;
         double avq6q6;
@@ -66,12 +66,32 @@ class Atom{
         void sx(vector<double>);
         void sid(int);
 
+
+        //variables for storing q2-12
+        //invidual variables or arrays - individual ones are easier!
+        double q[11];
+        double aq[11];
+        double realq[11][25];
+        double imgq[11][25];
+        double arealq[11][25];
+        double aimgq[11][25];
+        
+        double gq(int);
+        void sq(int, double);
+        vector <vector<double>> gqlm(int);
+
+        double gaq(int);
+        void saq(int, double);
+        vector <vector<double>> gaqlm(int);
+
 };
 
 
 class System{
   
     public:
+        
+        double dfactorial(int ,int );
         void convert_to_spherical_coordinates(double , double , double , double &, double &, double &);
         double PLM(int, int, double);
         void YLM(int , int , double , double , double &, double &);
@@ -99,7 +119,16 @@ class System{
         void set_inputfile(string);
         void set_neighbordistance(double);
         void assign_particles( vector<Atom>, vector<double>);
-    
+        //functions to set the list of reqd qs
+        //again, error checking would be amazing here.
+        void set_reqd_qs(vector<int>);
+        void set_reqd_aqs(vector<int>);
+        void calculate_q();
+        void calculate_aq();
+        int *reqdqs;
+        int lenqs;
+        int *reqdaqs;
+        int lenaqs;
         //old params
         int nop;
         int baseunit;
@@ -117,6 +146,14 @@ class System{
         int glargestclusterid();
         int gnop();
         vector<Atom> gallatoms();
+        vector<double> gqvals(int qq);
+        vector<double> gaqvals(int qq);
+        vector<int> rq_backup;
+        
+        //system flags
+        int neighborsfound;
+        int qsfound;
+        int fileread;
 
 };
 

@@ -8,6 +8,10 @@ System::System(){
     
     nop = -1;
     maxclusterid = -1;
+    neighborsfound = 0;
+    qsfound = 0;
+    fileread = 0;
+
 }
 
 System::~System(){
@@ -15,6 +19,43 @@ System::~System(){
     delete [] atoms;
 }
 
+
+double System::dfactorial(int l,int m){
+
+    double fac = 1.00;
+    for(int i=0;i<2*m;i++){
+        fac*=double(l+m-i);
+    }
+    return (1.00/fac);
+
+}
+
+void System::set_reqd_qs(vector <int> qs){
+
+    lenqs = qs.size();
+    reqdqs = new int[lenqs];
+    for(int i=0;i<lenqs;i++){
+        reqdqs[i] = qs[i];
+    }
+
+    rq_backup = qs;
+}
+
+
+void System::set_reqd_aqs(vector <int> qs){
+
+    lenaqs = qs.size();
+    reqdaqs = new int[lenaqs];
+    for(int i=0;i<lenaqs;i++){
+        for(int j=0;j<lenqs;j++){
+            if(qs[i]==reqdqs[j]) { reqdaqs[i] = qs[i]; }
+        }
+    }
+    //only qvlaues in the normal set will be included in the aq list
+    //check here if its in the qlist
+    //cout<<"corresponding q value should also be set."<<endl;
+
+}
 
 void System::read_particle_file(){
     
@@ -72,6 +113,8 @@ void System::read_particle_file(){
         }
   
     }
+
+    fileread = 1;
   
  }
 
@@ -161,7 +204,7 @@ void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
 
     atomitos.shrink_to_fit();
 
-
+    fileread = 1;
 }
 
 //needs two version of the function; one for fast inbuilt calculation.
@@ -206,10 +249,12 @@ double System::get_abs_distance(Atom atom1 , Atom atom2 ){
 
 void System::get_all_neighbors(){
 
+    
     double d;
     double diffx,diffy,diffz;
     double r,theta,phi;
 
+    if (!fileread) { read_particle_file(); }
 
     for (int ti = 0;ti<nop;ti++){
         
@@ -251,6 +296,9 @@ void System::get_all_neighbors(){
             }
         }
     }
+
+    //mark end of neighbor calc
+    neighborsfound = 1;
 
 }
 
@@ -301,7 +349,7 @@ void System::YLM(int l, int m, double theta, double phi, double &realYLM, double
     double factor;
     double m_PLM;
     m_PLM = PLM(l,m,cos(theta));
-    factor = ((2.0*double(l) + 1.0)*FACTORIALS[l-m]) / (4.0*PI*FACTORIALS[l+m]);
+    factor = ((2.0*double(l) + 1.0)/ (4.0*PI))*dfactorial(l,m);
     realYLM = sqrt(factor) * m_PLM * cos(double(m)*phi);
     imgYLM  = sqrt(factor) * m_PLM * sin(double(m)*phi);
 }
@@ -348,6 +396,128 @@ void System::calculate_complexQLM_6(){
             atoms[ti].realQ6[mi+6] = realti;
             atoms[ti].imgQ6[mi+6] = imgti;
         }
+    }
+}
+
+//calculation of any complex qval
+void System::calculate_q(){
+        
+    //nn = number of neighbors
+    int nn;
+    double realti,imgti;
+    double realYLM,imgYLM;
+    int q;
+    double summ;
+
+    //first make space in atoms for the number of qs needed - assign with null values
+    for(int ti=0;ti<nop;ti++){
+        for(int tj=0;tj<11;tj++){
+
+            atoms[ti].q[tj] = -1;
+            atoms[ti].aq[tj] = -1;
+            for(int tk=0;tk<25;tk++){
+                atoms[ti].realq[tj][tk] = 0;
+                atoms[ti].imgq[tj][tk] = 0;
+                atoms[ti].arealq[tj][tk] = 0;
+                atoms[ti].aimgq[tj][tk] = 0;
+            }    
+        }
+    }
+
+    //now check if neighbors are found
+    if (!neighborsfound){
+        get_all_neighbors();
+    }
+
+    //note that the qvals will be in -2 pos
+    //q2 will be in q0 pos and so on
+        
+    // nop = parameter.nop;
+    for (int ti= 0;ti<nop;ti++){
+        
+        nn = atoms[ti].n_neighbors;
+        for(int tq=0;tq<lenqs;tq++){
+            //find which q?
+            q = reqdqs[tq];
+            //cout<<q<<endl;
+            summ = 0;
+            for (int mi = -q;mi < q+1;mi++){                        
+                realti = 0.0;
+                imgti = 0.0;
+                for (int ci = 0;ci<nn;ci++){
+                                
+                    QLM(q,mi,atoms[ti].n_theta[ci],atoms[ti].n_phi[ci],realYLM, imgYLM);
+                    realti += realYLM;
+                    imgti += imgYLM;
+                }
+            
+            realti = realti/(double(nn));
+            imgti = imgti/(double(nn));
+            
+            atoms[ti].realq[q-2][mi+q] = realti;
+            atoms[ti].imgq[q-2][mi+q] = imgti;
+            
+            summ+= realti*realti + imgti*imgti;
+            }
+            //normalise summ
+            summ = pow(((4.0*PI/(2*q+1)) * summ),0.5);
+            atoms[ti].q[q-2] = summ;
+
+        }
+
+    }
+
+    qsfound = 1;
+}
+
+
+//calculation of any complex aqval
+void System::calculate_aq(){
+        
+    //nn = number of neighbors
+    int nn;
+    double realti,imgti;
+    //double realYLM,imgYLM;
+    int q;
+    double summ;
+
+    if (!qsfound) { set_reqd_qs(rq_backup); calculate_q(); }
+    //note that the qvals will be in -2 pos
+    //q2 will be in q0 pos and so on
+        
+    // nop = parameter.nop;
+    for (int ti= 0;ti<nop;ti++){
+        
+        nn = atoms[ti].n_neighbors;
+        
+        for(int tq=0;tq<lenqs;tq++){
+            //find which q?
+            q = reqdqs[tq];
+            //cout<<q<<endl;
+            summ = 0;
+            for (int mi = 0;mi < 2*q+1;mi++){                        
+                realti = atoms[ti].realq[q-2][mi];
+                imgti = atoms[ti].imgq[q-2][mi];
+                for (int ci = 0;ci<nn;ci++){
+                                
+                    realti += atoms[atoms[ti].neighbors[ci]].realq[q-2][mi];
+                    imgti += atoms[atoms[ti].neighbors[ci]].imgq[q-2][mi];
+                }
+            
+            realti = realti/(double(nn+1));
+            imgti = imgti/(double(nn+1));
+            
+            atoms[ti].arealq[q-2][mi] = realti;
+            atoms[ti].aimgq[q-2][mi] = imgti;
+            
+            summ+= realti*realti + imgti*imgti;
+            }
+            //normalise summ
+            summ = pow(((4.0*PI/(2*q+1)) * summ),0.5);
+            atoms[ti].aq[q-2] = summ;
+
+        }
+
     }
 }
 
@@ -529,7 +699,8 @@ void System::satom(Atom atom1) {
 }
 
 //add function to return nop
-int System::gnop() { return nop; } 
+int System::gnop() { return nop; }
+//int System::gnop() { return nop; } 
 //add function to pack and return the whole set of atoms
 vector<Atom> System::gallatoms(){
     vector<Atom> allatoms;
@@ -542,6 +713,26 @@ vector<Atom> System::gallatoms(){
 }
 
 int System::glargestclusterid() { return maxclusterid; }
+
+vector<double> System::gqvals(int qq){
+    vector<double> qres;
+    qres.reserve(nop);
+    for(int i=0;i<nop;i++){
+        qres.emplace_back(atoms[i].q[qq-2]);
+    }
+
+    return qres;    
+}
+
+vector<double> System::gaqvals(int qq){
+    vector<double> qres;
+    qres.reserve(nop);
+    for(int i=0;i<nop;i++){
+        qres.emplace_back(atoms[i].aq[qq-2]);
+    }
+
+    return qres;    
+}
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------
 Atom::Atom(){ }
@@ -578,75 +769,50 @@ void Atom::sx(vector<double> xx){
 }
 
 void Atom::sid(int n){ id = n; }
-//double Atom::gy( return posy; )
-//double Atom::gz( return posz; )
-//
-//
-/*
-void Filehandling::read_whole_file(string inputfile){
+double Atom::gq(int qq){ return q[qq-2]; }
+void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
+
+vector<vector <double>> Atom::gqlm(int qq) {
+
+    vector< vector <double>> qlms;
+    vector <double> rqlms;
+    vector <double> iqlms;
+    qlms.reserve(2);
+    rqlms.reserve(2*qq+1);
+    iqlms.reserve(2*qq+1);
     
-    double posx,posy,posz;
-    int id;
-    double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
-    double dummy;                        //dummy variable
-    char dummy_char[256];
-    string dummystr;                //dummy line
-    ifstream confFile(inputfile.c_str());
-  
-    vector<Atom> atoms;
-    vector<double> simbox;
-    vector<vector<Atom>> all_atoms;
-
-
-    int count=0;
-
-    while(getline(confFile,dummystr)){ 
-        
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-        confFile >> nop;
-       
-        atoms.reserve(nop);
-    
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-        confFile >> xsizeinf;
-        confFile >> xsizesup;
-        confFile >> ysizeinf;
-        confFile >> ysizesup;
-        confFile >> zsizeinf;
-        confFile >> zsizesup;;
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-  
-        boxx = xsizesup - xsizeinf;
-        boxy = ysizesup - ysizeinf;
-        boxz = zsizesup - zsizeinf;
-
-        //so lets read the particles positions
-        for (int ti = 0;ti<nop;ti++){
-            confFile>>id;
-            confFile>>dummy;
-            confFile>>dummy;
-            confFile>>posx;
-            confFile>>posy;
-            confFile>>posz;
-            confFile>>dummy;
-            confFile>>dummy;
-            confFile>>dummy;
-      
-            atoms[ti].posx = posx;
-            atoms[ti].posy = posy;
-            atoms[ti].posz = posz;
-            atoms[ti].id = id;
-            atoms[ti].belongsto = -1;
-            atoms[ti].issolid = 0; 
-        }
-
-        //reset stuff here
-  
+    for(int i=0;i<(2*qq+1);i++){
+        rqlms.emplace_back(realq[qq-2][i]);
+        iqlms.emplace_back(imgq[qq-2][i]);
     }
-  
- }
- */
+
+    qlms.emplace_back(rqlms);
+    qlms.emplace_back(iqlms);
+
+    return qlms;
+
+}
+
+double Atom::gaq(int qq){ return aq[qq-2]; }
+void Atom::saq(int qq, double qval){ aq[qq-2] = qval; }
+
+vector<vector <double>> Atom::gaqlm(int qq) {
+
+    vector< vector <double>> qlms;
+    vector <double> rqlms;
+    vector <double> iqlms;
+    qlms.reserve(2);
+    rqlms.reserve(2*qq+1);
+    iqlms.reserve(2*qq+1);
+    
+    for(int i=0;i<(2*qq+1);i++){
+        rqlms.emplace_back(arealq[qq-2][i]);
+        iqlms.emplace_back(aimgq[qq-2][i]);
+    }
+
+    qlms.emplace_back(rqlms);
+    qlms.emplace_back(iqlms);
+
+    return qlms;
+
+}
