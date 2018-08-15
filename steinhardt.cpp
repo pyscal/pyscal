@@ -11,41 +11,22 @@ System::System(){
     qsfound = 0;
     fileread = 0;
 
-
-    //factorial table
-    FACTORIALS[0] = 1;
-    FACTORIALS[1] = 1;
-    FACTORIALS[2] = 2;
-    FACTORIALS[3] = 6;
-    FACTORIALS[4] = 24;
-    FACTORIALS[5] = 120;
-    FACTORIALS[6] = 720;
-    FACTORIALS[7] = 5040;
-    FACTORIALS[8] = 40320;
-    FACTORIALS[9] = 362880;
-    FACTORIALS[10] = 3628800;
-    FACTORIALS[11] = 39916800;
-    FACTORIALS[12] = 479001600;
-    FACTORIALS[13] = 6227020800;
-    FACTORIALS[14] = 87178291200;
-    FACTORIALS[15] = 1307674368000;
-    FACTORIALS[16] = 20922789888000;
-    FACTORIALS[17] = FACTORIALS[16]*17;
-    FACTORIALS[18] = FACTORIALS[17]*18;
-    FACTORIALS[19] = FACTORIALS[18]*19;
-    FACTORIALS[20] = FACTORIALS[19]*20;
-    FACTORIALS[21] = FACTORIALS[20]*21;
-    FACTORIALS[22] = FACTORIALS[21]*22;
-    FACTORIALS[23] = FACTORIALS[22]*23;
-    FACTORIALS[24] = FACTORIALS[23]*24;
-    FACTORIALS[25] = FACTORIALS[24]*25;
-    FACTORIALS[26] = FACTORIALS[25]*26;
-    FACTORIALS[27] = FACTORIALS[26]*27;
 }
 
 System::~System(){
     
     delete [] atoms;
+}
+
+
+double System::dfactorial(int l,int m){
+
+    double fac = 1.00;
+    for(int i=0;i<2*m;i++){
+        fac*=double(l+m-i);
+    }
+    return (1.00/fac);
+
 }
 
 void System::set_reqd_qs(vector <int> qs){
@@ -304,7 +285,7 @@ void System::YLM(int l, int m, double theta, double phi, double &realYLM, double
     double factor;
     double m_PLM;
     m_PLM = PLM(l,m,cos(theta));
-    factor = ((2.0*double(l) + 1.0)*FACTORIALS[l-m]) / (4.0*PI*FACTORIALS[l+m]);
+    factor = ((2.0*double(l) + 1.0)/ (4.0*PI))*dfactorial(l,m);
     realYLM = sqrt(factor) * m_PLM * cos(double(m)*phi);
     imgYLM  = sqrt(factor) * m_PLM * sin(double(m)*phi);
 }
@@ -654,7 +635,8 @@ void System::satom(Atom atom1) {
 }
 
 //add function to return nop
-int System::gnop() { return nop; } 
+int System::gnop() { return nop; }
+//int System::gnop() { return nop; } 
 //add function to pack and return the whole set of atoms
 vector<Atom> System::gallatoms(){
     vector<Atom> allatoms;

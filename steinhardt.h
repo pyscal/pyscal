@@ -91,7 +91,7 @@ class System{
   
     public:
         
-        long int FACTORIALS[28];
+        double dfactorial(int ,int );
         void convert_to_spherical_coordinates(double , double , double , double &, double &, double &);
         double PLM(int, int, double);
         void YLM(int , int , double , double , double &, double &);
