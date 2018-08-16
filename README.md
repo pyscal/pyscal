@@ -86,7 +86,7 @@ After setting the name of the input file, it needs to be read in, which is done 
 sys.read_particle_file()
 ```
 
-** Accessing atom information **  
+*Accessing atom information*  
 All access functions start with the letter 'g' for get and all the functions used to set values start with the letter 's' for set. Atom class has access functions for the position and id. However, we need to get an atom from the system. This can be done as follows- 
 
 
@@ -142,7 +142,7 @@ sys.get_abs_distance(atom1,atom2)
 
 
 
-** Calculating the size of the largest cluster **  
+*Calculating the size of the largest cluster*  
 Next we will take a look at the calculation of the largest cluster size. A detailed description of each parameter and the method is available in [2], hence, we will skip the explanation here. There are certain parameters we need to set - namely cutoff distance to find neighbors, minimum number of solid neighbors, threshold and average threshold which can be set by-
 
 
