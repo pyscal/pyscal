@@ -7,7 +7,7 @@
 namespace py = pybind11;
 using namespace std;
 
-PYBIND11_MODULE(steinhardt, m) {
+PYBIND11_MODULE(_steinhardt, m) {
 
 //bindings for Atom class
 //------------------------------------------------------------------
