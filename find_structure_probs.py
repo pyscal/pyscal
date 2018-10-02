@@ -16,7 +16,7 @@ fccfile = 'traj.fcc.histo.npy'
 hcpfile = 'traj.hcp.histo.npy'
 lqdfile = 'traj.lqd.histo.npy'
 qspace = [4,6]
-cutoff = 0.0001
+cutoff = 0.00001
 rcut   = 3.63
 histomin = 0.0
 histomax = 0.60
@@ -84,45 +84,47 @@ for count,sys in enumerate(systems):
     netfcc=0
     nethcp=0
     netlqd=0
-    for i in range(len(aq4)):
-        pair = [aq4[i],aq6[i]]
-        #binn = np.digitize(aq4[i],bins=(xaxis,xaxis))
-        newhisto,edgex,edgey = np.histogram2d([aq4[i]],[aq6[i]],bins=(xaxis,xaxis))
-        #print bcchisto[np.nonzero(newhisto)]
-        #newhistoint = (newhisto>0).astype(int)
-        bccprob = bcchisto[np.nonzero(newhisto)][0]
-        fccprob = fcchisto[np.nonzero(newhisto)][0]
-        hcpprob = hcphisto[np.nonzero(newhisto)][0]
-        lqdprob = lqdhisto[np.nonzero(newhisto)][0]
-        
+    netudf=0
 
-        #bccprob = bccprob[np.nonzero(bccprob)]
-        #print bccprob[np.nonzero(bccprob)]
-        #hcpprob = hcpprob[np.nonzero(hcpprob)]
-        #print hcpprob[np.nonzero(hcpprob)]
-        #fccprob = fccprob[np.nonzero(fccprob)]
-        #lqdprob = lqdprob[np.nonzero(lqdprob)]
+    for i in range(len(aq4)):
+        aq4bin = np.digitize([aq4[i]],bins=xaxis,right=True)[0]-1
+        aq6bin = np.digitize([aq6[i]],bins=xaxis,right=True)[0]-1
+
+        bccprob = bcchisto[aq4bin,aq6bin]
+        fccprob = fcchisto[aq4bin,aq6bin]
+        hcpprob = hcphisto[aq4bin,aq6bin]
+        lqdprob = lqdhisto[aq4bin,aq6bin]
+        udfprob = 0.0
         #we need to correct the probabilities now
         probsum = bccprob+fccprob+hcpprob+lqdprob
-        clogger2.info("%f %f %f %f"%(bccprob,fccprob,hcpprob,lqdprob))
+
+        #account for zero or less probsum
+        if probsum<=cutoff:
+            udfprob=1.0-probsum
+            probsum=1
+
+        clogger2.info("%f %f %f %f %f"%(bccprob,fccprob,hcpprob,lqdprob,udfprob))
         bccprob/=probsum
         fccprob/=probsum
         hcpprob/=probsum
         lqdprob/=probsum
         #print the values
-        clogger.info("%f %f %f %f"%(bccprob,fccprob,hcpprob,lqdprob))
+        #print(bccprob)
+        clogger.info("%f %f %f %f %f"%(bccprob,fccprob,hcpprob,lqdprob,udfprob))
 
         netbcc+=bccprob
         netfcc+=fccprob
         nethcp+=hcpprob
         netlqd+=lqdprob
+        netudf+=udfprob
 
     netbcc/=float(len(aq4))
     netfcc/=float(len(aq4))
     nethcp/=float(len(aq4))
     netlqd/=float(len(aq4))
+    netudf/=float(len(aq4))
 
-    print("%d %f %f %f %f"%(count+1,netbcc,netfcc,nethcp,netlqd))
+    print("%d %f %f %f %f %f"%(count+1,netbcc,netfcc,nethcp,netlqd,netudf))
 
     #newhisto,edgex,edgey = np.histogram2d(aq4,aq6,bins=(xaxis,xaxis))
     #now get all nonzero bins of this histo
