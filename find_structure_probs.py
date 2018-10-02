@@ -65,6 +65,11 @@ fcchisto = np.load(fccfile,mmap_mode='r')
 hcphisto = np.load(hcpfile,mmap_mode='r')
 lqdhisto = np.load(lqdfile,mmap_mode='r')
 
+#start files for output
+peratom = open('structure_per_atom.dat','w')
+peratomn = open('structure_nonnormalised_per_atom.dat','w')
+persystem = open('structure_per_step.dat','w')
+
 #convert the data from infile to systems
 systems = st.traj_to_systems(filename)
             
@@ -75,6 +80,9 @@ for count,sys in enumerate(systems):
     #get q4 and q6 arrays
     aq4=sys.gaqvals(qspace[0])
     aq6=sys.gaqvals(qspace[1])
+    #get atom ids for this system
+    atomids = [atom.gid() for atom in systems[count].gallatoms()]
+
     #get the bins of all the values to be binnerd
     #aqs = np.stack((aq4,aq6),axis=-1)
     #print type(aqs)
@@ -103,14 +111,14 @@ for count,sys in enumerate(systems):
             udfprob=1.0-probsum
             probsum=1
 
-        clogger2.info("%f %f %f %f %f"%(bccprob,fccprob,hcpprob,lqdprob,udfprob))
+        peratomn.write("%5d %10.4f %10.4f %10.4f %10.4f %10.4f\n"%(atomids[i],bccprob,fccprob,hcpprob,lqdprob,udfprob))
         bccprob/=probsum
         fccprob/=probsum
         hcpprob/=probsum
         lqdprob/=probsum
         #print the values
         #print(bccprob)
-        clogger.info("%f %f %f %f %f"%(bccprob,fccprob,hcpprob,lqdprob,udfprob))
+        peratom.write("%5d %10.4f %10.4f %10.4f %10.4f %10.4f\n"%(atomids[i],bccprob,fccprob,hcpprob,lqdprob,udfprob))
 
         netbcc+=bccprob
         netfcc+=fccprob
@@ -124,7 +132,7 @@ for count,sys in enumerate(systems):
     netlqd/=float(len(aq4))
     netudf/=float(len(aq4))
 
-    print("%d %f %f %f %f %f"%(count+1,netbcc,netfcc,nethcp,netlqd,netudf))
+    persystem.write("%5d %10.4f %10.4f %10.4f %10.4f %10.4f\n"%(count+1,netbcc,netfcc,nethcp,netlqd,netudf))
 
     #newhisto,edgex,edgey = np.histogram2d(aq4,aq6,bins=(xaxis,xaxis))
     #now get all nonzero bins of this histo
@@ -136,3 +144,6 @@ for count,sys in enumerate(systems):
     #lqdprob = newhistoint*lqdhisto
     #finally print each prob and we are done?
 
+peratom.close()
+peratomn.close()
+persystem.close()
