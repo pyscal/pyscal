@@ -16,7 +16,7 @@ fccfile = 'traj.fcc.histo.npy'
 hcpfile = 'traj.hcp.histo.npy'
 lqdfile = 'traj.lqd.histo.npy'
 qspace = [4,6]
-cutoff = 0.00001
+cutoff = 0.00005
 rcut   = 3.63
 histomin = 0.0
 histomax = 0.60
@@ -133,6 +133,7 @@ for count,sys in enumerate(systems):
     netudf/=float(len(aq4))
 
     persystem.write("%5d %10.4f %10.4f %10.4f %10.4f %10.4f\n"%(count+1,netbcc,netfcc,nethcp,netlqd,netudf))
+    print("%5d %10.4f %10.4f %10.4f %10.4f %10.4f"%(count+1,netbcc,netfcc,nethcp,netlqd,netudf))
 
     #newhisto,edgex,edgey = np.histogram2d(aq4,aq6,bins=(xaxis,xaxis))
     #now get all nonzero bins of this histo

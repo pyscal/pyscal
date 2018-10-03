@@ -5,11 +5,12 @@ Takes one argument - name of the input trajectory file.
 By default calculates the q4,q6 space. However this can be easily modified by changing the variable qspace
 written by srm
 """
-
+from __future__ import print_function
 import steinhardt as st
 import numpy as np
 import sys
 import logging
+import os
 #import matplotlib.pyplot as plt
 ##############################################################
 #nput to modify
@@ -20,6 +21,7 @@ rcut   = 3.63
 histomin = 0.0
 histomax = 0.60
 histobins = 1000
+histoarea = ((histomax-histomin)/float(histobins))**2
 #cutoff <= sum(histo(n)-histo(n-1))/(number of non zero grids)
 ##############################################################
 logger = logging.getLogger(__name__)
@@ -43,6 +45,7 @@ clogger.propagate = False
 
 #get the infile
 infile = sys.argv[1]
+natoms = int(sys.argv[2])
 
 #checkfor dimension of qspace
 if len(qspace)!=2:
@@ -52,7 +55,9 @@ if len(qspace)!=2:
 logger.info("infile name is %s"%infile)
 
 #convert the data from infile to systems
-systems = st.traj_to_systems(infile)
+#systems = st.traj_to_systems2(infile,natoms=1372,nsteps=100)
+#systems = st.traj_to_systems(infile)
+systems,files = st.traj_to_systems3(infile,natoms)
 
 #some histo params
 xaxis = np.linspace(histomin,histomax,histobins)
@@ -68,54 +73,65 @@ aq6=[]
 #now start calculating one by one
 converged=False
 for i in range(len(systems)):
+    systems[i].read_particle_file()
     systems[i].set_neighbordistance(rcut)
     systems[i].set_reqd_qs(qspace)
     systems[i].calculate_aq()
+    os.remove(files[i])
 
     #collect the arrays
-    aq4 = np.concatenate((aq4,systems[i].gaqvals(qspace[0])))
-    aq6 = np.concatenate((aq6,systems[i].gaqvals(qspace[1])))
-
+    #aq4 = np.concatenate((aq4,systems[i].gaqvals(qspace[0])))
+    #aq6 = np.concatenate((aq6,systems[i].gaqvals(qspace[1])))
+    aq4 = systems[i].gaqvals(qspace[0])
+    aq6 = systems[i].gaqvals(qspace[1])
+    #now remove te=he systems
+    systems[i] = 0.0
+    
     #now calculate the newhisto
     newhisto,edgex,edgey = np.histogram2d(aq4,aq6,bins=(xaxis,xaxis))
-    #newhisto = oldhisto + newhistos
+    newhisto = newhisto + oldhisto
     #norm both old and new histo
     oldhistosum = np.sum(oldhisto)
     newhistosum = np.sum(newhisto)
-
+    #print(oldhistosum)
     #create the normed histos
     if oldhistosum>0:
-        normedold = oldhisto/float(oldhistosum)
+        normedold = oldhisto/(float(oldhistosum)*histoarea)
     else:
         normedold = oldhisto
     if newhistosum>0:
-        normednew = newhisto/float(newhistosum)
+        normednew = newhisto/(float(newhistosum)*histoarea)
     else:
         normednew = newhisto
 
     #print type(normednew)
     #find the difference between old and new
     diff = normednew-normedold
+    diff = np.abs(diff)*histoarea
+    diff = np.sum(diff)
     #diff = newhisto-oldhisto
     #print diff
     #print np.sum(diff)
     #print "old sum is: %f new sum is %f"%(np.sum(normedold),np.sum(normednew))
     #find number of non zero entries in new
-    nonzero = np.count_nonzero(normednew)
+    #nonzero = np.count_nonzero(normednew)
 
-    diffsum = np.sum(np.abs(diff))
+    #diffsum = np.sum(np.abs(diff))
 
-    diff_factor = diffsum/float(nonzero)
+    #diff_factor = diffsum/float(nonzero)
 
-    maxdiff = np.amax(np.abs(diff))
-
+    #maxdiff = np.amax(np.abs(diff))
+    #test = normednew*histoarea
+    #test = np.sum(test)
+    #print(test)
     #print the diff factor
-    logger.info("diff after adding %d systems is %f and sum is %f, max diff is %f"%(i+1,diff_factor,diffsum,maxdiff))
-    clogger.info("%d %f %f %f"%(i+1,diff_factor,diffsum,maxdiff))
+    logger.info("diff after adding %d systems is %f "%(i+1,diff))
+    print("diff after adding %d systems is %f "%(i+1,diff))
+    clogger.info("%d %f "%(i+1,diff))
     #now update the infos
     oldhisto=newhisto
 
-    if (diffsum<=cutoff):
+    if (diff<=cutoff):
         logger.info("histograms are converged after %d systems"%i+1)
         converged=True
         break

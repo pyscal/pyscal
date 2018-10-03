@@ -2,13 +2,50 @@
 from _steinhardt import *
 import numpy as np
 #import sys
+import mmap
+
 
 def sum_nos(a,b):
     return a+b
 
+def traj_to_systems3(filename,natoms):
+    
+    #filename = sys.argv[1]
+    #natoms=int(sys.argv[2])
+    nblock = natoms+9
+    startblock = 0
+    count=1
+    files = []
+    with open(filename) as infile:
+        for line in infile:
+            if(count==1):
+                ff = 'snap.'+str(startblock)+'.dat'
+                files.append(ff)
+                fout = open(ff,'w')
+                fout.write(line)
+                #count+=1
+            elif(count<nblock):
+                fout.write(line)
+                #count+=1
+
+            else:
+                fout.write(line)
+                fout.close()
+                count=0
+                startblock+=1
+            count+=1
+
+    #qtraj = getQTrajectory(files)
+    systems=[]
+    for file in files:
+        sys = System()
+        sys.set_inputfile(file)
+        systems.append(sys)
+    return systems,files
 
 
-def traj_to_systems(filename):
+
+def traj_to_systems(filename,map=False):
     """
     Function to convert a trajfile to systems and return them.
 
@@ -16,6 +53,8 @@ def traj_to_systems(filename):
     ----------
     filename : string
         the name of the input file
+    map : bool
+        use memory map if True, False otherwise
 
     Returns
     -------
@@ -25,10 +64,16 @@ def traj_to_systems(filename):
     atoms = []
     systems=[]
 
-    with open(filename) as infile:
+    with open(filename,"r+") as infile:
+        if map:
+            map = mmap.mmap(infile.fileno(),0)
+            iterval = iter(map.readline,"")
+        else:
+            iterval = infile
+
         count = 1
         timestep = 0
-        for line in infile:
+        for line in iterval:
             #print count
             if count==4:
                 natoms = int(line.strip())
@@ -70,6 +115,7 @@ def traj_to_systems(filename):
             count+=1
     return systems
 
+
 #def systems_to_traj(systems,titles=None,values=None):
     """
     Function to write down a list of systems as traj,along with other per atom
@@ -95,3 +141,4 @@ def traj_to_systems(filename):
         Each element must have 
 
     """
+
