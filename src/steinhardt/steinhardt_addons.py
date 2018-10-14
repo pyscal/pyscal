@@ -1,5 +1,5 @@
 
-from _steinhardt import *
+from steinhardt import *
 import numpy as np
 #import sys
 import mmap

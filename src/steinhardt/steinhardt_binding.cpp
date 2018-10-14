@@ -7,11 +7,11 @@
 namespace py = pybind11;
 using namespace std;
 
-PYBIND11_MODULE(_steinhardt, m) {
+PYBIND11_PLUGIN(steinhardt) {
 
 //bindings for Atom class
 //------------------------------------------------------------------
-
+    py::module m("steinhardt");
     py::class_<Atom>(m,"Atom")
         .def(py::init< >())     
         .def("gx",&Atom::gx,
