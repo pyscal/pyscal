@@ -3,23 +3,9 @@
 
 Steinhardt tools is a python library written in C++ to calculate and analyse Steinhardts parameters[1]. It provides the necessary tools to easily calculate and extend upon the Steinhardt parameters calculations.
 
-### Compilation
+### Installation
 
-The module has certain dependencies-
-
-* [pybind11](https://github.com/pybind/pybind11)
-  can be installed by pip using `pip install pybind11`
-
-* [pytest](https://docs.pytest.org/en/latest/)
-  can be installed by pip using `pip install pytest`
-
-After meeting dependencies, clone the Steinhardt tools repository.
-
-> Since a build is not released, as of now the module location needs to be added to PYTHONPATH
-> or you can run from the same folder that the module is in.
-
-The code can be compiled by using `make lib`.
-You can verify if everything works by typing `pytest` from the code folder.
+The module can be installed by using `pip install ./SteinhardtTools` after cloning the repository.
 
 The module can be imported as-
 
