@@ -10,7 +10,7 @@ import sys
 import logging
 import os
 
-def create_histograms(systems,histovars,cutoff,textfile=False,outfile=""):
+def create_histograms(systems,qspace,histovars,cutoff,textfile=False,outfile=""):
     """
     Calculate the probability distributions for identifying the structures.
 
@@ -24,6 +24,10 @@ def create_histograms(systems,histovars,cutoff,textfile=False,outfile=""):
         beforehand. See-
         steinhardt.System.set_neighbordistance()
         steinhardt.System.set_reqd_qs([x,y]) : only 2 d qspace can be used
+    
+    qspace : array of dim 2
+        The qspace on which the histogram is to be calculated. It should be 
+        two dimensional.
 
     histovars : array of dim 3
         Array of three quantities required for calculation of histograms, namely,
@@ -64,8 +68,10 @@ def create_histograms(systems,histovars,cutoff,textfile=False,outfile=""):
     aq4=[]
     aq6=[]
 
+
     converged=False
     for i in range(len(systems)):
+        systems[i].set_reqd_qs(qspace)
         systems[i].calculate_aq()
         
         aq4 = systems[i].gaqvals(qspace[0])
@@ -106,12 +112,12 @@ def create_histograms(systems,histovars,cutoff,textfile=False,outfile=""):
 
     #save as np array format
     if outfile == "":
-        outfile = infile+".histo.npy"
+        outfile = "structure.histo.npy"
     np.save(outfile,normednew)
     
     if textfile:
         summ = 0
-        outfile = infile+".histo.dat"
+        outfile = "structure.histo.dat"
         with open(outfile,'w') as fout:
             for i in range(histobins-1):
                 for j in range(histobins-1):
@@ -123,7 +129,7 @@ def create_histograms(systems,histovars,cutoff,textfile=False,outfile=""):
     return converged, pdiff
 
     
-def find_structure_probs(systems,histovars,cutoff,histofiles,peratom=False,normed=True, textfile=False, outfile=""):
+def find_structure_probs(systems, qspace, histovars,cutoff,histofiles,peratom=False,normed=True, textfile=False, outfile="", assigntosystems=False):
     """
     Calculate the probability distributions for identifying the structures.
 
@@ -137,6 +143,10 @@ def find_structure_probs(systems,histovars,cutoff,histofiles,peratom=False,norme
         beforehand. See-
         steinhardt.System.set_neighbordistance()
         steinhardt.System.set_reqd_qs([x,y]) : only 2 d qspace can be used
+
+    qspace : array of dim 2
+        The qspace on which the histogram is to be calculated. It should be 
+        two dimensional.
 
     histovars : array of dim 3
         Array of three quantities required for calculation of histograms, namely,
@@ -157,6 +167,12 @@ def find_structure_probs(systems,histovars,cutoff,histofiles,peratom=False,norme
     normed : bool
         If True the structural files will be written out with normalised probabilities
         False otherwise
+    
+    assigntosystems : bool
+        If True the structure is assigned to individual atoms of the system and 
+        systems are returned. The values of the structure would be from 1 to n, in order
+        of the histogram files provided. If it does not ebelong to all structure, 
+        a value of 0 will be given.
 
     """
     xaxis = np.linspace(histovars[0],histovars[1],histovars[2])
@@ -164,16 +180,18 @@ def find_structure_probs(systems,histovars,cutoff,histofiles,peratom=False,norme
     #now open the .npy files in mmap mode
     probmaps = []
     for file in histofiles:
-        probmaps.append(np.load(file,mmap_mode='r'))
+        probmaps.append(np.load(file))
     nstructs = len(probmaps)
 
     alltimedata = []
+    alltimeperatomdata = []
     for count,sys in enumerate(systems):
+        sys.set_reqd_qs(qspace)
         sys.calculate_aq()
         #get q4 and q6 arrays
         aq4=sys.gaqvals(qspace[0])
         aq6=sys.gaqvals(qspace[1])
-        
+        snapatomdata = []
         #get atom ids for this system
         atomids = [atom.gid() for atom in systems[count].gallatoms()]
 
@@ -201,11 +219,24 @@ def find_structure_probs(systems,histovars,cutoff,histofiles,peratom=False,norme
             #write out the per atom values here if reqd
             ###########################################
             ###########################################
-            
+            if peratom:
+                sprobsmod = np.insert(sprobs,0,atomids[i])
+                snapatomdata.append(sprobsmod)
             netstruct += sprobs
 
+        alltimeperatomdata.append(snapatomdata)
         #now norm netstructs
         netstruct /= float(len(aq4))
+        alltimedata.append(netstruct)
+
+    if outfile == "":
+        outfile = ".".join("structure",)
+    np.save(outfile,alltimedata)
+
+    if peratom:
+        atomoutfile = ".".join([outfile,"atom"])
+        np.save(atomoutfile,alltimeperatomdata)
+
 
 
 

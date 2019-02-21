@@ -12,7 +12,36 @@ def traj_to_systems3(filename,natoms):
     
     #filename = sys.argv[1]
     #natoms=int(sys.argv[2])
+    nblock = natoms+9
+    startblock = 0
+    count=1
+    files = []
+    with open(filename) as infile:
+        for line in infile:
+            if(count==1):
+                ff = 'snap.'+str(startblock)+'.dat'
+                files.append(ff)
+                fout = open(ff,'w')
+                fout.write(line)
+                #count+=1
+            elif(count<nblock):
+                fout.write(line)
+                #count+=1
 
+            else:
+                fout.write(line)
+                fout.close()
+                count=0
+                startblock+=1
+            count+=1
+
+    #qtraj = getQTrajectory(files)
+    systems=[]
+    for file in files:
+        sys = System()
+        sys.set_inputfile(file)
+        systems.append(sys)
+    return systems,files
 
 
 

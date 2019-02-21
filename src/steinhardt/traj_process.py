@@ -5,7 +5,7 @@ This file contains the methods for processing of a trajectory
 from steinhardt import *
 import numpy as np
 
-def traj_to_systems(filename,natoms,snaps=False):
+def traj_to_systems(filename,natoms,snaps=False,npy=False):
     """
     Reads in LAMMPS trajectory file and converts it to systems.
 
@@ -21,6 +21,8 @@ def traj_to_systems(filename,natoms,snaps=False):
         return a list of filenames if True.
         If False, returns an array of systems with the atom and box coordinates
         read in.
+    npy : bool
+        If true saves the systems as a npy file.
 
     Returns
     -------
@@ -113,5 +115,7 @@ def traj_to_systems(filename,natoms,snaps=False):
                         atoms = []
                         boxd = []
                 count+=1
+        if npy:
+            np.save(".".join([filename,"npy"]),systems)
         return systems        
 
