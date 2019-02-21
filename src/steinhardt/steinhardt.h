@@ -63,8 +63,10 @@ class Atom{
         int gissolid();
         int gid();
         int gbelongsto();
+        int gstructure();
         void sx(vector<double>);
         void sid(int);
+        void sstructure(int);
 
 
         //variables for storing q2-12
@@ -149,6 +151,7 @@ class System{
         vector<double> gqvals(int qq);
         vector<double> gaqvals(int qq);
         vector<int> rq_backup;
+        vector<double> gbox();
         
         //system flags
         int neighborsfound;

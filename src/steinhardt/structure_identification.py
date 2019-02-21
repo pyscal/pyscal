@@ -173,6 +173,7 @@ def find_structure_probs(systems, qspace, histovars,cutoff,histofiles,peratom=Fa
         systems are returned. The values of the structure would be from 1 to n, in order
         of the histogram files provided. If it does not ebelong to all structure, 
         a value of 0 will be given.
+        This is not yet implemented : Should not use.
 
     """
     xaxis = np.linspace(histovars[0],histovars[1],histovars[2])
@@ -222,6 +223,7 @@ def find_structure_probs(systems, qspace, histovars,cutoff,histofiles,peratom=Fa
             if peratom:
                 sprobsmod = np.insert(sprobs,0,atomids[i])
                 snapatomdata.append(sprobsmod)
+
             netstruct += sprobs
 
         alltimeperatomdata.append(snapatomdata)

@@ -91,6 +91,7 @@ void System::read_particle_file(){
         boxy = ysizesup - ysizeinf;
         boxz = zsizesup - zsizeinf;
 
+
         //so lets read the particles positions
         for (int ti = 0;ti<nop;ti++){
             confFile>>id;
@@ -733,6 +734,15 @@ vector<double> System::gaqvals(int qq){
 
     return qres;    
 }
+
+vector<double> System::gbox(){
+    vector<double> qres;
+    qres.reserve(nop);
+    qres.emplace_back(boxx);
+    qres.emplace_back(boxy);
+    qres.emplace_back(boxz);
+    return qres; 
+}
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------
 Atom::Atom(){ }
@@ -762,6 +772,7 @@ int Atom::gfrenkelnumber() { return frenkelnumber; }
 int Atom::gissolid() { return issolid; }
 int Atom::gid() { return id; }
 int Atom::gbelongsto() { return belongsto; }
+int Atom::gstructure() { return structure; }
 void Atom::sx(vector<double> xx){
     posx = xx[0];
     posy = xx[1];
@@ -769,6 +780,7 @@ void Atom::sx(vector<double> xx){
 }
 
 void Atom::sid(int n){ id = n; }
+void Atom::sstructure(int n){ structure = n; }
 double Atom::gq(int qq){ return q[qq-2]; }
 void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
 

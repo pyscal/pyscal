@@ -84,6 +84,21 @@ PYBIND11_PLUGIN(steinhardt) {
                     A value of 1 is returned if the atom is solid, 0 otherwise.
                 )doc")
 
+        .def("gstructure",&Atom::gstructure,
+            R"doc(
+                returns the structure of an atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                structure : int
+                    Int corresponding to the order of input structure histos.
+                    0 if structure is unknown.
+                )doc")
+
         .def("gid",&Atom::gid,
             R"doc(
                 Returns the id of the atom.
@@ -135,6 +150,20 @@ PYBIND11_PLUGIN(steinhardt) {
                 ----------
                 n : int
                     id of the atom
+
+                Returns
+                -------
+                None.
+                )doc")
+
+        .def("sstructure",&Atom::sstructure,
+            R"doc(
+                sets the structure of the atom.
+
+                Parameters
+                ----------
+                n : int
+                    structure of the atom
 
                 Returns
                 -------
@@ -381,6 +410,21 @@ PYBIND11_PLUGIN(steinhardt) {
                 -------
                 allatoms : vctor of Atom objects
                     all atoms in the system
+
+                    )doc"
+            )
+
+        .def("gbox",&System::gbox,
+            R"doc(
+                Access function that returns the dimensions of sim box.
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                boxdims : vector of box dimensions
 
                     )doc"
             )
