@@ -212,7 +212,7 @@ def find_structure_probs(systems, qspace, histovars,cutoff,histofiles,peratom=Fa
             #account for zero probsum
             if probsum < cutoff:
                 sprobs[-1] = 1.0 - probsum
-                probsum = 1
+                probsum = 1.00
 
             if normed:
                 sprobs /= probsum

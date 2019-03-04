@@ -56,8 +56,12 @@ def create_delayed_system(infile, natoms, **kwargs):
 
     """
     #read in the dask bag and convert to delayed object
-    b = db.read_text(infile)
+    #b = db.read_text(infile)
+    #c = b.to_delayed()
+    b = (delayed) (db.read_text) (infile)
     c = b.to_delayed()
+    #c = b
+
 
     #initialise systems
     nsystems = []
@@ -77,21 +81,24 @@ def create_delayed_system(infile, natoms, **kwargs):
     #this part would be  md code specific
     if format ==  "lammps":
         for slice in range(nslices):
-            nblock = natoms[slice] + 9
-            raw = c[0][nslices*nblock + 5].strip().split()
+            nblock = int(natoms[slice]) + 9
+            raw = c[0][slice*nblock + 5].strip().split()
             dimx = (delayed)(float)(raw[1])-(delayed)(float)(raw[0])          
-            raw = c[0][nslices*nblock + 6].strip().split()
+            raw = c[0][slice*nblock + 6].strip().split()
             dimy = (delayed)(float)(raw[1])-(delayed)(float)(raw[0])    
-            raw = c[0][nslices*nblock + 7].strip().split()
+            raw = c[0][slice*nblock + 7].strip().split()
             dimz = (delayed)(float)(raw[1])-(delayed)(float)(raw[0])
             boxd = [dimx,dimy,dimz]
             box = Boxc(dimx, dimy, dimz)
             atoms = []
 
             for i in range(9,natoms+9):
-                line = c[0][nslices*nblock + i].strip().split()
+                line = c[0][slice*nblock + i].strip().split()
+                #print type(slice*nblock + i)
+                #print line.compute()
                 idd = (delayed)(int)(line[0]) 
-                x = (delayed)(float)(line[3])
+                x = delayed (float)(line[3])
+                #print line[3].compute()
                 y = (delayed)(float)(line[4])
                 z = (delayed)(float)(line[5])
                 a = Atomc(idd,x,y,z)
@@ -99,7 +106,22 @@ def create_delayed_system(infile, natoms, **kwargs):
                 nsystems.append([box,atoms])
     
     #additional codes can be added at this point
-    
+    #if format == "imd":
+    #    #only single slice imd files would be supported now
+    #    for slice in range(1):
+    #        nblock = int(natoms[slice]) + 8
+    #        raw = c[0][slice*nblock + 5].strip().split()
+    #        dimx = (delayed)(float)(raw[1])-(delayed)(float)(raw[0])          
+    #        raw = c[0][slice*nblock + 5].strip().split()
+    #        dimx = (delayed)(float)(raw[1])-(delayed)(float)(raw[0])          
+    #        raw = c[0][slice*nblock + 5].strip().split()
+    #        dimx = (delayed)(float)(raw[1])-(delayed)(float)(raw[0])          
+
+
+
+
+
+
     #process the output
     if save_file:
         np.save(outfile, nsystems)
