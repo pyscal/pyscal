@@ -7,7 +7,7 @@ import numpy as np
 import io
 import gzip
 
-def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False):
+def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False, usecols=[]):
     """
     Reads in LAMMPS trajectory file and converts it to systems.
 
@@ -25,6 +25,14 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False):
         read in.
     npy : bool
         If true saves the systems as a npy file.
+    usecols : array like
+        If custom column numbers are to be used, they can be specified here.
+        for example if usecols = [3,4,5,8,9] - the first three columns are
+        used to read in x,y, and z values are the rest are read in as custom
+        properties. They can be accessed by atom.gcustom(). The minimum length
+        of usecols has to be three(for positions). The column number starts 
+        from 0. Atom ID always has to be column 0.
+        Restrictions - * ONLY used if snaps is set to False *
 
     Returns
     -------
@@ -83,6 +91,18 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False):
         atoms = []
         systems=[]
 
+        custom = False
+        if len(usecols) > 0:
+            if len(usecols)>=3:
+                xid = usecols[0]
+                yid = usecols[1]
+                zid = usecols[2]
+                customcols = usecols[3:]
+                custom = True
+        else:
+            xid = 3
+            yid = 4
+            zid = 5
 
         iterval = infile
         count = 1
@@ -105,13 +125,21 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False):
             elif count>9:
                 line = line.strip().split()
                 idd = int(line[0]) 
-                x = float(line[3])
-                y = float(line[4])
-                z = float(line[5])
+                x = float(line[xid])
+                y = float(line[yid])
+                z = float(line[zid])
+                cavals = []
+                if custom:
+                    for cindex in customcols:
+                        cavals.append(float(line[cindex]))
+
+               
                 xx = [x,y,z]
                 a = Atom()
                 a.sx(xx)
-                a.sid(idd)  
+                a.sid(idd)
+                a.scustom(cavals)
+                #print a.gcustom()  
                 atoms.append(a)
                 if count==natoms+9:
                     count=0

@@ -201,6 +201,7 @@ void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
         atoms[ti].id = atomitos[ti].id;
         atoms[ti].belongsto = -1;
         atoms[ti].issolid = 0;
+        atoms[ti].custom = atomitos[ti].custom;
     }
 
     atomitos.shrink_to_fit();
@@ -827,4 +828,20 @@ vector<vector <double>> Atom::gaqlm(int qq) {
 
     return qlms;
 
+}
+
+void Atom::scustom(vector<double> cvals) {
+    for(int i=0; i<cvals.size(); i++){
+        custom.emplace_back(cvals[i]);
+    }
+    //custom = cvals;
+}
+
+vector<double> Atom::gcustom() {
+    vector <double> rqlms;
+    for(int i=0; i<custom.size(); i++){
+        rqlms.emplace_back(custom[i]);
+    }
+    //rqlms = custom;
+    return rqlms;    
 }

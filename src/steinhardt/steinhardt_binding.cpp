@@ -99,6 +99,34 @@ PYBIND11_PLUGIN(steinhardt) {
                     0 if structure is unknown.
                 )doc")
 
+        .def("scustom",&Atom::scustom,
+            R"doc(
+                Set custom values of an Atom
+
+                Parameters
+                ----------
+                vector double : list of custom values
+                
+                Returns
+                -------
+                None
+
+                )doc")
+
+        .def("gcustom",&Atom::gcustom,
+            R"doc(
+                returns the custom values of an atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                custom : vector double
+                    custom values of the atom.
+                )doc")
+
         .def("gid",&Atom::gid,
             R"doc(
                 Returns the id of the atom.

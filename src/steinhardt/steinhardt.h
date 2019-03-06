@@ -86,6 +86,11 @@ class Atom{
         void saq(int, double);
         vector <vector<double>> gaqlm(int);
 
+        //for custom values
+        vector <double> custom;
+        void scustom(vector <double>);
+        vector<double> gcustom(); 
+
 };
 
 
