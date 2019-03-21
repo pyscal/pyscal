@@ -3,9 +3,10 @@
 #include <iomanip>
 #include <algorithm>
 #include <stdio.h>
+#include "voro++.hh"
+#include "string.h"
 
-
-
+using namespace voro;
 
 System::System(){
     
@@ -366,6 +367,74 @@ void System::get_all_neighbors(){
 
 }
 
+//overloaded function; would be called
+void System::get_all_neighbors( string &jkl){
+
+    if(strcmp(jkl.c_str(),"voronoi")!=0){
+        return;
+    }
+
+    double d;
+    double diffx,diffy,diffz;
+    double r,theta,phi;
+    int i;
+    int ti,id,tnx,tny,tnz;
+    double rx,ry,rz,tsum, fa;
+    vector<int> neigh,f_vert;
+    vector<double> facearea;
+    voronoicell_neighbor c;
+    vector< vector<double> > nweights;
+    vector< vector<int> > nneighs;
+    vector<int> idss;
+    double weightsum;
+
+    if (!fileread) { read_particle_file(); }
+
+    pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
+    for(int i=0; i<nop; i++){
+        pcon.put(i, atoms[i].posx, atoms[i].posy, atoms[i].posz);
+    }
+    pcon.guess_optimal(tnx,tny,tnz);        
+    container con(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],tnx,tny,tnz,true,true,true, nop);
+    pcon.setup(con);
+
+    c_loop_all cl(con);
+    if (cl.start()) do if(con.compute_cell(c,cl)) {
+            ti=cl.pid();
+            c.face_areas(facearea);
+            c.neighbors(neigh);
+            tsum = 0;
+            vector <double> dummyweights;
+            vector <int> dummyneighs;
+
+            //only loop over neighbors
+            weightsum = 0.0;
+            for (int i=0; i<facearea.size(); i++){
+                weightsum += facearea[i];
+            }
+            for (int tj=0; tj<neigh.size(); tj++){
+                atoms[ti].neighbors[tj] = neigh[tj];
+                atoms[ti].n_neighbors += 1;        
+                d = get_abs_distance(ti,neigh[tj],diffx,diffy,diffz); 
+                atoms[ti].neighbordist[tj] = d;
+                //weight is set to 1.0, unless manually reset
+                atoms[ti].neighborweight[tj] = facearea[tj]/weightsum;
+                atoms[ti].n_diffx[tj] = diffx;
+                atoms[ti].n_diffy[tj] = diffy;
+                atoms[ti].n_diffz[tj] = diffz;
+                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                atoms[ti].n_r[tj] = r;
+                atoms[ti].n_phi[tj] = phi;
+                atoms[ti].n_theta[tj] = theta;
+                
+            }   
+        
+    } while (cl.inc());
+
+    //mark end of neighbor calc
+    neighborsfound = 1;
+
+}
 
 double System::PLM(int l, int m, double x){
     
@@ -513,17 +582,16 @@ void System::calculate_q(){
                                 
                     QLM(q,mi,atoms[ti].n_theta[ci],atoms[ti].n_phi[ci],realYLM, imgYLM);
                     realti += atoms[ti].neighborweight[ci]*realYLM;
-                    //realti += atoms[ti].n_r[ci];
-                    //imgti += atoms[ti].n_phi[ci];
                     imgti += atoms[ti].neighborweight[ci]*imgYLM;
                     weightsum += atoms[ti].neighborweight[ci];
                 }
             
             //the weights are not normalised,
-            if (weightsum>1.01){
+            if(weightsum>1.01){
                 realti = realti/weightsum;
                 imgti = imgti/weightsum;                
             }
+            
             
             atoms[ti].realq[q-2][mi+q] = realti;
             atoms[ti].imgq[q-2][mi+q] = imgti;

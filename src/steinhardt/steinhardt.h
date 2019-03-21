@@ -113,6 +113,7 @@ class System{
         void YLM(int , int , double , double , double &, double &);
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors();
+        void get_all_neighbors(string &);
         void calculate_complexQLM_6();
         double get_number_from_bond(int,int);
         double get_number_from_bond(Atom ,Atom );

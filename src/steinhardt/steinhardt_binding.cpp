@@ -2,7 +2,9 @@
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
 #include <vector>
+#include <string>
 #include "steinhardt.h"
+
 
 namespace py = pybind11;
 using namespace std;
@@ -506,7 +508,7 @@ PYBIND11_PLUGIN(steinhardt) {
             R"doc(
                 Access function that returns the low and high values of sim box.
 
-                Parameters
+                Parametersb
                 ----------
                 None
 
@@ -656,13 +658,13 @@ PYBIND11_PLUGIN(steinhardt) {
                     )doc"
             )
 
-        .def("get_all_neighbors",&System::get_all_neighbors,
+        .def("get_all_neighbors", (void (System::*) (string &))  &System::get_all_neighbors, py::arg("method"), 
             R"doc(
                 Find neighbors of all atoms in the system.
 
                 Parameters
                 ----------
-                None
+                method
                 
                 Returns
                 -------
@@ -671,6 +673,20 @@ PYBIND11_PLUGIN(steinhardt) {
                     )doc"
             )
 
+        .def("get_all_neighbors", (void (System::*) ()) &System::get_all_neighbors,
+            R"doc(
+                Find neighbors of all atoms in the system.
+
+                Parameters
+                ----------
+                method
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
 
         .def("calculate_complexQLM_6",&System::calculate_complexQLM_6,
             R"doc(
