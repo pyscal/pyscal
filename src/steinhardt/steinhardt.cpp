@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <stdio.h>
 
+
+
+
 System::System(){
     
     nop = -1;
@@ -90,7 +93,12 @@ void System::read_particle_file(){
         boxx = xsizesup - xsizeinf;
         boxy = ysizesup - ysizeinf;
         boxz = zsizesup - zsizeinf;
-
+        boxdims[0][0] = xsizeinf;
+        boxdims[0][1] = xsizesup;
+        boxdims[1][0] = ysizeinf;
+        boxdims[1][1] = ysizesup;
+        boxdims[2][0] = zsizeinf;
+        boxdims[2][1] = zsizesup;
 
         //so lets read the particles positions
         for (int ti = 0;ti<nop;ti++){
@@ -111,6 +119,15 @@ void System::read_particle_file(){
             atoms[ti].belongsto = -1;
             atoms[ti].issolid = 0; 
             atoms[ti].loc = ti;
+            atoms[ti].isneighborset = 0;
+
+            for (int ti = 0;ti<nop;ti++){
+                atoms[ti].n_neighbors=0;
+                for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){          
+                    atoms[ti].neighbors[tn] = NILVALUE;
+                    atoms[ti].neighbordist[tn] = -1.0;
+                }
+            }
         }
   
     }
@@ -145,14 +162,22 @@ void System::read_particle_instance(int startblock,int natoms){
                 if (count==6+startblock*block){
                     sscanf(line.c_str(),"%lf %lf", &xsizeinf, &xsizesup);
                     boxx = xsizesup - xsizeinf;
+                    boxdims[0][0] = xsizeinf;
+                    boxdims[0][1] = xsizesup;
+
                 }
                 else if (count==7+startblock*block){
                     sscanf(line.c_str(),"%lf %lf", &ysizeinf, &ysizesup);
                     boxy = ysizesup - ysizeinf;
+                    boxdims[1][0] = ysizeinf;
+                    boxdims[1][1] = ysizesup;
+
                 }
                 else if (count==8+startblock*block){
                     sscanf(line.c_str(),"%lf %lf", &zsizeinf, &zsizesup);
                     boxz = zsizesup - zsizeinf;
+                    boxdims[2][0] = zsizeinf;
+                    boxdims[2][1] = zsizesup;
                 }
 
                 else if (count>9+startblock*block){
@@ -164,6 +189,7 @@ void System::read_particle_instance(int startblock,int natoms){
                     atoms[minc].belongsto = -1;
                     atoms[minc].issolid = 0; 
                     atoms[minc].loc = minc-9;
+                    atoms[minc].isneighborset = 0;
                     minc++;
 
                 }
@@ -181,6 +207,11 @@ void System::read_particle_instance(int startblock,int natoms){
     }  
 }
 
+//this is the old - actual function
+//now an overloaded version would be provided, the aim of this is to provide two infos-
+//1. The list of neighbors for each atom. This would be position of neighbor on the list of atoms
+//2. The list of weights for each neighbors. This is used to scale the YLM contributions.
+////wait - its better to just assign a variable weights to Atom and functions to set these and the weights
 
 void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
 //dont know if this will be faster-
@@ -201,6 +232,7 @@ void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
         atoms[ti].id = atomitos[ti].id;
         atoms[ti].belongsto = -1;
         atoms[ti].issolid = 0;
+        atoms[ti].isneighborset = 0;
         atoms[ti].custom = atomitos[ti].custom;
     }
 
@@ -208,6 +240,7 @@ void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
 
     fileread = 1;
 }
+
 
 //needs two version of the function; one for fast inbuilt calculation.
 //the other for being accessed to the python interface
@@ -249,6 +282,7 @@ double System::get_abs_distance(Atom atom1 , Atom atom2 ){
     return abs;
 }
 
+
 void System::get_all_neighbors(){
 
     
@@ -258,44 +292,72 @@ void System::get_all_neighbors(){
 
     if (!fileread) { read_particle_file(); }
 
-    for (int ti = 0;ti<nop;ti++){
-        
-        atoms[ti].n_neighbors=0;
-        for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
-                        
-            atoms[ti].neighbors[tn] = NILVALUE;
-            atoms[ti].neighbordist[tn] = -1.0;
-        }
-    }
+    //for (int ti = 0;ti<nop;ti++){
+    //    
+    //    atoms[ti].n_neighbors=0;
+    //    for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
+    //                    
+    //        atoms[ti].neighbors[tn] = NILVALUE;
+    //        atoms[ti].neighbordist[tn] = -1.0;
+    //    }
+    //}
 
-    for (int ti=0; ti<(nop-1); ti++){
-        for (int tj=ti+1; tj<nop; tj++){
-                        
-            d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
-            if (d < neighbordistance){
 
-                atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
-                atoms[ti].neighbordist[atoms[ti].n_neighbors] = d; 
-                atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
-                atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
-                atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
-                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                atoms[ti].n_r[atoms[ti].n_neighbors] = r;
-                atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
-                atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
-                atoms[ti].n_neighbors += 1;   
+    for (int ti=0; ti<nop; ti++){
+        if (atoms[ti].isneighborset == 0){
+            for (int tj=ti; tj<nop; tj++){
+                if(ti==tj) { continue; }
+                d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
+                if (d < neighbordistance){
 
-                atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
-                atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
-                atoms[tj].n_diffx[atoms[tj].n_neighbors] = -diffx;
-                atoms[tj].n_diffy[atoms[tj].n_neighbors] = -diffy;
-                atoms[tj].n_diffz[atoms[tj].n_neighbors] = -diffz;
-                convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
-                atoms[tj].n_r[atoms[tj].n_neighbors] = r;
-                atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
-                atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
-                atoms[tj].n_neighbors +=1;
+                    atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
+                    atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
+                    //weight is set to 1.0, unless manually reset
+                    atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
+                    atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
+                    atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
+                    atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
+                    convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                    atoms[ti].n_r[atoms[ti].n_neighbors] = r;
+                    atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
+                    atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
+                    atoms[ti].n_neighbors += 1;   
+
+                    atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
+                    atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
+                    //weight is set to 1.0, unless manually reset
+                    atoms[tj].neighborweight[atoms[tj].n_neighbors] = 1.00;
+                    atoms[tj].n_diffx[atoms[tj].n_neighbors] = -diffx;
+                    atoms[tj].n_diffy[atoms[tj].n_neighbors] = -diffy;
+                    atoms[tj].n_diffz[atoms[tj].n_neighbors] = -diffz;
+                    convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
+                    atoms[tj].n_r[atoms[tj].n_neighbors] = r;
+                    atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
+                    atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
+                    atoms[tj].n_neighbors +=1;
+                }
             }
+        }
+        //if neighbors are already read in
+        else {
+            //only loop over neighbors
+            for (int tj=0; tj<atoms[ti].n_neighbors; tj++){
+        
+                d = get_abs_distance(ti,atoms[ti].neighbors[tj],diffx,diffy,diffz); 
+                //atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
+                atoms[ti].neighbordist[tj] = d;
+                //weight is set to 1.0, unless manually reset
+                //atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
+                atoms[ti].n_diffx[tj] = diffx;
+                atoms[ti].n_diffy[tj] = diffy;
+                atoms[ti].n_diffz[tj] = diffz;
+                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                atoms[ti].n_r[tj] = r;
+                atoms[ti].n_phi[tj] = phi;
+                atoms[ti].n_theta[tj] = theta;
+                //atoms[ti].n_neighbors += 1;   
+                
+            }   
         }
     }
 
@@ -389,8 +451,8 @@ void System::calculate_complexQLM_6(){
             for (int ci = 0;ci<nn;ci++){
                                 
                 QLM(6,mi,atoms[ti].n_theta[ci],atoms[ti].n_phi[ci],realYLM, imgYLM);
-                realti += realYLM;
-                imgti += imgYLM;
+                realti += atoms[ti].neighborweight[ci]*realYLM;
+                imgti += atoms[ti].neighborweight[ci]*imgYLM;
             }
             
             realti = realti/(double(nn));
@@ -433,7 +495,7 @@ void System::calculate_q(){
 
     //note that the qvals will be in -2 pos
     //q2 will be in q0 pos and so on
-        
+    double weightsum;  
     // nop = parameter.nop;
     for (int ti= 0;ti<nop;ti++){
         
@@ -446,20 +508,28 @@ void System::calculate_q(){
             for (int mi = -q;mi < q+1;mi++){                        
                 realti = 0.0;
                 imgti = 0.0;
+                weightsum = 0;
                 for (int ci = 0;ci<nn;ci++){
                                 
                     QLM(q,mi,atoms[ti].n_theta[ci],atoms[ti].n_phi[ci],realYLM, imgYLM);
-                    realti += realYLM;
-                    imgti += imgYLM;
+                    realti += atoms[ti].neighborweight[ci]*realYLM;
+                    //realti += atoms[ti].n_r[ci];
+                    //imgti += atoms[ti].n_phi[ci];
+                    imgti += atoms[ti].neighborweight[ci]*imgYLM;
+                    weightsum += atoms[ti].neighborweight[ci];
                 }
             
-            realti = realti/(double(nn));
-            imgti = imgti/(double(nn));
+            //the weights are not normalised,
+            if (weightsum>1.01){
+                realti = realti/weightsum;
+                imgti = imgti/weightsum;                
+            }
             
             atoms[ti].realq[q-2][mi+q] = realti;
             atoms[ti].imgq[q-2][mi+q] = imgti;
             
             summ+= realti*realti + imgti*imgti;
+            //summ+= realti;
             }
             //normalise summ
             summ = pow(((4.0*PI/(2*q+1)) * summ),0.5);
@@ -738,12 +808,24 @@ vector<double> System::gaqvals(int qq){
 
 vector<double> System::gbox(){
     vector<double> qres;
-    qres.reserve(nop);
+    qres.reserve(3);
     qres.emplace_back(boxx);
     qres.emplace_back(boxy);
     qres.emplace_back(boxz);
     return qres; 
 }
+
+vector<double> System::gboxdims(){
+    vector<double> qres;
+    qres.reserve(6);
+    for(int i=0;i<3;i++){
+        for(int j=0;j<2;j++){
+            qres.emplace_back(boxdims[i][j]);
+        }
+    }
+    return qres; 
+}
+
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------
 Atom::Atom(){ }
@@ -844,4 +926,39 @@ vector<double> Atom::gcustom() {
     }
     //rqlms = custom;
     return rqlms;    
+}
+
+//functions to set the neighbors for each atoms
+void Atom::sneighbors(vector<int> nns){
+    
+    //first reset all neighbors
+    for (int i = 0;i<MAXNUMBEROFNEIGHBORS;i++){
+        neighbors[i] = NILVALUE;
+        neighbordist[i] = -1.0;
+    }
+
+    //now assign the neighbors
+    for(int i=0; i<nns.size(); i++){
+        neighbors[i] = nns[i];
+        //auto assign weight to 1
+        neighborweight[i] = 1.00;
+    }
+
+    n_neighbors = nns.size();
+    isneighborset = 1;
+
+}
+
+void Atom::sneighborweights(vector<double> nss){
+    for(int i=0; i<nss.size(); i++){
+        neighborweight[i] = nss[i];
+    }
+}
+
+vector<double> Atom::gneighborweights(){
+    vector <double> rqlms;
+    for(int i=0; i<n_neighbors; i++){
+        rqlms.emplace_back(neighborweight[i]);
+    }
+    return rqlms;
 }

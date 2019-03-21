@@ -127,6 +127,38 @@ PYBIND11_PLUGIN(steinhardt) {
                     custom values of the atom.
                 )doc")
 
+        .def("sneighbors",&Atom::sneighbors,
+            R"doc(
+                Set the neighbors of an atom
+
+                Parameters
+                ----------
+                array : index of the neighbor atoms 
+                
+                Returns
+                -------
+                None
+
+                )doc")
+
+        .def("sneighborweights",&Atom::sneighborweights,
+            R"doc(
+                Set the weights of each neighbor towards the 
+                calculation of YLM. By default, the weight is
+                1 for each atom.
+
+                Parameters
+                ----------
+                array : weight of each atom, equal to number of neighbors
+                    of each atom.
+                
+                Returns
+                -------
+                None
+
+                )doc")
+
+
         .def("gid",&Atom::gid,
             R"doc(
                 Returns the id of the atom.
@@ -292,6 +324,19 @@ PYBIND11_PLUGIN(steinhardt) {
                     second part is the 2q+1 imaginary values.
                 )doc")
 
+        .def("gneighborweights",&Atom::gneighborweights,
+            R"doc(
+                get the neighbor weights of the atom.
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                qlms : 2D array of 2q+1 values
+                    Neighbor weights.
+                )doc")
     ; 
 
     //bindings and documentation for individual functions
@@ -457,6 +502,21 @@ PYBIND11_PLUGIN(steinhardt) {
                     )doc"
             )
 
+        .def("gboxdims",&System::gboxdims,
+            R"doc(
+                Access function that returns the low and high values of sim box.
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                boxdims : vector of box dimensions
+
+                    )doc"
+            )
+
         .def("gnop",&System::gnop,
             R"doc(
                 Access function that returns the Atom object at the queried position.
@@ -610,6 +670,7 @@ PYBIND11_PLUGIN(steinhardt) {
 
                     )doc"
             )
+
 
         .def("calculate_complexQLM_6",&System::calculate_complexQLM_6,
             R"doc(

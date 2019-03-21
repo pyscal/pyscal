@@ -28,6 +28,7 @@ class Atom{
         double posx,posy,posz;
         int neighbors[MAXNUMBEROFNEIGHBORS];
         double neighbordist[MAXNUMBEROFNEIGHBORS];
+        double neighborweight[MAXNUMBEROFNEIGHBORS];
         double n_diffx[MAXNUMBEROFNEIGHBORS];
         double n_diffy[MAXNUMBEROFNEIGHBORS];
         double n_diffz[MAXNUMBEROFNEIGHBORS];
@@ -47,6 +48,8 @@ class Atom{
         int structure;
         int id;
         int loc;
+        //indicator which is 1 if neighbors are already provided
+        int isneighborset;
 
         //we need some functions to fetch atom properties
         vector<double> gx();
@@ -67,6 +70,10 @@ class Atom{
         void sx(vector<double>);
         void sid(int);
         void sstructure(int);
+        
+        //function to set neighbors
+        void sneighbors(vector<int> nns);
+        void sneighborweights(vector<double> nns);
 
 
         //variables for storing q2-12
@@ -78,6 +85,7 @@ class Atom{
         double arealq[11][25];
         double aimgq[11][25];
         
+
         double gq(int);
         void sq(int, double);
         vector <vector<double>> gqlm(int);
@@ -89,7 +97,8 @@ class Atom{
         //for custom values
         vector <double> custom;
         void scustom(vector <double>);
-        vector<double> gcustom(); 
+        vector<double> gcustom();
+        vector<double> gneighborweights(); 
 
 };
 
@@ -141,6 +150,8 @@ class System{
         int baseunit;
         int minfrenkel;
         double boxx, boxy, boxz;
+        //array for box
+        double boxdims[3][2];
         string inputfile;
         double neighbordistance;
         double threshold;
@@ -157,6 +168,7 @@ class System{
         vector<double> gaqvals(int qq);
         vector<int> rq_backup;
         vector<double> gbox();
+        vector<double> gboxdims();
         
         //system flags
         int neighborsfound;
