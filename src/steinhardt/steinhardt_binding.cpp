@@ -14,23 +14,75 @@ PYBIND11_PLUGIN(steinhardt) {
 //bindings for Atom class
 //------------------------------------------------------------------
     py::module m("steinhardt");
-    py::class_<Atom>(m,"Atom")
-        .def(py::init< >())     
-        .def("gx",&Atom::gx,
-            R"doc(
-                Returns the coordinates of the atom.
+    py::class_<Atom>(m,"Atom",             
+        R"doc(
+            Class to hold the details of an atom. The various 
+            variables that can be accessed from python module
+            are mentioned in attributes.
 
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                x : vector double
-                    position coordinates
-                )doc")
+            Attributes
+            ----------
+            Basic atom properties
+            ---------------------
+            x : float
+                x coordinate of atom
+            y : float
+                y coordinate of atom
+            z : float
+                z coordinate of atom
+            id : int
+                id of the atom
 
-        .def("gneighbors",&Atom::gneighbors,
+            Neighbor related properties
+            ---------------------------
+            n_neighbors : int
+                number of neighbors of the atom
+                Note that to access the list of neighbors, 
+                gneighbors() method needs to be used.
+            neighborweights : array like, float
+                The normalized weight of each neighbor atom contribution 
+                to calculation of q  parameters.
+            neighbordist : array like, float
+                List of neighbor distances to each atom.
+
+            Cluster related properties
+            --------------------------
+            frenkelnumber : int
+                frenkelnumber of the atom.
+            issolid : int
+                0 or 1. 1 if atom is solid.
+            structure : int
+                structure of the atom.
+            belongsto : int
+                id of the cluster to which atom belongs to.
+
+            Q value related properties
+            --------------------------
+            q : array like, float, length 11
+                array of q values.            
+            aq : array like, float, length 11
+                array of averaged q values.
+
+
+        )doc"
+        )
+        .def(py::init< >())
+        .def_readwrite("x", &Atom::posx)
+        .def_readwrite("y", &Atom::posy)
+        .def_readwrite("z", &Atom::posz)
+        .def_readwrite("n_neighbors", &Atom::n_neighbors)
+        .def_readwrite("neighborweights", &Atom::neighborweights)
+        .def_readwrite("neighbordist", &Atom::neighbordist)
+
+        .def_readwrite("frenkelnumber", &Atom::frenkelnumber)
+        .def_readwrite("issolid", &Atom::issolid)
+        .def_readwrite("structure", &Atom::structure)
+        .def_readwrite("belongsto", &Atom::belongsto)
+
+        .def_readwrite("q", &Atom::q)
+        .def_readwrite("aq", &Atom::aq)
+
+        .def("neighbors",&Atom::gneighbors,
             R"doc(
                 Returns the neighbors of the atom.
 
@@ -42,63 +94,6 @@ PYBIND11_PLUGIN(steinhardt) {
                 -------
                 x : vector int
                     neighbor indices
-                )doc")
-
-        .def("gn_neighbors",&Atom::gn_neighbors,
-            R"doc(
-                Returns the number of neighbors of the atom.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                n_neighbors : int 
-                    number of neighbors
-                )doc")
-
-        .def("gfrenkelnumber",&Atom::gfrenkelnumber,
-            R"doc(
-                Returns the frenkelnumber of the atom.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                frenkelnumber : int
-                    frenkelnumber
-                )doc")
-
-        .def("gissolid",&Atom::gissolid,
-            R"doc(
-                returns the solidity of an atom.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                issolid : int
-                    A value of 1 is returned if the atom is solid, 0 otherwise.
-                )doc")
-
-        .def("gstructure",&Atom::gstructure,
-            R"doc(
-                returns the structure of an atom.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                structure : int
-                    Int corresponding to the order of input structure histos.
-                    0 if structure is unknown.
                 )doc")
 
         .def("scustom",&Atom::scustom,
@@ -143,126 +138,6 @@ PYBIND11_PLUGIN(steinhardt) {
 
                 )doc")
 
-        .def("sneighborweights",&Atom::sneighborweights,
-            R"doc(
-                Set the weights of each neighbor towards the 
-                calculation of YLM. By default, the weight is
-                1 for each atom.
-
-                Parameters
-                ----------
-                array : weight of each atom, equal to number of neighbors
-                    of each atom.
-                
-                Returns
-                -------
-                None
-
-                )doc")
-
-
-        .def("gid",&Atom::gid,
-            R"doc(
-                Returns the id of the atom.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                id : int
-                    id of the atom
-                )doc")
-
-        .def("gbelongsto",&Atom::gbelongsto,
-            R"doc(
-                Returns the cluster id of the atom.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                id : int
-                    cluster id of the atom. A value of -1 means that the atom is liquid.
-                )doc")
-
-        .def("sx",&Atom::sx,
-            R"doc(
-                Set the coordinates of the atom.
-
-                Parameters
-                ----------
-                pos : vector double
-                    a vector containing x,y and z coordinates of the atom
-                
-                Returns
-                -------
-                None
-
-                )doc")
-
-        .def("sid",&Atom::sid,
-            R"doc(
-                sets the id of the atom.
-
-                Parameters
-                ----------
-                n : int
-                    id of the atom
-
-                Returns
-                -------
-                None.
-                )doc")
-
-        .def("sstructure",&Atom::sstructure,
-            R"doc(
-                sets the structure of the atom.
-
-                Parameters
-                ----------
-                n : int
-                    structure of the atom
-
-                Returns
-                -------
-                None.
-                )doc")
-
-        .def("gq",&Atom::gq,
-            R"doc(
-                get the qvalue of an atom.
-
-                Parameters
-                ----------
-                q : int
-                    number of the required q - from 2-12
-
-                Returns
-                -------
-                qval : double
-                    the corresponding qvalue.
-                )doc")
-
-        .def("sq",&Atom::sq,
-            R"doc(
-                sets the qvalue of an atom.
-
-                Parameters
-                ----------
-                q : int
-                    number of the required q - from 2-12
-                qval : double
-                    the corresponding qvalue.
-
-                Returns
-                -------
-                None.
-                )doc")
-
         .def("gqlm",&Atom::gqlm,
             R"doc(
                 get the real and imaginary qlm values of the atom.
@@ -279,36 +154,6 @@ PYBIND11_PLUGIN(steinhardt) {
                     second part is the 2q+1 imaginary values.
                 )doc")
 
-        .def("gaq",&Atom::gaq,
-            R"doc(
-                get the aqvalue of an atom.
-
-                Parameters
-                ----------
-                q : int
-                    number of the required q - from 2-12
-
-                Returns
-                -------
-                qval : double
-                    the corresponding qvalue.
-                )doc")
-
-        .def("saq",&Atom::saq,
-            R"doc(
-                sets the aqvalue of an atom.
-
-                Parameters
-                ----------
-                q : int
-                    number of the required q - from 2-12
-                qval : double
-                    the corresponding qvalue.
-
-                Returns
-                -------
-                None.
-                )doc")
 
         .def("gaqlm",&Atom::gaqlm,
             R"doc(
@@ -326,19 +171,6 @@ PYBIND11_PLUGIN(steinhardt) {
                     second part is the 2q+1 imaginary values.
                 )doc")
 
-        .def("gneighborweights",&Atom::gneighborweights,
-            R"doc(
-                get the neighbor weights of the atom.
-
-                Parameters
-                ----------
-                None
-
-                Returns
-                -------
-                qlms : 2D array of 2q+1 values
-                    Neighbor weights.
-                )doc")
     ; 
 
     //bindings and documentation for individual functions
