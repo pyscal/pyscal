@@ -611,7 +611,7 @@ void System::calculate_q(){
 }
 
 
-//calculation of any complex aqval
+//calculation of any complex aqvalb
 void System::calculate_aq(){
         
     //nn = number of neighbors
@@ -643,12 +643,12 @@ void System::calculate_aq(){
                                 
                     realti += atoms[ti].neighborweight[ci]*atoms[atoms[ti].neighbors[ci]].realq[q-2][mi];
                     imgti += atoms[ti].neighborweight[ci]*atoms[atoms[ti].neighbors[ci]].imgq[q-2][mi];
+                    weightsum += atoms[ti].neighborweight[ci];
                 }
             
-            if(weightsum>1.01){
-                realti = realti/weightsum;
-                imgti = imgti/weightsum;                
-            }            
+            realti = realti/(1.0+weightsum);
+            realti = realti/(1.0+weightsum);
+                        
             //realti = realti/(double(nn+1));
             //imgti = imgti/(double(nn+1));
             
