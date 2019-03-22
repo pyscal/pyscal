@@ -641,16 +641,16 @@ void System::calculate_aq(){
                 weightsum = 0;
                 for (int ci = 0;ci<nn;ci++){
                                 
-                    realti += atoms[ti].neighborweight[ci]*atoms[atoms[ti].neighbors[ci]].realq[q-2][mi];
-                    imgti += atoms[ti].neighborweight[ci]*atoms[atoms[ti].neighbors[ci]].imgq[q-2][mi];
+                    realti += atoms[atoms[ti].neighbors[ci]].realq[q-2][mi];
+                    imgti += atoms[atoms[ti].neighbors[ci]].imgq[q-2][mi];
                     weightsum += atoms[ti].neighborweight[ci];
                 }
             
-            realti = realti/(1.0+weightsum);
-            realti = realti/(1.0+weightsum);
+            //realti = realti/(1.0+weightsum);
+            //realti = realti/(1.0+weightsum);
                         
-            //realti = realti/(double(nn+1));
-            //imgti = imgti/(double(nn+1));
+            realti = realti/(double(nn+1));
+            imgti = imgti/(double(nn+1));
             
             atoms[ti].arealq[q-2][mi] = realti;
             atoms[ti].aimgq[q-2][mi] = imgti;
