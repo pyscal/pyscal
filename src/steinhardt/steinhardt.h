@@ -59,22 +59,13 @@ class Atom{
         //probably wont work
         //in that case will have to return a vector
         //its probably expensive
-        //but that doesnt matter because we wont use it regularly
-        vector<int> gneighbors();
-        int gn_neighbors();
-        int gfrenkelnumber();
-        int gissolid();
-        int gid();
-        int gbelongsto();
-        int gstructure();
-        void sx(vector<double>);
-        void sid(int);
-        void sstructure(int);
-        
+        //but that doesnt matter because we wont use it regularl
+      
         //function to set neighbors
         void sneighbors(vector<int> nns);
+        vector<int> gneighbors();
         void sneighborweights(vector<double> nns);
-
+        vector<double> gneighborweights(); 
 
         //variables for storing q2-12
         //invidual variables or arrays - individual ones are easier!
@@ -85,7 +76,6 @@ class Atom{
         double arealq[11][25];
         double aimgq[11][25];
         
-
         double gq(int);
         void sq(int, double);
         vector <vector<double>> gqlm(int);
@@ -98,7 +88,6 @@ class Atom{
         vector <double> custom;
         void scustom(vector <double>);
         vector<double> gcustom();
-        vector<double> gneighborweights(); 
 
 };
 
