@@ -900,15 +900,6 @@ Atom::Atom(){ }
 Atom::~Atom(){ }
 
 
-vector<double> Atom::gx(){ 
-    vector<double> pos;
-    pos.reserve(3);
-    pos.emplace_back(posx);
-    pos.emplace_back(posy);
-    pos.emplace_back(posz);
-    return pos; 
-}
-
 vector<int> Atom::gneighbors(){
     vector<int> nn;
     nn.reserve(n_neighbors);
@@ -918,20 +909,6 @@ vector<int> Atom::gneighbors(){
     return nn;
 }
 
-int Atom::gn_neighbors() { return n_neighbors; }
-int Atom::gfrenkelnumber() { return frenkelnumber; }
-int Atom::gissolid() { return issolid; }
-int Atom::gid() { return id; }
-int Atom::gbelongsto() { return belongsto; }
-int Atom::gstructure() { return structure; }
-void Atom::sx(vector<double> xx){
-    posx = xx[0];
-    posy = xx[1];
-    posz = xx[2];
-}
-
-void Atom::sid(int n){ id = n; }
-void Atom::sstructure(int n){ structure = n; }
 double Atom::gq(int qq){ return q[qq-2]; }
 void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
 

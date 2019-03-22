@@ -39,11 +39,6 @@ PYBIND11_PLUGIN(steinhardt) {
                 number of neighbors of the atom
                 Note that to access the list of neighbors, 
                 gneighbors() method needs to be used.
-            neighborweights : array like, float
-                The normalized weight of each neighbor atom contribution 
-                to calculation of q  parameters.
-            neighbordist : array like, float
-                List of neighbor distances to each atom.
 
             Cluster related properties
             --------------------------
@@ -56,33 +51,20 @@ PYBIND11_PLUGIN(steinhardt) {
             belongsto : int
                 id of the cluster to which atom belongs to.
 
-            Q value related properties
-            --------------------------
-            q : array like, float, length 11
-                array of q values.            
-            aq : array like, float, length 11
-                array of averaged q values.
-
-
-        )doc"
+       )doc"
         )
         .def(py::init< >())
         .def_readwrite("x", &Atom::posx)
         .def_readwrite("y", &Atom::posy)
         .def_readwrite("z", &Atom::posz)
         .def_readwrite("n_neighbors", &Atom::n_neighbors)
-        .def_readwrite("neighborweights", &Atom::neighborweights)
-        .def_readwrite("neighbordist", &Atom::neighbordist)
-
         .def_readwrite("frenkelnumber", &Atom::frenkelnumber)
         .def_readwrite("issolid", &Atom::issolid)
         .def_readwrite("structure", &Atom::structure)
         .def_readwrite("belongsto", &Atom::belongsto)
 
-        .def_readwrite("q", &Atom::q)
-        .def_readwrite("aq", &Atom::aq)
 
-        .def("neighbors",&Atom::gneighbors,
+        .def("get_neighbors",&Atom::gneighbors,
             R"doc(
                 Returns the neighbors of the atom.
 
@@ -96,35 +78,7 @@ PYBIND11_PLUGIN(steinhardt) {
                     neighbor indices
                 )doc")
 
-        .def("scustom",&Atom::scustom,
-            R"doc(
-                Set custom values of an Atom
-
-                Parameters
-                ----------
-                vector double : list of custom values
-                
-                Returns
-                -------
-                None
-
-                )doc")
-
-        .def("gcustom",&Atom::gcustom,
-            R"doc(
-                returns the custom values of an atom.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                custom : vector double
-                    custom values of the atom.
-                )doc")
-
-        .def("sneighbors",&Atom::sneighbors,
+        .def("set_neighbors",&Atom::sneighbors,
             R"doc(
                 Set the neighbors of an atom
 
@@ -138,7 +92,127 @@ PYBIND11_PLUGIN(steinhardt) {
 
                 )doc")
 
-        .def("gqlm",&Atom::gqlm,
+        .def("get_neighborweights",&Atom::gneighborweights,
+            R"doc(
+                Returns the neighbor weights of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                x : vector float
+                    neighbor weights
+                )doc")
+
+        .def("set_neighborweights",&Atom::sneighborweights,
+            R"doc(
+                Set the neighbor weights of an atom
+
+                Parameters
+                ----------
+                array like float: weights of the neighbor atoms 
+                
+                Returns
+                -------
+                None
+
+                )doc")
+
+        .def("set_custom",&Atom::scustom,
+            R"doc(
+                Set custom values of an Atom
+
+                Parameters
+                ----------
+                vector double : list of custom values
+                
+                Returns
+                -------
+                None
+
+                )doc")
+
+        .def("get_custom",&Atom::gcustom,
+            R"doc(
+                returns the custom values of an atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                custom : vector double
+                    custom values of the atom.
+                )doc")
+
+        .def("get_q",&Atom::gq,
+            R"doc(
+                get  q value of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                q : float
+                    The queried q value
+                )doc")
+
+
+        .def("set_q",&Atom::sq,
+            R"doc(
+                set the q values of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+                d : double
+                    the q value to set
+
+                Returns
+                -------
+                None
+                )doc")
+
+        .def("get_aq",&Atom::gaq,
+            R"doc(
+                get  avg q value of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                q : float
+                    The queried q value
+                )doc")
+
+
+        .def("set_aq",&Atom::saq,
+            R"doc(
+                set the avg q values of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+                d : double
+                    the q value to set
+
+                Returns
+                -------
+                None
+                )doc")
+
+        .def("get_qlm",&Atom::gqlm,
             R"doc(
                 get the real and imaginary qlm values of the atom.
 
@@ -155,7 +229,7 @@ PYBIND11_PLUGIN(steinhardt) {
                 )doc")
 
 
-        .def("gaqlm",&Atom::gaqlm,
+        .def("get_aqlm",&Atom::gaqlm,
             R"doc(
                 get the real and imaginary aqlm values of the atom.
 
