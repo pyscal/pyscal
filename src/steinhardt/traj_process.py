@@ -83,7 +83,7 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False, usecols=
         systems=[]
         for file in files:
             sys = System()
-            sys.set_inputfile(file)
+            sys.inputfile = file
             systems.append(sys)
         return systems,files
 
@@ -136,10 +136,11 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False, usecols=
                
                 xx = [x,y,z]
                 a = Atom()
-                a.sx(xx)
-                a.sid(idd)
+                a.x = x
+                a.y = y
+                a.z = z
+                a.id = idd
                 a.scustom(cavals)
-                #print a.gcustom()  
                 atoms.append(a)
                 if count==natoms+9:
                     count=0
