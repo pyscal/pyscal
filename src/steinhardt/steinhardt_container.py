@@ -14,6 +14,7 @@ import dask.bag as db
 from dask import delayed
 import os
 import pickle
+import shutil
 
 class Atomc(object):
     def __init__(self,idd,x,y,z):
@@ -148,10 +149,18 @@ def pickle_systems(infile, natoms, **kwargs):
     if not isinstance(natoms, list):
         natoms = np.ones(nslices)*natoms
 
+    #move out from pickling and use npy arrays
+    outfolder = os.path.join(os.getcwd(),"npydata")
+    if os.path.exists(outfolder):
+        shutil.rmtree(outfolder)
+    os.mkdir(outfolder)
+
     #this part would be  md code specific
     if format ==  "lammps":
-        fout = open(outfile,'wb')
+        #fout = open(outfile,'wb')
         for slice in range(nslices):
+            fout = ".".join(["snap",str(slice),"npy"])
+            fout = os.path.join(outfolder, fout)
             nblock = int(natoms[slice]) + 9
             raw = c[0][slice*nblock + 5].strip().split()
             dimxlow = (delayed)(float)(raw[0])
@@ -196,9 +205,45 @@ def pickle_systems(infile, natoms, **kwargs):
             sys.atoms = atoms
             sys.boxdims = boxdims
             #nsystems.append(sys)
-            pickle.dump(sys, fout)
-        fout.close()
+            #pickle.dump(sys, fout)
+            np.save(fout, sys)
+        #fout.close()
     
         #now save pickled file
         #create a function
-        return outfile
+        return outfolder
+
+def fetch_system(slice, outfolder=""):
+    """
+    Fetch a npy style system from outfolder.
+
+    Parameters
+    ----------
+    outfolder : string
+        the outfolder of the files
+        if not specified outfolder is npydata folder
+        in the work directory.
+    slice : int
+        number of slice
+
+    Returns
+    -------
+    sys : Systemc
+        The read system object
+    """
+    if outfolder == "":
+        outfolder = os.path.join(os.getcwd(),"npydata")
+
+    filefound = False
+    if os.path.exists(outfolder):
+        fout = ".".join(["snap",str(slice),"npy"])
+        fout = os.path.join(outfolder, fout)
+        if os.path.exists(fout):
+            sys = np.load(fout)
+            filefound = True
+    
+    if not filefound:
+        sys = False
+
+    return sys
+
