@@ -137,7 +137,7 @@ def pickle_systems(infile, natoms, **kwargs):
     outfile = kwargs.get('outfile', os.path.join(os.getcwd(),".".join([infile,"dump"])))
 
     #read in the dask bag and convert to delayed object
-    b = (delayed) (db.read_text) (infile)
+    b = (db.read_text) (infile)
     c = b.to_delayed()
 
     #initialise systems
