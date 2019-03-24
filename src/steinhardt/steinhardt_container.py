@@ -254,3 +254,65 @@ def fetch_system(slice, outfolder=""):
 
     return sys
 
+def transfer_steinhardt(sys):
+    """
+    Transfer a steinhardt sys to Systemc sys
+    """
+    nsys = Systemc()
+    satoms = sys.get_allatoms()
+    nsys.natoms = len(atoms)
+
+    nsys.atoms = []
+    for atom in satoms:
+        natom = Atomc(atom.id, atom.x, atom.y, atom.z)
+        nsys.atoms.append(natom)
+    nsys.boxdims = sys.get_box()
+
+    return nsys
+
+def untransfer_steinhardt(sys):
+    """
+    Transfer a Systemc sys to steinhardt sys
+    """
+    nsys = st.System()
+    satoms = sys.atoms
+    nsys.natoms = len(atoms)
+
+    atoms = []
+    for atom in satoms:
+        natom = st.Atom()
+        natom.id = atom.id 
+        natom.x = atom.x 
+        natom.y = atom.y 
+        natom.z = atom.z
+
+        atoms.append(natom)
+    
+    nsys.assign_particles(atoms, sys.boxdims)
+
+    return nsys
+
+
+
+
+
+def pickle_steinhardt(systems):
+    """
+    Pickle a steinhardt system to Systemc and save to disk
+    """
+    #move out from pickling and use npy arrays
+    outfolder = os.path.join(os.getcwd(),"npydata")
+    if os.path.exists(outfolder):
+        shutil.rmtree(outfolder)
+    os.mkdir(outfolder)
+
+    for slice,sys in enumerate(systems):
+        fout = ".".join(["snap",str(slice)])
+        fout = os.path.join(outfolder, fout)
+
+
+def unpickle_steinhardt():
+    """
+    Unpickle a steinhardt system. Converts a Systemc to steinhardt
+    system and return. 
+    """
