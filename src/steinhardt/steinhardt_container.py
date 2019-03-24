@@ -163,7 +163,7 @@ def pickle_systems(infile, natoms, **kwargs):
                 raw = c[0][slice*nblock + 7].strip().split()
                 dimzlow = (delayed)(float)(raw[0])
                 dimzhigh = (delayed)(float)(raw[1])
-                boxd = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
+                boxdims = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
                 atoms = []
 
                 for i in range(9,natoms+9):
@@ -178,12 +178,12 @@ def pickle_systems(infile, natoms, **kwargs):
                     a = Atomc(idd,x,y,z)
                     atoms.append(a)
 
-                    #create system
-                    sys = Systemc()
-                    sys.atoms = atoms
-                    sys.boxdims = boxdims
-                    #nsystems.append(sys)
-                    fout.dump(sys, outfile)
+                #create system
+                sys = Systemc()
+                sys.atoms = atoms
+                sys.boxdims = boxdims
+                #nsystems.append(sys)
+                fout.dump(sys, outfile)
             fout.close()
     
         #now save pickled file
