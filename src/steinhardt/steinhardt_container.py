@@ -135,6 +135,7 @@ def pickle_systems(infile, natoms, **kwargs):
     """
     #process kwargs
     delay = kwargs.get('delay', False)
+    compressed = kwargs.get('compressed', False)
     save_file = kwargs.get('save_file', True)
     return_array = kwargs.get('return_array', False)
     nslices = kwargs.get('nslices', 1)
