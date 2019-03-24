@@ -1,4 +1,7 @@
 """
+Now a npy file format is used instead of pickled data.
+
+--old info--
 Even though super short on time, this module has to be reimagined a bit.
 This stems from the fact that pybind11 objects are hard to pickle. So,
 we will use alternative classes here - Atomc, and Systemc. These classes
@@ -121,6 +124,7 @@ def pickle_systems(infile, natoms, **kwargs):
         nslices (int) : 1, number of time slices in the trajectory
         format (string) : lammps, the format of the trajectory file
         outfile (string) : name of the output file
+        compressed (bool) : False, if True, compress system and use npz format
 
     Returns
     -------
@@ -159,7 +163,7 @@ def pickle_systems(infile, natoms, **kwargs):
     if format ==  "lammps":
         #fout = open(outfile,'wb')
         for slice in range(nslices):
-            fout = ".".join(["snap",str(slice),"npy"])
+            fout = ".".join(["snap",str(slice)])
             fout = os.path.join(outfolder, fout)
             nblock = int(natoms[slice]) + 9
             raw = c[0][slice*nblock + 5].strip().split()
@@ -206,7 +210,10 @@ def pickle_systems(infile, natoms, **kwargs):
             sys.boxdims = boxdims
             #nsystems.append(sys)
             #pickle.dump(sys, fout)
-            np.save(fout, [sys])
+            if compressed:
+                np.savez(fout, [sys])
+            else:
+                np.save(fout, [sys])
         #fout.close()
     
         #now save pickled file
