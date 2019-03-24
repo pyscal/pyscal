@@ -136,55 +136,68 @@ def pickle_systems(infile, natoms, **kwargs):
     format = kwargs.get('format', "lammps")
     outfile = kwargs.get('outfile', os.path.join(os.getcwd(),".".join([infile,"dump"])))
 
-    if delay:
-        #read in the dask bag and convert to delayed object
-        b = (delayed) (db.read_text) (infile)
-        c = b.to_delayed()
+    #read in the dask bag and convert to delayed object
+    b = (delayed) (db.read_text) (infile)
+    c = b.to_delayed()
 
-        #initialise systems
-        #nsystems = []
- 
-        #if natoms is a single value - make it into an array. This allows for providing
-        #variable atom numbers in each time slice
-        if not isinstance(natoms, list):
-            natoms = np.ones(nslices)*natoms
+    #initialise systems
+    #nsystems = []
 
-        #this part would be  md code specific
-        if format ==  "lammps":
-            fout = open(outfile,'wb')
-            for slice in range(nslices):
-                nblock = int(natoms[slice]) + 9
-                raw = c[0][slice*nblock + 5].strip().split()
-                dimxlow = (delayed)(float)(raw[0])
-                dimxhigh = (delayed)(float)(raw[1])          
-                raw = c[0][slice*nblock + 6].strip().split()
-                dimylow = (delayed)(float)(raw[0])
-                dimyhigh = (delayed)(float)(raw[1])    
-                raw = c[0][slice*nblock + 7].strip().split()
-                dimzlow = (delayed)(float)(raw[0])
-                dimzhigh = (delayed)(float)(raw[1])
-                boxdims = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
-                atoms = []
+    #if natoms is a single value - make it into an array. This allows for providing
+    #variable atom numbers in each time slice
+    if not isinstance(natoms, list):
+        natoms = np.ones(nslices)*natoms
 
-                for i in range(9,natoms+9):
-                    line = c[0][slice*nblock + i].strip().split()
-                    #print type(slice*nblock + i)
-                    #print line.compute()
-                    idd = (delayed)(int)(line[0]) 
-                    x = delayed (float)(line[3])
-                    #print line[3].compute()
-                    y = (delayed)(float)(line[4])
-                    z = (delayed)(float)(line[5])
-                    a = Atomc(idd,x,y,z)
-                    atoms.append(a)
+    #this part would be  md code specific
+    if format ==  "lammps":
+        fout = open(outfile,'wb')
+        for slice in range(nslices):
+            nblock = int(natoms[slice]) + 9
+            raw = c[0][slice*nblock + 5].strip().split()
+            dimxlow = (delayed)(float)(raw[0])
+            dimxhigh = (delayed)(float)(raw[1])          
+            raw = c[0][slice*nblock + 6].strip().split()
+            dimylow = (delayed)(float)(raw[0])
+            dimyhigh = (delayed)(float)(raw[1])    
+            raw = c[0][slice*nblock + 7].strip().split()
+            dimzlow = (delayed)(float)(raw[0])
+            dimzhigh = (delayed)(float)(raw[1])
+            if not delay:
+                dimxlow = dimxlow.compute()
+                dimxhigh = dimxhigh.compute()
+                dimylow = dimylow.compute()
+                dimyhigh = dimyhigh.compute()
+                dimzlow = dimzlow.compute()
+                dimzhigh = dimzhigh.compute()
 
-                #create system
-                sys = Systemc()
-                sys.atoms = atoms
-                sys.boxdims = boxdims
-                #nsystems.append(sys)
-                pickle.dump(sys, fout)
-            fout.close()
+            boxdims = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
+            atoms = []
+
+            for i in range(9,natoms+9):
+                line = c[0][slice*nblock + i].strip().split()
+                #print type(slice*nblock + i)
+                #print line.compute()
+                idd = (delayed)(int)(line[0]) 
+                x = delayed (float)(line[3])
+                #print line[3].compute()
+                y = (delayed)(float)(line[4])
+                z = (delayed)(float)(line[5])
+                if not delay:
+                    idd = idd.compute()
+                    x = x.compute()
+                    y = y.compute()
+                    z = z.compute()
+
+                a = Atomc(idd,x,y,z)
+                atoms.append(a)
+
+            #create system
+            sys = Systemc()
+            sys.atoms = atoms
+            sys.boxdims = boxdims
+            #nsystems.append(sys)
+            pickle.dump(sys, fout)
+        fout.close()
     
         #now save pickled file
         #create a function
