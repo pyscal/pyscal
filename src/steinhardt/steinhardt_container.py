@@ -183,7 +183,7 @@ def pickle_systems(infile, natoms, **kwargs):
                 sys.atoms = atoms
                 sys.boxdims = boxdims
                 #nsystems.append(sys)
-                fout.dump(sys, outfile)
+                pickle.dump(sys, outfile)
             fout.close()
     
         #now save pickled file
