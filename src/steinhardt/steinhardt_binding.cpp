@@ -54,6 +54,7 @@ PYBIND11_PLUGIN(steinhardt) {
        )doc"
         )
         .def(py::init< >())
+        .def_readwrite("id", &Atom::id)
         .def_readwrite("x", &Atom::posx)
         .def_readwrite("y", &Atom::posy)
         .def_readwrite("z", &Atom::posz)

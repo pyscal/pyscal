@@ -18,6 +18,7 @@ from dask import delayed
 import os
 import pickle
 import shutil
+import steinhardt as st
 
 class Atomc(object):
     def __init__(self,idd,x,y,z):
@@ -142,86 +143,89 @@ def pickle_systems(infile, natoms, **kwargs):
     format = kwargs.get('format', "lammps")
     outfile = kwargs.get('outfile', os.path.join(os.getcwd(),".".join([infile,"dump"])))
 
-    #read in the dask bag and convert to delayed object
-    b = (db.read_text) (infile)
-    c = b.to_delayed()
+    if delay:
+        #read in the dask bag and convert to delayed object
+        b = (db.read_text) (infile)
+        c = b.to_delayed()
 
-    #initialise systems
-    #nsystems = []
+        #initialise systems
+        #nsystems = []
 
-    #if natoms is a single value - make it into an array. This allows for providing
-    #variable atom numbers in each time slice
-    if not isinstance(natoms, list):
-        natoms = np.ones(nslices)*natoms
+        #if natoms is a single value - make it into an array. This allows for providing
+        #variable atom numbers in each time slice
+        if not isinstance(natoms, list):
+            natoms = np.ones(nslices)*natoms
 
-    #move out from pickling and use npy arrays
-    outfolder = os.path.join(os.getcwd(),"npydata")
-    if os.path.exists(outfolder):
-        shutil.rmtree(outfolder)
-    os.mkdir(outfolder)
+        #move out from pickling and use npy arrays
+        outfolder = os.path.join(os.getcwd(),"npydata")
+        if os.path.exists(outfolder):
+            shutil.rmtree(outfolder)
+        os.mkdir(outfolder)
 
-    #this part would be  md code specific
-    if format ==  "lammps":
-        #fout = open(outfile,'wb')
-        for slice in range(nslices):
-            fout = ".".join(["snap",str(slice)])
-            fout = os.path.join(outfolder, fout)
-            nblock = int(natoms[slice]) + 9
-            raw = c[0][slice*nblock + 5].strip().split()
-            dimxlow = (delayed)(float)(raw[0])
-            dimxhigh = (delayed)(float)(raw[1])          
-            raw = c[0][slice*nblock + 6].strip().split()
-            dimylow = (delayed)(float)(raw[0])
-            dimyhigh = (delayed)(float)(raw[1])    
-            raw = c[0][slice*nblock + 7].strip().split()
-            dimzlow = (delayed)(float)(raw[0])
-            dimzhigh = (delayed)(float)(raw[1])
-            if not delay:
-                dimxlow = dimxlow.compute()
-                dimxhigh = dimxhigh.compute()
-                dimylow = dimylow.compute()
-                dimyhigh = dimyhigh.compute()
-                dimzlow = dimzlow.compute()
-                dimzhigh = dimzhigh.compute()
+        #this part would be  md code specific
+        if format ==  "lammps":
+            #fout = open(outfile,'wb')
+            for slice in range(nslices):
+                fout = ".".join(["snap",str(slice)])
+                fout = os.path.join(outfolder, fout)
+                nblock = int(natoms[slice]) + 9
+                raw = c[0][slice*nblock + 5].strip().split()
+                dimxlow = (delayed)(float)(raw[0])
+                dimxhigh = (delayed)(float)(raw[1])          
+                raw = c[0][slice*nblock + 6].strip().split()
+                dimylow = (delayed)(float)(raw[0])
+                dimyhigh = (delayed)(float)(raw[1])    
+                raw = c[0][slice*nblock + 7].strip().split()
+                dimzlow = (delayed)(float)(raw[0])
+                dimzhigh = (delayed)(float)(raw[1])
+                #if not delay:
+                #    dimxlow = dimxlow.compute()
+                #    dimxhigh = dimxhigh.compute()
+                #    dimylow = dimylow.compute()
+                #    dimyhigh = dimyhigh.compute()
+                #    dimzlow = dimzlow.compute()
+                #    dimzhigh = dimzhigh.compute()
 
-            boxdims = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
-            atoms = []
+                boxdims = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
+                atoms = []
 
-            for i in range(9,natoms+9):
-                line = c[0][slice*nblock + i].strip().split()
-                #print type(slice*nblock + i)
-                #print line.compute()
-                idd = (delayed)(int)(line[0]) 
-                x = delayed (float)(line[3])
-                #print line[3].compute()
-                y = (delayed)(float)(line[4])
-                z = (delayed)(float)(line[5])
-                if not delay:
-                    idd = idd.compute()
-                    x = x.compute()
-                    y = y.compute()
-                    z = z.compute()
+                for i in range(9,natoms+9):
+                    line = c[0][slice*nblock + i].strip().split()
+                    #print type(slice*nblock + i)
+                    #print line.compute()
+                    idd = (delayed)(int)(line[0]) 
+                    x = delayed (float)(line[3])
+                    #print line[3].compute()
+                    y = (delayed)(float)(line[4])
+                    z = (delayed)(float)(line[5])
+                    #if not delay:
+                    #    idd = idd.compute()
+                    #    x = x.compute()
+                    #    y = y.compute()
+                    #    z = z.compute()
 
-                a = Atomc(idd,x,y,z)
-                atoms.append(a)
+                    a = Atomc(idd,x,y,z)
+                    atoms.append(a)
 
-            #create system
-            sys = Systemc()
-            sys.atoms = atoms
-            sys.boxdims = boxdims
-            #nsystems.append(sys)
-            #pickle.dump(sys, fout)
-            if compressed:
-                np.savez(fout, [sys])
-            else:
-                np.save(fout, [sys])
-        #fout.close()
+                #create system
+                sys = Systemc()
+                sys.atoms = atoms
+                sys.boxdims = boxdims
+                #nsystems.append(sys)
+                #pickle.dump(sys, fout)
+                if compressed:
+                    np.savez(fout, [sys])
+                else:
+                    np.save(fout, [sys])
+            #fout.close()
     
         #now save pickled file
         #create a function
-        return outfolder
+    if not delay:
+        print("not implemented")
+    return outfolder
 
-def fetch_system(slice, outfolder=""):
+def fetch_system(slice, outfolder="", compressed=False):
     """
     Fetch a npy style system from outfolder.
 
@@ -233,18 +237,25 @@ def fetch_system(slice, outfolder=""):
         in the work directory.
     slice : int
         number of slice
+    compressed : bool
+        True if npz format
 
     Returns
     -------
     sys : Systemc
         The read system object
     """
+    if compressed:
+        filekey = "npz"
+    else:
+        filekey = "npy"
+
     if outfolder == "":
         outfolder = os.path.join(os.getcwd(),"npydata")
 
     filefound = False
     if os.path.exists(outfolder):
-        fout = ".".join(["snap",str(slice),"npy"])
+        fout = ".".join(["snap",str(slice),filekey])
         fout = os.path.join(outfolder, fout)
         if os.path.exists(fout):
             sys = np.load(fout)
@@ -277,10 +288,11 @@ def untransfer_steinhardt(sys):
     """
     nsys = st.System()
     satoms = sys.atoms
-    nsys.natoms = len(atoms)
-
+    nsys.nop = len(satoms)
+    #print "check 1"
     atoms = []
     for atom in satoms:
+        #print "check"
         natom = st.Atom()
         natom.id = atom.id 
         natom.x = atom.x 
@@ -288,7 +300,7 @@ def untransfer_steinhardt(sys):
         natom.z = atom.z
 
         atoms.append(natom)
-    
+    #print "check 2"
     nsys.assign_particles(atoms, sys.boxdims)
 
     return nsys
@@ -297,12 +309,13 @@ def untransfer_steinhardt(sys):
 
 
 
-def pickle_steinhardt(systems):
+def pickle_steinhardt(systems, compressed=False):
     """
     Pickle a steinhardt system to Systemc and save to disk
     """
     #move out from pickling and use npy arrays
     outfolder = os.path.join(os.getcwd(),"npydata")
+
     if os.path.exists(outfolder):
         shutil.rmtree(outfolder)
     os.mkdir(outfolder)
@@ -310,10 +323,36 @@ def pickle_steinhardt(systems):
     for slice,sys in enumerate(systems):
         fout = ".".join(["snap",str(slice)])
         fout = os.path.join(outfolder, fout)
+        sysc = transfer_steinhardt(sys)
+        if compressed:
+            np.savez(fout, [sys])
+        else:
+            np.save(fout, [sys])
 
 
-def unpickle_steinhardt():
+def unpickle_steinhardt(outfolder="",nslices=1):
     """
     Unpickle a steinhardt system. Converts a Systemc to steinhardt
     system and return. 
     """
+    if compressed:
+        filekey = "npz"
+    else:
+        filekey = "npy"
+
+    if outfolder == "":
+        outfolder = os.path.join(os.getcwd(),"npydata")
+    
+    systems = []
+
+    if os.path.exists(outfolder):
+        for i in range(nslices):
+            fout = ".".join(["snap",str(i),filekey])
+            fout = os.path.join(outfolder, fout)
+            sys = np.load(fout)[0]
+            ssys = untransfer_steinhardt(sys)
+            systems.append(ssys)
+
+    return systems
+
+
