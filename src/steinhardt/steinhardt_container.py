@@ -129,14 +129,14 @@ def pickle_systems(infile, natoms, **kwargs):
 
     """
     #process kwargs
-    delayed = kwargs.get('delayed', False)
+    delay = kwargs.get('delay', False)
     save_file = kwargs.get('save_file', True)
     return_array = kwargs.get('return_array', False)
     nslices = kwargs.get('nslices', 1)
     format = kwargs.get('format', "lammps")
     outfile = kwargs.get('outfile', os.path.join(os.getcwd(),".".join([infile,"dump"])))
 
-    if delayed:
+    if delay:
         #read in the dask bag and convert to delayed object
         b = (delayed) (db.read_text) (infile)
         c = b.to_delayed()
