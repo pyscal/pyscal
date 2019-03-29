@@ -54,16 +54,47 @@ PYBIND11_PLUGIN(steinhardt) {
        )doc"
         )
         .def(py::init< >())
-        .def_readwrite("id", &Atom::id)
-        .def_readwrite("x", &Atom::posx)
-        .def_readwrite("y", &Atom::posy)
-        .def_readwrite("z", &Atom::posz)
-        .def_readwrite("n_neighbors", &Atom::n_neighbors)
-        .def_readwrite("frenkelnumber", &Atom::frenkelnumber)
-        .def_readwrite("issolid", &Atom::issolid)
-        .def_readwrite("structure", &Atom::structure)
-        .def_readwrite("belongsto", &Atom::belongsto)
+        //.def_readwrite("id", &Atom::id)
+        //.def_readwrite("x", &Atom::posx)
+        //.def_readwrite("y", &Atom::posy)
+        //.def_readwrite("z", &Atom::posz)
+        //.def_readwrite("n_neighbors", &Atom::n_neighbors)
+        //.def_readwrite("frenkelnumber", &Atom::frenkelnumber)
+        //.def_readwrite("issolid", &Atom::issolid)
+        //.def_readwrite("structure", &Atom::structure)
+        //.def_readwrite("belongsto", &Atom::belongsto)
 
+        .def("get_x",&Atom::gx,
+            R"doc(
+                Returns the position of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                x : vector double
+                    vector of x coordinates [posx, posy, posz]
+                )doc")
+
+        .def("get_cluster",&Atom::gcluster,
+            R"doc(
+                Returns the cluster properties of the atom.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                cluster : vector int
+                    cluster is a vector of four values. they are described below-
+                        issolid - which is 1 if the atom is solid, 0 otherwise
+                        issurface - 1 if the atom has liquid neighbors, 0 otherwise
+                        lcluster - 1 if the atom belongs to the largest cluster, 0 otherwise
+                        belongsto - which gives the id of the cluster that the atom belongs to.
+                )doc")
 
         .def("get_neighbors",&Atom::gneighbors,
             R"doc(
@@ -150,6 +181,21 @@ PYBIND11_PLUGIN(steinhardt) {
                 )doc")
 
         .def("get_q",&Atom::gq,
+            R"doc(
+                get  q value of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                q : float
+                    The queried q value
+                )doc")
+
+        .def("get_id",&Atom::gid,
             R"doc(
                 get  q value of the atom.
 
@@ -293,17 +339,70 @@ PYBIND11_PLUGIN(steinhardt) {
         )doc")
 
         .def(py::init< >())
-        .def_readwrite("inputfile", &System::inputfile)
-        .def_readwrite("nop", &System::nop)
-        .def_readwrite("minfrenkel", &System::minfrenkel)
-        .def_readwrite("boxx", &System::boxx)
-        .def_readwrite("boxy", &System::boxy)
-        .def_readwrite("boxz", &System::boxz)
-        .def_readwrite("cutoff", &System::neighbordistance)
-        .def_readwrite("threshold", &System::threshold)
-        .def_readwrite("avgthreshold", &System::avgthreshold)
-        .def_readwrite("maxclusterid", &System::maxclusterid)
+        //.def_readwrite("inputfile", &System::inputfile)
+        //.def_readwrite("nop", &System::nop)
+        //.def_readwrite("minfrenkel", &System::minfrenkel)
+        //.def_readwrite("boxx", &System::boxx)
+        //.def_readwrite("boxy", &System::boxy)
+        //.def_readwrite("boxz", &System::boxz)
+        //.def_readwrite("cutoff", &System::neighbordistance)
+        //.def_readwrite("threshold", &System::threshold)
+        //.def_readwrite("avgthreshold", &System::avgthreshold)
+        //.def_readwrite("maxclusterid", &System::maxclusterid)
         //minfrenkel function
+        .def("set_inputfile",&System::set_inputfile,
+            R"doc(
+                Set input file
+
+                Parameters
+                ----------
+                
+                Returns
+                -------
+                
+                See Also
+                --------
+                read_inputfile - read an input file
+
+                )doc")        
+
+        .def("get_largestcluster",&System::glargestclusterid,
+            R"doc(
+                get id of the the largest cluster
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                clusterid : int 
+                    id of the largest cluster
+                See Also
+                --------
+                read_inputfile - read an input file
+
+                )doc")        
+
+        .def("set_cutoff",&System::set_neighbordistance,
+            R"doc(
+                Set cutoff for neighbor calculation.
+
+                Parameters
+                ----------
+                cutoff : double
+                    cutoff distance for calculating neighbors
+                
+                Returns
+                -------
+                None
+                
+                See Also
+                --------
+                read_inputfile - read an input file
+
+                )doc")        
+
         .def("set_nucsize_parameters",&System::set_nucsize_parameters,
             R"doc(
                 Set the value of parameters for calculating the largest cluster in the
@@ -485,6 +584,22 @@ PYBIND11_PLUGIN(steinhardt) {
             )
 
 
+        .def("assign_cluster_info",&System::get_largest_cluster_atoms,
+            R"doc(
+                Assigns parameters such as if the atom belongs to the largest cluster,
+                if it is on the surface.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
         .def("read_inputfile",&System::read_particle_file,
             R"doc(
                 Read a single snapshot of the lammps dump file and assign the positions
@@ -558,6 +673,21 @@ PYBIND11_PLUGIN(steinhardt) {
                 Parameters
                 ----------
                 method
+                
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
+
+        .def("reset_allneighbors", (void (System::*) ()) &System::reset_all_neighbors,
+            R"doc(
+                Reset the neighbors of all atoms in the system.
+
+                Parameters
+                ----------
+                None
                 
                 Returns
                 -------

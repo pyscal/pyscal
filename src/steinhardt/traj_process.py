@@ -7,7 +7,7 @@ import numpy as np
 import io
 import gzip
 
-def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False, usecols=[]):
+def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False,usecols=[]):
     """
     Reads in LAMMPS trajectory file and converts it to systems.
 
@@ -62,7 +62,8 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False, usecols=
 
         for line in infile:
             if(count==1):
-                ff = 'snap.'+str(startblock)+'.dat'
+                ff = ".".join([filename, 'snap', str(startblock), 'dat'])
+                #ff = 'snap.'+str(startblock)+'.dat'
                 files.append(ff)
                 fout = open(ff,'w')
                 fout.write(line)
@@ -80,12 +81,12 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False, usecols=
         infile.close()
 
         #qtraj = getQTrajectory(files)
-        systems=[]
-        for file in files:
-            sys = System()
-            sys.inputfile = file
-            systems.append(sys)
-        return systems,files
+        #systems=[]
+        #for file in files:
+            #sys = System()
+            #sys.inputfile = file
+            #systems.append(sys)
+        return files
 
     else:
         atoms = []

@@ -284,6 +284,17 @@ double System::get_abs_distance(Atom atom1 , Atom atom2 ){
 }
 
 
+void System::reset_all_neighbors(){
+    for (int ti = 0;ti<nop;ti++){
+        
+        atoms[ti].n_neighbors=0;
+        for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
+                        
+            atoms[ti].neighbors[tn] = NILVALUE;
+            atoms[ti].neighbordist[tn] = -1.0;
+        }
+    }
+}
 void System::get_all_neighbors(){
 
     
@@ -810,6 +821,26 @@ int System::largest_cluster(){
         return max;
 } 
 
+void System::get_largest_cluster_atoms(){
+        for(int ti=0; ti<nop; ti++){
+            atoms[ti].issurface = 1;
+            atoms[ti].lcluster = 0;
+            //if its in same cluster as max cluster assign it as one
+            if(atoms[ti].belongsto == maxclusterid){
+                atoms[ti].lcluster = 1;
+            }
+           //if its solid- identfy if it has liquid
+            if(atoms[ti].issolid == 1){
+                atoms[ti].issurface = 0;
+                for(int tj=0; tj<atoms[ti].n_neighbors; tj++){
+                    if(atoms[atoms[ti].neighbors[tj]].issolid == 0){
+                        atoms[ti].issurface = 1;
+                        break;
+                    }
+                }
+            }
+        }
+}
 
 int System::calculate_nucsize()
 {
@@ -826,6 +857,7 @@ int System::calculate_nucsize()
         find_solids();
         find_clusters();
         greatestbelongsto = largest_cluster();
+        get_largest_cluster_atoms();
         return greatestbelongsto;
 }
 
@@ -915,6 +947,28 @@ vector<int> Atom::gneighbors(){
 }
 
 double Atom::gq(int qq){ return q[qq-2]; }
+int Atom::gid(){ return id; }
+
+//aceesss funcs 
+vector<double> Atom::gx(){ 
+    vector<double> pos;
+    pos.emplace_back(posx);
+    pos.emplace_back(posy);
+    pos.emplace_back(posz);
+    return pos; 
+}
+
+vector<int> Atom::gcluster(){
+    vector<int> cl;
+    cl.emplace_back(issolid);
+    cl.emplace_back(issurface);
+    cl.emplace_back(lcluster);
+    cl.emplace_back(belongsto);
+    return cl;
+}
+
+
+
 void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
 
 vector<vector <double>> Atom::gqlm(int qq) {

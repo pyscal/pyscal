@@ -44,6 +44,8 @@ class Atom{
         double avq6q6;
 
         int belongsto;
+        int lcluster;
+        int issurface;
         int issolid;
         int structure;
         int id;
@@ -65,7 +67,9 @@ class Atom{
         void sneighbors(vector<int> nns);
         vector<int> gneighbors();
         void sneighborweights(vector<double> nns);
-        vector<double> gneighborweights(); 
+        vector<double> gneighborweights();
+        //vector<double> gx();
+        vector<int> gcluster(); 
 
         //variables for storing q2-12
         //invidual variables or arrays - individual ones are easier!
@@ -81,6 +85,7 @@ class Atom{
         vector <vector<double>> gqlm(int);
 
         double gaq(int);
+        int gid();
         void saq(int, double);
         vector <vector<double>> gaqlm(int);
 
@@ -103,6 +108,7 @@ class System{
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors();
         void get_all_neighbors(string &);
+        void reset_all_neighbors();
         void calculate_complexQLM_6();
         double get_number_from_bond(int,int);
         double get_number_from_bond(Atom ,Atom );
@@ -125,6 +131,7 @@ class System{
         void set_inputfile(string);
         void set_neighbordistance(double);
         void assign_particles( vector<Atom>, vector<double>);
+        void get_largest_cluster_atoms();
         //functions to set the list of reqd qs
         //again, error checking would be amazing here.
         void set_reqd_qs(vector<int>);
