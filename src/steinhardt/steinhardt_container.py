@@ -147,8 +147,8 @@ def pickle_systems(infile, natoms, **kwargs):
 
     if delay:
         #read in the dask bag and convert to delayed object
-        b = db.read_text(infile, collection=False, blocksize=bsize)
-        c =b
+        #b = db.read_text(infile, collection=False, blocksize=bsize)
+        #c =b
         #c = b.to_delayed()
 
         #initialise systems
@@ -170,9 +170,9 @@ def pickle_systems(infile, natoms, **kwargs):
             #fout = open(outfile,'wb')
             if not wurst:
                 for slice in range(nslices):
-                    sub_pickle_systems(slice, natoms, c, outfolder, compressed)
+                    sub_pickle_systems(slice, natoms, infile, bsize, outfolder, compressed)
             if wurst:
-                res = delayed (np.array) ([ delayed (sub_pickle_systems)(slice, natoms, c, outfolder, compressed) for slice in range(nslices)])
+                res = delayed (np.array) ([ delayed (sub_pickle_systems)(slice, natoms, infile, bsize, outfolder, compressed) for slice in range(nslices)])
                 res.compute()
             #fout.close()
                
@@ -182,8 +182,8 @@ def pickle_systems(infile, natoms, **kwargs):
         print("not implemented")
     return outfolder
 
-def sub_pickle_systems(slice, natoms, c, outfolder, compressed):
-        
+def sub_pickle_systems(slice, natoms, infile, bsize, outfolder, compressed):
+        c = db.read_text(infile, collection=False, blocksize=bsize)
         fout = ".".join(["snap",str(slice)])
         fout = os.path.join(outfolder, fout)
         nblock = int(natoms[slice]) + 9
