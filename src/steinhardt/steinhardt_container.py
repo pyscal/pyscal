@@ -141,13 +141,15 @@ def pickle_systems(infile, natoms, **kwargs):
     save_file = kwargs.get('save_file', True)
     return_array = kwargs.get('return_array', False)
     nslices = kwargs.get('nslices', 1)
+    bsize = kwargs.get('blocksize', 10000)
     format = kwargs.get('format', "lammps")
     outfile = kwargs.get('outfile', os.path.join(os.getcwd(),".".join([infile,"dump"])))
 
     if delay:
         #read in the dask bag and convert to delayed object
-        b = (db.read_text) (infile)
-        c = b.to_delayed()
+        b = db.read_text(infile, collection=False, blocksize=bsize)
+        c =b
+        #c = b.to_delayed()
 
         #initialise systems
         #nsystems = []
