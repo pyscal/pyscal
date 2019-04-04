@@ -136,6 +136,7 @@ def pickle_systems(infile, natoms, **kwargs):
     """
     #process kwargs
     delay = kwargs.get('delay', False)
+    wurst = kwargs.get('delay', False)
     compressed = kwargs.get('compressed', False)
     save_file = kwargs.get('save_file', True)
     return_array = kwargs.get('return_array', False)
@@ -165,65 +166,75 @@ def pickle_systems(infile, natoms, **kwargs):
         #this part would be  md code specific
         if format ==  "lammps":
             #fout = open(outfile,'wb')
-            for slice in range(nslices):
-                fout = ".".join(["snap",str(slice)])
-                fout = os.path.join(outfolder, fout)
-                nblock = int(natoms[slice]) + 9
-                raw = c[0][slice*nblock + 5].strip().split()
-                dimxlow = (delayed)(float)(raw[0])
-                dimxhigh = (delayed)(float)(raw[1])          
-                raw = c[0][slice*nblock + 6].strip().split()
-                dimylow = (delayed)(float)(raw[0])
-                dimyhigh = (delayed)(float)(raw[1])    
-                raw = c[0][slice*nblock + 7].strip().split()
-                dimzlow = (delayed)(float)(raw[0])
-                dimzhigh = (delayed)(float)(raw[1])
-                #if not delay:
-                #    dimxlow = dimxlow.compute()
-                #    dimxhigh = dimxhigh.compute()
-                #    dimylow = dimylow.compute()
-                #    dimyhigh = dimyhigh.compute()
-                #    dimzlow = dimzlow.compute()
-                #    dimzhigh = dimzhigh.compute()
-
-                boxdims = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
-                atoms = []
-
-                for i in range(9,natoms+9):
-                    line = c[0][slice*nblock + i].strip().split()
-                    #print type(slice*nblock + i)
-                    #print line.compute()
-                    idd = (delayed)(int)(line[0]) 
-                    x = delayed (float)(line[3])
-                    #print line[3].compute()
-                    y = (delayed)(float)(line[4])
-                    z = (delayed)(float)(line[5])
-                    #if not delay:
-                    #    idd = idd.compute()
-                    #    x = x.compute()
-                    #    y = y.compute()
-                    #    z = z.compute()
-
-                    a = Atomc(idd,x,y,z)
-                    atoms.append(a)
-
-                #create system
-                sys = Systemc()
-                sys.atoms = atoms
-                sys.boxdims = boxdims
-                #nsystems.append(sys)
-                #pickle.dump(sys, fout)
-                if compressed:
-                    np.savez(fout, [sys])
-                else:
-                    np.save(fout, [sys])
+            if not wurst:
+                for slice in range(nslices):
+                    sub_pickle_systems(slice, natoms, c, outfolder, compressed)
+            if wurst:
+                res = delayed (np.array) ([ delayed (sub_pickle_systems)(slice, natoms, c, outfolder, compressed) for slice in range(nslices)])
+                res.compute()
             #fout.close()
-    
+               
         #now save pickled file
         #create a function
     if not delay:
         print("not implemented")
     return outfolder
+
+def sub_pickle_systems(slice, natoms, c, outfolder, compressed):
+        
+        fout = ".".join(["snap",str(slice)])
+        fout = os.path.join(outfolder, fout)
+        nblock = int(natoms[slice]) + 9
+        raw = c[0][slice*nblock + 5].strip().split()
+        dimxlow = (delayed)(float)(raw[0])
+        dimxhigh = (delayed)(float)(raw[1])          
+        raw = c[0][slice*nblock + 6].strip().split()
+        dimylow = (delayed)(float)(raw[0])
+        dimyhigh = (delayed)(float)(raw[1])    
+        raw = c[0][slice*nblock + 7].strip().split()
+        dimzlow = (delayed)(float)(raw[0])
+        dimzhigh = (delayed)(float)(raw[1])
+        #if not delay:
+        #    dimxlow = dimxlow.compute()
+        #    dimxhigh = dimxhigh.compute()
+        #    dimylow = dimylow.compute()
+        #    dimyhigh = dimyhigh.compute()
+        #    dimzlow = dimzlow.compute()
+        #    dimzhigh = dimzhigh.compute()
+
+        boxdims = [[dimxlow,dimxhigh], [dimylow,dimyhigh], [dimzlow,dimzhigh]]
+        atoms = []
+
+        for i in range(9,int(natoms[slice])+9):
+            line = c[0][slice*nblock + i].strip().split()
+            #print type(slice*nblock + i)
+            #print line.compute()
+            idd = (delayed)(int)(line[0]) 
+            x = delayed (float)(line[3])
+            #print line[3].compute()
+            y = (delayed)(float)(line[4])
+            z = (delayed)(float)(line[5])
+            #if not delay:
+            #    idd = idd.compute()
+            #    x = x.compute()
+            #    y = y.compute()
+            #    z = z.compute()
+
+            a = Atomc(idd,x,y,z)
+            atoms.append(a)
+
+        #create system
+        sys = Systemc()
+        sys.atoms = atoms
+        sys.boxdims = boxdims
+        #nsystems.append(sys)
+        #pickle.dump(sys, fout)
+        if compressed:
+            np.savez(fout, [sys])
+        else:
+            np.save(fout, [sys])
+
+        return 1
 
 def fetch_system(slice, outfolder="", compressed=False):
     """
