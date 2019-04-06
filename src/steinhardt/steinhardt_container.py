@@ -19,6 +19,7 @@ import os
 import pickle
 import shutil
 import steinhardt as st
+import dask.dataframe as dd
 
 class Atomc(object):
     def __init__(self,idd,x,y,z):
@@ -183,7 +184,7 @@ def pickle_systems(infile, natoms, **kwargs):
     return outfolder
 
 def sub_pickle_systems(slice, natoms, infile, bsize, outfolder, compressed):
-        c = db.read_text(infile, collection=False, blocksize=bsize)
+        c = db.read_text(infile, collection=False)
         fout = ".".join(["snap",str(slice)])
         fout = os.path.join(outfolder, fout)
         nblock = int(natoms[slice]) + 9
@@ -222,13 +223,18 @@ def sub_pickle_systems(slice, natoms, infile, bsize, outfolder, compressed):
             #    y = y.compute()
             #    z = z.compute()
 
-            a = Atomc(idd,x,y,z)
+            #a = Atomc(idd,x,y,z)
+            a = [idd,x,y,z]
             atoms.append(a)
 
         #create system
-        sys = Systemc()
-        sys.atoms = atoms
-        sys.boxdims = boxdims
+        #sys = Systemc()
+        #sys.atoms = atoms
+        #sys.boxdims = boxdims
+        sys = np.array([atoms, boxdims])
+        #atoms = delayed (np.array) (atoms)
+        #sys = dd.from_delayed(atoms)
+        #sys.to_hdf(fout, 'atoms', )
         #nsystems.append(sys)
         #pickle.dump(sys, fout)
         if compressed:
