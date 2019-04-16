@@ -379,6 +379,7 @@ void System::get_all_neighbors(){
 }
 
 //overloaded function; would be called
+//if neighbor method voronoi is selected.
 void System::get_all_neighbors( string &jkl){
 
     if(strcmp(jkl.c_str(),"voronoi")!=0){
@@ -390,13 +391,15 @@ void System::get_all_neighbors( string &jkl){
     double r,theta,phi;
     int i;
     int ti,id,tnx,tny,tnz;
-    double rx,ry,rz,tsum, fa;
+    int n3, n4, n5, n6;
+    double rx,ry,rz,tsum, fa, x, y, z;
     vector<int> neigh,f_vert;
-    vector<double> facearea;
+    vector<double> facearea, v;
     voronoicell_neighbor c;
     vector< vector<double> > nweights;
     vector< vector<int> > nneighs;
     vector<int> idss;
+    vector<int> nvector;
     double weightsum;
 
     if (!fileread) { read_particle_file(); }
@@ -414,9 +417,41 @@ void System::get_all_neighbors( string &jkl){
             ti=cl.pid();
             c.face_areas(facearea);
             c.neighbors(neigh);
+            c.face_vertices(f_vert);
+            c.vertices(x,y,z,v);
             tsum = 0;
             vector <double> dummyweights;
             vector <int> dummyneighs;
+
+            //find vertices index
+            n3 = 0;
+            n4 = 0;
+            n5 = 0;
+            n6 = 0;
+
+            for(int i=0; i<f_vert.size(); i++){
+                if (f_vert[i] == 3){
+                    n3++;
+                }
+                else if (f_vert[i] == 4){
+                    n4++;
+                }
+                else if (f_vert[i] == 5){
+                    n5++;
+                }
+                else if (f_vert[i] == 6){
+                    n6++;
+                }
+            }
+
+            //assign to nvector
+            nvector.clear();
+            nvector.push_back(n3);
+            nvector.push_back(n4);
+            nvector.push_back(n5);
+            nvector.push_back(n6);
+            //assign to the atom
+            atoms[ti].vorovector = nvector;
 
             //only loop over neighbors
             weightsum = 0.0;
@@ -1065,4 +1100,12 @@ vector<double> Atom::gneighborweights(){
         rqlms.emplace_back(neighborweight[i]);
     }
     return rqlms;
+}
+
+vector<int> Atom::gvorovector(){
+    vector <int> voro;
+    for(int i=0; i<4; i++){
+        voro.emplace_back(vorovector[i]);
+    }
+    return voro;
 }

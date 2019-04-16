@@ -79,6 +79,7 @@ class Atom{
         double imgq[11][25];
         double arealq[11][25];
         double aimgq[11][25];
+
         
         double gq(int);
         void sq(int, double);
@@ -93,6 +94,10 @@ class Atom{
         vector <double> custom;
         void scustom(vector <double>);
         vector<double> gcustom();
+
+        //for vorocell identification
+        vector<int> vorovector;
+        vector<int> gvorovector();
 
 };
 

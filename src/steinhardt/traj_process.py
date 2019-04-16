@@ -37,10 +37,6 @@ def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False,usecols=[
     Returns
     -------
     
-    systems : array like
-        array of System. If snaps=True, the atom coordinates are not read in.
-        Otherwise, atom and box coordinates are already set.
-    
     files : array like
         list of files names of one time slice each. Only returned if
         snaps=True

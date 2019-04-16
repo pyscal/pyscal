@@ -292,6 +292,23 @@ PYBIND11_PLUGIN(steinhardt) {
                     second part is the 2q+1 imaginary values.
                 )doc")
 
+        .def("get_vorovector",&Atom::gvorovector,
+            R"doc(
+                get the voronoi structure identification vector. Returns a
+                vector of the form (n3, n4, n5, n6), where n3 is the number
+                of faces with 3 vertices, n4 is the number of faces with 4
+                vertices and so on. This can be used to identify structures.
+
+                Parameters
+                ----------
+                None
+
+                Returns
+                -------
+                vorovector : array like, int
+                    array of the form (n3, n4, n5, n6)
+                )doc")
+
     ; 
 
     //bindings and documentation for individual functions
