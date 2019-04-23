@@ -417,12 +417,18 @@ void System::get_all_neighbors( string &jkl){
             ti=cl.pid();
             c.face_areas(facearea);
             c.neighbors(neigh);
-            c.face_vertices(f_vert);
+            c.face_orders(f_vert);
             c.vertices(x,y,z,v);
             tsum = 0;
             vector <double> dummyweights;
             vector <int> dummyneighs;
 
+            //only loop over neighbors
+            weightsum = 0.0;
+            for (int i=0; i<facearea.size(); i++){
+            	weightsum += facearea[i];
+            }
+            
             //find vertices index
             n3 = 0;
             n4 = 0;
@@ -430,6 +436,10 @@ void System::get_all_neighbors( string &jkl){
             n6 = 0;
 
             for(int i=0; i<f_vert.size(); i++){
+                if ((facearea[i]/weightsum) < 0.002){
+                    continue;
+                }
+
                 if (f_vert[i] == 3){
                     n3++;
                 }
@@ -454,10 +464,10 @@ void System::get_all_neighbors( string &jkl){
             atoms[ti].vorovector = nvector;
 
             //only loop over neighbors
-            weightsum = 0.0;
-            for (int i=0; i<facearea.size(); i++){
-                weightsum += facearea[i];
-            }
+            //weightsum = 0.0;
+            //for (int i=0; i<facearea.size(); i++){
+            //    weightsum += facearea[i];
+            //}
             for (int tj=0; tj<neigh.size(); tj++){
                 atoms[ti].neighbors[tj] = neigh[tj];
                 atoms[ti].n_neighbors += 1;        
