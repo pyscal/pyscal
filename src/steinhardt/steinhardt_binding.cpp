@@ -1,3 +1,9 @@
+/*
+This is the main file of steinhardt module where the bindings of the classes System and Atom are
+provided. Additionally, the docstrings for the functions are also provided here. The docstrings should
+be elaborate and ideally follow pep-8 conventions.
+ */
+
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
@@ -9,64 +15,34 @@
 namespace py = pybind11;
 using namespace std;
 
-PYBIND11_PLUGIN(steinhardt) {
+//module name would be steinhardt
+/*
+What we could think of is to compile this module as something like _steinhardt and provide the 
+functions through a python module - the advantage of this is that the error checking and so on
+can be done in the wrapping python code, which is great.
+ */
 
+PYBIND11_PLUGIN(steinhardt) {
 //bindings for Atom class
 //------------------------------------------------------------------
     py::module m("steinhardt");
     py::class_<Atom>(m,"Atom",             
         R"doc(
-            Class to hold the details of an atom. The various 
-            variables that can be accessed from python module
-            are mentioned in attributes.
+        A c++ class for holding the properties of a single atom. Various properties of the atom
+        can be accessed through member functions which are described below.
 
-            Attributes
-            ----------
-            Basic atom properties
-            ---------------------
-            x : float
-                x coordinate of atom
-            y : float
-                y coordinate of atom
-            z : float
-                z coordinate of atom
-            id : int
-                id of the atom
+        Examples
+        --------
+        atom = Atom()
 
-            Neighbor related properties
-            ---------------------------
-            n_neighbors : int
-                number of neighbors of the atom
-                Note that to access the list of neighbors, 
-                gneighbors() method needs to be used.
-
-            Cluster related properties
-            --------------------------
-            frenkelnumber : int
-                frenkelnumber of the atom.
-            issolid : int
-                0 or 1. 1 if atom is solid.
-            structure : int
-                structure of the atom.
-            belongsto : int
-                id of the cluster to which atom belongs to.
-
-       )doc"
+        )doc"
         )
         .def(py::init< >())
-        //.def_readwrite("id", &Atom::id)
-        //.def_readwrite("x", &Atom::posx)
-        //.def_readwrite("y", &Atom::posy)
-        //.def_readwrite("z", &Atom::posz)
-        //.def_readwrite("n_neighbors", &Atom::n_neighbors)
-        //.def_readwrite("frenkelnumber", &Atom::frenkelnumber)
-        //.def_readwrite("issolid", &Atom::issolid)
-        //.def_readwrite("structure", &Atom::structure)
-        //.def_readwrite("belongsto", &Atom::belongsto)
-
+        
         .def("get_x",&Atom::gx,
             R"doc(
-                Returns the position of the atom.
+                Get the position of the atom. Meaningful values are only returned if the atoms are
+                set before using this function.
 
                 Parameters
                 ----------
@@ -74,13 +50,22 @@ PYBIND11_PLUGIN(steinhardt) {
                 
                 Returns
                 -------
-                x : vector double
-                    vector of x coordinates [posx, posy, posz]
+                x : array of float
+                    contains the position of the atom in the form [posx, posy, posz], where
+                    posx is the x coordinate of the atom, posy is the y coordinate and posz 
+                    is the z coordinate. 
+
+                Examples
+                --------
+                >>> atom = Atom()
+                >>> x = atom.get_x()
+
                 )doc")
 
         .def("get_cluster",&Atom::gcluster,
             R"doc(
-                Returns the cluster properties of the atom.
+                Get the cluster properties of the atom. The cluster properties of the atom
+                include
 
                 Parameters
                 ----------

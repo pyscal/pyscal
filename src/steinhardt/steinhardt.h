@@ -15,13 +15,9 @@ using namespace std;
 const int MAXNUMBEROFNEIGHBORS = 100;
 const double PI = 3.141592653589793;
 const int NILVALUE = 33333333;
-//const long int FACTORIALS[25] = {1,1,2,6,24,120,720,5040,40320,362880,3628800,39916800,479001600,6227020800,87178291200,1307674368000,20922789888000};
-
-
-
 
 class Atom{
-     
+    //documentation is available on the binding module    
     public:
         Atom();
         virtual ~Atom();
@@ -178,12 +174,3 @@ class System{
         int fileread;
 
 };
-
-/*
-class Filehandling{
-
-    public:
-        vector<vector<Atoms>> read_whole_file(string);  
-
-}
-*/
