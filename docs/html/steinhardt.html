@@ -1,0 +1,256 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>steinhardt package &mdash; pybop 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> pybop
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">steinhardt package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-steinhardt.core">steinhardt.core module</a></li>
+<li><a class="reference internal" href="#module-steinhardt.traj_process">steinhardt.traj_process module</a></li>
+<li><a class="reference internal" href="#module-steinhardt">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">pybop</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>steinhardt package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/steinhardt.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="steinhardt-package">
+<h1>steinhardt package<a class="headerlink" href="#steinhardt-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-steinhardt.core">
+<span id="steinhardt-core-module"></span><h2>steinhardt.core module<a class="headerlink" href="#module-steinhardt.core" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-steinhardt.traj_process">
+<span id="steinhardt-traj-process-module"></span><h2>steinhardt.traj_process module<a class="headerlink" href="#module-steinhardt.traj_process" title="Permalink to this headline">¶</a></h2>
+<p>This file contains the methods for processing of a trajectory</p>
+<dl class="function">
+<dt id="steinhardt.traj_process.traj_to_systems">
+<code class="descclassname">steinhardt.traj_process.</code><code class="descname">traj_to_systems</code><span class="sig-paren">(</span><em>filename</em>, <em>natoms</em>, <em>snaps=False</em>, <em>npy=False</em>, <em>zipped=False</em>, <em>usecols=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/steinhardt/traj_process.html#traj_to_systems"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#steinhardt.traj_process.traj_to_systems" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in LAMMPS trajectory file and converts it to systems.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>string</em>) – name of input file</li>
+<li><strong>natoms</strong> (<em>int</em>) – number of input atoms</li>
+<li><strong>snaps</strong> (<em>bool</em>) – splits the input file into smaller files of one time slice each and
+return a list of filenames if True.
+If False, returns an array of systems with the atom and box coordinates
+read in.</li>
+<li><strong>npy</strong> (<em>bool</em>) – If true saves the systems as a npy file.</li>
+<li><strong>usecols</strong> (<em>array like</em>) – If custom column numbers are to be used, they can be specified here.
+for example if usecols = [3,4,5,8,9] - the first three columns are
+used to read in x,y, and z values are the rest are read in as custom
+properties. They can be accessed by atom.gcustom(). The minimum length
+of usecols has to be three(for positions). The column number starts
+from 0. Atom ID always has to be column 0.
+Restrictions - * ONLY used if snaps is set to False *</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>files</strong> – list of files names of one time slice each. Only returned if
+snaps=True</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array like</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-steinhardt">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-steinhardt" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sarath Menon, Grisell Diaz Leines, Jutta Rogal
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
