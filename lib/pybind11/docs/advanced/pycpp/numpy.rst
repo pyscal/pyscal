@@ -41,7 +41,7 @@ completely avoid copy operations with Python expressions like
                 py::format_descriptor<float>::format(), /* Python struct-style format descriptor */
                 2,                                      /* Number of dimensions */
                 { m.rows(), m.cols() },                 /* Buffer dimensions */
-                { sizeof(float) * m.rows(),             /* Strides (in bytes) for each index */
+                { sizeof(float) * m.cols(),             /* Strides (in bytes) for each index */
                   sizeof(float) }
             );
         });
@@ -57,11 +57,11 @@ specification.
 
     struct buffer_info {
         void *ptr;
-        size_t itemsize;
+        ssize_t itemsize;
         std::string format;
-        int ndim;
-        std::vector<size_t> shape;
-        std::vector<size_t> strides;
+        ssize_t ndim;
+        std::vector<ssize_t> shape;
+        std::vector<ssize_t> strides;
     };
 
 To create a C++ function that can take a Python buffer object as an argument,
@@ -95,11 +95,11 @@ buffer objects (e.g. a NumPy matrix).
                 throw std::runtime_error("Incompatible buffer dimension!");
 
             auto strides = Strides(
-                info.strides[rowMajor ? 0 : 1] / sizeof(Scalar),
-                info.strides[rowMajor ? 1 : 0] / sizeof(Scalar));
+                info.strides[rowMajor ? 0 : 1] / (py::ssize_t)sizeof(Scalar),
+                info.strides[rowMajor ? 1 : 0] / (py::ssize_t)sizeof(Scalar));
 
             auto map = Eigen::Map<Matrix, 0, Strides>(
-                static_cat<Scalar *>(info.ptr), info.shape[0], info.shape[1], strides);
+                static_cast<Scalar *>(info.ptr), info.shape[0], info.shape[1], strides);
 
             new (&m) Matrix(map);
         });
@@ -111,18 +111,14 @@ as follows:
 
     .def_buffer([](Matrix &m) -> py::buffer_info {
         return py::buffer_info(
-            m.data(),                /* Pointer to buffer */
-            sizeof(Scalar),          /* Size of one scalar */
-            /* Python struct-style format descriptor */
-            py::format_descriptor<Scalar>::format(),
-            /* Number of dimensions */
-            2,
-            /* Buffer dimensions */
-            { (size_t) m.rows(),
-              (size_t) m.cols() },
-            /* Strides (in bytes) for each index */
+            m.data(),                                /* Pointer to buffer */
+            sizeof(Scalar),                          /* Size of one scalar */
+            py::format_descriptor<Scalar>::format(), /* Python struct-style format descriptor */
+            2,                                       /* Number of dimensions */
+            { m.rows(), m.cols() },                  /* Buffer dimensions */
             { sizeof(Scalar) * (rowMajor ? m.cols() : 1),
               sizeof(Scalar) * (rowMajor ? 1 : m.rows()) }
+                                                     /* Strides (in bytes) for each index */
         );
      })
 
@@ -194,13 +190,20 @@ expects the type followed by field names:
     };
 
     // ...
-    PYBIND11_PLUGIN(test) {
+    PYBIND11_MODULE(test, m) {
         // ...
 
         PYBIND11_NUMPY_DTYPE(A, x, y);
         PYBIND11_NUMPY_DTYPE(B, z, a);
         /* now both A and B can be used as template arguments to py::array_t */
     }
+
+The structure should consist of fundamental arithmetic types, ``std::complex``,
+previously registered substructures, and arrays of any of the above. Both C++
+arrays and ``std::array`` are supported. While there is a static assertion to
+prevent many types of unsupported structures, it is still the user's
+responsibility to use only "plain" structures that can be safely manipulated as
+raw memory without violating invariants.
 
 Vectorizing functions
 =====================
@@ -236,27 +239,13 @@ by the compiler. The result is returned as a NumPy array of type
 The scalar argument ``z`` is transparently replicated 4 times.  The input
 arrays ``x`` and ``y`` are automatically converted into the right types (they
 are of type  ``numpy.dtype.int64`` but need to be ``numpy.dtype.int32`` and
-``numpy.dtype.float32``, respectively)
+``numpy.dtype.float32``, respectively).
 
-Sometimes we might want to explicitly exclude an argument from the vectorization
-because it makes little sense to wrap it in a NumPy array. For instance,
-suppose the function signature was
+.. note::
 
-.. code-block:: cpp
-
-    double my_func(int x, float y, my_custom_type *z);
-
-This can be done with a stateful Lambda closure:
-
-.. code-block:: cpp
-
-    // Vectorize a lambda function with a capture object (e.g. to exclude some arguments from the vectorization)
-    m.def("vectorized_func",
-        [](py::array_t<int> x, py::array_t<float> y, my_custom_type *z) {
-            auto stateful_closure = [z](int x, float y) { return my_func(x, y, z); };
-            return py::vectorize(stateful_closure)(x, y);
-        }
-    );
+    Only arithmetic, complex, and POD types passed by value or by ``const &``
+    reference are vectorized; all other arguments are passed through as-is.
+    Functions taking rvalue reference arguments cannot be vectorized.
 
 In cases where the computation is too complicated to be reduced to
 ``vectorize``, it will be necessary to create and access the buffer contents
@@ -272,7 +261,7 @@ simply using ``vectorize``).
     namespace py = pybind11;
 
     py::array_t<double> add_arrays(py::array_t<double> input1, py::array_t<double> input2) {
-        auto buf1 = input1.request(), buf2 = input2.request();
+        py::buffer_info buf1 = input1.request(), buf2 = input2.request();
 
         if (buf1.ndim != 1 || buf2.ndim != 1)
             throw std::runtime_error("Number of dimensions must be one");
@@ -283,7 +272,7 @@ simply using ``vectorize``).
         /* No pointer is passed, so NumPy will allocate the buffer */
         auto result = py::array_t<double>(buf1.size);
 
-        auto buf3 = result.request();
+        py::buffer_info buf3 = result.request();
 
         double *ptr1 = (double *) buf1.ptr,
                *ptr2 = (double *) buf2.ptr,
@@ -295,10 +284,8 @@ simply using ``vectorize``).
         return result;
     }
 
-    PYBIND11_PLUGIN(test) {
-        py::module m("test");
+    PYBIND11_MODULE(test, m) {
         m.def("add_arrays", &add_arrays, "Add two NumPy arrays");
-        return m.ptr();
     }
 
 .. seealso::
@@ -322,17 +309,17 @@ where ``N`` gives the required dimensionality of the array:
     m.def("sum_3d", [](py::array_t<double> x) {
         auto r = x.unchecked<3>(); // x must have ndim = 3; can be non-writeable
         double sum = 0;
-        for (size_t i = 0; i < r.shape(0); i++)
-            for (size_t j = 0; j < r.shape(1); j++)
-                for (size_t k = 0; k < r.shape(2); k++)
+        for (ssize_t i = 0; i < r.shape(0); i++)
+            for (ssize_t j = 0; j < r.shape(1); j++)
+                for (ssize_t k = 0; k < r.shape(2); k++)
                     sum += r(i, j, k);
         return sum;
     });
     m.def("increment_3d", [](py::array_t<double> x) {
         auto r = x.mutable_unchecked<3>(); // Will throw if ndim != 3 or flags.writeable is false
-        for (size_t i = 0; i < r.shape(0); i++)
-            for (size_t j = 0; j < r.shape(1); j++)
-                for (size_t k = 0; k < r.shape(2); k++)
+        for (ssize_t i = 0; i < r.shape(0); i++)
+            for (ssize_t j = 0; j < r.shape(1); j++)
+                for (ssize_t k = 0; k < r.shape(2); k++)
                     r(i, j, k) += 1.0;
     }, py::arg().noconvert());
 
@@ -377,3 +364,23 @@ uses of ``py::array``:
 
     The file :file:`tests/test_numpy_array.cpp` contains additional examples
     demonstrating the use of this feature.
+
+Ellipsis
+========
+
+Python 3 provides a convenient ``...`` ellipsis notation that is often used to
+slice multidimensional arrays. For instance, the following snippet extracts the
+middle dimensions of a tensor with the first and last index set to zero.
+
+.. code-block:: python
+
+   a = # a NumPy array
+   b = a[0, ..., 0]
+
+The function ``py::ellipsis()`` function can be used to perform the same
+operation on the C++ side:
+
+.. code-block:: cpp
+
+   py::array a = /* A NumPy array */;
+   py::array b = a[py::make_tuple(0, py::ellipsis(), 0)];

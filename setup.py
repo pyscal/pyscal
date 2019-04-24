@@ -16,6 +16,7 @@ class CMakeExtension(Extension):
         self.sourcedir = os.path.abspath(sourcedir)
 
 
+#checks for the cmake version
 class CMakeBuild(build_ext):
     def run(self):
         try:
@@ -82,8 +83,7 @@ setup(
     # and nowhere else
     package_dir={'':'src'},
     # add an extension module named 'python_cpp_example' to the package 
-    # 'python_cpp_example'
-    ext_modules=[CMakeExtension('steinhardt/steinhardt')],
+    ext_modules=[CMakeExtension('steinhardt/core')],
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,

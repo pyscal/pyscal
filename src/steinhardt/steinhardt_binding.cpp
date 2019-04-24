@@ -15,25 +15,30 @@ be elaborate and ideally follow pep-8 conventions.
 namespace py = pybind11;
 using namespace std;
 
-//module name would be steinhardt
+//module name would be steinhardt.core
 /*
 What we could think of is to compile this module as something like _steinhardt and provide the 
 functions through a python module - the advantage of this is that the error checking and so on
 can be done in the wrapping python code, which is great.
  */
 
-PYBIND11_PLUGIN(steinhardt) {
+PYBIND11_MODULE(core, m) {
 //bindings for Atom class
 //------------------------------------------------------------------
-    py::module m("steinhardt");
+    //py::module m("steinhardt");
+    m.doc() = R"doc(
+                steinhardt plugin
+                -----------------
+        
+    )doc";
     py::class_<Atom>(m,"Atom",             
         R"doc(
-        A c++ class for holding the properties of a single atom. Various properties of the atom
-        can be accessed through member functions which are described below.
+                A c++ class for holding the properties of a single atom. Various properties of the atom
+                can be accessed through member functions which are described below.
 
-        Examples
-        --------
-        atom = Atom()
+                Examples
+                --------
+                atom = Atom()
 
         )doc"
         )
@@ -65,7 +70,8 @@ PYBIND11_PLUGIN(steinhardt) {
         .def("get_cluster",&Atom::gcluster,
             R"doc(
                 Get the cluster properties of the atom. The cluster properties of the atom
-                include
+                include four different properties as listed below. The properties are only
+                returned if they are calculated before using
 
                 Parameters
                 ----------
@@ -298,75 +304,36 @@ PYBIND11_PLUGIN(steinhardt) {
 
     //bindings and documentation for individual functions
     py::class_<System>(m,"System",R"doc(
-        Class to hold a steinhardt system. It includes all the atoms and
-        other system properties.
+                
+                A c++ class for holding the properties of a single atom. Various properties of the atom
+                can be accessed through member functions which are described below.
 
-        A list of variables that can be set directly is provided.
-
-        Attributes
-        ----------
-        File operations
-        ---------------
-        inputfile : string
-            Name of the input file to read the atom information
-        
-        Simulation box
-        --------------
-        nop : int
-            Number of atoms in the system.
-        minfrenkel : int
-            minimum number of frenkel connections to be identified as a 
-            solid.
-        boxx : float
-            x dimension of the box
-        boxy : float
-            y dimension of the box
-        boxz : float
-            z dimension of the box
-        neighbordistance : float
-            cutoff distance to be used for neighbor calculations.
-            accessible from python module as cutoff.
-
-        Calculation of largest cluster
-        ------------------------------
-        threshold : float
-            The cutoff value of connection between two atoms for them to be 
-            defined as having a bond.
-        avgthreshold : float
-            Averaged value of connection between an atom and its neighbors for 
-            an atom to be solid.
-        maxclusterid : int
-            id of the biggest cluster.
-
-        )doc")
+                Examples
+                --------
+                atom = Atom()
+                
+        )doc"
+        )
 
         .def(py::init< >())
-        //.def_readwrite("inputfile", &System::inputfile)
-        //.def_readwrite("nop", &System::nop)
-        //.def_readwrite("minfrenkel", &System::minfrenkel)
-        //.def_readwrite("boxx", &System::boxx)
-        //.def_readwrite("boxy", &System::boxy)
-        //.def_readwrite("boxz", &System::boxz)
-        //.def_readwrite("cutoff", &System::neighbordistance)
-        //.def_readwrite("threshold", &System::threshold)
-        //.def_readwrite("avgthreshold", &System::avgthreshold)
-        //.def_readwrite("maxclusterid", &System::maxclusterid)
-        //minfrenkel function
+        
         .def("set_inputfile",&System::set_inputfile,
             R"doc(
                 Set input file
 
                 Parameters
                 ----------
-                
+                None
+
                 Returns
                 -------
-                
+                None
+
                 See Also
                 --------
                 read_inputfile - read an input file
-
-                )doc")        
+                
+               )doc")        
 
         .def("get_largestcluster",&System::glargestclusterid,
             R"doc(
@@ -380,6 +347,7 @@ PYBIND11_PLUGIN(steinhardt) {
                 -------
                 clusterid : int 
                     id of the largest cluster
+
                 See Also
                 --------
                 read_inputfile - read an input file
@@ -538,7 +506,7 @@ PYBIND11_PLUGIN(steinhardt) {
             R"doc(
                 Access function that returns the low and high values of sim box.
 
-                Parametersb
+                Parameters
                 ----------
                 None
 
@@ -654,21 +622,6 @@ PYBIND11_PLUGIN(steinhardt) {
             )
 
         .def("get_allneighbors", (void (System::*) (string &))  &System::get_all_neighbors, py::arg("method"), 
-            R"doc(
-                Find neighbors of all atoms in the system.
-
-                Parameters
-                ----------
-                method
-                
-                Returns
-                -------
-                None
-
-                    )doc"
-            )
-
-        .def("get_allneighbors", (void (System::*) ()) &System::get_all_neighbors,
             R"doc(
                 Find neighbors of all atoms in the system.
 

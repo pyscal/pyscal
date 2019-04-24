@@ -18,23 +18,27 @@ find_package(PythonLibsNew ${PYBIND11_PYTHON_VERSION} REQUIRED)
 include(CheckCXXCompilerFlag)
 include(CMakeParseArguments)
 
-function(select_cxx_standard)
-  if(NOT MSVC AND NOT PYBIND11_CPP_STANDARD)
+if(NOT PYBIND11_CPP_STANDARD AND NOT CMAKE_CXX_STANDARD)
+  if(NOT MSVC)
     check_cxx_compiler_flag("-std=c++14" HAS_CPP14_FLAG)
-    check_cxx_compiler_flag("-std=c++11" HAS_CPP11_FLAG)
 
     if (HAS_CPP14_FLAG)
       set(PYBIND11_CPP_STANDARD -std=c++14)
-    elseif (HAS_CPP11_FLAG)
-      set(PYBIND11_CPP_STANDARD -std=c++11)
     else()
-      message(FATAL_ERROR "Unsupported compiler -- pybind11 requires C++11 support!")
+      check_cxx_compiler_flag("-std=c++11" HAS_CPP11_FLAG)
+      if (HAS_CPP11_FLAG)
+        set(PYBIND11_CPP_STANDARD -std=c++11)
+      else()
+        message(FATAL_ERROR "Unsupported compiler -- pybind11 requires C++11 support!")
+      endif()
     endif()
-
-    set(PYBIND11_CPP_STANDARD ${PYBIND11_CPP_STANDARD} CACHE STRING
-        "C++ standard flag, e.g. -std=c++11 or -std=c++14. Defaults to latest available." FORCE)
+  elseif(MSVC)
+    set(PYBIND11_CPP_STANDARD /std:c++14)
   endif()
-endfunction()
+
+  set(PYBIND11_CPP_STANDARD ${PYBIND11_CPP_STANDARD} CACHE STRING
+      "C++ standard flag, e.g. -std=c++11, -std=c++14, /std:c++14.  Defaults to C++14 mode." FORCE)
+endif()
 
 # Checks whether the given CXX/linker flags can compile and link a cxx file.  cxxflags and
 # linkerflags are lists of flags to use.  The result variable is a unique variable name for each set
@@ -106,10 +110,10 @@ endfunction()
 
 # Build a Python extension module:
 # pybind11_add_module(<name> [MODULE | SHARED] [EXCLUDE_FROM_ALL]
-#                     [NO_EXTRAS] [THIN_LTO] source1 [source2 ...])
+#                     [NO_EXTRAS] [SYSTEM] [THIN_LTO] source1 [source2 ...])
 #
 function(pybind11_add_module target_name)
-  set(options MODULE SHARED EXCLUDE_FROM_ALL NO_EXTRAS THIN_LTO)
+  set(options MODULE SHARED EXCLUDE_FROM_ALL NO_EXTRAS SYSTEM THIN_LTO)
   cmake_parse_arguments(ARG "${options}" "" "" ${ARGN})
 
   if(ARG_MODULE AND ARG_SHARED)
@@ -126,14 +130,33 @@ function(pybind11_add_module target_name)
 
   add_library(${target_name} ${lib_type} ${exclude_from_all} ${ARG_UNPARSED_ARGUMENTS})
 
-  target_include_directories(${target_name}
+  if(ARG_SYSTEM)
+    set(inc_isystem SYSTEM)
+  endif()
+
+  target_include_directories(${target_name} ${inc_isystem}
     PRIVATE ${PYBIND11_INCLUDE_DIR}  # from project CMakeLists.txt
     PRIVATE ${pybind11_INCLUDE_DIR}  # from pybind11Config
     PRIVATE ${PYTHON_INCLUDE_DIRS})
 
+  # Python debug libraries expose slightly different objects
+  # https://docs.python.org/3.6/c-api/intro.html#debugging-builds
+  # https://stackoverflow.com/questions/39161202/how-to-work-around-missing-pymodule-create2-in-amd64-win-python35-d-lib
+  if(PYTHON_IS_DEBUG)
+    target_compile_definitions(${target_name} PRIVATE Py_DEBUG)
+  endif()
+
   # The prefix and extension are provided by FindPythonLibsNew.cmake
   set_target_properties(${target_name} PROPERTIES PREFIX "${PYTHON_MODULE_PREFIX}")
   set_target_properties(${target_name} PROPERTIES SUFFIX "${PYTHON_MODULE_EXTENSION}")
+
+  # -fvisibility=hidden is required to allow multiple modules compiled against
+  # different pybind versions to work properly, and for some features (e.g.
+  # py::module_local).  We force it on everything inside the `pybind11`
+  # namespace; also turning it on for a pybind module compilation here avoids
+  # potential warnings or issues from having mixed hidden/non-hidden types.
+  set_target_properties(${target_name} PROPERTIES CXX_VISIBILITY_PRESET "hidden")
+  set_target_properties(${target_name} PROPERTIES CUDA_VISIBILITY_PRESET "hidden")
 
   if(WIN32 OR CYGWIN)
     # Link against the Python shared library on Windows
@@ -161,11 +184,8 @@ function(pybind11_add_module target_name)
     endif()
   endif()
 
-  select_cxx_standard()
-  if(NOT MSVC)
-    # Make sure C++11/14 are enabled
-    target_compile_options(${target_name} PUBLIC ${PYBIND11_CPP_STANDARD})
-  endif()
+  # Make sure C++11/14 are enabled
+  target_compile_options(${target_name} PUBLIC ${PYBIND11_CPP_STANDARD})
 
   if(ARG_NO_EXTRAS)
     return()
@@ -174,9 +194,6 @@ function(pybind11_add_module target_name)
   _pybind11_add_lto_flags(${target_name} ${ARG_THIN_LTO})
 
   if (NOT MSVC AND NOT ${CMAKE_BUILD_TYPE} MATCHES Debug)
-    # Set the default symbol visibility to hidden (very important to obtain small binaries)
-    target_compile_options(${target_name} PRIVATE "-fvisibility=hidden")
-
     # Strip unnecessary sections of the binary on Linux/Mac OS
     if(CMAKE_STRIP)
       if(APPLE)
@@ -192,6 +209,15 @@ function(pybind11_add_module target_name)
   if(MSVC)
     # /MP enables multithreaded builds (relevant when there are many files), /bigobj is
     # needed for bigger binding projects due to the limit to 64k addressable sections
-    target_compile_options(${target_name} PRIVATE /MP /bigobj)
+    target_compile_options(${target_name} PRIVATE /bigobj)
+    if(CMAKE_VERSION VERSION_LESS 3.11)
+      target_compile_options(${target_name} PRIVATE $<$<NOT:$<CONFIG:Debug>>:/MP>)
+    else()
+      # Only set these options for C++ files.  This is important so that, for
+      # instance, projects that include other types of source files like CUDA
+      # .cu files don't get these options propagated to nvcc since that would
+      # cause the build to fail.
+      target_compile_options(${target_name} PRIVATE $<$<NOT:$<CONFIG:Debug>>:$<$<COMPILE_LANGUAGE:CXX>:/MP>>)
+    endif()
   endif()
 endfunction()

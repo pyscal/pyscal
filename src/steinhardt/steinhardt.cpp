@@ -8,6 +8,9 @@
 
 using namespace voro;
 
+/*
+Constructor for the system.
+*/
 System::System(){
     
     nop = -1;
@@ -18,12 +21,17 @@ System::System(){
 
 }
 
+/*
+Destructor of the system class
+ */
 System::~System(){
     
     delete [] atoms;
 }
 
-
+/*
+Calculate factorial of a number
+ */
 double System::dfactorial(int l,int m){
 
     double fac = 1.00;
@@ -295,7 +303,7 @@ void System::reset_all_neighbors(){
         }
     }
 }
-void System::get_all_neighbors(){
+void System::get_all_neighbors_normal(){
 
     
     double d;
@@ -380,11 +388,8 @@ void System::get_all_neighbors(){
 
 //overloaded function; would be called
 //if neighbor method voronoi is selected.
-void System::get_all_neighbors( string &jkl){
+void System::get_all_neighbors_voronoi(){
 
-    if(strcmp(jkl.c_str(),"voronoi")!=0){
-        return;
-    }
 
     double d;
     double diffx,diffy,diffz;
@@ -489,6 +494,17 @@ void System::get_all_neighbors( string &jkl){
 
     //mark end of neighbor calc
     neighborsfound = 1;
+
+}
+
+void System::get_all_neighbors( string &jkl){
+
+    if(strcmp(jkl.c_str(),"voronoi")==0){
+        get_all_neighbors_voronoi();
+    }
+    else{
+        get_all_neighbors_normal();
+    }
 
 }
 
@@ -615,7 +631,7 @@ void System::calculate_q(){
 
     //now check if neighbors are found
     if (!neighborsfound){
-        get_all_neighbors();
+        get_all_neighbors_normal();
     }
 
     //note that the qvals will be in -2 pos
@@ -893,7 +909,7 @@ int System::calculate_nucsize()
         int greatestbelongsto;
         //Find all particles within a radius of neighbourdistancess
         //read_particle_file();
-        get_all_neighbors();
+        get_all_neighbors_normal();
         //Get Q6 values
         calculate_complexQLM_6();
         //and the number of bonds to find the largest cluster

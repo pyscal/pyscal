@@ -2,7 +2,7 @@
 This file contains the methods for processing of a trajectory
 
 """
-from steinhardt import *
+from steinhardt.core import *
 import numpy as np
 import io
 import gzip

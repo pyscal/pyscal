@@ -23,6 +23,8 @@ std::string test_function3(int i) {
     return "test_function(" + std::to_string(i) + ")";
 }
 
+py::str test_function4()           { return "test_function()"; }
+py::str test_function4(char *)     { return "test_function(char *)"; }
 py::str test_function4(int, float) { return "test_function(int, float)"; }
 py::str test_function4(float, int) { return "test_function(float, int)"; }
 
@@ -47,7 +49,14 @@ namespace test_exc_sp {
 int f1(int x) noexcept { return x+1; }
 int f2(int x) noexcept(true) { return x+2; }
 int f3(int x) noexcept(false) { return x+3; }
+#if defined(__GNUG__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wdeprecated"
+#endif
 int f4(int x) throw() { return x+4; } // Deprecated equivalent to noexcept(true)
+#if defined(__GNUG__)
+#  pragma GCC diagnostic pop
+#endif
 struct C {
     int m1(int x) noexcept { return x-1; }
     int m2(int x) const noexcept { return x-2; }
@@ -55,23 +64,36 @@ struct C {
     int m4(int x) const noexcept(true) { return x-4; }
     int m5(int x) noexcept(false) { return x-5; }
     int m6(int x) const noexcept(false) { return x-6; }
+#if defined(__GNUG__)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wdeprecated"
+#endif
     int m7(int x) throw() { return x-7; }
     int m8(int x) const throw() { return x-8; }
+#if defined(__GNUG__)
+#  pragma GCC diagnostic pop
+#endif
 };
 }
 
 
-test_initializer constants_and_functions([](py::module &m) {
+TEST_SUBMODULE(constants_and_functions, m) {
+    // test_constants
     m.attr("some_constant") = py::int_(14);
 
+    // test_function_overloading
     m.def("test_function", &test_function1);
     m.def("test_function", &test_function2);
     m.def("test_function", &test_function3);
 
 #if defined(PYBIND11_OVERLOAD_CAST)
+    m.def("test_function", py::overload_cast<>(&test_function4));
+    m.def("test_function", py::overload_cast<char *>(&test_function4));
     m.def("test_function", py::overload_cast<int, float>(&test_function4));
     m.def("test_function", py::overload_cast<float, int>(&test_function4));
 #else
+    m.def("test_function", static_cast<py::str (*)()>(&test_function4));
+    m.def("test_function", static_cast<py::str (*)(char *)>(&test_function4));
     m.def("test_function", static_cast<py::str (*)(int, float)>(&test_function4));
     m.def("test_function", static_cast<py::str (*)(float, int)>(&test_function4));
 #endif
@@ -81,12 +103,13 @@ test_initializer constants_and_functions([](py::module &m) {
         .value("ESecondEntry", ESecondEntry)
         .export_values();
 
+    // test_bytes
     m.def("return_bytes", &return_bytes);
     m.def("print_bytes", &print_bytes);
 
+    // test_exception_specifiers
     using namespace test_exc_sp;
-    py::module m2 = m.def_submodule("exc_sp");
-    py::class_<C>(m2, "C")
+    py::class_<C>(m, "C")
         .def(py::init<>())
         .def("m1", &C::m1)
         .def("m2", &C::m2)
@@ -97,8 +120,8 @@ test_initializer constants_and_functions([](py::module &m) {
         .def("m7", &C::m7)
         .def("m8", &C::m8)
         ;
-    m2.def("f1", f1);
-    m2.def("f2", f2);
-    m2.def("f3", f3);
-    m2.def("f4", f4);
-});
+    m.def("f1", f1);
+    m.def("f2", f2);
+    m.def("f3", f3);
+    m.def("f4", f4);
+}

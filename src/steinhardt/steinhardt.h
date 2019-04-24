@@ -17,11 +17,54 @@ const double PI = 3.141592653589793;
 const int NILVALUE = 33333333;
 
 class Atom{
-    //documentation is available on the binding module    
+    /*
+    Class to hold the details of an atom. This is a list of all
+    members of the class. 
+
+    Attributes
+    ----------
+    Basic atom properties
+    ---------------------
+    posx : float
+        x coordinate of atom
+    posy : float
+        y coordinate of atom
+    posz : float
+        z coordinate of atom
+    id : int
+        id of the atom
+    loc : int
+        location of the atom in the array of all atoms in 
+        the system.
+
+    Neighbor related properties
+    ---------------------------
+    n_neighbors : int
+        number of neighbors of the atom
+
+
+    Cluster related properties
+    --------------------------
+    frenkelnumber : int
+        frenkelnumber of the atom.
+    issolid : int
+        0 or 1. 1 if atom is solid.
+    structure : int
+        structure of the atom.
+    belongsto : int
+        id of the cluster to which atom belongs to.
+    
+     */    
     public:
         Atom();
         virtual ~Atom();
+        
+        //basic atom properties
         double posx,posy,posz;
+        int id;
+        int loc;
+
+        //neighbor related properties
         int neighbors[MAXNUMBEROFNEIGHBORS];
         double neighbordist[MAXNUMBEROFNEIGHBORS];
         double neighborweight[MAXNUMBEROFNEIGHBORS];
@@ -44,8 +87,8 @@ class Atom{
         int issurface;
         int issolid;
         int structure;
-        int id;
-        int loc;
+        
+        
         //indicator which is 1 if neighbors are already provided
         int isneighborset;
 
@@ -107,7 +150,8 @@ class System{
         double PLM(int, int, double);
         void YLM(int , int , double , double , double &, double &);
         void QLM(int ,int ,double ,double ,double &, double & );
-        void get_all_neighbors();
+        void get_all_neighbors_normal();
+        void get_all_neighbors_voronoi();
         void get_all_neighbors(string &);
         void reset_all_neighbors();
         void calculate_complexQLM_6();
