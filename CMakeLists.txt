@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-project(steinhardt)
+project(pybop)
 #------------------------------------------------------
 
 # Set source directory
 #------------------------------------------------------
 # main directory for steinhardt cpp modules
-set(SOURCE_DIR "src/steinhardt")
+set(SOURCE_DIR "src/pybop")
 #sub directory for voro lib
 set(SSOURCE_DIR "lib/voro++")
 

@@ -71,8 +71,8 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    name='steinhardt',
-    version='0.1',
+    name='pybop',
+    version='0.9',
     author='Sarath Menon',
     author_email='sarath.menon@rub.de',
     description='A hybrid C++/python module for calculation of Steinhardt Parameters',
@@ -83,7 +83,7 @@ setup(
     # and nowhere else
     package_dir={'':'src'},
     # add an extension module named 'python_cpp_example' to the package 
-    ext_modules=[CMakeExtension('steinhardt/core')],
+    ext_modules=[CMakeExtension('pybop/core')],
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
