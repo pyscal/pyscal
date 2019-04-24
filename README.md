@@ -1,7 +1,7 @@
 
-# Steinhardt Tools
+# pybop
 
-Steinhardt tools is a python library written in C++ to calculate and analyse Steinhardts parameters[1]. It provides the necessary tools to easily calculate and extend upon the Steinhardt parameters calculations.
+pybop is a python library written in C++ to calculate and analyse Steinhardts parameters[1]. It provides the necessary tools to easily calculate and extend upon the Steinhardt parameters calculations.
 
 ### Installation
 
