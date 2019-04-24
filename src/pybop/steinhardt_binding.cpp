@@ -25,20 +25,34 @@ can be done in the wrapping python code, which is great.
 PYBIND11_MODULE(core, m) {
 //bindings for Atom class
 //------------------------------------------------------------------
-    //py::module m("steinhardt");
-    m.doc() = R"doc(
-                steinhardt plugin
-                -----------------
-        
-    )doc";
     py::class_<Atom>(m,"Atom",             
         R"doc(
                 A c++ class for holding the properties of a single atom. Various properties of the atom
-                can be accessed through member functions which are described below.
+                can be accessed through member functions which are described below in detail. Atoms can
+                be created individually or directly by reading in a file. Check the examples for more 
+                details on how atoms are created. For creating atoms directly from an input file check
+                the documentation of `System` class.
+
+                Atoms should be thought of inherently as members of the `System` class. The coordinates
+                of atom are always relative to the simulation box.
 
                 Examples
                 --------
+                #method 1 - individually
                 atom = Atom()
+                #now set positions of the atoms
+                atom.set_x([23.0, 45.2, 34.2])
+                #now set id
+                atom.set_id(23)
+
+                See also
+                --------
+                get_x
+                set_x
+                set_id
+                get_id
+                System
+
 
         )doc"
         )
@@ -66,6 +80,30 @@ PYBIND11_MODULE(core, m) {
                 >>> x = atom.get_x()
 
                 )doc")
+
+        .def("set_x",&Atom::sx,
+            R"doc(
+                Get the position of the atom. Meaningful values are only returned if the atoms are
+                set before using this function.
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                x : array of float
+                    contains the position of the atom in the form [posx, posy, posz], where
+                    posx is the x coordinate of the atom, posy is the y coordinate and posz 
+                    is the z coordinate. 
+
+                Examples
+                --------
+                >>> atom = Atom()
+                >>> x = atom.get_x()
+
+                )doc")
+
 
         .def("get_cluster",&Atom::gcluster,
             R"doc(
@@ -187,6 +225,21 @@ PYBIND11_MODULE(core, m) {
                 )doc")
 
         .def("get_id",&Atom::gid,
+            R"doc(
+                get  q value of the atom.
+
+                Parameters
+                ----------
+                q : int
+                    number of the required q - from 2-12
+
+                Returns
+                -------
+                q : float
+                    The queried q value
+                )doc")
+
+        .def("set_id",&Atom::sid,
             R"doc(
                 get  q value of the atom.
 

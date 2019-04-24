@@ -94,6 +94,7 @@ class Atom{
 
         //we need some functions to fetch atom properties
         vector<double> gx();
+        void sx(vector<double>);
         //int* gx();
         //double gy();
         //double gz();
@@ -126,6 +127,7 @@ class Atom{
 
         double gaq(int);
         int gid();
+        void sid(int);
         void saq(int, double);
         vector <vector<double>> gaqlm(int);
 

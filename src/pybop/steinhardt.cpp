@@ -1009,6 +1009,7 @@ vector<int> Atom::gneighbors(){
 
 double Atom::gq(int qq){ return q[qq-2]; }
 int Atom::gid(){ return id; }
+void Atom::sid(int idd){ id=idd; }
 
 //aceesss funcs 
 vector<double> Atom::gx(){ 
@@ -1017,6 +1018,12 @@ vector<double> Atom::gx(){
     pos.emplace_back(posy);
     pos.emplace_back(posz);
     return pos; 
+}
+
+void Atom::sx(vector<double> rls){
+    posx = rls[0];
+    posy = rls[1];
+    posz = rls[2];
 }
 
 vector<int> Atom::gcluster(){
