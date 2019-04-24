@@ -80,10 +80,7 @@
               <div class="local-toc"><ul>
 <li><a class="reference internal" href="#">pybop package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pybop.core">pybop.core module</a><ul>
-<li><a class="reference internal" href="#steinhardt-plugin">steinhardt plugin</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#module-pybop.core">pybop.core module</a></li>
 <li><a class="reference internal" href="#module-pybop.traj_process">pybop.traj_process module</a></li>
 <li><a class="reference internal" href="#module-pybop">Module contents</a></li>
 </ul>
@@ -159,16 +156,28 @@
 </div>
 <div class="section" id="module-pybop.core">
 <span id="pybop-core-module"></span><h2>pybop.core module<a class="headerlink" href="#module-pybop.core" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="steinhardt-plugin">
-<h3>steinhardt plugin<a class="headerlink" href="#steinhardt-plugin" title="Permalink to this headline">¶</a></h3>
 <dl class="class">
 <dt id="pybop.core.Atom">
 <em class="property">class </em><code class="descclassname">pybop.core.</code><code class="descname">Atom</code><a class="headerlink" href="#pybop.core.Atom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_builtins.pybind11_object</span></code></p>
 <p>A c++ class for holding the properties of a single atom. Various properties of the atom
-can be accessed through member functions which are described below.</p>
+can be accessed through member functions which are described below in detail. Atoms can
+be created individually or directly by reading in a file. Check the examples for more
+details on how atoms are created. For creating atoms directly from an input file check
+the documentation of <cite>System</cite> class.</p>
+<p>Atoms should be thought of inherently as members of the <cite>System</cite> class. The coordinates
+of atom are always relative to the simulation box.</p>
 <p class="rubric">Examples</p>
-<p>atom = Atom()</p>
+<p>#method 1 - individually
+atom = Atom()
+#now set positions of the atoms
+atom.set_x([23.0, 45.2, 34.2])
+#now set id
+atom.set_id(23)</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.get_x" title="pybop.core.Atom.get_x"><code class="xref py py-class docutils literal notranslate"><span class="pre">get_x</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_x" title="pybop.core.Atom.set_x"><code class="xref py py-class docutils literal notranslate"><span class="pre">set_x</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_id" title="pybop.core.Atom.set_id"><code class="xref py py-class docutils literal notranslate"><span class="pre">set_id</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_id" title="pybop.core.Atom.get_id"><code class="xref py py-class docutils literal notranslate"><span class="pre">get_id</span></code></a>, <a class="reference internal" href="#pybop.core.System" title="pybop.core.System"><code class="xref py py-class docutils literal notranslate"><span class="pre">System</span></code></a></p>
+</div>
 <dl class="method">
 <dt id="pybop.core.Atom.get_aq">
 <code class="descname">get_aq</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#pybop.core.Atom.get_aq" title="Permalink to this definition">¶</a></dt>
@@ -432,6 +441,24 @@ is the z coordinate.</td>
 </dd></dl>
 
 <dl class="method">
+<dt id="pybop.core.Atom.set_id">
+<code class="descname">set_id</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>get  q value of the atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<em>int</em>) – number of the required q - from 2-12</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>q</strong> – The queried q value</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="pybop.core.Atom.set_neighbors">
 <code class="descname">set_neighbors</code><span class="sig-paren">(</span><em>self: pybop.core.Atom, arg0: List[int]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_neighbors" title="Permalink to this definition">¶</a></dt>
 <dd><p>Set the neighbors of an atom</p>
@@ -489,6 +516,32 @@ is the z coordinate.</td>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybop.core.Atom.set_x">
+<code class="descname">set_x</code><span class="sig-paren">(</span><em>self: pybop.core.Atom, arg0: List[float]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_x" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the position of the atom. Meaningful values are only returned if the atoms are
+set before using this function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>x</strong> – contains the position of the atom in the form [posx, posy, posz], where
+posx is the x coordinate of the atom, posy is the y coordinate and posz
+is the z coordinate.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array of float</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -1037,7 +1090,6 @@ calculate_q function.</p>
 
 </dd></dl>
 
-</div>
 </div>
 <div class="section" id="module-pybop.traj_process">
 <span id="pybop-traj-process-module"></span><h2>pybop.traj_process module<a class="headerlink" href="#module-pybop.traj_process" title="Permalink to this headline">¶</a></h2>

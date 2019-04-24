@@ -15,12 +15,6 @@ be elaborate and ideally follow pep-8 conventions.
 namespace py = pybind11;
 using namespace std;
 
-//module name would be steinhardt.core
-/*
-What we could think of is to compile this module as something like _steinhardt and provide the 
-functions through a python module - the advantage of this is that the error checking and so on
-can be done in the wrapping python code, which is great.
- */
 
 PYBIND11_MODULE(core, m) {
 //bindings for Atom class
@@ -33,17 +27,21 @@ PYBIND11_MODULE(core, m) {
                 details on how atoms are created. For creating atoms directly from an input file check
                 the documentation of `System` class.
 
-                Atoms should be thought of inherently as members of the `System` class. The coordinates
-                of atom are always relative to the simulation box.
+                Although an `Atom` object can be created independently, Atoms should be thought of 
+                inherently as members of the `System` class. All the properties that define an `atom` are
+                relative to the `System` class. `System` has a list of all atoms using which the neighbors
+                of an atom, if its solid and so on can be calculated. All the calculated properties of an
+                atom which depend on any other atom hence should be calculated through `System`. Please
+                check the examples section of the documentation for more details. 
 
                 Examples
                 --------
-                #method 1 - individually
-                atom = Atom()
-                #now set positions of the atoms
-                atom.set_x([23.0, 45.2, 34.2])
-                #now set id
-                atom.set_id(23)
+                >>> #method 1 - individually
+                >>> atom = Atom()
+                >>> #now set positions of the atoms
+                >>> atom.set_x([23.0, 45.2, 34.2])
+                >>> #now set id
+                >>> atom.set_id(23)
 
                 See also
                 --------
@@ -79,28 +77,36 @@ PYBIND11_MODULE(core, m) {
                 >>> atom = Atom()
                 >>> x = atom.get_x()
 
+                See also
+                --------
+                set_x
+                Atom
+                System
+
                 )doc")
 
         .def("set_x",&Atom::sx,
             R"doc(
-                Get the position of the atom. Meaningful values are only returned if the atoms are
-                set before using this function.
+                Set the position of the atom. 
 
                 Parameters
                 ----------
-                None
-                
+                x : list of floats of length 3
+                    list contains three values which are the position coordinates of the atom with
+                    respect to the simulation box.
+
                 Returns
                 -------
-                x : array of float
-                    contains the position of the atom in the form [posx, posy, posz], where
-                    posx is the x coordinate of the atom, posy is the y coordinate and posz 
-                    is the z coordinate. 
+                None
 
                 Examples
                 --------
                 >>> atom = Atom()
-                >>> x = atom.get_x()
+                >>> x = atom.set_x([23.0, 45.2, 34.2])
+
+                See also
+                --------
+                get_x
 
                 )doc")
 
@@ -109,7 +115,8 @@ PYBIND11_MODULE(core, m) {
             R"doc(
                 Get the cluster properties of the atom. The cluster properties of the atom
                 include four different properties as listed below. The properties are only
-                returned if they are calculated before using
+                returned if they are calculated before using 'calculate_nucsize' function 
+                before.
 
                 Parameters
                 ----------
@@ -117,17 +124,29 @@ PYBIND11_MODULE(core, m) {
                 
                 Returns
                 -------
-                cluster : vector int
+                cluster : list of int of length 4
                     cluster is a vector of four values. they are described below-
                         issolid - which is 1 if the atom is solid, 0 otherwise
                         issurface - 1 if the atom has liquid neighbors, 0 otherwise
                         lcluster - 1 if the atom belongs to the largest cluster, 0 otherwise
                         belongsto - which gives the id of the cluster that the atom belongs to.
+                
+                Examples
+                --------
+                >>> cinfo = atom.get_cluster()
+
+                See also
+                --------
+                set_nucsize_parameters
+                calculate_nucsize
+
                 )doc")
 
         .def("get_neighbors",&Atom::gneighbors,
             R"doc(
-                Returns the neighbors of the atom.
+                Returns the neighbors indices of the atom. The list returned consistes of the indices
+                of neighbor atom which indicate their position in the list of all atoms. The neighbors
+                of an atom can be calculated from the `System` object that it belongs to.
 
                 Parameters
                 ----------
@@ -135,27 +154,55 @@ PYBIND11_MODULE(core, m) {
                 
                 Returns
                 -------
-                x : vector int
-                    neighbor indices
+                x : list of int
+                    list of neighbor indices of the atom.
+
+                Examples
+                --------
+                neighbors = atom.get_neighbors()
+
+                See also
+                --------
+                set_neighbors
+                set_neighborweights
+                get_neighborweights
+
                 )doc")
 
         .def("set_neighbors",&Atom::sneighbors,
             R"doc(
-                Set the neighbors of an atom
+                Set the neighbors of an atom manually.
 
                 Parameters
                 ----------
-                array : index of the neighbor atoms 
+                neighs : list of ints
+                    index of the neighbor atoms 
                 
                 Returns
                 -------
                 None
+
+                Examples
+                --------
+                atom.set_neighbors([0,23,11,22,334,112,11])
+
+                See also
+                --------
+                get_neighbors
+                set_neighborweights
+                get_neighborweights
 
                 )doc")
 
         .def("get_neighborweights",&Atom::gneighborweights,
             R"doc(
-                Returns the neighbor weights of the atom.
+                Get the neighbor weights of the atom. The neighbor weights are used weight the 
+                contribution of each neighboring atom towards the q value of the host atom. By 
+                default, each neighbor has a weight of 1 each. However, if the neighbors are calculated
+                using the `System.get_allneighbors(method='voronoi')`, each neighbor atom gets a 
+                weight proportional to the face area shared between the neighboring atom and the 
+                host atom. This can sometimes be helpful in controlling the contribution of atoms
+                with low face areas due to the thermal vibrations at high temperature.
 
                 Parameters
                 ----------
@@ -163,26 +210,49 @@ PYBIND11_MODULE(core, m) {
                 
                 Returns
                 -------
-                x : vector float
+                x : list of float
                     neighbor weights
+
+                Examples
+                --------
+                >>> weights = atom.get_neighborweights()
+
+                See also
+                --------
+                get_neighbors
+                set_neighbors
+                set_neighborweights
+
                 )doc")
 
         .def("set_neighborweights",&Atom::sneighborweights,
             R"doc(
-                Set the neighbor weights of an atom
+                Set the neighbor weights of an atom.
 
                 Parameters
                 ----------
-                array like float: weights of the neighbor atoms 
+                weights : list of floats 
+                    weights of the neighbor atoms 
                 
                 Returns
                 -------
                 None
+
+                Examples
+                --------
+                >>> atom.set_neighborweights([0.1, 0.2, 0.2, 0.4, 0.1])
+
+                See also
+                --------
+                get_neighbors
+                set_neighbors
+                set_neighborweights
 
                 )doc")
 
         .def("set_custom",&Atom::scustom,
             R"doc(
+                NOT CLEAR
                 Set custom values of an Atom
 
                 Parameters
@@ -197,6 +267,7 @@ PYBIND11_MODULE(core, m) {
 
         .def("get_custom",&Atom::gcustom,
             R"doc(
+                NOT CLEAR
                 returns the custom values of an atom.
 
                 Parameters
@@ -207,11 +278,12 @@ PYBIND11_MODULE(core, m) {
                 -------
                 custom : vector double
                     custom values of the atom.
+
                 )doc")
 
         .def("get_q",&Atom::gq,
             R"doc(
-                get  q value of the atom.
+                get q value of the atom. 
 
                 Parameters
                 ----------
@@ -222,42 +294,69 @@ PYBIND11_MODULE(core, m) {
                 -------
                 q : float
                     The queried q value
+
+                Examples
+                --------
+                >>> q2 = atom.get_q(2)
+
+                See also
+                --------
+                set_q
+                get_aq
+                set_aq
+
                 )doc")
 
         .def("get_id",&Atom::gid,
             R"doc(
-                get  q value of the atom.
+                get  the id of the atom.
 
                 Parameters
                 ----------
-                q : int
-                    number of the required q - from 2-12
+                None
 
                 Returns
                 -------
-                q : float
-                    The queried q value
+                id : int
+                    id of the atom
+
+                Examples
+                --------
+                >>> id = atom.get_id()
+
+                See also
+                --------
+                set_id
+
                 )doc")
 
         .def("set_id",&Atom::sid,
             R"doc(
-                get  q value of the atom.
+                set  the id of the atom.
 
                 Parameters
                 ----------
-                q : int
-                    number of the required q - from 2-12
+                id : int
+                    id of the atom
 
                 Returns
                 -------
-                q : float
-                    The queried q value
+                None
+
+                Examples
+                --------
+                >>> atom.set_id(2)
+
+                See also
+                --------
+                get_id
+
                 )doc")
 
 
         .def("set_q",&Atom::sq,
             R"doc(
-                set the q values of the atom.
+                set the q value of the atom.
 
                 Parameters
                 ----------
@@ -269,11 +368,22 @@ PYBIND11_MODULE(core, m) {
                 Returns
                 -------
                 None
+
+                Examples
+                --------
+                >>> atom.set_q(2, 0.24)
+
+                See also
+                --------
+                set_aq
+                get_aq
+                get_q
+
                 )doc")
 
         .def("get_aq",&Atom::gaq,
             R"doc(
-                get  avg q value of the atom.
+                get averaged q value of the atom. 
 
                 Parameters
                 ----------
@@ -284,12 +394,23 @@ PYBIND11_MODULE(core, m) {
                 -------
                 q : float
                     The queried q value
+
+                Examples
+                --------
+                >>> q2 = atom.get_q(2)
+
+                See also
+                --------
+                set_q
+                get_q
+                set_aq
+
                 )doc")
 
 
         .def("set_aq",&Atom::saq,
             R"doc(
-                set the avg q values of the atom.
+                set the averaged q value of the atom.
 
                 Parameters
                 ----------
@@ -301,11 +422,23 @@ PYBIND11_MODULE(core, m) {
                 Returns
                 -------
                 None
+
+                Examples
+                --------
+                >>> atom.set_aq(2, 0.24)
+
+                See also
+                --------
+                set_q
+                get_q
+                get_aq
+
                 )doc")
 
         .def("get_qlm",&Atom::gqlm,
             R"doc(
-                get the real and imaginary qlm values of the atom.
+                
+                Get the real and imaginary qlm values of the atom.
 
                 Parameters
                 ----------
@@ -317,12 +450,13 @@ PYBIND11_MODULE(core, m) {
                 qlms : 2D array of 2q+1 values
                     the first part of the array is the 2q+1 real values
                     second part is the 2q+1 imaginary values.
+                
                 )doc")
 
 
         .def("get_aqlm",&Atom::gaqlm,
             R"doc(
-                get the real and imaginary aqlm values of the atom.
+                Get the real and imaginary aqlm values of the atom.
 
                 Parameters
                 ----------
@@ -334,10 +468,12 @@ PYBIND11_MODULE(core, m) {
                 qlms : 2D array of 2q+1 values
                     the first part of the array is the 2q+1 real values
                     second part is the 2q+1 imaginary values.
+                
                 )doc")
 
         .def("get_vorovector",&Atom::gvorovector,
             R"doc(
+                
                 get the voronoi structure identification vector. Returns a
                 vector of the form (n3, n4, n5, n6), where n3 is the number
                 of faces with 3 vertices, n4 is the number of faces with 4
@@ -351,6 +487,7 @@ PYBIND11_MODULE(core, m) {
                 -------
                 vorovector : array like, int
                     array of the form (n3, n4, n5, n6)
+                
                 )doc")
 
     ; 
@@ -358,12 +495,18 @@ PYBIND11_MODULE(core, m) {
     //bindings and documentation for individual functions
     py::class_<System>(m,"System",R"doc(
                 
-                A c++ class for holding the properties of a single atom. Various properties of the atom
-                can be accessed through member functions which are described below.
+                A c++ class for holding the properties of a system. A `System` consists of two
+                major components - the simulation box and the atoms. All the associated variables
+                are then calculated over these.
+
+                A `System` can be set and populated by reading an input file in lammps dump format.
+                This enables for automatic reading of all atomic positions and the simulation box.
 
                 Examples
                 --------
-                atom = Atom()
+                >>> sys = System()
+                >>> sys.set_inputfile("atoms.dat")
+                >>> sys.read_inputfile()
                 
         )doc"
         )
