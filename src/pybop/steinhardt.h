@@ -154,7 +154,7 @@ class System{
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors_normal();
         void get_all_neighbors_voronoi();
-        void get_all_neighbors(string &);
+        void get_all_neighbors(string &, double);
         void reset_all_neighbors();
         void calculate_complexQLM_6();
         double get_number_from_bond(int,int);
@@ -167,7 +167,7 @@ class System{
 
         Atom* atoms;
     
-        void read_particle_file();
+        void read_particle_file(string);
         void read_particle_instance(int,int);
         int calculate_nucsize();	//variant of function above
         int cluster_criteria(int,int );
@@ -175,16 +175,16 @@ class System{
         void find_clusters();
         int largest_cluster();
         void set_nucsize_parameters(int,double,double);
-        void set_inputfile(string);
-        void set_neighbordistance(double);
+        //void set_inputfile(string);
+        //void set_neighbordistance(double);
         void assign_particles( vector<Atom>, vector<double>);
         void get_largest_cluster_atoms();
         //functions to set the list of reqd qs
         //again, error checking would be amazing here.
         void set_reqd_qs(vector<int>);
         void set_reqd_aqs(vector<int>);
-        void calculate_q();
-        void calculate_aq();
+        void calculate_q(vector <int>);
+        void calculate_aq(vector <int>);
         int *reqdqs;
         int lenqs;
         int *reqdaqs;

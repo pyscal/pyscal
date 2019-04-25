@@ -69,8 +69,10 @@ void System::set_reqd_aqs(vector <int> qs){
 
 }
 
-void System::read_particle_file(){
+void System::read_particle_file(string nn){
     
+    inputfile = nn;
+
     double posx,posy,posz;
     int id;
     double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
@@ -582,8 +584,9 @@ void System::get_all_neighbors_voronoi(){
 
 }
 
-void System::get_all_neighbors( string &jkl){
+void System::get_all_neighbors( string &jkl, double cutoff){
 
+    neighbordistance = cutoff; 
     if(strcmp(jkl.c_str(),"voronoi")==0){
         get_all_neighbors_voronoi();
     }
@@ -690,8 +693,10 @@ void System::calculate_complexQLM_6(){
 }
 
 //calculation of any complex qval
-void System::calculate_q(){
+void System::calculate_q(vector <int> qs){
         
+    set_reqd_qs(qs);
+
     //nn = number of neighbors
     int nn;
     double realti,imgti;
@@ -769,7 +774,7 @@ void System::calculate_q(){
 
 
 //calculation of any complex aqvalb
-void System::calculate_aq(){
+void System::calculate_aq(vector <int> qs){
         
     //nn = number of neighbors
     int nn;
@@ -778,7 +783,7 @@ void System::calculate_aq(){
     int q;
     double summ, weightsum;
 
-    if (!qsfound) { set_reqd_qs(rq_backup); calculate_q(); }
+    if (!qsfound) { calculate_q(qs); }
     //note that the qvals will be in -2 pos
     //q2 will be in q0 pos and so on
         
@@ -964,6 +969,8 @@ int System::largest_cluster(){
                 
         }
 
+        get_largest_cluster_atoms();
+
         return max;
 } 
 
@@ -1012,8 +1019,8 @@ int System::calculate_nucsize()
 
 //access functions for system
 //------------------------------------------------------------------------------------------------------------------------
-void System::set_inputfile(string nn) { inputfile = nn; }
-void System::set_neighbordistance(double nn) { neighbordistance = nn; }
+//void System::set_inputfile(string nn) { inputfile = nn; }
+//void System::set_neighbordistance(double nn) { }
 void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) { 

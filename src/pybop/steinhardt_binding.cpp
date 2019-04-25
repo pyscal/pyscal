@@ -513,10 +513,15 @@ PYBIND11_MODULE(core, m) {
 
         .def(py::init< >())
         
-        .def("set_inputfile",&System::set_inputfile,
+        .def("read_inputfile",&System::read_particle_file,
             R"doc(
-                Set input file
-
+                Read input file containing the information of a time slice from a molecular dynamics
+                simulation. As of now, the file should be a lammps dump format and can only have a
+                specific header format. That is-
+                id type mass x y z vx vy vz
+                However, this restriction can easily be overcome using the `assign_particles` method
+                from system where a list of atoms and box vectors are directly provided to the system.
+                This functions only sets the input file
                 Parameters
                 ----------
                 None
@@ -527,13 +532,14 @@ PYBIND11_MODULE(core, m) {
 
                 See Also
                 --------
-                read_inputfile - read an input file
+                assign_particles
                 
                )doc")        
 
         .def("get_largestcluster",&System::glargestclusterid,
             R"doc(
-                get id of the the largest cluster
+                Get id of the the largest cluster. id is only available if the largest cluster has already
+                been found. Otherwise it returns the default values.
 
                 Parameters
                 ----------
@@ -546,46 +552,37 @@ PYBIND11_MODULE(core, m) {
 
                 See Also
                 --------
-                read_inputfile - read an input file
+                get_allneighbors
+                calculate_nucsize
+                set_nucsize_parameters
 
-                )doc")        
-
-        .def("set_cutoff",&System::set_neighbordistance,
-            R"doc(
-                Set cutoff for neighbor calculation.
-
-                Parameters
-                ----------
-                cutoff : double
-                    cutoff distance for calculating neighbors
-                
-                Returns
-                -------
-                None
-                
-                See Also
-                --------
-                read_inputfile - read an input file
-
-                )doc")        
+                )doc")             
 
         .def("set_nucsize_parameters",&System::set_nucsize_parameters,
             R"doc(
-                Set the value of parameters for calculating the largest cluster in the
+                Set the value of parameters for calculating the largest solid cluster in the
                 liquid, a detailed description of the order parameter can be found in  
-                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082 .
+                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082.
+
+                The number of atoms in the largest solid cluster in liquid is often used as an
+                order parameter in the study of nucleation during solidification. In order to
+                actually calculate the largest solid cluster, `calculate_nucsize` has to be 
+                called after setting the parameters.
 
                 Parameters
                 ----------
                 minfrenkel : int
-                    Minimum number of solid connections for an atom to be identified as
+                    Minimum number of solid bonds for an atom to be identified as
                     a solid.
+                
                 threshold : double
                     The cutoff value of connection between two atoms for them to be def
                     ined as having a bond.
+                
                 avgthreshold : double
                     Averaged value of connection between an atom and its neighbors for 
-                    an atom to be solid.
+                    an atom to be solid. This threshold is known to improve the solid-liquid
+                    distinction in interfaces between solid and liquid. 
 
                 Returns
                 -------
@@ -593,8 +590,7 @@ PYBIND11_MODULE(core, m) {
 
                 See Also
                 --------
-                set_inputfile - sets the input file for reading inc
-                set_neighbordistance - sets the cutoff distance for neighbors of an atom.
+                calculate_nucsize
 
                 Examples
                 --------
@@ -603,18 +599,20 @@ PYBIND11_MODULE(core, m) {
                 )doc")
         
 
-        .def("assign_particles",&System::assign_particles,
+        .def("assign_particles", &System::assign_particles,
             R"doc(
                 Assign atoms directly. Receive a vector of atom objects which is stored instead
                 of reading in the input file. If this method is used, there is no need of using
-                read_inputfile method.
+                `read_inputfile` method. Also using this function allows for reading of multiple
+                file formats which are not supported by the inbuilt `read_inputfile` method.
 
                 Parameters
                 ----------
-                atoms : vector Atoms
-                    vector of Atom class instances
-                box   : vector double
-                    vector of box dimensions
+                atoms : list of `Atom` objects
+                    list consisting of all atoms
+                box   : list of float of length 6
+                    list which consists of the box dimensions in the format-
+                    [box_x_low, box_x_high, box_y_low, box_y_high, box_z_low, box_z_high]
 
                 Returns
                 -------
@@ -622,7 +620,8 @@ PYBIND11_MODULE(core, m) {
 
                 See Also
                 --------
-                read_inputfile - read an input file
+                read_inputfile
+
 
                 )doc")
 
@@ -630,9 +629,12 @@ PYBIND11_MODULE(core, m) {
             R"doc(
                 Calculate the size of the largest cluster in the given system. Calculation
                 the size of the largest cluster needs various prerequisites that can be set
-                by the functions set_neighbordistance and set_nucsize_parameters. 
-                For a detailed description of how the calculation works see-
-                Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082
+                by the functions `set_nucsize_parameters`. A detailed description of the order 
+                parameter can be found in Diaz Leines et al, JCP 146(2017). 
+                http://doi.org/10.1063/1.4980082.
+
+                The number of atoms in the largest solid cluster in liquid is often used as an
+                order parameter in the study of nucleation during solidification.
 
                 Parameters
                 ----------
@@ -641,32 +643,38 @@ PYBIND11_MODULE(core, m) {
                 Returns
                 -------
                 cluster size : int
-                    size of the largest cluster in number of atoms
+                    size of the largest solid cluster in liquid (number of atoms)
 
                     )doc"
             )
 
 
-        .def("get_atom",&System::gatom,
+        .def("get_atom",  &System::gatom,
             R"doc(
-                Access function that returns the Atom object at the queried position.
+                Get the `Atom` object at the queried position in the list of all atoms
+                in the `System`.
 
                 Parameters
                 ----------
                 index : int
-                        index of required atom
+                    index of required atom in the list of all atoms.
 
                 Returns
                 -------
                 atom : Atom object
-                    atom object at the queried position
+                    atom object at the queried position.
 
                     )doc"
             )
 
-       .def("set_atom",&System::satom,
+       .def("set_atom", &System::satom,
             R"doc(
-                return the atom to its original location after modification.
+                Return the atom to its original location after modification. For example, an
+                `Atom` at location `i` in the list of all atoms in `System` can be queried by,
+                `atom = System.get_atom(i)`, then any kind of modification, for example, the 
+                position of the `Atom` can done by, `atom.set_x([2.3, 4.5, 4.5])`. After 
+                modification, the `Atom` can be set back to its position in `System` by
+                `System.set_atom(atom)`.
 
                 Parameters
                 ----------
@@ -683,7 +691,7 @@ PYBIND11_MODULE(core, m) {
 
         .def("get_allatoms",&System::gallatoms,
             R"doc(
-                Access function that returns the a vector of Atom objects.
+                Get a list of all `Atom` objects that belong to the system.
 
                 Parameters
                 ----------
@@ -691,7 +699,7 @@ PYBIND11_MODULE(core, m) {
 
                 Returns
                 -------
-                allatoms : vctor of Atom objects
+                allatoms : list of `Atom` objects
                     all atoms in the system
 
                     )doc"
@@ -700,7 +708,7 @@ PYBIND11_MODULE(core, m) {
 
         .def("get_box",&System::gboxdims,
             R"doc(
-                Access function that returns the low and high values of sim box.
+                Get the dimensions of the simulation box.
 
                 Parameters
                 ----------
@@ -708,7 +716,9 @@ PYBIND11_MODULE(core, m) {
 
                 Returns
                 -------
-                boxdims : vector of box dimensions
+                boxdims : list of box dimensions of length 6
+                    the return value consists of the vector of values in the form-
+                    [box_x_low, box_x_high, box_y_low, box_y_high, box_z_low, box_z_high]
 
                     )doc"
             )
@@ -716,7 +726,8 @@ PYBIND11_MODULE(core, m) {
 
         .def("get_qvals",&System::gqvals,
             R"doc(
-                return the required q values of all atoms.
+                Get the required q values of all atoms. The function returns a list of 
+                q values in the same order as that of the atoms in the system.
 
                 Parameters
                 ----------
@@ -725,8 +736,8 @@ PYBIND11_MODULE(core, m) {
 
                 Returns
                 -------
-                qvals : list of double
-                    list of qth qvalue of all atoms.
+                qvals : list of floats
+                    list of qvalue of all atoms.
 
                     )doc"
             )
@@ -734,7 +745,8 @@ PYBIND11_MODULE(core, m) {
 
         .def("get_aqvals",&System::gaqvals,
             R"doc(
-                return the required aq values of all atoms.
+                Get the required averaged q values of all atoms. The function returns a list of 
+                q values in the same order as that of the atoms in the system.
 
                 Parameters
                 ----------
@@ -750,63 +762,15 @@ PYBIND11_MODULE(core, m) {
             )
 
 
-        .def("assign_cluster_info",&System::get_largest_cluster_atoms,
-            R"doc(
-                Assigns parameters such as if the atom belongs to the largest cluster,
-                if it is on the surface.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                None
-
-                    )doc"
-            )
-
-        .def("read_inputfile",&System::read_particle_file,
-            R"doc(
-                Read a single snapshot of the lammps dump file and assign the positions
-                and ids to an array of Atom objects stored in the parent class.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                None
-
-                    )doc"
-            )
-
-        .def("read_particleinstance",&System::read_particle_instance,
-            R"doc(
-                Read a single snapshot of the lammps dump file and assign the positions
-                and ids to an array of Atom objects stored in the parent class.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                None
-
-                    )doc"
-            )
-
         .def("get_absdistance", (double (System::*) (Atom, Atom))  &System::get_abs_distance,
             R"doc(
                 Get the distance between two atoms.
 
                 Parameters
                 ----------
-                atom1 : Atom object
+                atom1 : `Atom` object
                         first atom
-                atom2 : Atom object
+                atom2 : `Atom` object
                         second atom
                 
                 Returns
@@ -817,24 +781,38 @@ PYBIND11_MODULE(core, m) {
                     )doc"
             )
 
-        .def("get_allneighbors", (void (System::*) (string &))  &System::get_all_neighbors, py::arg("method"), 
+        .def("get_allneighbors", &System::get_all_neighbors, py::arg("method"), py::arg("cutoff") = 3.0, 
             R"doc(
-                Find neighbors of all atoms in the system.
+                Find neighbors of all atoms in the `System`. There are two methods to do this, the 
+                traditional approach being the one in which the neighbors of an atom are the ones that lie
+                in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
+                that share a Voronoi polyhedra face with the host atoms are considered its neighbors.
 
                 Parameters
                 ----------
-                method
+                method : `cutoff` or `voronoi`, default: `cutoff`
+                    `cutoff` method finds atoms within a specified cutoff distance of the host atom
+                    `voronoi` method finds atoms that share a Voronoi polyhedra face with the host atom.
+
+                cutoff : float
+                    the cutoff distance to be used for the `cutoff` based neighbor calculation method
+                    described above.
                 
                 Returns
                 -------
                 None
 
+                See also
+                --------
+                reset_allneighbors
+
                     )doc"
             )
 
-        .def("reset_allneighbors", (void (System::*) ()) &System::reset_all_neighbors,
+        .def("reset_allneighbors", &System::reset_all_neighbors,
             R"doc(
-                Reset the neighbors of all atoms in the system.
+                Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
+                with two different approaches.
 
                 Parameters
                 ----------
@@ -844,97 +822,90 @@ PYBIND11_MODULE(core, m) {
                 -------
                 None
 
-                    )doc"
-            )
-
-        .def("calculate_complexQLM6",&System::calculate_complexQLM_6,
-            R"doc(
-                Find complex qlm 6 values for all atoms.
-
-                Parameters
-                ----------
-                None
-                
-                Returns
-                -------
-                None
+                See also
+                --------
+                get_allneighbors
 
                     )doc"
             )
-
 
         .def("calculate_q",&System::calculate_q,
             R"doc(
-                Find the q  value for all atoms. The required q indices(2-12) should be set
-                using the set_reqd_qs function.
+                Find the bond order parameter - q  for all atoms. Any of the q parameters from 2-12 can be provided. 
 
                 Parameters
                 ----------
-                None
+                qs : list of ints
+                    A list of all q params to be found from 2-12. Even if a single value is required, it
+                    has be enclosed in a list. For example, [2] or [2,4,6] and so on.
                 
                 Returns
                 -------
                 None
+
+                See also
+                --------
+                calculate_aq
 
                     )doc"
             )
 
         .def("calculate_aq",&System::calculate_aq,
             R"doc(
-                Find the averaged q  value for all atoms. The required q indices(2-12) should be set
-                using the set_reqd_qs function.
+                Find the averaged bond order parameter q for all atoms. Any of the q parameters from 2-12 can be provided.
+                If `calculate_aq` function is used before `calculate_q`, q parameters are first calculated before
+                the averaged versions are calculated. See Lechner, Dellago, JCP 129, 2008. for a description of the
+                averaged bond order parameters.
 
                 Parameters
                 ----------
-                None
+                qs : list of ints
+                    A list of all q params to be found from 2-12. Even if a single value is required, it
+                    has be enclosed in a list. For example, [2] or [2,4,6] and so on.
                 
                 Returns
                 -------
                 None
 
-                    )doc"
-            )
-
-        .def("set_reqdqs",&System::set_reqd_qs,
-            R"doc(
-                Set the list of qvalues to be calculated which will be done through 
-                calculate_q function.
-
-                Parameters
-                ----------
-                qlist : array of int
-                    a list of q values to be calculated from 2-12
-                
-                Returns
-                -------
-                None
+                See also
+                --------
+                calculate_q
 
                     )doc"
             )
-
 
         .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond,
             R"doc(
-                Get the connection between two atoms. Connection is defined by Qlm(i).Qlm(j)
+                Get the connection between two atoms. Connection is defined by Qlm(i).Qlm(j). Normally,
+                a connection of more than 0.6 is considered a solid bond.
 
                 Parameters
                 ----------
-                atom1 : Atom object
+                atom1 : `Atom` object
                         first atom
-                atom2 : Atom object
+                atom2 : `Atom` object
                         second atom
                 
                 Returns
                 -------
                 connection : double
-                        connection between the first and second atom.
+                    connection between the first and second atom.
+
+                See also
+                --------
+                calculate_frenkelnumbers
+                find_clusters
+                find_largest_cluster
+                set_nucsize_parameters
                 
                     )doc"
             )
 
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers,
             R"doc(
-                Find frenkel numbers of all atoms in the system.
+                Find frenkel numbers of all atoms in the system. Frenkel number is the number of solid
+                neighbors that an atom has. A solid bond is considered between two atoms if the connection
+                betweem them is greater than 0.6.
 
                 Parameters
                 ----------
@@ -943,13 +914,21 @@ PYBIND11_MODULE(core, m) {
                 Returns
                 -------
                 None
-
+                
+                See also
+                --------
+                get_number_from_bond
+                find_clusters
+                find_largest_cluster
+                set_nucsize_parameters
+                    
                     )doc"
             )
 
         .def("find_clusters",&System::find_clusters,
             R"doc(
-                Find he clusters of all atoms in the system.
+                Find the clusters of all atoms in the system. Go through all the atoms and cluster them
+                together.
 
                 Parameters
                 ----------
@@ -958,13 +937,21 @@ PYBIND11_MODULE(core, m) {
                 Returns
                 -------
                 None
+
+                See also
+                --------
+                calculate_frenkelnumbers
+                get_number_from_bond
+                find_largest_cluster
+                set_nucsize_parameters
 
                     )doc"
             )
 
         .def("find_largest_cluster",&System::largest_cluster,
             R"doc(
-                Find the largest in the system.
+                Find the largest solid cluster of atoms in the system from all the clusters. `find_clusters`
+                has to be used before using this function.
 
                 Parameters
                 ----------
@@ -974,6 +961,13 @@ PYBIND11_MODULE(core, m) {
                 -------
                 cluster : int
                     the size of the largest cluster
+
+                See also
+                --------
+                calculate_frenkelnumbers
+                find_clusters
+                get_number_from_bond
+                set_nucsize_parameters
 
                     )doc"
             )
