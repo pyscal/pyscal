@@ -130,13 +130,14 @@ void System::read_particle_file(){
             atoms[ti].loc = ti;
             atoms[ti].isneighborset = 0;
 
-            for (int ti = 0;ti<nop;ti++){
-                atoms[ti].n_neighbors=0;
-                for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){          
-                    atoms[ti].neighbors[tn] = NILVALUE;
-                    atoms[ti].neighbordist[tn] = -1.0;
-                }
+
+            atoms[ti].n_neighbors=0;
+            
+            for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){          
+                atoms[ti].neighbors[tn] = NILVALUE;
+                atoms[ti].neighbordist[tn] = -1.0;
             }
+            
         }
   
     }
@@ -150,7 +151,81 @@ void System::read_particle_instance(int startblock,int natoms){
 
     string line,str;
     //stringstream ss;
-    int count = 1;
+    int count = 1;void System::read_particle_file(){
+    
+    double posx,posy,posz;
+    int id;
+    double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
+    double dummy;                        //dummy variable
+    char dummy_char[256];                //dummy line
+    ifstream confFile;
+  
+    confFile.open(inputfile.c_str(),ifstream::in);
+
+    if (confFile.is_open()){ 
+        
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+        confFile >> nop;
+        atoms = new Atom[nop];
+    
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+        confFile >> xsizeinf;
+        confFile >> xsizesup;
+        confFile >> ysizeinf;
+        confFile >> ysizesup;
+        confFile >> zsizeinf;
+        confFile >> zsizesup;;
+        confFile.getline(dummy_char,256);
+        confFile.getline(dummy_char,256);
+  
+        boxx = xsizesup - xsizeinf;
+        boxy = ysizesup - ysizeinf;
+        boxz = zsizesup - zsizeinf;
+        boxdims[0][0] = xsizeinf;
+        boxdims[0][1] = xsizesup;
+        boxdims[1][0] = ysizeinf;
+        boxdims[1][1] = ysizesup;
+        boxdims[2][0] = zsizeinf;
+        boxdims[2][1] = zsizesup;
+
+        //so lets read the particles positions
+        for (int ti = 0;ti<nop;ti++){
+            confFile>>id;
+            confFile>>dummy;
+            confFile>>dummy;
+            confFile>>posx;
+            confFile>>posy;
+            confFile>>posz;
+            confFile>>dummy;
+            confFile>>dummy;
+            confFile>>dummy;
+      
+            atoms[ti].posx = posx;
+            atoms[ti].posy = posy;
+            atoms[ti].posz = posz;
+            atoms[ti].id = id;
+            atoms[ti].belongsto = -1;
+            atoms[ti].issolid = 0; 
+            atoms[ti].loc = ti;
+            atoms[ti].isneighborset = 0;
+
+            for (int ti = 0;ti<nop;ti++){
+                atoms[ti].n_neighbors=0;
+                for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){          
+                    atoms[ti].neighbors[tn] = NILVALUE;
+                    atoms[ti].neighbordist[tn] = -1.0;
+                }
+            }
+        }
+  
+    }
+
+    fileread = 1;
+  
+    }
     int minc = 0;
     double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
     nop = natoms;
@@ -216,33 +291,43 @@ void System::read_particle_instance(int startblock,int natoms){
     }  
 }
 
-//this is the old - actual function
-//now an overloaded version would be provided, the aim of this is to provide two infos-
-//1. The list of neighbors for each atom. This would be position of neighbor on the list of atoms
-//2. The list of weights for each neighbors. This is used to scale the YLM contributions.
-////wait - its better to just assign a variable weights to Atom and functions to set these and the weights
 
+//this function allows for handling custom formats of atoms and so on
 void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
-//dont know if this will be faster-
-//what it does would be to recieve a 
-//vector of atoms and then process it
-//add it to the normal list we have.
+    //atomitos are just a list of Atom objects
+    //boxd is a vector of 6 values - [xlow, xhigh, ylow, yhigh, zlow, zhigh]
     nop = atomitos.size();
     atoms = new Atom[nop];
 
-    boxx = boxd[0];
-    boxy = boxd[1];
-    boxz = boxd[2];
+    boxdims[0][0] = boxd[0];
+    boxdims[0][1] = boxd[1];
+    boxdims[1][0] = boxd[2];
+    boxdims[1][1] = boxd[3];
+    boxdims[2][0] = boxd[4];
+    boxdims[2][1] = boxd[5];
+    
+    boxx = boxd[1] - boxd[0];
+    boxy = boxd[3] - boxd[2];
+    boxz = boxd[5] - boxd[4];
 
-    for(int ti=0;ti<nop;ti++){
+    for(int ti=0; ti<nop; ti++){
+        
         atoms[ti].posx = atomitos[ti].posx;
         atoms[ti].posy = atomitos[ti].posy;
         atoms[ti].posz = atomitos[ti].posz;
         atoms[ti].id = atomitos[ti].id;
         atoms[ti].belongsto = -1;
         atoms[ti].issolid = 0;
+        atoms[ti].loc = ti;
         atoms[ti].isneighborset = 0;
         atoms[ti].custom = atomitos[ti].custom;
+        atoms[ti].n_neighbors=0;
+        
+        for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){          
+            atoms[ti].neighbors[tn] = NILVALUE;
+            atoms[ti].neighbordist[tn] = -1.0;
+        }
+        
     }
 
     atomitos.shrink_to_fit();
