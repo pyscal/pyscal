@@ -3,7 +3,7 @@ Getting started
 
 Installation
 ------------
-**pybop** can be installed by running ``python setup.py install`` from main code directory after cloning the `github repo <https://github.com/srmnitc/pybop>`. It can be uninstalled by ``pip uninstall pathsampling``. All the dependencies of **pybop** are installed automatically. 
+**pybop** can be installed by running ``python setup.py install`` from main code directory after cloning the `github repo <https://github.com/srmnitc/pybop>`_. It can be uninstalled by ``pip uninstall pathsampling``. All the dependencies of **pybop** are installed automatically. 
 
 Tests
 -----
