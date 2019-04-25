@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Basic example - setting up &mdash; pybop 1.0.0 documentation</title>
+  <title>Getting started with pybop &mdash; pybop 1.0.0 documentation</title>
   
 
   
@@ -82,7 +82,12 @@
 <li class="toctree-l1"><a class="reference internal" href="pybop.html">pybop structure</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="examples.html">Examples</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="examples.html#id1">Examples</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Basic example - setting up</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Getting started with pybop</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#the-system-class">The System class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#the-atom-class">The Atom class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reading-in-an-input-file">Reading in an input file</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -134,7 +139,7 @@
         
           <li><a href="examples.html">Examples</a> &raquo;</li>
         
-      <li>Basic example - setting up</li>
+      <li>Getting started with pybop</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -153,8 +158,121 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="basic-example-setting-up">
-<h1>Basic example - setting up<a class="headerlink" href="#basic-example-setting-up" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="getting-started-with-pybop">
+<h1>Getting started with pybop<a class="headerlink" href="#getting-started-with-pybop" title="Permalink to this headline">¶</a></h1>
+<div class="line-block">
+<div class="line">This example illustrates basic functionality of pybop python library
+by setting up a system and reading in atoms. An interactive version of
+this example would be made available soon.</div>
+<div class="line">We start by importing the module</div>
+</div>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pybop.core</span> <span class="k">as</span> <span class="nn">pc</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+<div class="section" id="the-system-class">
+<h2>The System class<a class="headerlink" href="#the-system-class" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">System</span></code> is the basic class of pydoc and is required to be setup in
+order to perform any calculations. It can be set up as easily as-</p>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">sys</span></code> is a <code class="docutils literal notranslate"><span class="pre">System</span></code> object. But at this point, it is completely
+empty. We have to populate the system with two major information- * the
+simulation box dimensions * the information regarding individual atoms.</p>
+<div class="line-block">
+<div class="line">Let us try setting up a small system, which is the bcc unitcell of
+lattice constant 1. The simulation box dimensions of such a unit cell
+would be [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]] where the first set
+correspond to the x axis, second to y axis and so on.</div>
+<div class="line">The unitcell has 2 atoms and their positions are [0,0,0] and [0.5,
+0.5, 0.5].</div>
+</div>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">set_box</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]])</span>
+</pre></div>
+</div>
+<p>We can easily check if everything worked by getting the box dimensions</p>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">box</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">get_box</span><span class="p">()</span>
+<span class="n">box</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-atom-class">
+<h2>The Atom class<a class="headerlink" href="#the-atom-class" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">The next part is assigning the atoms. This can be done using the
+<code class="docutils literal notranslate"><span class="pre">Atom</span></code> class. Here, we will only look at the basic properties of
+<code class="docutils literal notranslate"><span class="pre">Atom</span></code> class. For a more detailed description, check the examples.</div>
+<div class="line">Now lets create two atoms.</div>
+</div>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">atom1</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="p">()</span>
+<span class="n">atom2</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now two empty atom objects are created. The major poperties of an atom
+are its positions and id. Lets set this up.</p>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">atom1</span><span class="o">.</span><span class="n">set_x</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+<span class="n">atom1</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">atom2</span><span class="o">.</span><span class="n">set_x</span><span class="p">([</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">])</span>
+<span class="n">atom2</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can check the details of the atom by querying it</p>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x1</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span>
+<span class="n">x1</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="reading-in-an-input-file">
+<h2>Reading in an input file<a class="headerlink" href="#reading-in-an-input-file" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">We are all set! The <code class="docutils literal notranslate"><span class="pre">System</span></code> is ready for calculations. However, in
+most realistic simulation situations, we have many atoms and it can be
+difficult to set each of them</div>
+<div class="line">individually. In this situation we can read in input file directly. An
+example input file containing 500 atoms in a simulation box can be
+read in automatically.</div>
+</div>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="p">()</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">read_inputfile</span><span class="p">(</span><span class="s1">&#39;conf.dump&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Once again, lets check if the box dimensions are read in correctly</p>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">box</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">get_box</span><span class="p">()</span>
+<span class="n">box</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">-</span><span class="mf">7.66608</span><span class="p">,</span> <span class="mf">11.1901</span><span class="p">,</span> <span class="o">-</span><span class="mf">7.66915</span><span class="p">,</span> <span class="mf">11.1931</span><span class="p">,</span> <span class="o">-</span><span class="mf">7.74357</span><span class="p">,</span> <span class="mf">11.2676</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Now we can get all atoms that belong to this system</p>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">atoms</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">get_allatoms</span><span class="p">()</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">500</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">We can see that all the atoms are read in correctly and there are 500
+atoms in total. Once again, individual atom properties can be</div>
+<div class="line">accessed as before.</div>
+</div>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">-</span><span class="mf">5.66782</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.06781</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.58151</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Thats it! Now we are ready for some calculations. You can find more in
+the examples section of the documentation.</p>
+</div>
 </div>
 
 

@@ -168,7 +168,7 @@ class System{
         Atom* atoms;
     
         void read_particle_file(string);
-        void read_particle_instance(int,int);
+        //void read_particle_instance(int,int);
         int calculate_nucsize();	//variant of function above
         int cluster_criteria(int,int );
         void find_solids();
@@ -212,6 +212,7 @@ class System{
         vector<double> gaqvals(int qq);
         vector<int> rq_backup;
         vector<double> gbox();
+        void sbox(vector<vector<double>>);
         vector<double> gboxdims();
         
         //system flags

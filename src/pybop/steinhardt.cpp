@@ -42,6 +42,20 @@ double System::dfactorial(int l,int m){
 
 }
 
+void System::sbox(vector<vector <double>> boxd) {
+
+    boxdims[0][0] = boxd[0][0];
+    boxdims[0][1] = boxd[0][1];
+    boxdims[1][0] = boxd[1][0];
+    boxdims[1][1] = boxd[1][1];
+    boxdims[2][0] = boxd[2][0];
+    boxdims[2][1] = boxd[2][1];
+    
+    boxx = boxd[0][1] - boxd[0][0];
+    boxy = boxd[1][1] - boxd[1][0];
+    boxz = boxd[2][1] - boxd[2][0];    
+}
+
 void System::set_reqd_qs(vector <int> qs){
 
     lenqs = qs.size();
@@ -148,150 +162,6 @@ void System::read_particle_file(string nn){
   
  }
 
-void System::read_particle_instance(int startblock,int natoms){
-    
-
-    string line,str;
-    //stringstream ss;
-    int count = 1;void System::read_particle_file(){
-    
-    double posx,posy,posz;
-    int id;
-    double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
-    double dummy;                        //dummy variable
-    char dummy_char[256];                //dummy line
-    ifstream confFile;
-  
-    confFile.open(inputfile.c_str(),ifstream::in);
-
-    if (confFile.is_open()){ 
-        
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-        confFile >> nop;
-        atoms = new Atom[nop];
-    
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-        confFile >> xsizeinf;
-        confFile >> xsizesup;
-        confFile >> ysizeinf;
-        confFile >> ysizesup;
-        confFile >> zsizeinf;
-        confFile >> zsizesup;;
-        confFile.getline(dummy_char,256);
-        confFile.getline(dummy_char,256);
-  
-        boxx = xsizesup - xsizeinf;
-        boxy = ysizesup - ysizeinf;
-        boxz = zsizesup - zsizeinf;
-        boxdims[0][0] = xsizeinf;
-        boxdims[0][1] = xsizesup;
-        boxdims[1][0] = ysizeinf;
-        boxdims[1][1] = ysizesup;
-        boxdims[2][0] = zsizeinf;
-        boxdims[2][1] = zsizesup;
-
-        //so lets read the particles positions
-        for (int ti = 0;ti<nop;ti++){
-            confFile>>id;
-            confFile>>dummy;
-            confFile>>dummy;
-            confFile>>posx;
-            confFile>>posy;
-            confFile>>posz;
-            confFile>>dummy;
-            confFile>>dummy;
-            confFile>>dummy;
-      
-            atoms[ti].posx = posx;
-            atoms[ti].posy = posy;
-            atoms[ti].posz = posz;
-            atoms[ti].id = id;
-            atoms[ti].belongsto = -1;
-            atoms[ti].issolid = 0; 
-            atoms[ti].loc = ti;
-            atoms[ti].isneighborset = 0;
-
-            for (int ti = 0;ti<nop;ti++){
-                atoms[ti].n_neighbors=0;
-                for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){          
-                    atoms[ti].neighbors[tn] = NILVALUE;
-                    atoms[ti].neighbordist[tn] = -1.0;
-                }
-            }
-        }
-  
-    }
-
-    fileread = 1;
-  
-    }
-    int minc = 0;
-    double xsizeinf,ysizeinf,zsizeinf,xsizesup,ysizesup,zsizesup;
-    nop = natoms;
-    atoms = new Atom[nop];
-    int block = natoms +9;
-    double posx,posy,posz;
-    int id;
-    double dummy;
-    int idummy;
-    //cout<<startblock*block<<endl;
-    ifstream infile(inputfile.c_str());
-    
-    if (infile.is_open()){
-        while(getline(infile,line)){
-            //now we have to skip everything until the lines we need
-            if (count>startblock*block){
-                //this is in the reading range
-                if (count==6+startblock*block){
-                    sscanf(line.c_str(),"%lf %lf", &xsizeinf, &xsizesup);
-                    boxx = xsizesup - xsizeinf;
-                    boxdims[0][0] = xsizeinf;
-                    boxdims[0][1] = xsizesup;
-
-                }
-                else if (count==7+startblock*block){
-                    sscanf(line.c_str(),"%lf %lf", &ysizeinf, &ysizesup);
-                    boxy = ysizesup - ysizeinf;
-                    boxdims[1][0] = ysizeinf;
-                    boxdims[1][1] = ysizesup;
-
-                }
-                else if (count==8+startblock*block){
-                    sscanf(line.c_str(),"%lf %lf", &zsizeinf, &zsizesup);
-                    boxz = zsizesup - zsizeinf;
-                    boxdims[2][0] = zsizeinf;
-                    boxdims[2][1] = zsizesup;
-                }
-
-                else if (count>9+startblock*block){
-                    sscanf(line.c_str(),"%d %d %lf %lf %lf %lf %lf %lf %lf", &id, &idummy, &dummy, &posx, &posy, &posz, &dummy, &dummy, &dummy);
-                    atoms[minc].posx = posx;
-                    atoms[minc].posy = posy;
-                    atoms[minc].posz = posz;
-                    atoms[minc].id = id;
-                    atoms[minc].belongsto = -1;
-                    atoms[minc].issolid = 0; 
-                    atoms[minc].loc = minc-9;
-                    atoms[minc].isneighborset = 0;
-                    minc++;
-
-                }
-
-                
-
-                if (count==block+startblock*block) { break; }
-
-
-            }
-            //cout<<"count "<<count<<endl;
-            //break loop if exceeded
-            count++;
-        }
-    }  
-}
 
 
 //this function allows for handling custom formats of atoms and so on
@@ -397,7 +267,7 @@ void System::get_all_neighbors_normal(){
     double diffx,diffy,diffz;
     double r,theta,phi;
 
-    if (!fileread) { read_particle_file(); }
+    if (!fileread) { read_particle_file(inputfile); }
 
     //for (int ti = 0;ti<nop;ti++){
     //    
@@ -494,7 +364,7 @@ void System::get_all_neighbors_voronoi(){
     vector<int> nvector;
     double weightsum;
 
-    if (!fileread) { read_particle_file(); }
+    if (!fileread) { read_particle_file(inputfile); }
 
     pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
     for(int i=0; i<nop; i++){

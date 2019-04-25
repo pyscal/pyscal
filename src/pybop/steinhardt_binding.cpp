@@ -716,13 +716,29 @@ PYBIND11_MODULE(core, m) {
 
                 Returns
                 -------
-                boxdims : list of box dimensions of length 6
+                boxdims : list of box dimensions of length 2
                     the return value consists of the vector of values in the form-
-                    [box_x_low, box_x_high, box_y_low, box_y_high, box_z_low, box_z_high]
+                    [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
 
                     )doc"
             )
 
+        .def("set_box",&System::sbox,
+            R"doc(
+                Set the dimensions of the simulation box.
+
+                Parameters
+                ----------
+                boxdims : list of box dimensions of length 6
+                    the return value consists of the vector of values in the form-
+                    [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+
+                Returns
+                -------
+                None
+
+                    )doc"
+            )
 
         .def("get_qvals",&System::gqvals,
             R"doc(

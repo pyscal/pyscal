@@ -166,15 +166,21 @@ can be accessed through member functions which are described below in detail. At
 be created individually or directly by reading in a file. Check the examples for more
 details on how atoms are created. For creating atoms directly from an input file check
 the documentation of <cite>System</cite> class.</p>
-<p>Atoms should be thought of inherently as members of the <cite>System</cite> class. The coordinates
-of atom are always relative to the simulation box.</p>
+<p>Although an <cite>Atom</cite> object can be created independently, Atoms should be thought of
+inherently as members of the <cite>System</cite> class. All the properties that define an <cite>atom</cite> are
+relative to the <cite>System</cite> class. <cite>System</cite> has a list of all atoms using which the neighbors
+of an atom, if its solid and so on can be calculated. All the calculated properties of an
+atom which depend on any other atom hence should be calculated through <cite>System</cite>. Please
+check the examples section of the documentation for more details.</p>
 <p class="rubric">Examples</p>
-<p>#method 1 - individually
-atom = Atom()
-#now set positions of the atoms
-atom.set_x([23.0, 45.2, 34.2])
-#now set id
-atom.set_id(23)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1">#method 1 - individually</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#now set positions of the atoms</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">set_x</span><span class="p">([</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">45.2</span><span class="p">,</span> <span class="mf">34.2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#now set id</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="mi">23</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><a class="reference internal" href="#pybop.core.Atom.get_x" title="pybop.core.Atom.get_x"><code class="xref py py-class docutils literal notranslate"><span class="pre">get_x</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_x" title="pybop.core.Atom.set_x"><code class="xref py py-class docutils literal notranslate"><span class="pre">set_x</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_id" title="pybop.core.Atom.set_id"><code class="xref py py-class docutils literal notranslate"><span class="pre">set_id</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_id" title="pybop.core.Atom.get_id"><code class="xref py py-class docutils literal notranslate"><span class="pre">get_id</span></code></a>, <a class="reference internal" href="#pybop.core.System" title="pybop.core.System"><code class="xref py py-class docutils literal notranslate"><span class="pre">System</span></code></a></p>
@@ -182,7 +188,7 @@ atom.set_id(23)</p>
 <dl class="method">
 <dt id="pybop.core.Atom.get_aq">
 <code class="descname">get_aq</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#pybop.core.Atom.get_aq" title="Permalink to this definition">¶</a></dt>
-<dd><p>get  avg q value of the atom.</p>
+<dd><p>get averaged q value of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -195,12 +201,20 @@ atom.set_id(23)</p>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q2</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_q" title="pybop.core.Atom.set_q"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_q()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_q" title="pybop.core.Atom.get_q"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_q()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_aq" title="pybop.core.Atom.set_aq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_aq()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.get_aqlm">
 <code class="descname">get_aqlm</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; List[List[float]]<a class="headerlink" href="#pybop.core.Atom.get_aqlm" title="Permalink to this definition">¶</a></dt>
-<dd><p>get the real and imaginary aqlm values of the atom.</p>
+<dd><p>Get the real and imaginary aqlm values of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -221,7 +235,8 @@ second part is the 2q+1 imaginary values.</td>
 <code class="descname">get_cluster</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; List[int]<a class="headerlink" href="#pybop.core.Atom.get_cluster" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the cluster properties of the atom. The cluster properties of the atom
 include four different properties as listed below. The properties are only
-returned if they are calculated before using</p>
+returned if they are calculated before using ‘calculate_nucsize’ function
+before.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -237,16 +252,25 @@ belongsto - which gives the id of the cluster that the atom belongs to.</dd>
 </dl>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">vector int</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of int of length 4</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cinfo</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_cluster</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_nucsize_parameters()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_nucsize()</span></code></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.get_custom">
 <code class="descname">get_custom</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; List[float]<a class="headerlink" href="#pybop.core.Atom.get_custom" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the custom values of an atom.</p>
+<dd><p>NOT CLEAR
+returns the custom values of an atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -264,43 +288,65 @@ belongsto - which gives the id of the cluster that the atom belongs to.</dd>
 <dl class="method">
 <dt id="pybop.core.Atom.get_id">
 <code class="descname">get_id</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#pybop.core.Atom.get_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>get  q value of the atom.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<em>int</em>) – number of the required q - from 2-12</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>q</strong> – The queried q value</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pybop.core.Atom.get_neighbors">
-<code class="descname">get_neighbors</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; List[int]<a class="headerlink" href="#pybop.core.Atom.get_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the neighbors of the atom.</p>
+<dd><p>get  the id of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>x</strong> – neighbor indices</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>id</strong> – id of the atom</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">vector int</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">id</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_id" title="pybop.core.Atom.set_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_id()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybop.core.Atom.get_neighbors">
+<code class="descname">get_neighbors</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; List[int]<a class="headerlink" href="#pybop.core.Atom.get_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the neighbors indices of the atom. The list returned consistes of the indices
+of neighbor atom which indicate their position in the list of all atoms. The neighbors
+of an atom can be calculated from the <cite>System</cite> object that it belongs to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>x</strong> – list of neighbor indices of the atom.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of int</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>neighbors = atom.get_neighbors()</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_neighbors" title="pybop.core.Atom.set_neighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_neighborweights" title="pybop.core.Atom.set_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighborweights()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_neighborweights" title="pybop.core.Atom.get_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_neighborweights()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.get_neighborweights">
 <code class="descname">get_neighborweights</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; List[float]<a class="headerlink" href="#pybop.core.Atom.get_neighborweights" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the neighbor weights of the atom.</p>
+<dd><p>Get the neighbor weights of the atom. The neighbor weights are used weight the
+contribution of each neighboring atom towards the q value of the host atom. By
+default, each neighbor has a weight of 1 each. However, if the neighbors are calculated
+using the <cite>System.get_allneighbors(method=’voronoi’)</cite>, each neighbor atom gets a
+weight proportional to the face area shared between the neighboring atom and the
+host atom. This can sometimes be helpful in controlling the contribution of atoms
+with low face areas due to the thermal vibrations at high temperature.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -309,16 +355,24 @@ belongsto - which gives the id of the cluster that the atom belongs to.</dd>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>x</strong> – neighbor weights</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">vector float</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of float</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">weights</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_neighborweights</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.get_neighbors" title="pybop.core.Atom.get_neighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_neighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_neighbors" title="pybop.core.Atom.set_neighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_neighborweights" title="pybop.core.Atom.set_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighborweights()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.get_q">
 <code class="descname">get_q</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#pybop.core.Atom.get_q" title="Permalink to this definition">¶</a></dt>
-<dd><p>get  q value of the atom.</p>
+<dd><p>get q value of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -331,12 +385,20 @@ belongsto - which gives the id of the cluster that the atom belongs to.</dd>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q2</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_q</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_q" title="pybop.core.Atom.set_q"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_q()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_aq" title="pybop.core.Atom.get_aq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_aq()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_aq" title="pybop.core.Atom.set_aq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_aq()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.get_qlm">
 <code class="descname">get_qlm</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; List[List[float]]<a class="headerlink" href="#pybop.core.Atom.get_qlm" title="Permalink to this definition">¶</a></dt>
-<dd><p>get the real and imaginary qlm values of the atom.</p>
+<dd><p>Get the real and imaginary qlm values of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -397,12 +459,16 @@ is the z coordinate.</td>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_x" title="pybop.core.Atom.set_x"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_x()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom" title="pybop.core.Atom"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Atom()</span></code></a>, <a class="reference internal" href="#pybop.core.System" title="pybop.core.System"><code class="xref py py-meth docutils literal notranslate"><span class="pre">System()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.set_aq">
 <code class="descname">set_aq</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em>, <em>arg1: float</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_aq" title="Permalink to this definition">¶</a></dt>
-<dd><p>set the avg q values of the atom.</p>
+<dd><p>set the averaged q value of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -421,12 +487,21 @@ is the z coordinate.</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">set_aq</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.24</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_q" title="pybop.core.Atom.set_q"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_q()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_q" title="pybop.core.Atom.get_q"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_q()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_aq" title="pybop.core.Atom.get_aq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_aq()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.set_custom">
 <code class="descname">set_custom</code><span class="sig-paren">(</span><em>self: pybop.core.Atom, arg0: List[float]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_custom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set custom values of an Atom</p>
+<dd><p>NOT CLEAR
+Set custom values of an Atom</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -444,30 +519,38 @@ is the z coordinate.</td>
 <dl class="method">
 <dt id="pybop.core.Atom.set_id">
 <code class="descname">set_id</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>get  q value of the atom.</p>
+<dd><p>set  the id of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<em>int</em>) – number of the required q - from 2-12</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<em>int</em>) – id of the atom</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>q</strong> – The queried q value</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.get_id" title="pybop.core.Atom.get_id"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_id()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.set_neighbors">
 <code class="descname">set_neighbors</code><span class="sig-paren">(</span><em>self: pybop.core.Atom, arg0: List[int]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the neighbors of an atom</p>
+<dd><p>Set the neighbors of an atom manually.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array</strong> (<em>index of the neighbor atoms</em>) – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>neighs</strong> (<em>list of ints</em>) – index of the neighbor atoms</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -475,17 +558,23 @@ is the z coordinate.</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<p>atom.set_neighbors([0,23,11,22,334,112,11])</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.get_neighbors" title="pybop.core.Atom.get_neighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_neighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_neighborweights" title="pybop.core.Atom.set_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighborweights()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_neighborweights" title="pybop.core.Atom.get_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_neighborweights()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.set_neighborweights">
 <code class="descname">set_neighborweights</code><span class="sig-paren">(</span><em>self: pybop.core.Atom, arg0: List[float]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_neighborweights" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the neighbor weights of an atom</p>
+<dd><p>Set the neighbor weights of an atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>like float</strong> (<em>array</em>) – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>weights</strong> (<em>list of floats</em>) – weights of the neighbor atoms</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -493,12 +582,20 @@ is the z coordinate.</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">set_neighborweights</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.get_neighbors" title="pybop.core.Atom.get_neighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_neighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_neighbors" title="pybop.core.Atom.set_neighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_neighborweights" title="pybop.core.Atom.set_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighborweights()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.set_q">
 <code class="descname">set_q</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em>, <em>arg0: int</em>, <em>arg1: float</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_q" title="Permalink to this definition">¶</a></dt>
-<dd><p>set the q values of the atom.</p>
+<dd><p>set the q value of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -517,31 +614,41 @@ is the z coordinate.</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span><span class="o">.</span><span class="n">set_q</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">0.24</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_aq" title="pybop.core.Atom.set_aq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_aq()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_aq" title="pybop.core.Atom.get_aq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_aq()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_q" title="pybop.core.Atom.get_q"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_q()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.Atom.set_x">
 <code class="descname">set_x</code><span class="sig-paren">(</span><em>self: pybop.core.Atom, arg0: List[float]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.Atom.set_x" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the position of the atom. Meaningful values are only returned if the atoms are
-set before using this function.</p>
+<dd><p>Set the position of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>list of floats of length 3</em>) – list contains three values which are the position coordinates of the atom with
+respect to the simulation box.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>x</strong> – contains the position of the atom in the form [posx, posy, posz], where
-posx is the x coordinate of the atom, posy is the y coordinate and posz
-is the z coordinate.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array of float</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">x</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">set_x</span><span class="p">([</span><span class="mf">23.0</span><span class="p">,</span> <span class="mf">45.2</span><span class="p">,</span> <span class="mf">34.2</span><span class="p">])</span>
 </pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.get_x" title="pybop.core.Atom.get_x"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_x()</span></code></a></p>
 </div>
 </dd></dl>
 
@@ -551,42 +658,32 @@ is the z coordinate.</td>
 <dt id="pybop.core.System">
 <em class="property">class </em><code class="descclassname">pybop.core.</code><code class="descname">System</code><a class="headerlink" href="#pybop.core.System" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_builtins.pybind11_object</span></code></p>
-<p>A c++ class for holding the properties of a single atom. Various properties of the atom
-can be accessed through member functions which are described below.</p>
+<p>A c++ class for holding the properties of a system. A <cite>System</cite> consists of two
+major components - the simulation box and the atoms. All the associated variables
+are then calculated over these.</p>
+<p>A <cite>System</cite> can be set and populated by reading an input file in lammps dump format.
+This enables for automatic reading of all atomic positions and the simulation box.</p>
 <p class="rubric">Examples</p>
-<p>atom = Atom()</p>
-<dl class="method">
-<dt id="pybop.core.System.assign_cluster_info">
-<code class="descname">assign_cluster_info</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.assign_cluster_info" title="Permalink to this definition">¶</a></dt>
-<dd><p>Assigns parameters such as if the atom belongs to the largest cluster,
-if it is on the surface.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">set_inputfile</span><span class="p">(</span><span class="s2">&quot;atoms.dat&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">read_inputfile</span><span class="p">()</span>
+</pre></div>
+</div>
 <dl class="method">
 <dt id="pybop.core.System.assign_particles">
 <code class="descname">assign_particles</code><span class="sig-paren">(</span><em>self: pybop.core.System, arg0: List[pybop.core.Atom], arg1: List[float]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.assign_particles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Assign atoms directly. Receive a vector of atom objects which is stored instead
 of reading in the input file. If this method is used, there is no need of using
-read_inputfile method.</p>
+<cite>read_inputfile</cite> method. Also using this function allows for reading of multiple
+file formats which are not supported by the inbuilt <cite>read_inputfile</cite> method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>atoms</strong> (<em>vector Atoms</em>) – vector of Atom class instances</li>
-<li><strong>box</strong> (<em>vector double</em>) – vector of box dimensions</li>
+<li><strong>atoms</strong> (list of <cite>Atom</cite> objects) – list consisting of all atoms</li>
+<li><strong>box</strong> (<em>list of float of length 6</em>) – list which consists of the box dimensions in the format-
+[box_x_low, box_x_high, box_y_low, box_y_high, box_z_low, box_z_high]</li>
 </ul>
 </td>
 </tr>
@@ -606,14 +703,17 @@ read_inputfile method.</p>
 
 <dl class="method">
 <dt id="pybop.core.System.calculate_aq">
-<code class="descname">calculate_aq</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.calculate_aq" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the averaged q  value for all atoms. The required q indices(2-12) should be set
-using the set_reqd_qs function.</p>
+<code class="descname">calculate_aq</code><span class="sig-paren">(</span><em>self: pybop.core.System, arg0: List[int]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.calculate_aq" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the averaged bond order parameter q for all atoms. Any of the q parameters from 2-12 can be provided.
+If <cite>calculate_aq</cite> function is used before <cite>calculate_q</cite>, q parameters are first calculated before
+the averaged versions are calculated. See Lechner, Dellago, JCP 129, 2008. for a description of the
+averaged bond order parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>qs</strong> (<em>list of ints</em>) – A list of all q params to be found from 2-12. Even if a single value is required, it
+has be enclosed in a list. For example, [2] or [2,4,6] and so on.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -621,30 +721,18 @@ using the set_reqd_qs function.</p>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pybop.core.System.calculate_complexQLM6">
-<code class="descname">calculate_complexQLM6</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.calculate_complexQLM6" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find complex qlm 6 values for all atoms.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
-</tr>
-</tbody>
-</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.calculate_q" title="pybop.core.System.calculate_q"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_q()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.calculate_frenkelnumbers">
 <code class="descname">calculate_frenkelnumbers</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.calculate_frenkelnumbers" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find frenkel numbers of all atoms in the system.</p>
+<dd><p>Find frenkel numbers of all atoms in the system. Frenkel number is the number of solid
+neighbors that an atom has. A solid bond is considered between two atoms if the connection
+betweem them is greater than 0.6.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -657,6 +745,10 @@ using the set_reqd_qs function.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.get_number_from_bond" title="pybop.core.System.get_number_from_bond"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_number_from_bond()</span></code></a>, <a class="reference internal" href="#pybop.core.System.find_clusters" title="pybop.core.System.find_clusters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_clusters()</span></code></a>, <a class="reference internal" href="#pybop.core.System.find_largest_cluster" title="pybop.core.System.find_largest_cluster"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_largest_cluster()</span></code></a>, <a class="reference internal" href="#pybop.core.System.set_nucsize_parameters" title="pybop.core.System.set_nucsize_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_nucsize_parameters()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -664,16 +756,18 @@ using the set_reqd_qs function.</p>
 <code class="descname">calculate_nucsize</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#pybop.core.System.calculate_nucsize" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate the size of the largest cluster in the given system. Calculation
 the size of the largest cluster needs various prerequisites that can be set
-by the functions set_neighbordistance and set_nucsize_parameters.
-For a detailed description of how the calculation works see-
-Diaz Leines et al, JCP 146(2017). <a class="reference external" href="http://doi.org/10.1063/1.4980082">http://doi.org/10.1063/1.4980082</a></p>
+by the functions <cite>set_nucsize_parameters</cite>. A detailed description of the order
+parameter can be found in Diaz Leines et al, JCP 146(2017).
+<a class="reference external" href="http://doi.org/10.1063/1.4980082">http://doi.org/10.1063/1.4980082</a>.</p>
+<p>The number of atoms in the largest solid cluster in liquid is often used as an
+order parameter in the study of nucleation during solidification.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cluster size</strong> – size of the largest cluster in number of atoms</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cluster size</strong> – size of the largest solid cluster in liquid (number of atoms)</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
 </tr>
@@ -683,14 +777,14 @@ Diaz Leines et al, JCP 146(2017). <a class="reference external" href="http://doi
 
 <dl class="method">
 <dt id="pybop.core.System.calculate_q">
-<code class="descname">calculate_q</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.calculate_q" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the q  value for all atoms. The required q indices(2-12) should be set
-using the set_reqd_qs function.</p>
+<code class="descname">calculate_q</code><span class="sig-paren">(</span><em>self: pybop.core.System, arg0: List[int]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.calculate_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find the bond order parameter - q  for all atoms. Any of the q parameters from 2-12 can be provided.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>qs</strong> (<em>list of ints</em>) – A list of all q params to be found from 2-12. Even if a single value is required, it
+has be enclosed in a list. For example, [2] or [2,4,6] and so on.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -698,12 +792,17 @@ using the set_reqd_qs function.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.calculate_aq" title="pybop.core.System.calculate_aq"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_aq()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.find_clusters">
 <code class="descname">find_clusters</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.find_clusters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find he clusters of all atoms in the system.</p>
+<dd><p>Find the clusters of all atoms in the system. Go through all the atoms and cluster them
+together.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -716,12 +815,17 @@ using the set_reqd_qs function.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.calculate_frenkelnumbers" title="pybop.core.System.calculate_frenkelnumbers"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_frenkelnumbers()</span></code></a>, <a class="reference internal" href="#pybop.core.System.get_number_from_bond" title="pybop.core.System.get_number_from_bond"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_number_from_bond()</span></code></a>, <a class="reference internal" href="#pybop.core.System.find_largest_cluster" title="pybop.core.System.find_largest_cluster"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_largest_cluster()</span></code></a>, <a class="reference internal" href="#pybop.core.System.set_nucsize_parameters" title="pybop.core.System.set_nucsize_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_nucsize_parameters()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.find_largest_cluster">
 <code class="descname">find_largest_cluster</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#pybop.core.System.find_largest_cluster" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find the largest in the system.</p>
+<dd><p>Find the largest solid cluster of atoms in the system from all the clusters. <cite>find_clusters</cite>
+has to be used before using this function.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -734,6 +838,10 @@ using the set_reqd_qs function.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.calculate_frenkelnumbers" title="pybop.core.System.calculate_frenkelnumbers"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_frenkelnumbers()</span></code></a>, <a class="reference internal" href="#pybop.core.System.find_clusters" title="pybop.core.System.find_clusters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_clusters()</span></code></a>, <a class="reference internal" href="#pybop.core.System.get_number_from_bond" title="pybop.core.System.get_number_from_bond"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_number_from_bond()</span></code></a>, <a class="reference internal" href="#pybop.core.System.set_nucsize_parameters" title="pybop.core.System.set_nucsize_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_nucsize_parameters()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
@@ -745,8 +853,8 @@ using the set_reqd_qs function.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>atom1</strong> (<em>Atom object</em>) – first atom</li>
-<li><strong>atom2</strong> (<em>Atom object</em>) – second atom</li>
+<li><strong>atom1</strong> (<cite>Atom</cite> object) – first atom</li>
+<li><strong>atom2</strong> (<cite>Atom</cite> object) – second atom</li>
 </ul>
 </td>
 </tr>
@@ -763,7 +871,7 @@ using the set_reqd_qs function.</p>
 <dl class="method">
 <dt id="pybop.core.System.get_allatoms">
 <code class="descname">get_allatoms</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; List[pybop.core.Atom]<a class="headerlink" href="#pybop.core.System.get_allatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>Access function that returns the a vector of Atom objects.</p>
+<dd><p>Get a list of all <cite>Atom</cite> objects that belong to the system.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -772,7 +880,7 @@ using the set_reqd_qs function.</p>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>allatoms</strong> – all atoms in the system</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">vctor of Atom objects</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of <cite>Atom</cite> objects</td>
 </tr>
 </tbody>
 </table>
@@ -780,26 +888,42 @@ using the set_reqd_qs function.</p>
 
 <dl class="method">
 <dt id="pybop.core.System.get_allneighbors">
-<code class="descname">get_allneighbors</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>method: unicode</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.get_allneighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find neighbors of all atoms in the system.</p>
+<code class="descname">get_allneighbors</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>method: unicode</em>, <em>cutoff: float = 3.0</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.get_allneighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find neighbors of all atoms in the <cite>System</cite>. There are two methods to do this, the
+traditional approach being the one in which the neighbors of an atom are the ones that lie
+in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
+that share a Voronoi polyhedra face with the host atoms are considered its neighbors.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>method</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>method</strong> (<cite>cutoff</cite> or <cite>voronoi</cite>, default: <cite>cutoff</cite>) – <cite>cutoff</cite> method finds atoms within a specified cutoff distance of the host atom
+<cite>voronoi</cite> method finds atoms that share a Voronoi polyhedra face with the host atom.</li>
+<li><strong>cutoff</strong> (<em>float</em>) – the cutoff distance to be used for the <cite>cutoff</cite> based neighbor calculation method
+described above.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.reset_allneighbors" title="pybop.core.System.reset_allneighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset_allneighbors()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.get_aqvals">
 <code class="descname">get_aqvals</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; List[float]<a class="headerlink" href="#pybop.core.System.get_aqvals" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the required aq values of all atoms.</p>
+<dd><p>Get the required averaged q values of all atoms. The function returns a list of
+q values in the same order as that of the atoms in the system.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -817,14 +941,15 @@ using the set_reqd_qs function.</p>
 <dl class="method">
 <dt id="pybop.core.System.get_atom">
 <code class="descname">get_atom</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; pybop.core.Atom<a class="headerlink" href="#pybop.core.System.get_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>Access function that returns the Atom object at the queried position.</p>
+<dd><p>Get the <cite>Atom</cite> object at the queried position in the list of all atoms
+in the <cite>System</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – index of required atom</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<em>int</em>) – index of required atom in the list of all atoms.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>atom</strong> – atom object at the queried position</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>atom</strong> – atom object at the queried position.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Atom object</td>
 </tr>
@@ -835,16 +960,17 @@ using the set_reqd_qs function.</p>
 <dl class="method">
 <dt id="pybop.core.System.get_box">
 <code class="descname">get_box</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; List[float]<a class="headerlink" href="#pybop.core.System.get_box" title="Permalink to this definition">¶</a></dt>
-<dd><p>Access function that returns the low and high values of sim box.</p>
+<dd><p>Get the dimensions of the simulation box.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>boxdims</strong></td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>boxdims</strong> – the return value consists of the vector of values in the form-
+[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">vector of box dimensions</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of box dimensions of length 2</td>
 </tr>
 </tbody>
 </table>
@@ -853,7 +979,8 @@ using the set_reqd_qs function.</p>
 <dl class="method">
 <dt id="pybop.core.System.get_largestcluster">
 <code class="descname">get_largestcluster</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#pybop.core.System.get_largestcluster" title="Permalink to this definition">¶</a></dt>
-<dd><p>get id of the the largest cluster</p>
+<dd><p>Get id of the the largest cluster. id is only available if the largest cluster has already
+been found. Otherwise it returns the default values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -868,21 +995,22 @@ using the set_reqd_qs function.</p>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#pybop.core.System.read_inputfile" title="pybop.core.System.read_inputfile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_inputfile()</span></code></a></p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.get_allneighbors" title="pybop.core.System.get_allneighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_allneighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.System.calculate_nucsize" title="pybop.core.System.calculate_nucsize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_nucsize()</span></code></a>, <a class="reference internal" href="#pybop.core.System.set_nucsize_parameters" title="pybop.core.System.set_nucsize_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_nucsize_parameters()</span></code></a></p>
 </div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.get_number_from_bond">
 <code class="descname">get_number_from_bond</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: pybop.core.Atom</em>, <em>arg1: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#pybop.core.System.get_number_from_bond" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the connection between two atoms. Connection is defined by Qlm(i).Qlm(j)</p>
+<dd><p>Get the connection between two atoms. Connection is defined by Qlm(i).Qlm(j). Normally,
+a connection of more than 0.6 is considered a solid bond.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>atom1</strong> (<em>Atom object</em>) – first atom</li>
-<li><strong>atom2</strong> (<em>Atom object</em>) – second atom</li>
+<li><strong>atom1</strong> (<cite>Atom</cite> object) – first atom</li>
+<li><strong>atom2</strong> (<cite>Atom</cite> object) – second atom</li>
 </ul>
 </td>
 </tr>
@@ -894,21 +1022,26 @@ using the set_reqd_qs function.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.calculate_frenkelnumbers" title="pybop.core.System.calculate_frenkelnumbers"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_frenkelnumbers()</span></code></a>, <a class="reference internal" href="#pybop.core.System.find_clusters" title="pybop.core.System.find_clusters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_clusters()</span></code></a>, <a class="reference internal" href="#pybop.core.System.find_largest_cluster" title="pybop.core.System.find_largest_cluster"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_largest_cluster()</span></code></a>, <a class="reference internal" href="#pybop.core.System.set_nucsize_parameters" title="pybop.core.System.set_nucsize_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_nucsize_parameters()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.get_qvals">
 <code class="descname">get_qvals</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: int</em><span class="sig-paren">)</span> &#x2192; List[float]<a class="headerlink" href="#pybop.core.System.get_qvals" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the required q values of all atoms.</p>
+<dd><p>Get the required q values of all atoms. The function returns a list of
+q values in the same order as that of the atoms in the system.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>q</strong> (<em>int</em>) – required q value from 2-12</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>qvals</strong> – list of qth qvalue of all atoms.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>qvals</strong> – list of qvalue of all atoms.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of double</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of floats</td>
 </tr>
 </tbody>
 </table>
@@ -916,46 +1049,36 @@ using the set_reqd_qs function.</p>
 
 <dl class="method">
 <dt id="pybop.core.System.read_inputfile">
-<code class="descname">read_inputfile</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.read_inputfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a single snapshot of the lammps dump file and assign the positions
-and ids to an array of Atom objects stored in the parent class.</p>
+<code class="descname">read_inputfile</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: unicode</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.read_inputfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read input file containing the information of a time slice from a molecular dynamics
+simulation. As of now, the file should be a lammps dump format and can only have a
+specific header format. That is-
+id type mass x y z vx vy vz
+However, this restriction can easily be overcome using the <cite>assign_particles</cite> method
+from system where a list of atoms and box vectors are directly provided to the system.
+This functions only sets the input file
+:param None:</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pybop.core.System.read_particleinstance">
-<code class="descname">read_particleinstance</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: int</em>, <em>arg1: int</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.read_particleinstance" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read a single snapshot of the lammps dump file and assign the positions
-and ids to an array of Atom objects stored in the parent class.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
-</tr>
-</tbody>
-</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.assign_particles" title="pybop.core.System.assign_particles"><code class="xref py py-meth docutils literal notranslate"><span class="pre">assign_particles()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.reset_allneighbors">
 <code class="descname">reset_allneighbors</code><span class="sig-paren">(</span><em>self: pybop.core.System</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.reset_allneighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reset the neighbors of all atoms in the system.</p>
+<dd><p>Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
+with two different approaches.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -968,12 +1091,21 @@ and ids to an array of Atom objects stored in the parent class.</p>
 </tr>
 </tbody>
 </table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.get_allneighbors" title="pybop.core.System.get_allneighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_allneighbors()</span></code></a></p>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.set_atom">
 <code class="descname">set_atom</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.set_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>return the atom to its original location after modification.</p>
+<dd><p>Return the atom to its original location after modification. For example, an
+<cite>Atom</cite> at location <cite>i</cite> in the list of all atoms in <cite>System</cite> can be queried by,
+<cite>atom = System.get_atom(i)</cite>, then any kind of modification, for example, the
+position of the <cite>Atom</cite> can done by, <cite>atom.set_x([2.3, 4.5, 4.5])</cite>. After
+modification, the <cite>Atom</cite> can be set back to its position in <cite>System</cite> by
+<cite>System.set_atom(atom)</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -989,14 +1121,15 @@ and ids to an array of Atom objects stored in the parent class.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="pybop.core.System.set_cutoff">
-<code class="descname">set_cutoff</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: float</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.set_cutoff" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set cutoff for neighbor calculation.</p>
+<dt id="pybop.core.System.set_box">
+<code class="descname">set_box</code><span class="sig-paren">(</span><em>self: pybop.core.System, arg0: List[List[float]]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.set_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the dimensions of the simulation box.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cutoff</strong> (<em>double</em>) – cutoff distance for calculating neighbors</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>boxdims</strong> (<em>list of box dimensions of length 6</em>) – the return value consists of the vector of values in the form-
+[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -1004,51 +1137,30 @@ and ids to an array of Atom objects stored in the parent class.</p>
 </tr>
 </tbody>
 </table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#pybop.core.System.read_inputfile" title="pybop.core.System.read_inputfile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_inputfile()</span></code></a></p>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="pybop.core.System.set_inputfile">
-<code class="descname">set_inputfile</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: unicode</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.set_inputfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set input file</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition seealso">
-<p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#pybop.core.System.read_inputfile" title="pybop.core.System.read_inputfile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">read_inputfile()</span></code></a></p>
-</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="pybop.core.System.set_nucsize_parameters">
 <code class="descname">set_nucsize_parameters</code><span class="sig-paren">(</span><em>self: pybop.core.System</em>, <em>arg0: int</em>, <em>arg1: float</em>, <em>arg2: float</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.set_nucsize_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the value of parameters for calculating the largest cluster in the
+<dd><p>Set the value of parameters for calculating the largest solid cluster in the
 liquid, a detailed description of the order parameter can be found in
-Diaz Leines et al, JCP 146(2017). <a class="reference external" href="http://doi.org/10.1063/1.4980082">http://doi.org/10.1063/1.4980082</a> .</p>
+Diaz Leines et al, JCP 146(2017). <a class="reference external" href="http://doi.org/10.1063/1.4980082">http://doi.org/10.1063/1.4980082</a>.</p>
+<p>The number of atoms in the largest solid cluster in liquid is often used as an
+order parameter in the study of nucleation during solidification. In order to
+actually calculate the largest solid cluster, <cite>calculate_nucsize</cite> has to be
+called after setting the parameters.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>minfrenkel</strong> (<em>int</em>) – Minimum number of solid connections for an atom to be identified as
+<li><strong>minfrenkel</strong> (<em>int</em>) – Minimum number of solid bonds for an atom to be identified as
 a solid.</li>
 <li><strong>threshold</strong> (<em>double</em>) – The cutoff value of connection between two atoms for them to be def
 ined as having a bond.</li>
 <li><strong>avgthreshold</strong> (<em>double</em>) – Averaged value of connection between an atom and its neighbors for
-an atom to be solid.</li>
+an atom to be solid. This threshold is known to improve the solid-liquid
+distinction in interfaces between solid and liquid.</li>
 </ul>
 </td>
 </tr>
@@ -1062,31 +1174,12 @@ an atom to be solid.</li>
 </table>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
-<p class="last"><a class="reference internal" href="#pybop.core.System.set_inputfile" title="pybop.core.System.set_inputfile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_inputfile()</span></code></a>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighbordistance()</span></code></p>
+<p class="last"><a class="reference internal" href="#pybop.core.System.calculate_nucsize" title="pybop.core.System.calculate_nucsize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_nucsize()</span></code></a></p>
 </div>
 <p class="rubric">Examples</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">st</span><span class="o">.</span><span class="n">set_nucsize_parameters</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">0.5</span><span class="p">)</span>
 </pre></div>
 </div>
-</dd></dl>
-
-<dl class="method">
-<dt id="pybop.core.System.set_reqdqs">
-<code class="descname">set_reqdqs</code><span class="sig-paren">(</span><em>self: pybop.core.System, arg0: List[int]</em><span class="sig-paren">)</span> &#x2192; None<a class="headerlink" href="#pybop.core.System.set_reqdqs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the list of qvalues to be calculated which will be done through
-calculate_q function.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>qlist</strong> (<em>array of int</em>) – a list of q values to be calculated from 2-12</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </dd></dl>
