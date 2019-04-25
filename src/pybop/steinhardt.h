@@ -106,6 +106,7 @@ class Atom{
         //function to set neighbors
         void sneighbors(vector<int> nns);
         vector<int> gneighbors();
+        int gnneighbors();
         void sneighborweights(vector<double> nns);
         vector<double> gneighborweights();
         //vector<double> gx();

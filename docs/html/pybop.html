@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pybop structure &mdash; pybop 1.0.0 documentation</title>
+  <title>pybop package &mdash; pybop 1.0.0 documentation</title>
   
 
   
@@ -80,7 +80,8 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="gettingstarted.html">Getting started</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">pybop structure</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">pybop package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pybop.core">pybop.core module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pybop.traj_process">pybop.traj_process module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-pybop">Module contents</a></li>
@@ -132,7 +133,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>pybop structure</li>
+      <li>pybop package</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -151,10 +152,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pybop-structure">
-<h1>pybop structure<a class="headerlink" href="#pybop-structure" title="Permalink to this headline">¶</a></h1>
-<p><strong>pybop</strong> consists of a <cite>core</cite> module with additional helper modules. The <cite>core</cite> module consists of all the core functionality which is written in C++. The helper modules are written in python and extends the functionaly of the core module.</p>
-<p>This contains two main classes, the <cite>System</cite> class and the <cite>Atom</cite> class. The <cite>System</cite> class the main class of this module and has to be set up to start any calculation. Further explanation is given in the Examples section.</p>
+  <div class="section" id="pybop-package">
+<h1>pybop package<a class="headerlink" href="#pybop-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="module-pybop.core">
 <span id="pybop-core-module"></span><h2>pybop.core module<a class="headerlink" href="#module-pybop.core" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -263,6 +265,31 @@ belongsto - which gives the id of the cluster that the atom belongs to.</dd>
 <div class="admonition seealso">
 <p class="first admonition-title">See also</p>
 <p class="last"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_nucsize_parameters()</span></code>, <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_nucsize()</span></code></p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybop.core.Atom.get_coordination">
+<code class="descname">get_coordination</code><span class="sig-paren">(</span><em>self: pybop.core.Atom</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#pybop.core.Atom.get_coordination" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the coordination number of the atom. <cite>get_allneighbors</cite> function of the <cite>System</cite> class
+has to be used before accessing coordination numbers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cn</strong> – coordination number of the atom.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>neighbors = atom.get_neighbors()</p>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pybop.core.Atom.set_neighbors" title="pybop.core.Atom.set_neighbors"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighbors()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.set_neighborweights" title="pybop.core.Atom.set_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_neighborweights()</span></code></a>, <a class="reference internal" href="#pybop.core.Atom.get_neighborweights" title="pybop.core.Atom.get_neighborweights"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_neighborweights()</span></code></a></p>
 </div>
 </dd></dl>
 

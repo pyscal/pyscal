@@ -9,5 +9,5 @@ Examples
 .. toctree::
     
     example1basic
-    example2qcalc
+    example2basic
     

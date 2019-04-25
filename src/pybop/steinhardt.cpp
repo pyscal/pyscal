@@ -969,6 +969,10 @@ vector<int> Atom::gneighbors(){
     return nn;
 }
 
+int Atom::gnneighbors(){
+    return n_neighbors;
+}
+
 double Atom::gq(int qq){ return q[qq-2]; }
 int Atom::gid(){ return id; }
 void Atom::sid(int idd){ id=idd; }

@@ -169,6 +169,32 @@ PYBIND11_MODULE(core, m) {
 
                 )doc")
 
+        .def("get_coordination",&Atom::gnneighbors,
+            R"doc(
+                Returns the coordination number of the atom. `get_allneighbors` function of the `System` class
+                has to be used before accessing coordination numbers. 
+
+                Parameters
+                ----------
+                None
+                
+                Returns
+                -------
+                cn : int
+                    coordination number of the atom.
+
+                Examples
+                --------
+                neighbors = atom.get_neighbors()
+
+                See also
+                --------
+                set_neighbors
+                set_neighborweights
+                get_neighborweights
+
+                )doc")
+
         .def("set_neighbors",&Atom::sneighbors,
             R"doc(
                 Set the neighbors of an atom manually.
