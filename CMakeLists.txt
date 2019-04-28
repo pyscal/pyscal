@@ -23,4 +23,4 @@ add_subdirectory(lib/pybind11)
 
 #Finally create the package
 #--------------------------------------------------------
-pybind11_add_module(core ${SOURCES} "${SOURCE_DIR}/steinhardt_binding.cpp" "${SSOURCE_DIR}/voro++.cc")
+pybind11_add_module(ccore ${SOURCES} "${SOURCE_DIR}/steinhardt_binding.cpp" "${SSOURCE_DIR}/voro++.cc")
