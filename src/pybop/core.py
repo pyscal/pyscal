@@ -282,14 +282,21 @@ class Atom(pc.Atom):
 		"""
 		pc.Atom.set_neighborweights(self, weights)
 
-	def get_q(self, q):
+	def get_q(self, q, averaged = False):
 		"""
-        get q value of the atom. 
+        get q value of the atom. The q value can be either normal or can
+        be averaged according to Lechner, W, Dellago, C. JCP 129, 2008.
+        The averaged version can be obtained by using keyword
+        `averaged = True`.
 
         Parameters
         ----------
         q : int or list of int
             number of the required q - from 2-12
+
+        averaged : bool, default False
+            If True, return the averaged q values,
+            If False, return the non averaged ones
 
         Returns
         -------
@@ -298,7 +305,7 @@ class Atom(pc.Atom):
 
         Examples
         --------
-        >>> q2 = atom.get_q(2)
+        >>> q2 = atom.get_q(2, averaged = True)
         >>> q24 = atom.get_q([2, 4])
 
         See also
@@ -308,16 +315,23 @@ class Atom(pc.Atom):
         set_aq		
 		"""
 		if isinstance(q, int):
-			rq = pc.Atom.get_q(self, q)
+            if averaged:
+                rq = pc.Atom.get_aq(self, q)
+            else:
+                rq = pc.Atom.get_q(self, q)
 			return rq
 
 		else:
-			rq = [ pc.Atom.get_q(self, qq) for qq in q ]
+            if averaged:
+                rq = [ pc.Atom.get_aq(self, qq) for qq in q ]
+            else:
+                rq = [ pc.Atom.get_q(self, qq) for qq in q ]
 			return rq
 
-	def set_q(self, q, d):
+	def set_q(self, q, d, averaged = False):
 		"""
-        set the q value of the atom.
+        set the q value of the atom. If `averaged = True`, sets the averaged versions of
+        the q parameters.
 
         Parameters
         ----------
@@ -325,6 +339,9 @@ class Atom(pc.Atom):
             number of the required q - from 2-12
         d : float or list of floats
             the q value to set
+        averaged : bool, default False
+            If True, return the averaged q values,
+            If False, return the non averaged ones            
 
         Returns
         -------
@@ -332,7 +349,7 @@ class Atom(pc.Atom):
 
         Examples
         --------
-        >>> atom.set_q(2, 0.24)
+        >>> atom.set_q(2, 0.24, averaged = True)
         >>> atom.set_q([2,4], [0.24, 0.05])
 
         See also
@@ -342,77 +359,18 @@ class Atom(pc.Atom):
         get_q
 		"""
 		if isinstance(q, int):
-			pc.Atom.set_q(self, q)
-
+            if averaged:
+                pc.Atom.set_aq(self, q)
+            else:
+                pc.Atom.set_q(self, q)
 		else:
-			for count, qq in enumerate(q):
-				pc.Atom.set_q(self, qq, d[count])
+            if averaged:
+                for count, qq in enumerate(q):
+				    pc.Atom.set_aq(self, qq, d[count])
+            else:
+                for count, qq in enumerate(q):
+                    pc.Atom.set_q(self, qq, d[count])
 
-	def get_aq(self, q):
-		"""
-        get averaged q value of the atom. 
-
-        Parameters
-        ----------
-        q : int or list of int
-            number of the required q - from 2-12
-
-        Returns
-        -------
-        q : float or list of floats
-            The queried q value
-
-        Examples
-        --------
-        >>> q2 = atom.get_aq(2)
-        >>> q24 = atom.get_aq([2, 4])
-
-        See also
-        --------
-        set_aq
-        get_q
-        set_q		
-		"""
-		if isinstance(q, int):
-			rq = pc.Atom.get_aq(self, q)
-			return rq
-
-		else:
-			rq = [ pc.Atom.get_q(self, qq) for qq in q ]
-			return rq
-
-	def set_aq(self, q, d):
-		"""
-        set the averaged q value of the atom.
-
-        Parameters
-        ----------
-        q : int or list of ints
-            number of the required q - from 2-12
-        d : float or list of floats
-            the q value to set
-
-        Returns
-        -------
-        None
-
-        Examples
-        --------
-        >>> atom.set_aq(2, 0.24)
-        >>> atom.set_aq([2,4], [0.24, 0.05])
-
-        See also
-        --------
-        set_q
-        get_q
-        get_aq
-		"""
-		if isinstance(q, int):
-			pc.Atom.set_aq(self, q)
-
-		else:
-			for count, qq in enumerate(q):
-				pc.Atom.set_aq(self, qq, d[count])
 
 	def get_id(self):
 		"""
@@ -461,9 +419,10 @@ class Atom(pc.Atom):
 		"""
 		pc.Atom.set_id(self, idd)
 
-	def get_qlm(self, q):
+	def get_qlm(self, q, averaged = False):
 		"""
-        Get the real and imaginary qlm values of the atom.
+        Get the real and imaginary qlm values of the atom. If `averaged = True`,
+        return the averaged qlm values.
 
         Parameters
         ----------
@@ -475,37 +434,22 @@ class Atom(pc.Atom):
         qlms : 2D array of 2q+1 values or n 2D arrays
             the first part of the array is the 2q+1 real values
             second part is the 2q+1 imaginary values.
-
+        averaged : bool, default False
+            If True, return the averaged q values,
+            If False, return the non averaged ones    
 		"""
 		if isinstance(q, int):
-			rq = pc.Atom.get_qlm(self, q)
+            if averaged:
+                rq = pc.Atom.get_aqlm(self, q)
+            else:
+                rq = pc.Atom.get_qlm(self, q)
 			return rq
 
 		else:
-			rq = [ pc.Atom.get_qlm(self, qq) for qq in q ]
-			return rq
-
-	def get_aqlm(self, q):
-		"""
-                Get the real and imaginary aqlm values of the atom.
-
-                Parameters
-                ----------
-                q : int
-                    number of the required q - from 2-12
-
-                Returns
-                -------
-                qlms : 2D array of 2q+1 values
-                    the first part of the array is the 2q+1 real values
-                    second part is the 2q+1 imaginary values.
-		"""
-		if isinstance(q, int):
-			rq = pc.Atom.get_aqlm(self, q)
-			return rq
-
-		else:
-			rq = [ pc.Atom.get_aqlm(self, qq) for qq in q ]
+            if averaged:
+                rq = [ pc.Atom.get_aqlm(self, qq) for qq in q ]
+            else:
+                rq = [ pc.Atom.get_qlm(self, qq) for qq in q ]
 			return rq
 
 	def get_vorovector(self):
@@ -545,6 +489,474 @@ class System(pc.System):
 	"""
 	def __init__(self):
 		self.initialized = True
+
+    def read_inputfile(self, filename, format="lammps-dump"):
+        """
+        Read input file containing the information of a time slice from a molecular dynamics
+        simulation. 
+        
+
+        As of now, the file should be a lammps dump format and can only have a
+        specific header format. That is-
+        id type mass x y z vx vy vz
+        However, this restriction can easily be overcome using the `assign_particles` method
+        from system where a list of atoms and box vectors are directly provided to the system.
+        
+        Parameters
+        ----------
+        filename : string
+            name of the input file to be read in
+
+        format : `lammps-dump`
+            format of the input file
+
+        Returns
+        -------
+        None
+
+        See Also
+        --------
+        assign_particles
+        """
+        if format == 'lammps-dump':
+            pc.System.read_inputfile(self, filename)
+
+    def assign_atoms(self, atoms, box):
+        """
+        Assign atoms directly. Receive a vector of atom objects which is stored instead
+        of reading in the input file. If this method is used, there is no need of using
+        `read_inputfile` method. Also using this function allows for reading of multiple
+        file formats which are not supported by the inbuilt `read_inputfile` method.
+
+        Parameters
+        ----------
+        atoms : list of `Atom` objects
+            list consisting of all atoms
+        box   : list of list of floats
+            list which consists of the box dimensions in the format-
+            [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+
+        Returns
+        -------
+        None
+
+        See Also
+        --------
+        read_inputfile
+        """
+        pc.System.assign_particles(self, atoms, box)        
+
+    def get_largestcluster(self):
+        """
+        Get id of the the largest cluster. id is only available if the largest cluster has already
+        been found. Otherwise it returns the default values.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        clusterid : int 
+            id of the largest cluster
+
+        See Also
+        --------
+        get_allneighbors
+        calculate_nucsize
+        set_nucsize_parameters
+        """
+        return pc.System.get_largestcluster(self)
+
+    def set_nucsize_parameters(self, minfrenkel, threshold, avgthreshold):
+        """
+        Set the value of parameters for calculating the largest solid cluster in the
+        liquid, a detailed description of the order parameter can be found in  
+        Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082.
+
+        The number of atoms in the largest solid cluster in liquid is often used as an
+        order parameter in the study of nucleation during solidification. In order to
+        actually calculate the largest solid cluster, `calculate_nucsize` has to be 
+        called after setting the parameters.
+
+        Parameters
+        ----------
+        minfrenkel : int
+            Minimum number of solid bonds for an atom to be identified as
+            a solid.
+        
+        threshold : double
+            The cutoff value of connection between two atoms for them to be def
+            ined as having a bond.
+        
+        avgthreshold : double
+            Averaged value of connection between an atom and its neighbors for 
+            an atom to be solid. This threshold is known to improve the solid-liquid
+            distinction in interfaces between solid and liquid. 
+
+        Returns
+        -------
+        None
+
+        See Also
+        --------
+        calculate_nucsize
+
+        Examples
+        --------
+        >>> st.set_nucsize_parameters(7,0.5,0.5)
+        """
+        pc.System.set_nucsize_parameters(self, minfrenkel, threshold, avgthreshold)
+
+    def calculate_nucsize(self):
+        """
+        Calculate the size of the largest cluster in the given system. Calculation
+        the size of the largest cluster needs various prerequisites that can be set
+        by the functions `set_nucsize_parameters`. A detailed description of the order 
+        parameter can be found in Diaz Leines et al, JCP 146(2017). 
+        http://doi.org/10.1063/1.4980082.
+
+        The number of atoms in the largest solid cluster in liquid is often used as an
+        order parameter in the study of nucleation during solidification.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        cluster size : int
+            size of the largest solid cluster in liquid (number of atoms)
+        """
+        pc.System.calculate_nucsize(self)
+
+    def get_atom(self, index):
+        """
+        Get the `Atom` object at the queried position in the list of all atoms
+        in the `System`.
+
+        Parameters
+        ----------
+        index : int
+            index of required atom in the list of all atoms.
+
+        Returns
+        -------
+        atom : Atom object
+            atom object at the queried position.
+        """
+        return pc.System.get_atom(self, index)
+
+    def set_atom(self, atom):
+        """
+        Return the atom to its original location after modification. For example, an
+        `Atom` at location `i` in the list of all atoms in `System` can be queried by,
+        `atom = System.get_atom(i)`, then any kind of modification, for example, the 
+        position of the `Atom` can done by, `atom.set_x([2.3, 4.5, 4.5])`. After 
+        modification, the `Atom` can be set back to its position in `System` by
+        `System.set_atom(atom)`.
+
+        Parameters
+        ----------
+        atom : Atom
+                atom to be replaced
+
+        Returns
+        -------
+        None
+        """
+        pc.System.set_atom(self, atom)
+
+    def get_allatoms(self):
+        """
+        Get a list of all `Atom` objects that belong to the system.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        allatoms : list of `Atom` objects
+            all atoms in the system
+        """
+        return pc.System.get_allatoms(self)
+
+    def get_box(self):
+        """
+        Get the dimensions of the simulation box.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        boxdims : list of box dimensions of length 2
+            the return value consists of the vector of values in the form-
+            [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+        """
+        return pc.System.get_box(self)
+
+    def set_box(self, box):
+        """
+        Set the dimensions of the simulation box.
+
+        Parameters
+        ----------
+        boxdims : list of box dimensions of length 6
+            the return value consists of the vector of values in the form-
+            [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+
+        Returns
+        -------
+        None
+        """
+        pc.System.set_box(self, box)
+
+    def get_qvals(self, q, averaged = False):
+        """
+        Get the required q values of all atoms. The function returns a list of 
+        q values in the same order as that of the atoms in the system.
+
+        Parameters
+        ----------
+        q : int or list of ints
+            required q value from 2-12
+        averaged : bool, default False
+            If True, return the averaged q values,
+            If False, return the non averaged ones 
+
+        Returns
+        -------
+        qvals : list of floats
+            list of qvalue of all atoms.
+        """
+        if isinstance(q, int):
+            if averaged:
+                rq = pc.System.get_aqvals(self, q)
+            else:
+                rq = pc.System.get_qvals(self, q)
+            return rq
+
+        else:
+            if averaged:
+                rq = [ pc.System.get_aqvals(self, qq) for qq in q ]
+            else:
+                rq = [ pc.System.get_qvals(self, qq) for qq in q ]
+            return rq
+
+    def get_distance(self, atom1, atom2):
+        """
+        Get the distance between two atoms.
+
+        Parameters
+        ----------
+        atom1 : `Atom` object
+                first atom
+        atom2 : `Atom` object
+                second atom
+        
+        Returns
+        -------
+        distance : double
+                distance between the first and second atom.
+        """
+        return pc.System.get_absdistance(self, atom1, atom2)
+
+    def get_neighbors(self, method="cutoff", cutoff=None):
+        """
+        Find neighbors of all atoms in the `System`. There are two methods to do this, the 
+        traditional approach being the one in which the neighbors of an atom are the ones that lie
+        in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
+        that share a Voronoi polyhedra face with the host atoms are considered its neighbors.
+
+        Parameters
+        ----------
+        method : `cutoff` or `voronoi`, default: `cutoff`
+            `cutoff` method finds atoms within a specified cutoff distance of the host atom
+            `voronoi` method finds atoms that share a Voronoi polyhedra face with the host atom.
+
+        cutoff : float
+            the cutoff distance to be used for the `cutoff` based neighbor calculation method
+            described above.
+        
+        Returns
+        -------
+        None
+
+        See also
+        --------
+        reset_allneighbors
+        """
+        #first reset all neighbors
+        pc.System.reset_allneighbors(self)
+
+        if method == 'cutoff':
+            pc.System.set_neighbordistance(self, cutoff)
+            pc.System.get_all_neighbors_normal(self)
+
+        elif method == 'voronoi':
+            pc.System.get_all_neighbors_voronoi(self)
+
+
+    def reset_neighbors(self):
+        """
+        Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
+        with two different approaches.
+
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        None
+
+        See also
+        --------
+        get_allneighbors
+        """
+        pc.System.reset_allneighbors(self)
+
+    def calculate_q(self, q, averaged = False):
+        """
+        Find the bond order parameter q for all atoms. Any of the q parameters from 2-12 can be provided.
+        If the averaged versions are to be calculated, the keyword `averaged = True` should be set.
+        See Lechner, Dellago, JCP 129, 2008. for a description of the
+        averaged bond order parameters.
+
+        Parameters
+        ----------
+        qs : int or list of ints
+            A list of all q params to be found from 2-12. 
+        averaged : bool, default False
+            If True, return the averaged q values,
+            If False, return the non averaged ones 
+
+        Returns
+        -------
+        None
+        """
+        if isinstance(q, int):
+            q = [q]
+
+        pc.System.calculate_q(self, q)
+
+        if averaged:
+            pc.System.calculate_aq(self, q)
+
+
+    def get_connection(self, atom1, atom2):
+        """
+        Get the connection between two atoms. Connection is defined by Qlm(i).Qlm(j). Normally,
+        a connection of more than 0.6 is considered a solid bond.
+
+        Parameters
+        ----------
+        atom1 : `Atom` object
+                first atom
+        atom2 : `Atom` object
+                second atom
+        
+        Returns
+        -------
+        connection : double
+            connection between the first and second atom.
+
+        See also
+        --------
+        calculate_frenkelnumbers
+        find_clusters
+        find_largest_cluster
+        set_nucsize_parameters
+        """
+        return pc.System.get_number_from_bond(self, atom1, atom2)
+
+    def calculate_frenkelnumbers(self):
+        """
+        Find frenkel numbers of all atoms in the system. Frenkel number is the number of solid
+        neighbors that an atom has. A solid bond is considered between two atoms if the connection
+        betweem them is greater than 0.6.
+
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        None
+        
+        See also
+        --------
+        get_number_from_bond
+        find_clusters
+        find_largest_cluster
+        set_nucsize_parameters
+        """
+        pc.System.calculate_frenkelnumbers(self)
+
+    def find_clusters(self):
+        """
+        Find the clusters of all atoms in the system. Go through all the atoms and cluster them
+        together.
+
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        None
+
+        See also
+        --------
+        calculate_frenkelnumbers
+        get_number_from_bond
+        find_largest_cluster
+        set_nucsize_parameters
+        """
+        pc.System.find_clusters(self)
+
+    def find_largest_cluster(self):
+        """
+        Find the largest solid cluster of atoms in the system from all the clusters. `find_clusters`
+        has to be used before using this function.
+
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        cluster : int
+            the size of the largest cluster
+
+        See also
+        --------
+        calculate_frenkelnumbers
+        find_clusters
+        get_number_from_bond
+        set_nucsize_parameters
+        """
+        return pc.System.find_largest_cluster(self)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	
 

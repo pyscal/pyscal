@@ -454,18 +454,6 @@ void System::get_all_neighbors_voronoi(){
 
 }
 
-void System::get_all_neighbors( string &jkl, double cutoff){
-
-    neighbordistance = cutoff; 
-    if(strcmp(jkl.c_str(),"voronoi")==0){
-        get_all_neighbors_voronoi();
-    }
-    else{
-        get_all_neighbors_normal();
-    }
-
-}
-
 double System::PLM(int l, int m, double x){
     
     double fact,pll,pmm,pmmp1,somx2;
@@ -890,7 +878,7 @@ int System::calculate_nucsize()
 //access functions for system
 //------------------------------------------------------------------------------------------------------------------------
 //void System::set_inputfile(string nn) { inputfile = nn; }
-//void System::set_neighbordistance(double nn) { }
+void System::set_neighbordistance(double nn) { neighbordistance = nn; }
 void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) { 

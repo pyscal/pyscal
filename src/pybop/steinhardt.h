@@ -155,7 +155,6 @@ class System{
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors_normal();
         void get_all_neighbors_voronoi();
-        void get_all_neighbors(string &, double);
         void reset_all_neighbors();
         void calculate_complexQLM_6();
         double get_number_from_bond(int,int);
@@ -177,7 +176,7 @@ class System{
         int largest_cluster();
         void set_nucsize_parameters(int,double,double);
         //void set_inputfile(string);
-        //void set_neighbordistance(double);
+        void set_neighbordistance(double);
         void assign_particles( vector<Atom>, vector<double>);
         void get_largest_cluster_atoms();
         //functions to set the list of reqd qs
