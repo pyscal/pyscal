@@ -1,11 +1,11 @@
 import pybop.ccore as pc
-
+import os
 """
 Definitions of class Atom.
 
 """
 class Atom(pc.Atom):
-	"""
+    """
     A c++ class for holding the properties of a single atom. Various properties of the atom
     can be accessed through member functions which are described below in detail. Atoms can
     be created individually or directly by reading in a file. Check the examples for more 
@@ -22,10 +22,10 @@ class Atom(pc.Atom):
     Parameters
     ----------
     pos : list of floats of length 3, default [0,0,0]
-    	position of the `Atom`
+        position of the `Atom`
 
     id : int, default 0
-    	id of the `Atom`
+        id of the `Atom`
 
     Examples
     --------
@@ -43,18 +43,19 @@ class Atom(pc.Atom):
     set_id
     get_id
     System
-	
-	"""
-	def __init__(self, pos=[0,0,0], id=0):
-		"""
-		Deafults args
-		"""		
-		pc.Atom.set_x(self, pos)
-		pc.Atom.set_id(self, id)
+    
+    """
+    def __init__(self, pos=[0,0,0], id=0):
+        """
+        Deafults args
+        """     
+        pc.Atom.set_x(self, pos)
+        pc.Atom.set_id(self, id)
 
-	#now wrapping for other normal functions
-	def get_x(self):
-		"""
+    #now wrapping for other normal functions
+    def get_x(self):
+        """
+        TD
         Get the position of the atom. Meaningful values are only returned if the atoms are
         set before using this function.
 
@@ -78,13 +79,14 @@ class Atom(pc.Atom):
         --------
         set_x
         Atom
-        System		
-		"""
-		x = pc.Atom.get_x(self)
-		return x
+        System      
+        """
+        x = pc.Atom.get_x(self)
+        return x
 
-	def set_x(self, pos):
-		"""
+    def set_x(self, pos):
+        """
+        TD
         Set the position of the atom. 
 
         Parameters
@@ -106,13 +108,13 @@ class Atom(pc.Atom):
         --------
         get_x
 
-		"""
-		if len(pos) == 3:
-			pc.Atom.set_x(self, pos)
+        """
+        if len(pos) == 3:
+            pc.Atom.set_x(self, pos)
 
 
-	def get_cluster(self):
-		"""
+    def get_cluster(self):
+        """
         Get the cluster properties of the atom. The cluster properties of the atom
         include four different properties as listed below. The properties are only
         returned if they are calculated before using 'calculate_nucsize' function 
@@ -140,12 +142,13 @@ class Atom(pc.Atom):
         set_nucsize_parameters
         calculate_nucsize
 
-		"""
-		x = pc.Atom.get_cluster(self)
-		return x
+        """
+        x = pc.Atom.get_cluster(self)
+        return x
 
-	def get_neighbors(self):
-		"""
+    def get_neighbors(self):
+        """
+        TD
         Returns the neighbors indices of the atom. The list returned consistes of the indices
         of neighbor atom which indicate their position in the list of all atoms. The neighbors
         of an atom can be calculated from the `System` object that it belongs to.
@@ -169,11 +172,12 @@ class Atom(pc.Atom):
         set_neighborweights
         get_neighborweights
 
-		"""
-		return pc.Atom.get_neighbors(self)
+        """
+        return pc.Atom.get_neighbors(self)
 
-	def set_neighbors(self, neighs):
-		"""
+    def set_neighbors(self, neighs):
+        """
+        TD
         Set the neighbors of an atom manually.
 
         Parameters
@@ -194,12 +198,13 @@ class Atom(pc.Atom):
         get_neighbors
         set_neighborweights
         get_neighborweights
-		"""
-		pc.Atom.set_neighbors(self, neighs)
+        """
+        pc.Atom.set_neighbors(self, neighs)
 
 
-	def get_coordination(self):
-		"""
+    def get_coordination(self):
+        """
+        TD
         Returns the coordination number of the atom. `get_allneighbors` function of the `System` class
         has to be used before accessing coordination numbers. 
 
@@ -222,11 +227,12 @@ class Atom(pc.Atom):
         set_neighborweights
         get_neighborweights
 
-		"""
-		return pc.Atom.get_coordination(self)
+        """
+        return pc.Atom.get_coordination(self)
 
-	def get_neighborweights(self):
-		"""
+    def get_neighborweights(self):
+        """
+        TD
         Get the neighbor weights of the atom. The neighbor weights are used weight the 
         contribution of each neighboring atom towards the q value of the host atom. By 
         default, each neighbor has a weight of 1 each. However, if the neighbors are calculated
@@ -253,12 +259,13 @@ class Atom(pc.Atom):
         get_neighbors
         set_neighbors
         set_neighborweights
-		"""
+        """
 
-		return pc.Atom.get_neighborweights()
+        return pc.Atom.get_neighborweights(self)
 
-	def set_neighborweights(self, weights):
-		"""
+    def set_neighborweights(self, weights):
+        """
+        TD
         Set the neighbor weights of an atom.
 
         Parameters
@@ -279,11 +286,11 @@ class Atom(pc.Atom):
         get_neighbors
         set_neighbors
         set_neighborweights
-		"""
-		pc.Atom.set_neighborweights(self, weights)
+        """
+        pc.Atom.set_neighborweights(self, weights)
 
-	def get_q(self, q, averaged = False):
-		"""
+    def get_q(self, q, averaged = False):
+        """
         get q value of the atom. The q value can be either normal or can
         be averaged according to Lechner, W, Dellago, C. JCP 129, 2008.
         The averaged version can be obtained by using keyword
@@ -312,24 +319,24 @@ class Atom(pc.Atom):
         --------
         set_q
         get_aq
-        set_aq		
-		"""
-		if isinstance(q, int):
+        set_aq      
+        """
+        if isinstance(q, int):
             if averaged:
                 rq = pc.Atom.get_aq(self, q)
             else:
                 rq = pc.Atom.get_q(self, q)
-			return rq
+            return rq
 
-		else:
+        else:
             if averaged:
                 rq = [ pc.Atom.get_aq(self, qq) for qq in q ]
             else:
                 rq = [ pc.Atom.get_q(self, qq) for qq in q ]
-			return rq
+            return rq
 
-	def set_q(self, q, d, averaged = False):
-		"""
+    def set_q(self, q, d, averaged = False):
+        """
         set the q value of the atom. If `averaged = True`, sets the averaged versions of
         the q parameters.
 
@@ -357,23 +364,24 @@ class Atom(pc.Atom):
         set_aq
         get_aq
         get_q
-		"""
-		if isinstance(q, int):
+        """
+        if isinstance(q, int):
             if averaged:
                 pc.Atom.set_aq(self, q)
             else:
                 pc.Atom.set_q(self, q)
-		else:
+        else:
             if averaged:
                 for count, qq in enumerate(q):
-				    pc.Atom.set_aq(self, qq, d[count])
+                    pc.Atom.set_aq(self, qq, d[count])
             else:
                 for count, qq in enumerate(q):
                     pc.Atom.set_q(self, qq, d[count])
 
 
-	def get_id(self):
-		"""
+    def get_id(self):
+        """
+        TD
         get  the id of the atom.
 
         Parameters
@@ -392,11 +400,12 @@ class Atom(pc.Atom):
         See also
         --------
         set_id
-		"""
-		return pc.Atom.get_id(self)
+        """
+        return pc.Atom.get_id(self)
 
-	def set_id(self, idd):
-		"""
+    def set_id(self, idd):
+        """
+        TD
         set  the id of the atom.
 
         Parameters
@@ -416,11 +425,11 @@ class Atom(pc.Atom):
         --------
         get_id
 
-		"""
-		pc.Atom.set_id(self, idd)
+        """
+        pc.Atom.set_id(self, idd)
 
-	def get_qlm(self, q, averaged = False):
-		"""
+    def get_qlm(self, q, averaged = False):
+        """
         Get the real and imaginary qlm values of the atom. If `averaged = True`,
         return the averaged qlm values.
 
@@ -437,23 +446,23 @@ class Atom(pc.Atom):
         averaged : bool, default False
             If True, return the averaged q values,
             If False, return the non averaged ones    
-		"""
-		if isinstance(q, int):
+        """
+        if isinstance(q, int):
             if averaged:
                 rq = pc.Atom.get_aqlm(self, q)
             else:
                 rq = pc.Atom.get_qlm(self, q)
-			return rq
+            return rq
 
-		else:
+        else:
             if averaged:
                 rq = [ pc.Atom.get_aqlm(self, qq) for qq in q ]
             else:
                 rq = [ pc.Atom.get_qlm(self, qq) for qq in q ]
-			return rq
+            return rq
 
-	def get_vorovector(self):
-		"""
+    def get_vorovector(self):
+        """
         get the voronoi structure identification vector. Returns a
         vector of the form (n3, n4, n5, n6), where n3 is the number
         of faces with 3 vertices, n4 is the number of faces with 4
@@ -467,14 +476,14 @@ class Atom(pc.Atom):
         -------
         vorovector : array like, int
             array of the form (n3, n4, n5, n6)
-		"""
-		return pc.Atom.get_vorovector()
+        """
+        return pc.Atom.get_vorovector()
 
 """
 System class definitions
 """
 class System(pc.System):
-	"""
+    """
     A c++ class for holding the properties of a system. A `System` consists of two
     major components - the simulation box and the atoms. All the associated variables
     are then calculated over these.
@@ -486,12 +495,13 @@ class System(pc.System):
     --------
     >>> sys = System()
     >>> sys.read_inputfile()
-	"""
-	def __init__(self):
-		self.initialized = True
+    """
+    def __init__(self):
+        self.initialized = True
 
     def read_inputfile(self, filename, format="lammps-dump"):
         """
+        TD
         Read input file containing the information of a time slice from a molecular dynamics
         simulation. 
         
@@ -519,7 +529,9 @@ class System(pc.System):
         assign_particles
         """
         if format == 'lammps-dump':
-            pc.System.read_inputfile(self, filename)
+            if os.path.exists(filename):
+                filename = unicode(filename, "utf-8")
+                pc.System.read_inputfile(self, filename)
 
     def assign_atoms(self, atoms, box):
         """
@@ -696,7 +708,9 @@ class System(pc.System):
             the return value consists of the vector of values in the form-
             [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
         """
-        return pc.System.get_box(self)
+        box6dim = pc.System.get_box(self)
+        pbox = [[box6dim[0], box6dim[1]], [box6dim[2], box6dim[3]], [box6dim[4], box6dim[5]]]
+        return pbox
 
     def set_box(self, box):
         """
@@ -958,7 +972,7 @@ class System(pc.System):
 
 
 
-	
+    
 
 
 
