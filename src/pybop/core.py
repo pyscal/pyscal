@@ -696,6 +696,7 @@ class System(pc.System):
 
     def get_box(self):
         """
+        TD
         Get the dimensions of the simulation box.
 
         Parameters
@@ -714,6 +715,7 @@ class System(pc.System):
 
     def set_box(self, box):
         """
+        TD
         Set the dimensions of the simulation box.
 
         Parameters
