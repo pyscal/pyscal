@@ -15,9 +15,9 @@ def test_q_4():
     assert np.round(atoms[0].get_q(4), decimals=2) == 0.51
     assert np.round(atoms[0].get_q(4, averaged=True), decimals=2) == 0.51
     assert np.round(atoms[0].get_q([4, 6])[0], decimals=2) == 0.51
-    assert np.round(atoms[0].get_q([4, 6], averaged=True)[1], decimals=2) == 0.51
+    assert np.round(atoms[0].get_q([4, 6], averaged=True)[1], decimals=2) == 0.63
     assert np.round(atoms[0].get_q([4, 6]), decimals=2)[0] == 0.51
-    assert np.round(atoms[0].get_q([4, 6], averaged=True)[1], decimals=2) == 0.51
+    assert np.round(atoms[0].get_q([4, 6], averaged=True)[1], decimals=2) == 0.63
 
     #now change the q4 values
     atoms[0].set_q(4, .23)

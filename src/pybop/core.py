@@ -371,9 +371,9 @@ class Atom(pc.Atom):
         """
         if isinstance(q, int):
             if averaged:
-                pc.Atom.set_aq(self, q)
+                pc.Atom.set_aq(self, q, d)
             else:
-                pc.Atom.set_q(self, q)
+                pc.Atom.set_q(self, q, d)
         else:
             if averaged:
                 for count, qq in enumerate(q):
@@ -906,7 +906,9 @@ class System(pc.System):
         distance : double
                 distance between the first and second atom.
         """
-        return pc.System.get_absdistance(self, atom1, atom2)
+        atom1c = self.copy_atom_to_catom(atom1)
+        atom2c = self.copy_atom_to_catom(atom2)
+        return pc.System.get_absdistance(self, atom1c, atom2c)
 
     def get_neighbors(self, method="cutoff", cutoff=None):
         """
@@ -993,33 +995,6 @@ class System(pc.System):
 
         if averaged:
             pc.System.calculate_aq(self, qq)
-
-
-    def get_connection(self, atom1, atom2):
-        """
-        Get the connection between two atoms. Connection is defined by Qlm(i).Qlm(j). Normally,
-        a connection of more than 0.6 is considered a solid bond.
-
-        Parameters
-        ----------
-        atom1 : `Atom` object
-                first atom
-        atom2 : `Atom` object
-                second atom
-        
-        Returns
-        -------
-        connection : double
-            connection between the first and second atom.
-
-        See also
-        --------
-        calculate_frenkelnumbers
-        find_clusters
-        find_largest_cluster
-        set_nucsize_parameters
-        """
-        return pc.System.get_number_from_bond(self, atom1, atom2)
 
     def calculate_frenkelnumbers(self):
         """
