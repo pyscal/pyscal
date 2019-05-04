@@ -432,6 +432,55 @@ class Atom(pc.Atom):
         """
         pc.Atom.set_id(self, idd)
 
+    def get_loc(self):
+        """
+        TD
+        get  the location of the atom.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        loc : int
+            loc of the atom
+
+        Examples
+        --------
+        >>> loc = atom.get_loc()
+
+        See also
+        --------
+        set_loc
+        """
+        return pc.Atom.get_loc(self)
+
+    def set_loc(self, idd):
+        """
+        TD
+        set  the loc of the atom.
+
+        Parameters
+        ----------
+        idd : int
+            loc of the atom
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> atom.set_loc(2)
+
+        See also
+        --------
+        get_loc
+
+        """
+        pc.Atom.set_loc(self, idd)
+
     def get_type(self):
         """
         TD
@@ -530,7 +579,7 @@ class Atom(pc.Atom):
         vorovector : array like, int
             array of the form (n3, n4, n5, n6)
         """
-        return pc.Atom.get_vorovector()
+        return pc.Atom.get_vorovector(self)
 
 """
 System class definitions
@@ -729,7 +778,9 @@ class System(pc.System):
         atom : Atom object
             atom object at the queried position.
         """
-        return pc.System.get_atom(self, index)
+        atomc = pc.System.get_atom(self, index)
+        atom = self.copy_catom_to_atom(atomc)
+        return atom
 
     def set_atom(self, atom):
         """
@@ -750,7 +801,8 @@ class System(pc.System):
         -------
         None
         """
-        pc.System.set_atom(self, atom)
+        atomc = self.copy_atom_to_catom(atom)
+        pc.System.set_atom(self, atomc)
 
     def get_allatoms(self):
         """
@@ -766,7 +818,9 @@ class System(pc.System):
         allatoms : list of `Atom` objects
             all atoms in the system
         """
-        return pc.System.get_allatoms(self)
+        atomcs = pc.System.get_allatoms(self)
+        atoms = [self.copy_catom_to_atom(xx) for xx in atomcs]
+        return atoms
 
     def get_box(self):
         """
@@ -1034,6 +1088,65 @@ class System(pc.System):
         set_nucsize_parameters
         """
         return pc.System.find_largest_cluster(self)
+
+    def copy_catom_to_atom(self, atomc):
+        """
+        Used to copy a C++ `Atom` object to python `Atom` object.
+        
+        Parameters
+        ----------
+        atomc : C++ `Atom` object
+            the input atom
+        
+        Returns
+        -------
+        atom : python `Atom` object
+            output atom
+        """
+        atom = Atom()
+        atom.set_x(atomc.get_x())
+        atom.set_cluster(atomc.get_cluster())
+        atom.set_neighbors(atomc.get_neighbors())
+        atom.set_neighborweights(atomc.get_neighbors())
+        atom.set_allq(atomc.get_allq())
+        atom.set_allaq(atomc.get_allaq())
+        atom.set_id(atomc.get_id())
+        atom.set_loc(atomc.get_loc())
+        atom.set_type(atomc.get_type())
+        atom.set_vorovector(atomc.get_vorovector())
+        return atom
+
+    def copy_atom_to_catom(self, atom):
+        """
+        Used to copy a python `Atom` object to C++ `Atom` object.
+        
+        Parameters
+        ----------
+        atom : python `Atom` object
+            output atom
+
+        Returns
+        -------
+        atomc : C++ `Atom` object
+            the input atom
+
+        """
+        atomc = pc.Atom()
+        atomc.set_x(atom.get_x())
+        atomc.set_cluster(atom.get_cluster())
+        atomc.set_neighbors(atom.get_neighbors())
+        atomc.set_neighborweights(atom.get_neighbors())
+        atomc.set_allq(atom.get_allq())
+        atomc.set_allaq(atom.get_allaq())
+        atomc.set_id(atom.get_id())
+        atomc.set_loc(atom.get_loc())
+        atomc.set_type(atom.get_type())
+        atomc.set_vorovector(atom.get_vorovector())
+        return atomc
+
+
+
+
 
 
 

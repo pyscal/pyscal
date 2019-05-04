@@ -113,7 +113,8 @@ class Atom{
         void sneighborweights(vector<double> nns);
         vector<double> gneighborweights();
         //vector<double> gx();
-        vector<int> gcluster(); 
+        vector<int> gcluster();
+        void scluster(vector<int>); 
 
         //variables for storing q2-12
         //invidual variables or arrays - individual ones are easier!
@@ -124,7 +125,11 @@ class Atom{
         double arealq[11][25];
         double aimgq[11][25];
 
-        
+        vector<double> gallq();
+        vector<double> gallaq();
+        void sallq(vector<double>);
+        void sallaq(vector<double>);
+
         double gq(int);
         void sq(int, double);
         vector <vector<double>> gqlm(int);
@@ -132,6 +137,8 @@ class Atom{
         double gaq(int);
         int gid();
         void sid(int);
+        int gloc();
+        void sloc(int);
         int gtype();
         void stype(int);
         void saq(int, double);
@@ -143,8 +150,9 @@ class Atom{
         vector<double> gcustom();
 
         //for vorocell identification
-        vector<int> vorovector;
+        int vorovector[4];
         vector<int> gvorovector();
+        void svorovector(vector<int>);
 
 };
 

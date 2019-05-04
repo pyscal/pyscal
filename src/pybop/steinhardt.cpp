@@ -201,6 +201,22 @@ void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> box
             atoms[ti].neighbors[tn] = NILVALUE;
             atoms[ti].neighbordist[tn] = -1.0;
         }
+
+        for (int tn = 0; tn<11; tn++){
+            atoms[ti].q[tn] = -1;
+            atoms[ti].aq[tn] = -1;
+            for (int tnn =0; tnn<25; tnn++){
+                atoms[ti].realq[tn][tnn] = -1;
+                atoms[ti].imgq[tn][tnn] = -1;
+                atoms[ti].arealq[tn][tnn] = -1;
+                atoms[ti].aimgq[tn][tnn] = -1;
+            } 
+        }
+
+        for (int tn = 0; tn<4; tn++){
+            atoms[ti].vorovector[tn] = -1;
+        }
+
         
     }
 
@@ -363,7 +379,7 @@ void System::get_all_neighbors_voronoi(){
     vector< vector<double> > nweights;
     vector< vector<int> > nneighs;
     vector<int> idss;
-    vector<int> nvector;
+    //vector<int> nvector;
     double weightsum;
 
     if (!fileread) { read_particle_file(inputfile); }
@@ -419,13 +435,13 @@ void System::get_all_neighbors_voronoi(){
             }
 
             //assign to nvector
-            nvector.clear();
-            nvector.push_back(n3);
-            nvector.push_back(n4);
-            nvector.push_back(n5);
-            nvector.push_back(n6);
+            //nvector.clear();
+            atoms[ti].vorovector[0] = n3;
+            atoms[ti].vorovector[1] = n4;
+            atoms[ti].vorovector[2] = n5;
+            atoms[ti].vorovector[3] = n6;
             //assign to the atom
-            atoms[ti].vorovector = nvector;
+            //atoms[ti].vorovector = nvector;
 
             //only loop over neighbors
             //weightsum = 0.0;
@@ -974,8 +990,38 @@ int Atom::gnneighbors(){
 double Atom::gq(int qq){ return q[qq-2]; }
 int Atom::gid(){ return id; }
 void Atom::sid(int idd){ id=idd; }
+int Atom::gloc(){ return loc; }
+void Atom::sloc(int idd){ loc=idd; }
 int Atom::gtype(){ return type; }
 void Atom::stype(int idd){ type=idd; }
+
+vector<double> Atom::gallq(){
+    vector<double> allq;
+    for(int i=0; i<11; i++){
+        allq.emplace_back(q[i]);
+    }
+    return allq;
+}
+
+vector<double> Atom::gallaq(){
+    vector<double> allq;
+    for(int i=0; i<11; i++){
+        allq.emplace_back(aq[i]);
+    }
+    return allq;
+}
+
+void Atom::sallq(vector<double> allq){
+    for(int i=0; i<11; i++){
+        q[i] = allq[i];
+    }
+}
+
+void Atom::sallaq(vector<double> allaq){
+    for(int i=0; i<11; i++){
+        aq[i] = allaq[i];
+    }
+}
 
 //aceesss funcs 
 vector<double> Atom::gx(){ 
@@ -1001,6 +1047,12 @@ vector<int> Atom::gcluster(){
     return cl;
 }
 
+void Atom::scluster(vector<int> c1){
+    issolid = c1[0];
+    issurface = c1[1];
+    lcluster = c1[2];
+    belongsto = c1[3];
+}
 
 
 void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
@@ -1107,4 +1159,10 @@ vector<int> Atom::gvorovector(){
         voro.emplace_back(vorovector[i]);
     }
     return voro;
+}
+
+void Atom::svorovector(vector<int> voro){
+    for(int i=0; i<4; i++){
+        vorovector[i] = voro[i];
+    }
 }

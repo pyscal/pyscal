@@ -24,6 +24,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_x",&Atom::gx)
         .def("set_x",&Atom::sx)
         .def("get_cluster",&Atom::gcluster)
+        .def("set_cluster",&Atom::scluster)
         .def("get_neighbors",&Atom::gneighbors)
         .def("get_coordination",&Atom::gnneighbors)
         .def("set_neighbors",&Atom::sneighbors)
@@ -34,6 +35,12 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_q",&Atom::gq)
         .def("get_id",&Atom::gid)
         .def("set_id",&Atom::sid)
+        .def("get_loc",&Atom::gloc)
+        .def("set_loc",&Atom::sloc)
+        .def("get_allq",&Atom::gallq)
+        .def("get_allaq",&Atom::gallaq)
+        .def("set_allq",&Atom::sallq)
+        .def("set_allaq",&Atom::sallaq)
         .def("get_type",&Atom::gtype)
         .def("set_type",&Atom::stype)
         .def("set_q",&Atom::sq)
@@ -41,7 +48,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_aq",&Atom::saq)
         .def("get_qlm",&Atom::gqlm)
         .def("get_aqlm",&Atom::gaqlm)
-        .def("get_vorovector",&Atom::gvorovector); 
+        .def("get_vorovector",&Atom::gvorovector)
+        .def("set_vorovector",&Atom::svorovector); 
 
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")
