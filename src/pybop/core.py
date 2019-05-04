@@ -1,5 +1,8 @@
 import pybop.ccore as pc
+import pybop.traj_process as ptp
 import os
+
+
 """
 Definitions of class Atom.
 
@@ -45,12 +48,13 @@ class Atom(pc.Atom):
     System
     
     """
-    def __init__(self, pos=[0,0,0], id=0):
+    def __init__(self, pos=[0,0,0], id=0, type=1):
         """
         Deafults args
         """     
         pc.Atom.set_x(self, pos)
         pc.Atom.set_id(self, id)
+        pc.Atom.set_type(self, type)
 
     #now wrapping for other normal functions
     def get_x(self):
@@ -428,6 +432,55 @@ class Atom(pc.Atom):
         """
         pc.Atom.set_id(self, idd)
 
+    def get_type(self):
+        """
+        TD
+        get  the type(species) of the atom.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        type : int
+            species/type of the atom
+
+        Examples
+        --------
+        >>> t = atom.get_type()
+
+        See also
+        --------
+        set_type
+        """
+        return pc.Atom.get_type(self)
+
+    def set_type(self, tt):
+        """
+        TD
+        set  the type of the atom.
+
+        Parameters
+        ----------
+        tt : int
+            type of the atom
+
+        Returns
+        -------
+        None
+
+        Examples
+        --------
+        >>> atom.set_type(2)
+
+        See also
+        --------
+        get_type
+
+        """
+        pc.Atom.set_type(self, tt)
+
     def get_qlm(self, q, averaged = False):
         """
         Get the real and imaginary qlm values of the atom. If `averaged = True`,
@@ -499,18 +552,16 @@ class System(pc.System):
     def __init__(self):
         self.initialized = True
 
-    def read_inputfile(self, filename, format="lammps-dump"):
+    def read_inputfile(self, filename, format="lammps-dump", use_c = False, compressed = False):
         """
         TD
         Read input file containing the information of a time slice from a molecular dynamics
         simulation. 
         
-
-        As of now, the file should be a lammps dump format and can only have a
-        specific header format. That is-
-        id type mass x y z vx vy vz
-        However, this restriction can easily be overcome using the `assign_particles` method
-        from system where a list of atoms and box vectors are directly provided to the system.
+        The format of the input file is specified using the `format` keyword. Currently only
+        a `lammps-dump` file is supported. However, this restriction can easily be overcome 
+        using the `assign_particles` method from system where a list of atoms and box vectors 
+        are directly provided to the system.
         
         Parameters
         ----------
@@ -519,6 +570,18 @@ class System(pc.System):
 
         format : `lammps-dump`
             format of the input file
+
+        compressed : bool, default False
+            If True, force to read a `gz` compressed format. However, if a file ends with `.gz`
+            extension, it is automatically treated as a compressed file and this keyword is not
+            necessary
+
+        use_c : bool, default False
+            If True, use the `read_particle_file` method from c++ module. This might be faster
+            but only accepts file format of `lammps-dump` type with a particular header layout.
+            Also `compressed` keyword doesnt work anymore. This keyword is deprecated and only
+            kept for compatibility reasons. Use of this keyword is not recommended.
+
 
         Returns
         -------
@@ -531,10 +594,15 @@ class System(pc.System):
         if format == 'lammps-dump':
             if os.path.exists(filename):
                 filename = unicode(filename, "utf-8")
-                pc.System.read_inputfile(self, filename)
+                if not use_c:
+                    atoms, boxdims = ptp.read_lammps_dump(filename, compressed=compressed)
+                    pc.System.assign_particles(self, atoms, boxdims)
+                else:
+                    pc.System.read_inputfile(self, filename)
 
     def assign_atoms(self, atoms, box):
         """
+        TD
         Assign atoms directly. Receive a vector of atom objects which is stored instead
         of reading in the input file. If this method is used, there is no need of using
         `read_inputfile` method. Also using this function allows for reading of multiple
@@ -580,7 +648,7 @@ class System(pc.System):
         """
         return pc.System.get_largestcluster(self)
 
-    def set_nucsize_parameters(self, minfrenkel, threshold, avgthreshold):
+    def set_nucsize_parameters(self, cutoff, minfrenkel, threshold, avgthreshold):
         """
         Set the value of parameters for calculating the largest solid cluster in the
         liquid, a detailed description of the order parameter can be found in  
@@ -593,6 +661,9 @@ class System(pc.System):
 
         Parameters
         ----------
+        cutoff : float
+            cutoff distance for calculating neighbors
+
         minfrenkel : int
             Minimum number of solid bonds for an atom to be identified as
             a solid.
@@ -618,7 +689,7 @@ class System(pc.System):
         --------
         >>> st.set_nucsize_parameters(7,0.5,0.5)
         """
-        pc.System.set_nucsize_parameters(self, minfrenkel, threshold, avgthreshold)
+        pc.System.set_nucsize_parameters(self, cutoff, minfrenkel, threshold, avgthreshold)
 
     def calculate_nucsize(self):
         """
@@ -640,10 +711,11 @@ class System(pc.System):
         cluster size : int
             size of the largest solid cluster in liquid (number of atoms)
         """
-        pc.System.calculate_nucsize(self)
+        return pc.System.calculate_nucsize(self)
 
     def get_atom(self, index):
         """
+        TD
         Get the `Atom` object at the queried position in the list of all atoms
         in the `System`.
 
@@ -661,6 +733,7 @@ class System(pc.System):
 
     def set_atom(self, atom):
         """
+        TD
         Return the atom to its original location after modification. For example, an
         `Atom` at location `i` in the list of all atoms in `System` can be queried by,
         `atom = System.get_atom(i)`, then any kind of modification, for example, the 
@@ -681,6 +754,7 @@ class System(pc.System):
 
     def get_allatoms(self):
         """
+        TD
         Get a list of all `Atom` objects that belong to the system.
 
         Parameters
@@ -782,6 +856,7 @@ class System(pc.System):
 
     def get_neighbors(self, method="cutoff", cutoff=None):
         """
+        TD
         Find neighbors of all atoms in the `System`. There are two methods to do this, the 
         traditional approach being the one in which the neighbors of an atom are the ones that lie
         in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
@@ -818,6 +893,7 @@ class System(pc.System):
 
     def reset_neighbors(self):
         """
+        TD
         Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
         with two different approaches.
 
@@ -855,12 +931,14 @@ class System(pc.System):
         None
         """
         if isinstance(q, int):
-            q = [q]
-
-        pc.System.calculate_q(self, q)
+            qq = [q]
+        else:
+            qq = q
+            
+        pc.System.calculate_q(self, qq)
 
         if averaged:
-            pc.System.calculate_aq(self, q)
+            pc.System.calculate_aq(self, qq)
 
 
     def get_connection(self, atom1, atom2):
@@ -956,6 +1034,14 @@ class System(pc.System):
         set_nucsize_parameters
         """
         return pc.System.find_largest_cluster(self)
+
+
+
+
+
+
+
+
 
 
 

@@ -34,6 +34,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_q",&Atom::gq)
         .def("get_id",&Atom::gid)
         .def("set_id",&Atom::sid)
+        .def("get_type",&Atom::gtype)
+        .def("set_type",&Atom::stype)
         .def("set_q",&Atom::sq)
         .def("get_aq",&Atom::gaq)
         .def("set_aq",&Atom::saq)

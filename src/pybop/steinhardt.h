@@ -10,7 +10,9 @@
 #include <time.h>
 #include <vector>
 
+
 using namespace std;
+
 
 const int MAXNUMBEROFNEIGHBORS = 100;
 const double PI = 3.141592653589793;
@@ -87,6 +89,7 @@ class Atom{
         int issurface;
         int issolid;
         int structure;
+        int type;
         
         
         //indicator which is 1 if neighbors are already provided
@@ -129,6 +132,8 @@ class Atom{
         double gaq(int);
         int gid();
         void sid(int);
+        int gtype();
+        void stype(int);
         void saq(int, double);
         vector <vector<double>> gaqlm(int);
 
@@ -163,7 +168,7 @@ class System{
         double get_abs_distance(int,int,double&,double&,double&);
         double get_abs_distance(Atom , Atom );
         System();
-        virtual ~System();
+        ~System();
 
         Atom* atoms;
     
@@ -174,10 +179,10 @@ class System{
         void find_solids();
         void find_clusters();
         int largest_cluster();
-        void set_nucsize_parameters(int,double,double);
+        void set_nucsize_parameters(double,int,double,double);
         //void set_inputfile(string);
         void set_neighbordistance(double);
-        void assign_particles( vector<Atom>, vector<double>);
+        void assign_particles( vector<Atom>, vector<vector<double>>);
         void get_largest_cluster_atoms();
         //functions to set the list of reqd qs
         //again, error checking would be amazing here.

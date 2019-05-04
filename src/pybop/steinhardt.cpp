@@ -26,7 +26,7 @@ Destructor of the system class
  */
 System::~System(){
     
-    delete [] atoms;
+    //delete [] atoms;
 }
 
 /*
@@ -165,22 +165,22 @@ void System::read_particle_file(string nn){
 
 
 //this function allows for handling custom formats of atoms and so on
-void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
+void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> boxd ){
     //atomitos are just a list of Atom objects
     //boxd is a vector of 6 values - [xlow, xhigh, ylow, yhigh, zlow, zhigh]
     nop = atomitos.size();
     atoms = new Atom[nop];
 
-    boxdims[0][0] = boxd[0];
-    boxdims[0][1] = boxd[1];
-    boxdims[1][0] = boxd[2];
-    boxdims[1][1] = boxd[3];
-    boxdims[2][0] = boxd[4];
-    boxdims[2][1] = boxd[5];
+    boxdims[0][0] = boxd[0][0];
+    boxdims[0][1] = boxd[0][1];
+    boxdims[1][0] = boxd[1][0];
+    boxdims[1][1] = boxd[1][1];
+    boxdims[2][0] = boxd[2][0];
+    boxdims[2][1] = boxd[2][1];
     
-    boxx = boxd[1] - boxd[0];
-    boxy = boxd[3] - boxd[2];
-    boxz = boxd[5] - boxd[4];
+    boxx = boxd[0][1] - boxd[0][0];
+    boxy = boxd[1][1] - boxd[1][0];
+    boxz = boxd[2][1] - boxd[2][0];
 
     for(int ti=0; ti<nop; ti++){
         
@@ -188,12 +188,14 @@ void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
         atoms[ti].posy = atomitos[ti].posy;
         atoms[ti].posz = atomitos[ti].posz;
         atoms[ti].id = atomitos[ti].id;
+        atoms[ti].type = atomitos[ti].type;
         atoms[ti].belongsto = -1;
         atoms[ti].issolid = 0;
         atoms[ti].loc = ti;
         atoms[ti].isneighborset = 0;
         atoms[ti].custom = atomitos[ti].custom;
         atoms[ti].n_neighbors=0;
+        atoms[ti].isneighborset = 0;
         
         for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){          
             atoms[ti].neighbors[tn] = NILVALUE;
@@ -202,7 +204,7 @@ void System::assign_particles( vector<Atom> atomitos, vector<double> boxd ){
         
     }
 
-    atomitos.shrink_to_fit();
+    //atomitos.shrink_to_fit();
 
     fileread = 1;
 }
@@ -270,7 +272,7 @@ void System::get_all_neighbors_normal(){
     if (!fileread) { read_particle_file(inputfile); }
 
     //for (int ti = 0;ti<nop;ti++){
-    //    
+        
     //    atoms[ti].n_neighbors=0;
     //    for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
     //                    
@@ -553,7 +555,7 @@ void System::calculate_complexQLM_6(){
 //calculation of any complex qval
 void System::calculate_q(vector <int> qs){
         
-    set_reqd_qs(qs);
+    //set_reqd_qs(qs);
 
     //nn = number of neighbors
     int nn;
@@ -589,9 +591,10 @@ void System::calculate_q(vector <int> qs){
     for (int ti= 0;ti<nop;ti++){
         
         nn = atoms[ti].n_neighbors;
-        for(int tq=0;tq<lenqs;tq++){
+        //for(int tq=0;tq<lenqs;tq++){
+        for(int tq=0;tq<qs.size();tq++){
             //find which q?
-            q = reqdqs[tq];
+            q = qs[tq];
             //cout<<q<<endl;
             summ = 0;
             for (int mi = -q;mi < q+1;mi++){                        
@@ -641,7 +644,7 @@ void System::calculate_aq(vector <int> qs){
     int q;
     double summ, weightsum;
 
-    if (!qsfound) { calculate_q(qs); }
+    //if (!qsfound) { calculate_q(qs); }
     //note that the qvals will be in -2 pos
     //q2 will be in q0 pos and so on
         
@@ -650,9 +653,9 @@ void System::calculate_aq(vector <int> qs){
         
         nn = atoms[ti].n_neighbors;
         
-        for(int tq=0;tq<lenqs;tq++){
+        for(int tq=0;tq<qs.size();tq++){
             //find which q?
-            q = reqdqs[tq];
+            q = qs[tq];
             //cout<<q<<endl;
             summ = 0;
             for (int mi = 0;mi < 2*q+1;mi++){                        
@@ -861,14 +864,21 @@ int System::calculate_nucsize()
         //read_particle_file();
         get_all_neighbors_normal();
         //Get Q6 values
+        //cout<<"step 1"<<endl;
         calculate_complexQLM_6();
+        //cout<<"step 2"<<endl;
         //and the number of bonds to find the largest cluster
         calculate_frenkel_numbers();
+        //cout<<"step 3"<<endl;
 
         find_solids();
+        //cout<<"step 4"<<endl;
         find_clusters();
+        //cout<<"step 5"<<endl;
         greatestbelongsto = largest_cluster();
+        //cout<<"step 6"<<endl;
         get_largest_cluster_atoms();
+        //cout<<"step 7"<<endl;
         return greatestbelongsto;
 }
 
@@ -879,7 +889,7 @@ int System::calculate_nucsize()
 //------------------------------------------------------------------------------------------------------------------------
 //void System::set_inputfile(string nn) { inputfile = nn; }
 void System::set_neighbordistance(double nn) { neighbordistance = nn; }
-void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
+void System::set_nucsize_parameters(double cutoff, int n1, double n2, double n3 ) { neighbordistance = cutoff; minfrenkel = n1; threshold = n2; avgthreshold = n3; }
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) { 
     int idd = atom1.loc;
@@ -964,6 +974,8 @@ int Atom::gnneighbors(){
 double Atom::gq(int qq){ return q[qq-2]; }
 int Atom::gid(){ return id; }
 void Atom::sid(int idd){ id=idd; }
+int Atom::gtype(){ return type; }
+void Atom::stype(int idd){ type=idd; }
 
 //aceesss funcs 
 vector<double> Atom::gx(){ 
