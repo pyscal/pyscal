@@ -59,7 +59,7 @@ class Atom(pc.Atom):
     #now wrapping for other normal functions
     def get_x(self):
         """
-        TD
+        
         Get the position of the atom. Meaningful values are only returned if the atoms are
         set before using this function.
 
@@ -90,7 +90,7 @@ class Atom(pc.Atom):
 
     def set_x(self, pos):
         """
-        TD
+        
         Set the position of the atom. 
 
         Parameters
@@ -152,7 +152,7 @@ class Atom(pc.Atom):
 
     def get_neighbors(self):
         """
-        TD
+        
         Returns the neighbors indices of the atom. The list returned consistes of the indices
         of neighbor atom which indicate their position in the list of all atoms. The neighbors
         of an atom can be calculated from the `System` object that it belongs to.
@@ -181,7 +181,7 @@ class Atom(pc.Atom):
 
     def set_neighbors(self, neighs):
         """
-        TD
+        
         Set the neighbors of an atom manually.
 
         Parameters
@@ -208,7 +208,7 @@ class Atom(pc.Atom):
 
     def get_coordination(self):
         """
-        TD
+        
         Returns the coordination number of the atom. `get_allneighbors` function of the `System` class
         has to be used before accessing coordination numbers. 
 
@@ -236,7 +236,7 @@ class Atom(pc.Atom):
 
     def get_neighborweights(self):
         """
-        TD
+        
         Get the neighbor weights of the atom. The neighbor weights are used weight the 
         contribution of each neighboring atom towards the q value of the host atom. By 
         default, each neighbor has a weight of 1 each. However, if the neighbors are calculated
@@ -269,7 +269,7 @@ class Atom(pc.Atom):
 
     def set_neighborweights(self, weights):
         """
-        TD
+        
         Set the neighbor weights of an atom.
 
         Parameters
@@ -385,7 +385,7 @@ class Atom(pc.Atom):
 
     def get_id(self):
         """
-        TD
+        
         get  the id of the atom.
 
         Parameters
@@ -409,7 +409,7 @@ class Atom(pc.Atom):
 
     def set_id(self, idd):
         """
-        TD
+        
         set  the id of the atom.
 
         Parameters
@@ -434,7 +434,7 @@ class Atom(pc.Atom):
 
     def get_loc(self):
         """
-        TD
+        
         get  the location of the atom.
 
         Parameters
@@ -458,7 +458,7 @@ class Atom(pc.Atom):
 
     def set_loc(self, idd):
         """
-        TD
+        
         set  the loc of the atom.
 
         Parameters
@@ -483,7 +483,7 @@ class Atom(pc.Atom):
 
     def get_type(self):
         """
-        TD
+        
         get  the type(species) of the atom.
 
         Parameters
@@ -507,7 +507,7 @@ class Atom(pc.Atom):
 
     def set_type(self, tt):
         """
-        TD
+        
         set  the type of the atom.
 
         Parameters
@@ -571,7 +571,7 @@ class System(pc.System):
 
     def read_inputfile(self, filename, format="lammps-dump", use_c = False, compressed = False):
         """
-        TD
+        
         Read input file containing the information of a time slice from a molecular dynamics
         simulation. 
         
@@ -619,7 +619,7 @@ class System(pc.System):
 
     def assign_atoms(self, atoms, box):
         """
-        TD
+        
         Assign atoms directly. Receive a vector of atom objects which is stored instead
         of reading in the input file. If this method is used, there is no need of using
         `read_inputfile` method. Also using this function allows for reading of multiple
@@ -732,7 +732,7 @@ class System(pc.System):
 
     def get_atom(self, index):
         """
-        TD
+        
         Get the `Atom` object at the queried position in the list of all atoms
         in the `System`.
 
@@ -752,7 +752,7 @@ class System(pc.System):
 
     def set_atom(self, atom):
         """
-        TD
+        
         Return the atom to its original location after modification. For example, an
         `Atom` at location `i` in the list of all atoms in `System` can be queried by,
         `atom = System.get_atom(i)`, then any kind of modification, for example, the 
@@ -774,7 +774,7 @@ class System(pc.System):
 
     def get_allatoms(self):
         """
-        TD
+        
         Get a list of all `Atom` objects that belong to the system.
 
         Parameters
@@ -792,7 +792,7 @@ class System(pc.System):
 
     def get_box(self):
         """
-        TD
+        
         Get the dimensions of the simulation box.
 
         Parameters
@@ -811,7 +811,7 @@ class System(pc.System):
 
     def set_box(self, box):
         """
-        TD
+        
         Set the dimensions of the simulation box.
 
         Parameters
@@ -917,7 +917,7 @@ class System(pc.System):
 
     def reset_neighbors(self):
         """
-        TD
+        
         Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
         with two different approaches.
 

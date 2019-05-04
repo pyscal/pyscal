@@ -15,7 +15,7 @@ Highlights
 
 * Fast and efficient library using C++.
 * Calculation of Steinhardts order parameters and their averaged version [#]_.
-* Links with `Voro++ <http://math.lbl.gov/voro++/>` code, to enable weighted calculation of local bond order parameters [#]_.
+* Links with `Voro++ <http://math.lbl.gov/voro++/>`_ code, to enable weighted calculation of local bond order parameters [#]_.
 * An environment for easy processing of simulation data.
 * Distinction of solid and liquid atoms using q6 parameter [#]_.
 * Cluster algorithms of solid atoms to find largest cluster of solid atoms in liquid [#]_.

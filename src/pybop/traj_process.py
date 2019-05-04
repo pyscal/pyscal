@@ -26,7 +26,17 @@ def read_lammps_dump(infile, compressed = False):
 
     Returns
     -------
-    
+    atoms : list of `Atom` objects
+        list of all atoms as created by user input
+    box : list of list of floats
+        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
+        and upper limits of the simulation box in x, y and z directions respectively.
+
+    Examples
+    --------
+    >>> atoms, box = read_lammps_dump('conf.dump')
+    >>> atoms, box = read_lammps_dump('conf.dump.gz')
+    >>> atoms, box = read_lammps_dump('conf.d', compressed=True)    
 
     """
     #first depending on if the extension is .gz - use zipped read

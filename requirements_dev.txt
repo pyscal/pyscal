@@ -1,0 +1,4 @@
+pip==19.0.3
+pytest==4.3.0
+pytest-cov==2.6.1
+coveralls==1.6.0
