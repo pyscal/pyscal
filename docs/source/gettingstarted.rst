@@ -7,5 +7,5 @@ Installation
 
 Tests
 -----
-**pybop** also contains automated tests which use the `pytest <https://docs.pytest.org/en/latest/>`_ python library, which can be installed by ``pip install pytest``. The tests can be run by executing the command ``pytest`` from the main code directory.
+**pybop** also contains automated tests which use the `pytest <https://docs.pytest.org/en/latest/>`_ python library, which can be installed by ``pip install pytest``. The tests can be run by executing the command ``pytest tests/`` from the main code directory.
 
