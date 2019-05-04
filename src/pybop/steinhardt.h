@@ -10,7 +10,9 @@
 #include <time.h>
 #include <vector>
 
+
 using namespace std;
+
 
 const int MAXNUMBEROFNEIGHBORS = 100;
 const double PI = 3.141592653589793;
@@ -87,6 +89,7 @@ class Atom{
         int issurface;
         int issolid;
         int structure;
+        int type;
         
         
         //indicator which is 1 if neighbors are already provided
@@ -110,7 +113,8 @@ class Atom{
         void sneighborweights(vector<double> nns);
         vector<double> gneighborweights();
         //vector<double> gx();
-        vector<int> gcluster(); 
+        vector<int> gcluster();
+        void scluster(vector<int>); 
 
         //variables for storing q2-12
         //invidual variables or arrays - individual ones are easier!
@@ -121,7 +125,11 @@ class Atom{
         double arealq[11][25];
         double aimgq[11][25];
 
-        
+        vector<double> gallq();
+        vector<double> gallaq();
+        void sallq(vector<double>);
+        void sallaq(vector<double>);
+
         double gq(int);
         void sq(int, double);
         vector <vector<double>> gqlm(int);
@@ -129,6 +137,10 @@ class Atom{
         double gaq(int);
         int gid();
         void sid(int);
+        int gloc();
+        void sloc(int);
+        int gtype();
+        void stype(int);
         void saq(int, double);
         vector <vector<double>> gaqlm(int);
 
@@ -138,8 +150,9 @@ class Atom{
         vector<double> gcustom();
 
         //for vorocell identification
-        vector<int> vorovector;
+        int vorovector[4];
         vector<int> gvorovector();
+        void svorovector(vector<int>);
 
 };
 
@@ -155,7 +168,6 @@ class System{
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors_normal();
         void get_all_neighbors_voronoi();
-        void get_all_neighbors(string &, double);
         void reset_all_neighbors();
         void calculate_complexQLM_6();
         double get_number_from_bond(int,int);
@@ -164,7 +176,7 @@ class System{
         double get_abs_distance(int,int,double&,double&,double&);
         double get_abs_distance(Atom , Atom );
         System();
-        virtual ~System();
+        ~System();
 
         Atom* atoms;
     
@@ -175,10 +187,10 @@ class System{
         void find_solids();
         void find_clusters();
         int largest_cluster();
-        void set_nucsize_parameters(int,double,double);
+        void set_nucsize_parameters(double,int,double,double);
         //void set_inputfile(string);
-        //void set_neighbordistance(double);
-        void assign_particles( vector<Atom>, vector<double>);
+        void set_neighbordistance(double);
+        void assign_particles( vector<Atom>, vector<vector<double>>);
         void get_largest_cluster_atoms();
         //functions to set the list of reqd qs
         //again, error checking would be amazing here.
