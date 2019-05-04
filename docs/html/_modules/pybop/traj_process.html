@@ -17,32 +17,44 @@
   
 
   
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'1.0.0',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
-  
-  
     
 
   
-
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
-
-  
-  <script src="../../_static/js/modernizr.min.js"></script>
-
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -147,13 +159,140 @@
 <span class="sd">This file contains the methods for processing of a trajectory</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">steinhardt.core</span> <span class="k">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">pybop.ccore</span> <span class="k">as</span> <span class="nn">pc</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">gzip</span>
 
-<div class="viewcode-block" id="traj_to_systems"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.traj_to_systems">[docs]</a><span class="k">def</span> <span class="nf">traj_to_systems</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="n">natoms</span><span class="p">,</span><span class="n">snaps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">npy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">zipped</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">usecols</span><span class="o">=</span><span class="p">[]):</span>
+<span class="c1">#functions that are not wrapped from C++</span>
+<div class="viewcode-block" id="read_lammps_dump"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.read_lammps_dump">[docs]</a><span class="k">def</span> <span class="nf">read_lammps_dump</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to read a lammps dump file format - single time slice. This is essentially the same as </span>
+<span class="sd">    C++ read, but can have variable headers, reads in type and so on. So if verstility is required,</span>
+<span class="sd">    this function is better. C++ version might be faster.</span>
+<span class="sd">    Zipped files which end with a `.gz` can also be read automatically. However, if the file does not</span>
+<span class="sd">    end with a `.gz` extension, keyword `compressed = True` can also be used.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    infile : string</span>
+<span class="sd">        name of the input file</span>
+<span class="sd">    compressed : bool, Default False</span>
+<span class="sd">        force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not</span>
+<span class="sd">        necessary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#first depending on if the extension is .gz - use zipped read</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">infile</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">raw</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;gz&#39;</span> <span class="ow">or</span>  <span class="n">compressed</span><span class="p">:</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">gz</span><span class="p">)</span>            
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">gz</span>
+
+    <span class="c1">#now go through the file line by line            </span>
+    <span class="n">paramsread</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">paramsread</span><span class="p">:</span>
+            <span class="c1">#atom numer is at line 3</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">natoms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="c1">#box dims in lines 5,6,7</span>
+            <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">boxx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">boxy</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+            <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">boxz</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="n">boxdims</span> <span class="o">=</span> <span class="p">[</span><span class="n">boxx</span><span class="p">,</span> <span class="n">boxy</span><span class="p">,</span> <span class="n">boxz</span><span class="p">]</span>
+            <span class="c1">#header is here</span>
+            <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+                <span class="n">headerdict</span> <span class="o">=</span> <span class="p">{</span> <span class="n">raw</span><span class="p">[</span><span class="n">x</span><span class="p">]:</span><span class="n">x</span><span class="o">-</span><span class="mi">2</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">))</span> <span class="p">}</span>
+                <span class="n">paramsread</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+            <span class="n">idd</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="n">headerdict</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]])</span>
+            <span class="n">typ</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="n">headerdict</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]])</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="n">headerdict</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]])</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="n">headerdict</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]])</span>
+            <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="n">headerdict</span><span class="p">[</span><span class="s2">&quot;z&quot;</span><span class="p">]])</span>
+            <span class="n">atom</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="p">()</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">set_x</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">])</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="n">idd</span><span class="p">)</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">set_type</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
+            <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+
+    <span class="c1">#close files</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span></div>
+
+<div class="viewcode-block" id="write_structure"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.write_structure">[docs]</a><span class="k">def</span> <span class="nf">write_structure</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;lammps-dump&#39;</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Write the state of the system to a trajectory file. </span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sys : `System` object</span>
+<span class="sd">        the system object to be written out</span>
+<span class="sd">    outfile : string</span>
+<span class="sd">        name of the output file</span>
+<span class="sd">    format : string, default `lammps-dump`</span>
+<span class="sd">        the format of the output file, as of now only `lammps-dump` format</span>
+<span class="sd">        is supported.</span>
+<span class="sd">    compressed : bool, default false</span>
+<span class="sd">        write a `.gz` format</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">boxdims</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">get_box</span><span class="p">()</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">get_allatoms</span><span class="p">()</span>
+
+    <span class="c1">#open files for writing</span>
+    <span class="k">if</span> <span class="n">compressed</span><span class="p">:</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">dump</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">gz</span><span class="p">)</span>            
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">gz</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">outfile</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">dump</span> <span class="o">=</span> <span class="n">gz</span>
+
+    <span class="c1">#now write</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: TIMESTEP</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;0</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: NUMBER OF ATOMS</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">))</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: BOX BOUNDS</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boxdims</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxdims</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boxdims</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxdims</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boxdims</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxdims</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: ATOMS id type x y z</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span>
+        <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
+                   <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_type</span><span class="p">(),</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+    <span class="n">dump</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">def traj_to_systems(filename,natoms,snaps=False,npy=False,zipped=False,usecols=[]):</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    DEPRECATED</span>
 <span class="sd">    Reads in LAMMPS trajectory file and converts it to systems.</span>
 
 <span class="sd">    Parameters</span>
@@ -186,121 +325,122 @@
 <span class="sd">        list of files names of one time slice each. Only returned if</span>
 <span class="sd">        snaps=True</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">zipped</span><span class="p">:</span>
-        <span class="n">gz</span> <span class="o">=</span> <span class="n">gzip</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;rb&#39;</span><span class="p">)</span>
-        <span class="n">infile</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BufferedReader</span><span class="p">(</span><span class="n">gz</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">gz</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
-        <span class="n">infile</span> <span class="o">=</span> <span class="n">gz</span>        
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    if zipped:</span>
+<span class="sd">        gz = gzip.open(filename,&#39;rb&#39;)</span>
+<span class="sd">        infile = io.BufferedReader(gz)</span>
+<span class="sd">    else:</span>
+<span class="sd">        gz = open(filename,&#39;r&#39;)</span>
+<span class="sd">        infile = gz        </span>
 
-    <span class="k">if</span> <span class="n">snaps</span><span class="p">:</span>
-        <span class="n">nblock</span> <span class="o">=</span> <span class="n">natoms</span><span class="o">+</span><span class="mi">9</span>
-        <span class="n">startblock</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">count</span><span class="o">=</span><span class="mi">1</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="sd">    if snaps:</span>
+<span class="sd">        nblock = natoms+9</span>
+<span class="sd">        startblock = 0</span>
+<span class="sd">        count=1</span>
+<span class="sd">        files = []</span>
 
 
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">infile</span><span class="p">:</span>
-            <span class="k">if</span><span class="p">(</span><span class="n">count</span><span class="o">==</span><span class="mi">1</span><span class="p">):</span>
-                <span class="n">ff</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;snap&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">startblock</span><span class="p">),</span> <span class="s1">&#39;dat&#39;</span><span class="p">])</span>
-                <span class="c1">#ff = &#39;snap.&#39;+str(startblock)+&#39;.dat&#39;</span>
-                <span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ff</span><span class="p">)</span>
-                <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">ff</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-                <span class="c1">#count+=1</span>
-            <span class="k">elif</span><span class="p">(</span><span class="n">count</span><span class="o">&lt;</span><span class="n">nblock</span><span class="p">):</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-                <span class="c1">#count+=1</span>
+<span class="sd">        for line in infile:</span>
+<span class="sd">            if(count==1):</span>
+<span class="sd">                ff = &quot;.&quot;.join([filename, &#39;snap&#39;, str(startblock), &#39;dat&#39;])</span>
+<span class="sd">                #ff = &#39;snap.&#39;+str(startblock)+&#39;.dat&#39;</span>
+<span class="sd">                files.append(ff)</span>
+<span class="sd">                fout = open(ff,&#39;w&#39;)</span>
+<span class="sd">                fout.write(line)</span>
+<span class="sd">                #count+=1</span>
+<span class="sd">            elif(count&lt;nblock):</span>
+<span class="sd">                fout.write(line)</span>
+<span class="sd">                #count+=1</span>
 
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="n">count</span><span class="o">=</span><span class="mi">0</span>
-                <span class="n">startblock</span><span class="o">+=</span><span class="mi">1</span>
-            <span class="n">count</span><span class="o">+=</span><span class="mi">1</span>
-        <span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="sd">            else:</span>
+<span class="sd">                fout.write(line)</span>
+<span class="sd">                fout.close()</span>
+<span class="sd">                count=0</span>
+<span class="sd">                startblock+=1</span>
+<span class="sd">            count+=1</span>
+<span class="sd">        infile.close()</span>
 
-        <span class="c1">#qtraj = getQTrajectory(files)</span>
-        <span class="c1">#systems=[]</span>
-        <span class="c1">#for file in files:</span>
-            <span class="c1">#sys = System()</span>
-            <span class="c1">#sys.inputfile = file</span>
-            <span class="c1">#systems.append(sys)</span>
-        <span class="k">return</span> <span class="n">files</span>
+<span class="sd">        #qtraj = getQTrajectory(files)</span>
+<span class="sd">        #systems=[]</span>
+<span class="sd">        #for file in files:</span>
+<span class="sd">            #sys = System()</span>
+<span class="sd">            #sys.inputfile = file</span>
+<span class="sd">            #systems.append(sys)</span>
+<span class="sd">        return files</span>
 
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">systems</span><span class="o">=</span><span class="p">[]</span>
+<span class="sd">    else:</span>
+<span class="sd">        atoms = []</span>
+<span class="sd">        systems=[]</span>
 
-        <span class="n">custom</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">usecols</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">usecols</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">3</span><span class="p">:</span>
-                <span class="n">xid</span> <span class="o">=</span> <span class="n">usecols</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">yid</span> <span class="o">=</span> <span class="n">usecols</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="n">zid</span> <span class="o">=</span> <span class="n">usecols</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-                <span class="n">customcols</span> <span class="o">=</span> <span class="n">usecols</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>
-                <span class="n">custom</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">xid</span> <span class="o">=</span> <span class="mi">3</span>
-            <span class="n">yid</span> <span class="o">=</span> <span class="mi">4</span>
-            <span class="n">zid</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="sd">        custom = False</span>
+<span class="sd">        if len(usecols) &gt; 0:</span>
+<span class="sd">            if len(usecols)&gt;=3:</span>
+<span class="sd">                xid = usecols[0]</span>
+<span class="sd">                yid = usecols[1]</span>
+<span class="sd">                zid = usecols[2]</span>
+<span class="sd">                customcols = usecols[3:]</span>
+<span class="sd">                custom = True</span>
+<span class="sd">        else:</span>
+<span class="sd">            xid = 3</span>
+<span class="sd">            yid = 4</span>
+<span class="sd">            zid = 5</span>
 
-        <span class="n">iterval</span> <span class="o">=</span> <span class="n">infile</span>
-        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">timestep</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">iterval</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">count</span><span class="o">==</span><span class="mi">6</span><span class="p">:</span>
-                <span class="n">box</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="n">dimx</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>          
-            
-            <span class="k">elif</span> <span class="n">count</span><span class="o">==</span><span class="mi">7</span><span class="p">:</span> 
-                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="n">dimy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                
-            <span class="k">elif</span> <span class="n">count</span><span class="o">==</span><span class="mi">8</span><span class="p">:</span>
-                <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="n">dimz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">-</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">boxd</span> <span class="o">=</span> <span class="p">[</span><span class="n">dimx</span><span class="p">,</span><span class="n">dimy</span><span class="p">,</span><span class="n">dimz</span><span class="p">]</span>
-                
-            <span class="k">elif</span> <span class="n">count</span><span class="o">&gt;</span><span class="mi">9</span><span class="p">:</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                <span class="n">idd</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> 
-                <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">xid</span><span class="p">])</span>
-                <span class="n">y</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">yid</span><span class="p">])</span>
-                <span class="n">z</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">zid</span><span class="p">])</span>
-                <span class="n">cavals</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">if</span> <span class="n">custom</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">cindex</span> <span class="ow">in</span> <span class="n">customcols</span><span class="p">:</span>
-                        <span class="n">cavals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="n">cindex</span><span class="p">]))</span>
+<span class="sd">        iterval = infile</span>
+<span class="sd">        count = 1</span>
+<span class="sd">        timestep = 0</span>
+<span class="sd">        for line in iterval:</span>
+<span class="sd">            if count==6:</span>
+<span class="sd">                box = []</span>
+<span class="sd">                raw = line.strip().split()</span>
+<span class="sd">                dimx = float(raw[1])-float(raw[0])          </span>
+<span class="sd">            </span>
+<span class="sd">            elif count==7: </span>
+<span class="sd">                raw = line.strip().split()</span>
+<span class="sd">                dimy = float(raw[1])-float(raw[0])</span>
+<span class="sd">                </span>
+<span class="sd">            elif count==8:</span>
+<span class="sd">                raw = line.strip().split()</span>
+<span class="sd">                dimz = float(raw[1])-float(raw[0])</span>
+<span class="sd">                boxd = [dimx,dimy,dimz]</span>
+<span class="sd">                </span>
+<span class="sd">            elif count&gt;9:</span>
+<span class="sd">                line = line.strip().split()</span>
+<span class="sd">                idd = int(line[0]) </span>
+<span class="sd">                x = float(line[xid])</span>
+<span class="sd">                y = float(line[yid])</span>
+<span class="sd">                z = float(line[zid])</span>
+<span class="sd">                cavals = []</span>
+<span class="sd">                if custom:</span>
+<span class="sd">                    for cindex in customcols:</span>
+<span class="sd">                        cavals.append(float(line[cindex]))</span>
 
-               
-                <span class="n">xx</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">]</span>
-                <span class="n">a</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
-                <span class="n">a</span><span class="o">.</span><span class="n">x</span> <span class="o">=</span> <span class="n">x</span>
-                <span class="n">a</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
-                <span class="n">a</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="n">z</span>
-                <span class="n">a</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">idd</span>
-                <span class="n">a</span><span class="o">.</span><span class="n">scustom</span><span class="p">(</span><span class="n">cavals</span><span class="p">)</span>
-                <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">count</span><span class="o">==</span><span class="n">natoms</span><span class="o">+</span><span class="mi">9</span><span class="p">:</span>
-                    <span class="n">count</span><span class="o">=</span><span class="mi">0</span>
-                    <span class="c1">#do stuff here</span>
-                    <span class="n">sys</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span>
-                    <span class="n">sys</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span><span class="n">boxd</span><span class="p">)</span>
-                    <span class="n">systems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sys</span><span class="p">)</span>
-                    <span class="k">del</span> <span class="n">atoms</span><span class="p">[:]</span>
-                    <span class="k">del</span> <span class="n">boxd</span><span class="p">[:]</span>
-                    <span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
-                    <span class="n">boxd</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">count</span><span class="o">+=</span><span class="mi">1</span>
-        <span class="n">infile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-        
-        <span class="k">if</span> <span class="n">npy</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">filename</span><span class="p">,</span><span class="s2">&quot;npy&quot;</span><span class="p">]),</span><span class="n">systems</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">systems</span>        </div>
-
+<span class="sd">               </span>
+<span class="sd">                xx = [x,y,z]</span>
+<span class="sd">                a = Atom()</span>
+<span class="sd">                a.x = x</span>
+<span class="sd">                a.y = y</span>
+<span class="sd">                a.z = z</span>
+<span class="sd">                a.id = idd</span>
+<span class="sd">                a.scustom(cavals)</span>
+<span class="sd">                atoms.append(a)</span>
+<span class="sd">                if count==natoms+9:</span>
+<span class="sd">                    count=0</span>
+<span class="sd">                    #do stuff here</span>
+<span class="sd">                    sys = System()</span>
+<span class="sd">                    sys.assign_particles(atoms,boxd)</span>
+<span class="sd">                    systems.append(sys)</span>
+<span class="sd">                    del atoms[:]</span>
+<span class="sd">                    del boxd[:]</span>
+<span class="sd">                    atoms = []</span>
+<span class="sd">                    boxd = []</span>
+<span class="sd">            count+=1</span>
+<span class="sd">        infile.close()</span>
+<span class="sd">        </span>
+<span class="sd">        if npy:</span>
+<span class="sd">            np.save(&quot;.&quot;.join([filename,&quot;npy&quot;]),systems)</span>
+<span class="sd">        return systems        </span>
+<span class="sd">&quot;&quot;&quot;</span>
 </pre></div>
 
            </div>
@@ -330,26 +470,16 @@
   
 
 
-  
-
-    
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-    
-
-  
-
-  <script type="text/javascript" src="../../_static/js/theme.js"></script>
-
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script> 
+  </script>
+
+  
+  
+    
+   
 
 </body>
 </html>
