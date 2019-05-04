@@ -530,38 +530,6 @@ class Atom(pc.Atom):
         """
         pc.Atom.set_type(self, tt)
 
-    def get_qlm(self, q, averaged = False):
-        """
-        Get the real and imaginary qlm values of the atom. If `averaged = True`,
-        return the averaged qlm values.
-
-        Parameters
-        ----------
-        q : int or list of ints
-            number of the required q - from 2-12
-
-        Returns
-        -------
-        qlms : 2D array of 2q+1 values or n 2D arrays
-            the first part of the array is the 2q+1 real values
-            second part is the 2q+1 imaginary values.
-        averaged : bool, default False
-            If True, return the averaged q values,
-            If False, return the non averaged ones    
-        """
-        if isinstance(q, int):
-            if averaged:
-                rq = pc.Atom.get_aqlm(self, q)
-            else:
-                rq = pc.Atom.get_qlm(self, q)
-            return rq
-
-        else:
-            if averaged:
-                rq = [ pc.Atom.get_aqlm(self, qq) for qq in q ]
-            else:
-                rq = [ pc.Atom.get_qlm(self, qq) for qq in q ]
-            return rq
 
     def get_vorovector(self):
         """

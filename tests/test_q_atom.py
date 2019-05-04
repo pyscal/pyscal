@@ -21,4 +21,13 @@ def test_q_4():
 
     #now change the q4 values
     atoms[0].set_q(4, .23)
-    assert np.round(atoms[0].get_q(4), decimals=2) == 0.23    
+    atoms[0].set_q(4, .23, averaged=True)
+    assert np.round(atoms[0].get_q(4), decimals=2) == 0.23
+    assert np.round(atoms[0].get_q(4, averaged=True), decimals=2) == 0.23
+
+    atoms[0].set_q([4, 6], [.23, .46])
+    atoms[0].set_q([4, 6], [.23, .46], averaged=True)
+    assert np.round(atoms[0].get_q(4), decimals=2) == 0.23
+    assert np.round(atoms[0].get_q(4, averaged=True), decimals=2) == 0.23
+    assert np.round(atoms[0].get_q(6), decimals=2) == 0.46
+    assert np.round(atoms[0].get_q(6, averaged=True), decimals=2) == 0.46

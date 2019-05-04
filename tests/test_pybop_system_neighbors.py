@@ -20,7 +20,7 @@ def test_neighbors_system():
     atoms = sys.get_allatoms()
     assert atoms[0].get_coordination() == 8
 
-    sys.reset_allneighbors()
+    sys.reset_neighbors()
 
     #cutoff method - second shell
     sys.get_neighbors(method = 'cutoff', cutoff=1.1)

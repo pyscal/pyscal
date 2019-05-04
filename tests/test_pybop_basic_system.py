@@ -38,7 +38,6 @@ def test_system_read():
     filtered_atoms = [ atom for atom in atoms if atom.get_id() == 204]
     assert filtered_atoms[0].get_x() == [-0.10301, -6.35752, -6.44787]
 
-
 def test_system_atom_access():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc')
