@@ -215,6 +215,11 @@ class System{
         double avgthreshold;
         int maxclusterid;
 
+        //variables for a filter
+        int filter;
+        void sfilter(int);
+        //int apply_filter(int, int);
+
         //some access functions for system
         Atom gatom(int);
         void satom(Atom);

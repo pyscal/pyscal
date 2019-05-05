@@ -878,9 +878,9 @@ class System(pc.System):
         atom2c = self.copy_atom_to_catom(atom2)
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
-    def get_neighbors(self, method="cutoff", cutoff=None):
+    def get_neighbors(self, method="cutoff", cutoff=None, filter=None):
         """
-        TD
+        
         Find neighbors of all atoms in the `System`. There are two methods to do this, the 
         traditional approach being the one in which the neighbors of an atom are the ones that lie
         in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
@@ -895,6 +895,10 @@ class System(pc.System):
         cutoff : float
             the cutoff distance to be used for the `cutoff` based neighbor calculation method
             described above.
+
+        filter : string - `None` or `type`, default None
+            apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
+            `type`, only atoms of the same type would be included in the neighbor calculations. 
         
         Returns
         -------
@@ -906,6 +910,11 @@ class System(pc.System):
         """
         #first reset all neighbors
         pc.System.reset_allneighbors(self)
+        pc.System.set_filter(self, 0)
+
+        if filter == 'type':
+            # type corresponds to 1
+            pc.System.set_filter(self, 1)
 
         if method == 'cutoff':
             pc.System.set_neighbordistance(self, cutoff)

@@ -18,6 +18,7 @@ System::System(){
     neighborsfound = 0;
     qsfound = 0;
     fileread = 0;
+    filter = 0;
 
 }
 
@@ -278,6 +279,12 @@ void System::reset_all_neighbors(){
         }
     }
 }
+
+void System::sfilter(int fno){
+
+    filter = fno;
+}
+
 void System::get_all_neighbors_normal(){
 
     
@@ -304,6 +311,10 @@ void System::get_all_neighbors_normal(){
                 if(ti==tj) { continue; }
                 d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
                 if (d < neighbordistance){
+
+                    if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                        continue;
+                    }
 
                     atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
                     atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
@@ -449,6 +460,12 @@ void System::get_all_neighbors_voronoi(){
             //    weightsum += facearea[i];
             //}
             for (int tj=0; tj<neigh.size(); tj++){
+
+                //if filter doesnt work continue
+                if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                    continue;
+                }
+
                 atoms[ti].neighbors[tj] = neigh[tj];
                 atoms[ti].n_neighbors += 1;        
                 d = get_abs_distance(ti,neigh[tj],diffx,diffy,diffz); 

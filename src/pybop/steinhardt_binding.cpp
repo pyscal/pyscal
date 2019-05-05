@@ -77,6 +77,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
         .def("find_clusters",&System::find_clusters)
         .def("find_largest_cluster",&System::largest_cluster)
+        .def("set_filter",&System::sfilter)
         ;
 
 
