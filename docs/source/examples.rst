@@ -10,7 +10,13 @@ Basic examples
     
     example1basic
     example2basic
-    example3basic
+
+Advanced examples
+-----------------
+
+.. toctree::
+
+	example3basic
 
 
     
