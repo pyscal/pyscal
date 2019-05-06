@@ -183,7 +183,17 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    </span>
+<span class="sd">    atoms : list of `Atom` objects</span>
+<span class="sd">        list of all atoms as created by user input</span>
+<span class="sd">    box : list of list of floats</span>
+<span class="sd">        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower</span>
+<span class="sd">        and upper limits of the simulation box in x, y and z directions respectively.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; atoms, box = read_lammps_dump(&#39;conf.dump&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; atoms, box = read_lammps_dump(&#39;conf.dump.gz&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; atoms, box = read_lammps_dump(&#39;conf.d&#39;, compressed=True)    </span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1">#first depending on if the extension is .gz - use zipped read</span>

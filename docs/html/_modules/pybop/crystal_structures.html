@@ -177,6 +177,21 @@
 <span class="sd">        of type [nx, ny, nz], repetions of the unit cell in x, y and z directions.</span>
 <span class="sd">    ca_ratio : float, default 1.633</span>
 <span class="sd">        ratio of c/a for hcp structures.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    atoms : list of `Atom` objects</span>
+<span class="sd">        list of all atoms as created by user input</span>
+<span class="sd">    box : list of list of floats</span>
+<span class="sd">        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower</span>
+<span class="sd">        and upper limits of the simulation box in x, y and z directions respectively.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; atoms, box = make_crystal(&#39;bcc&#39;, lattice_constant=3.48, repetitions=[2,2,2])</span>
+<span class="sd">    &gt;&gt;&gt; sys = System()</span>
+<span class="sd">    &gt;&gt;&gt; sys.assign_atoms(atoms, box)</span>
+<span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">nx</span> <span class="o">=</span> <span class="n">repetitions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">ny</span> <span class="o">=</span> <span class="n">repetitions</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>

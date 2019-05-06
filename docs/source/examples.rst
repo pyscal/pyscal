@@ -10,6 +10,7 @@ Basic examples
     
     example1basic
     example2basic
+    example3basic
 
 
     

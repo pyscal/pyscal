@@ -251,8 +251,7 @@ belongsto - which gives the id of the cluster that the atom belongs to.</dd>
 <dl class="method">
 <dt id="pybop.core.Atom.get_coordination">
 <code class="descname">get_coordination</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_coordination"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_coordination" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Returns the coordination number of the atom. <cite>get_allneighbors</cite> function of the <cite>System</cite> class
+<dd><p>Returns the coordination number of the atom. <cite>get_allneighbors</cite> function of the <cite>System</cite> class
 has to be used before accessing coordination numbers.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -277,8 +276,7 @@ has to be used before accessing coordination numbers.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.get_id">
 <code class="descname">get_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-get  the id of the atom.</p>
+<dd><p>get  the id of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -304,8 +302,7 @@ get  the id of the atom.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.get_loc">
 <code class="descname">get_loc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_loc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_loc" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-get  the location of the atom.</p>
+<dd><p>get  the location of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -331,8 +328,7 @@ get  the location of the atom.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.get_neighbors">
 <code class="descname">get_neighbors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Returns the neighbors indices of the atom. The list returned consistes of the indices
+<dd><p>Returns the neighbors indices of the atom. The list returned consistes of the indices
 of neighbor atom which indicate their position in the list of all atoms. The neighbors
 of an atom can be calculated from the <cite>System</cite> object that it belongs to.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -358,8 +354,7 @@ of an atom can be calculated from the <cite>System</cite> object that it belongs
 <dl class="method">
 <dt id="pybop.core.Atom.get_neighborweights">
 <code class="descname">get_neighborweights</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_neighborweights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_neighborweights" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Get the neighbor weights of the atom. The neighbor weights are used weight the
+<dd><p>Get the neighbor weights of the atom. The neighbor weights are used weight the
 contribution of each neighboring atom towards the q value of the host atom. By
 default, each neighbor has a weight of 1 each. However, if the neighbors are calculated
 using the <cite>System.get_allneighbors(method=’voronoi’)</cite>, each neighbor atom gets a
@@ -428,8 +423,7 @@ If False, return the non averaged ones</li>
 <dl class="method">
 <dt id="pybop.core.Atom.get_type">
 <code class="descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-get  the type(species) of the atom.</p>
+<dd><p>get  the type(species) of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -476,8 +470,7 @@ vertices and so on. This can be used to identify structures.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.get_x">
 <code class="descname">get_x</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_x" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Get the position of the atom. Meaningful values are only returned if the atoms are
+<dd><p>Get the position of the atom. Meaningful values are only returned if the atoms are
 set before using this function.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -507,8 +500,7 @@ is the z coordinate.</td>
 <dl class="method">
 <dt id="pybop.core.Atom.set_id">
 <code class="descname">set_id</code><span class="sig-paren">(</span><em>idd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_id" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-set  the id of the atom.</p>
+<dd><p>set  the id of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -534,8 +526,7 @@ set  the id of the atom.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.set_loc">
 <code class="descname">set_loc</code><span class="sig-paren">(</span><em>idd</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_loc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_loc" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-set  the loc of the atom.</p>
+<dd><p>set  the loc of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -561,8 +552,7 @@ set  the loc of the atom.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.set_neighbors">
 <code class="descname">set_neighbors</code><span class="sig-paren">(</span><em>neighs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Set the neighbors of an atom manually.</p>
+<dd><p>Set the neighbors of an atom manually.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -586,8 +576,7 @@ Set the neighbors of an atom manually.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.set_neighborweights">
 <code class="descname">set_neighborweights</code><span class="sig-paren">(</span><em>weights</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_neighborweights"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_neighborweights" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Set the neighbor weights of an atom.</p>
+<dd><p>Set the neighbor weights of an atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -649,8 +638,7 @@ If False, return the non averaged ones</li>
 <dl class="method">
 <dt id="pybop.core.Atom.set_type">
 <code class="descname">set_type</code><span class="sig-paren">(</span><em>tt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-set  the type of the atom.</p>
+<dd><p>set  the type of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -676,8 +664,7 @@ set  the type of the atom.</p>
 <dl class="method">
 <dt id="pybop.core.Atom.set_x">
 <code class="descname">set_x</code><span class="sig-paren">(</span><em>pos</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_x"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_x" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Set the position of the atom.</p>
+<dd><p>Set the position of the atom.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -721,8 +708,7 @@ This enables for automatic reading of all atomic positions and the simulation bo
 <dl class="method">
 <dt id="pybop.core.System.assign_atoms">
 <code class="descname">assign_atoms</code><span class="sig-paren">(</span><em>atoms</em>, <em>box</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.assign_atoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.assign_atoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Assign atoms directly. Receive a vector of atom objects which is stored instead
+<dd><p>Assign atoms directly. Receive a vector of atom objects which is stored instead
 of reading in the input file. If this method is used, there is no need of using
 <cite>read_inputfile</cite> method. Also using this function allows for reading of multiple
 file formats which are not supported by the inbuilt <cite>read_inputfile</cite> method.</p>
@@ -912,8 +898,7 @@ has to be used before using this function.</p>
 <dl class="method">
 <dt id="pybop.core.System.get_allatoms">
 <code class="descname">get_allatoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_allatoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_allatoms" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Get a list of all <cite>Atom</cite> objects that belong to the system.</p>
+<dd><p>Get a list of all <cite>Atom</cite> objects that belong to the system.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -931,8 +916,7 @@ Get a list of all <cite>Atom</cite> objects that belong to the system.</p>
 <dl class="method">
 <dt id="pybop.core.System.get_atom">
 <code class="descname">get_atom</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Get the <cite>Atom</cite> object at the queried position in the list of all atoms
+<dd><p>Get the <cite>Atom</cite> object at the queried position in the list of all atoms
 in the <cite>System</cite>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -951,8 +935,7 @@ in the <cite>System</cite>.</p>
 <dl class="method">
 <dt id="pybop.core.System.get_box">
 <code class="descname">get_box</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_box" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Get the dimensions of the simulation box.</p>
+<dd><p>Get the dimensions of the simulation box.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1017,9 +1000,8 @@ been found. Otherwise it returns the default values.</p>
 
 <dl class="method">
 <dt id="pybop.core.System.get_neighbors">
-<code class="descname">get_neighbors</code><span class="sig-paren">(</span><em>method='cutoff'</em>, <em>cutoff=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Find neighbors of all atoms in the <cite>System</cite>. There are two methods to do this, the
+<code class="descname">get_neighbors</code><span class="sig-paren">(</span><em>method='cutoff'</em>, <em>cutoff=None</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find neighbors of all atoms in the <cite>System</cite>. There are two methods to do this, the
 traditional approach being the one in which the neighbors of an atom are the ones that lie
 in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
 that share a Voronoi polyhedra face with the host atoms are considered its neighbors.</p>
@@ -1032,6 +1014,8 @@ that share a Voronoi polyhedra face with the host atoms are considered its neigh
 <cite>voronoi</cite> method finds atoms that share a Voronoi polyhedra face with the host atom.</li>
 <li><strong>cutoff</strong> (<em>float</em>) – the cutoff distance to be used for the <cite>cutoff</cite> based neighbor calculation method
 described above.</li>
+<li><strong>filter</strong> (string - <cite>None</cite> or <cite>type</cite>, default None) – apply a filter to nearest neighbor calculation. If the <cite>filter</cite> keyword is set to
+<cite>type</cite>, only atoms of the same type would be included in the neighbor calculations.</li>
 </ul>
 </td>
 </tr>
@@ -1078,8 +1062,7 @@ If False, return the non averaged ones</li>
 <dl class="method">
 <dt id="pybop.core.System.read_inputfile">
 <code class="descname">read_inputfile</code><span class="sig-paren">(</span><em>filename</em>, <em>format='lammps-dump'</em>, <em>use_c=False</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.read_inputfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.read_inputfile" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Read input file containing the information of a time slice from a molecular dynamics
+<dd><p>Read input file containing the information of a time slice from a molecular dynamics
 simulation.</p>
 <p>The format of the input file is specified using the <cite>format</cite> keyword. Currently only
 a <cite>lammps-dump</cite> file is supported. However, this restriction can easily be overcome
@@ -1119,8 +1102,7 @@ kept for compatibility reasons. Use of this keyword is not recommended.</li>
 <dl class="method">
 <dt id="pybop.core.System.reset_neighbors">
 <code class="descname">reset_neighbors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.reset_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.reset_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
+<dd><p>Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
 with two different approaches.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1143,8 +1125,7 @@ with two different approaches.</p>
 <dl class="method">
 <dt id="pybop.core.System.set_atom">
 <code class="descname">set_atom</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.set_atom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.set_atom" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Return the atom to its original location after modification. For example, an
+<dd><p>Return the atom to its original location after modification. For example, an
 <cite>Atom</cite> at location <cite>i</cite> in the list of all atoms in <cite>System</cite> can be queried by,
 <cite>atom = System.get_atom(i)</cite>, then any kind of modification, for example, the
 position of the <cite>Atom</cite> can done by, <cite>atom.set_x([2.3, 4.5, 4.5])</cite>. After
@@ -1167,8 +1148,7 @@ modification, the <cite>Atom</cite> can be set back to its position in <cite>Sys
 <dl class="method">
 <dt id="pybop.core.System.set_box">
 <code class="descname">set_box</code><span class="sig-paren">(</span><em>box</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.set_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.set_box" title="Permalink to this definition">¶</a></dt>
-<dd><p>TD
-Set the dimensions of the simulation box.</p>
+<dd><p>Set the dimensions of the simulation box.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1243,7 +1223,7 @@ and box dimensions.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>structure</strong> (<em>string</em><em> , </em><em>bcc</em><em>, </em><em>fcc</em><em> or </em><em>hcp</em>) – type of the crystal structure</li>
 <li><strong>lattice_constant</strong> (<em>float</em><em>, </em><em>default 1</em>) – lattice constant of the crystal structure</li>
 <li><strong>repetitions</strong> (<em>list of ints of len 3</em>) – of type [nx, ny, nz], repetions of the unit cell in x, y and z directions.</li>
@@ -1251,8 +1231,22 @@ and box dimensions.</p>
 </ul>
 </td>
 </tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>atoms</strong> (list of <cite>Atom</cite> objects) – list of all atoms as created by user input</li>
+<li><strong>box</strong> (<em>list of list of floats</em>) – list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
+and upper limits of the simulation box in x, y and z directions respectively.</li>
+</ul>
+</p>
+</td>
+</tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span> <span class="o">=</span> <span class="n">make_crystal</span><span class="p">(</span><span class="s1">&#39;bcc&#39;</span><span class="p">,</span> <span class="n">lattice_constant</span><span class="o">=</span><span class="mf">3.48</span><span class="p">,</span> <span class="n">repetitions</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sys</span><span class="o">.</span><span class="n">assign_atoms</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 </div>
@@ -1271,15 +1265,29 @@ end with a <cite>.gz</cite> extension, keyword <cite>compressed = True</cite> ca
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>infile</strong> (<em>string</em>) – name of the input file</li>
 <li><strong>compressed</strong> (<em>bool</em><em>, </em><em>Default False</em>) – force to read a <cite>gz</cite> zipped file. If the filename ends with <cite>.gz</cite>, use of this keyword is not
 necessary.</li>
 </ul>
 </td>
 </tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>atoms</strong> (list of <cite>Atom</cite> objects) – list of all atoms as created by user input</li>
+<li><strong>box</strong> (<em>list of list of floats</em>) – list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
+and upper limits of the simulation box in x, y and z directions respectively.</li>
+</ul>
+</p>
+</td>
+</tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span> <span class="o">=</span> <span class="n">read_lammps_dump</span><span class="p">(</span><span class="s1">&#39;conf.dump&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span> <span class="o">=</span> <span class="n">read_lammps_dump</span><span class="p">(</span><span class="s1">&#39;conf.dump.gz&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span> <span class="o">=</span> <span class="n">read_lammps_dump</span><span class="p">(</span><span class="s1">&#39;conf.d&#39;</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="function">
