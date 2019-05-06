@@ -36,7 +36,7 @@ cutoff distance of the host atom.
 
 .. code:: ipython2
 
-    sys.get_allneighbors(method='cutoff', cutoff=3.6)
+    sys.get_neighbors(method='cutoff', cutoff=3.6)
 
 Now lets get all the atoms.
 
@@ -55,7 +55,7 @@ lets try accessing the coordination number of an atom
 
 .. parsed-literal::
 
-    12
+    15
 
 
 
@@ -99,16 +99,9 @@ Voronoi method
 | Voronoi polyhedra is calculated using the Voro++ code. However, you
   dont need to install this specifically as it is linked to pybop.
 
-    Attention! before running the neighbor calculation again, we have to
-    reset the neighbors
-
 .. code:: ipython2
 
-    sys.reset_allneighbors()
-
-.. code:: ipython2
-
-    sys.get_allneighbors(method='voronoi')
+    sys.get_neighbors(method='voronoi')
 
 Once again, lets get all atoms and find their coordination
 
@@ -137,7 +130,7 @@ And visualise the results
 
 
 
-.. image:: output_27_1.png
+.. image:: output_25_1.png
 
 
 Finally..
