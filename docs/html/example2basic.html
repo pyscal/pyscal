@@ -103,9 +103,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#finally">Finally..</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="example3basic.html">Calculating bond order parameters</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html#advanced-examples">Advanced examples</a></li>
 </ul>
 </li>
 </ul>
@@ -205,7 +205,7 @@ voronoi polyhedra method.</div>
 <h3>Cutoff method<a class="headerlink" href="#cutoff-method" title="Permalink to this headline">¶</a></h3>
 <p>Cutoff method takes cutoff distance value and finds all atoms within the
 cutoff distance of the host atom.</p>
-<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">get_allneighbors</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;cutoff&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">3.6</span><span class="p">)</span>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;cutoff&#39;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="mf">3.6</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Now lets get all the atoms.</p>
@@ -216,7 +216,7 @@ cutoff distance of the host atom.</p>
 <div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">atoms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_coordination</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">12</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">15</span>
 </pre></div>
 </div>
 <p>We can loop over all atoms and create a histogram of the results</p>
@@ -234,7 +234,7 @@ cutoff distance of the host atom.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Cutoff method&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="output_17_1.png" src="output_17_1.png" />
+<img alt="_images/output_17_1.png" src="_images/output_17_1.png" />
 <p>Now finally we can compare with the voronoi method</p>
 </div>
 </div>
@@ -247,13 +247,7 @@ neighbors.</div>
 <div class="line">Voronoi polyhedra is calculated using the Voro++ code. However, you
 dont need to install this specifically as it is linked to pybop.</div>
 </div>
-<blockquote>
-<div>Attention! before running the neighbor calculation again, we have to
-reset the neighbors</div></blockquote>
-<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">reset_allneighbors</span><span class="p">()</span>
-</pre></div>
-</div>
-<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">get_allneighbors</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;voronoi&#39;</span><span class="p">)</span>
+<div class="code ipython2 highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sys</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;voronoi&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once again, lets get all atoms and find their coordination</p>
@@ -272,7 +266,7 @@ reset the neighbors</div></blockquote>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="s1">&#39;Voronoi method&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/output_27_1.png" src="_images/output_27_1.png" />
+<img alt="_images/output_25_1.png" src="_images/output_25_1.png" />
 </div>
 <div class="section" id="finally">
 <h2>Finally..<a class="headerlink" href="#finally" title="Permalink to this headline">¶</a></h2>
