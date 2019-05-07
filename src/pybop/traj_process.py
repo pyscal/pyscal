@@ -91,6 +91,118 @@ def read_lammps_dump(infile, compressed = False):
 
     return atoms, boxdims
 
+
+def read_poscar(infile, compressed = False):
+    """
+    Function to read a POSCAR format. Zipped files which end with a `.gz` can also be 
+    read automatically. However, if the file does not end with a `.gz` extension, 
+    keyword `compressed = True` can also be used.
+
+    Parameters
+    ----------
+    infile : string
+        name of the input file
+    compressed : bool, Default False
+        force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
+        necessary.
+
+    Returns
+    -------
+    atoms : list of `Atom` objects
+        list of all atoms as created by user input
+    box : list of list of floats
+        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
+        and upper limits of the simulation box in x, y and z directions respectively.
+
+    Examples
+    --------
+    >>> atoms, box = read_poscar('POSCAR')
+    >>> atoms, box = read_poscar('POSCAR.gz')
+    >>> atoms, box = read_poscar('POSCAR.dat', compressed=True)    
+
+    """
+    raw = infile.split('.')
+    if raw[-1] == 'gz' or  compressed:
+        gz = gzip.open(infile,'rb')
+        f = io.BufferedReader(gz)            
+    else:
+        gz = open(infile,'r')
+        f = gz
+    
+    data = []
+    for line in f:
+        data.append(line)
+
+    no_atoms = data[5].split()
+    no_atoms = np.array(no_atoms)
+    no_atoms = no_atoms.astype(int)
+
+    natoms = np.sum(no_atoms)
+    atom_list = no_atoms        
+
+    scaling_factor = np.array(data[1].strip()).astype(float)
+    xvector = np.array(data[2].strip().split()).astype(float)
+    yvector = np.array(data[3].strip().split()).astype(float)
+    zvector = np.array(data[4].strip().split()).astype(float)
+
+    xlow = 0
+    xhigh = scaling_factor*xvector[0]    
+    ylow = 0
+    yhigh = scaling_factor*yvector[1]    
+    zlow = 0
+    zhigh = scaling_factor*zvector[2]
+    boxdims = [[xlow, xhigh],[ylow, yhigh],[zlow, zhigh]]    
+
+    if (data[6].strip().split()[0]=='s' or data[6].strip().split()[0]=='S'):
+        selective_dynamics=True
+        cord_system=data[7].strip()
+        atom_start = 8
+    else:
+        cord_system=data[6].strip()
+        atom_start = 7
+
+    species = 1
+    count = 0
+
+    cum_list = np.cumsum(atom_list)
+    i = atom_start
+    atoms = []
+
+    while i in range(atom_start,atom_start+natoms):
+        if (count<cum_list[species-1]):
+            raw = np.array(data[i].strip().split()).astype(float)
+            typ = species
+            x = float(raw[0])*xhigh
+            y = float(raw[1])*yhigh
+            z = float(raw[2])*zhigh
+            #if x,y,z are out of the box, they need to be put in
+            if (x < xlow):
+                x = x + (xhigh - xlow)
+            elif (x > xhigh):
+                x = x - (xhigh - xlow)
+            if (y < ylow):
+                y = y + (yhigh - ylow)
+            elif (y > yhigh):
+                y = y - (yhigh - ylow)
+            if (z < zlow):
+                z = z + (zhigh - zlow)
+            elif (z > zhigh):
+                z = z - (zhigh - zlow)
+
+            count+=1
+            idd = count
+            atom = pc.Atom()
+            atom.set_x([x, y, z])
+            atom.set_id(idd)
+            atom.set_type(typ)
+            #atom = pc.Atom(pos=, id=idd, type=typ)
+            atoms.append(atom)
+            i+=1
+        else:
+            species+=1
+
+    return atoms, boxdims
+
 def write_structure(sys, outfile, format = 'lammps-dump', compressed = False):
     """
     Write the state of the system to a trajectory file. 

@@ -616,6 +616,13 @@ class System(pc.System):
                     pc.System.assign_particles(self, atoms, boxdims)
                 else:
                     pc.System.read_inputfile(self, filename)
+        
+        elif format == 'poscar':
+            if os.path.exists(filename):
+                filename = unicode(filename, "utf-8")
+                atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
+                pc.System.assign_particles(self, atoms, boxdims)
+
 
     def assign_atoms(self, atoms, box):
         """
