@@ -1,4 +1,8 @@
-[![Build Status](https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&branch=master)](https://travis-ci.com/srmnitc/pybop)
+
+
+.. |travis-badge| image:: https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&branch=master
+.. _travis-badge: https://travis-ci.com/srmnitc/pybop
+
 
 pybop
 =================================
