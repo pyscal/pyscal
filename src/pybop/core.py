@@ -569,7 +569,7 @@ class System(pc.System):
     def __init__(self):
         self.initialized = True
 
-    def read_inputfile(self, filename, format="lammps-dump", use_c = False, compressed = False):
+    def read_inputfile(self, filename, format="lammps-dump", compressed = False):
         """
         
         Read input file containing the information of a time slice from a molecular dynamics
@@ -579,6 +579,8 @@ class System(pc.System):
         a `lammps-dump` file is supported. However, this restriction can easily be overcome 
         using the `assign_particles` method from system where a list of atoms and box vectors 
         are directly provided to the system.
+
+        `use_c` is no deprecated and no longer used to ease transition to python 3. 
         
         Parameters
         ----------
@@ -593,7 +595,7 @@ class System(pc.System):
             extension, it is automatically treated as a compressed file and this keyword is not
             necessary
 
-        use_c : bool, default False
+        use_c : bool, default False, deprecated
             If True, use the `read_particle_file` method from c++ module. This might be faster
             but only accepts file format of `lammps-dump` type with a particular header layout.
             Also `compressed` keyword doesnt work anymore. This keyword is deprecated and only
@@ -610,16 +612,11 @@ class System(pc.System):
         """
         if format == 'lammps-dump':
             if os.path.exists(filename):
-                filename = unicode(filename, "utf-8")
-                if not use_c:
-                    atoms, boxdims = ptp.read_lammps_dump(filename, compressed=compressed)
-                    pc.System.assign_particles(self, atoms, boxdims)
-                else:
-                    pc.System.read_inputfile(self, filename)
+                atoms, boxdims = ptp.read_lammps_dump(filename, compressed=compressed)
+                pc.System.assign_particles(self, atoms, boxdims)
         
         elif format == 'poscar':
             if os.path.exists(filename):
-                filename = unicode(filename, "utf-8")
                 atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
                 pc.System.assign_particles(self, atoms, boxdims)
 

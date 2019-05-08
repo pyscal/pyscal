@@ -4,7 +4,6 @@ This file contains the methods for processing of a trajectory
 """
 import pybop.ccore as pc
 import numpy as np
-import io
 import gzip
 
 #functions that are not wrapped from C++
@@ -42,11 +41,9 @@ def read_lammps_dump(infile, compressed = False):
     #first depending on if the extension is .gz - use zipped read
     raw = infile.split('.')
     if raw[-1] == 'gz' or  compressed:
-        gz = gzip.open(infile,'rb')
-        f = io.BufferedReader(gz)            
+        f = gzip.open(infile,'rt')          
     else:
-        gz = open(infile,'r')
-        f = gz
+        f = open(infile,'r')
 
     #now go through the file line by line            
     paramsread = False
@@ -123,11 +120,9 @@ def read_poscar(infile, compressed = False):
     """
     raw = infile.split('.')
     if raw[-1] == 'gz' or  compressed:
-        gz = gzip.open(infile,'rb')
-        f = io.BufferedReader(gz)            
+        f = gzip.open(infile,'rt')            
     else:
-        gz = open(infile,'r')
-        f = gz
+        f = open(infile,'r')
     
     data = []
     for line in f:

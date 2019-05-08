@@ -87,5 +87,9 @@ setup(
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    install_requires=['numpy','dask[complete]']
+    install_requires=['numpy','dask[complete]'],
+    classifiers=[
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 2',
+    ]
 )
