@@ -1,3 +1,4 @@
+
 dist: xenial
 language: python
 jobs:
@@ -8,4 +9,10 @@ install:
   - pip install -r requirements_dev.txt
   - pip install -e .
 script:
-  - pytest tests/
+  - pytest --cov-report term-missing --cov=pybop tests/
+
+env:
+  - CODECOV_TOKEN="9a576708-79d8-4899-880b-8aa1124531e1"
+
+after_success:
+  - codecov
