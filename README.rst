@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&branch=master)](https://travis-ci.com/srmnitc/pybop)
+
 pybop
 =================================
 complete documentation with examples available `here <https://srmnitc.github.io/pybop/index.html>`_.
