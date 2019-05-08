@@ -2,6 +2,9 @@
 .. image:: https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&branch=master
     :alt: my-picture1
 
+.. image:: https://codecov.io/gh/srmnitc/pybop/branch/master/graph/badge.svg?token=tzM81RBcYQ
+  :target: https://codecov.io/gh/srmnitc/pybop
+  
 pybop
 =================================
 complete documentation with examples available `here <https://srmnitc.github.io/pybop/index.html>`_.
