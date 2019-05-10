@@ -167,6 +167,7 @@ class System{
         void YLM(int , int , double , double , double &, double &);
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors_normal();
+        void get_all_neighbors_adaptive(int, double);
         void get_all_neighbors_voronoi();
         void reset_all_neighbors();
         void calculate_complexQLM_6();
