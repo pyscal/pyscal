@@ -17,46 +17,34 @@
   
 
   
-  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'1.0.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="_static/jquery.js"></script>
-        <script type="text/javascript" src="_static/underscore.js"></script>
-        <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
 
+  
+  
     
 
   
+
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Examples" href="examples.html" />
     <link rel="prev" title="Getting started" href="gettingstarted.html" /> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -1000,20 +988,29 @@ been found. Otherwise it returns the default values.</p>
 
 <dl class="method">
 <dt id="pybop.core.System.get_neighbors">
-<code class="descname">get_neighbors</code><span class="sig-paren">(</span><em>method='cutoff'</em>, <em>cutoff=None</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_neighbors" title="Permalink to this definition">¶</a></dt>
-<dd><p>Find neighbors of all atoms in the <cite>System</cite>. There are two methods to do this, the
+<code class="descname">get_neighbors</code><span class="sig-paren">(</span><em>method='cutoff'</em>, <em>cutoff=None</em>, <em>nlimit=6</em>, <em>threshold=1.21</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_neighbors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_neighbors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find neighbors of all atoms in the <cite>System</cite>. There are few methods to do this, the
 traditional approach being the one in which the neighbors of an atom are the ones that lie
 in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
 that share a Voronoi polyhedra face with the host atoms are considered its neighbors.</p>
+<p>Finally there is also an adaptive cutoff method if <cite>cutoff</cite> is specified as <cite>‘adaptive’</cite> or 0.
+In this method, the six closest atoms to the
+host atom are found and a cutoff distance is determined as threshold*(1/nlimit)*sum(r_ij).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>method</strong> (<cite>cutoff</cite> or <cite>voronoi</cite>, default: <cite>cutoff</cite>) – <cite>cutoff</cite> method finds atoms within a specified cutoff distance of the host atom
+<li><strong>method</strong> (<cite>cutoff</cite> or <cite>voronoi</cite> or <cite>adaptive-cutoff</cite>, default: <cite>cutoff</cite>) – <cite>cutoff</cite> method finds atoms within a specified cutoff distance of the host atom
 <cite>voronoi</cite> method finds atoms that share a Voronoi polyhedra face with the host atom.</li>
-<li><strong>cutoff</strong> (<em>float</em>) – the cutoff distance to be used for the <cite>cutoff</cite> based neighbor calculation method
-described above.</li>
+<li><strong>cutoff</strong> (float or <cite>adaptive</cite>) – the cutoff distance to be used for the <cite>cutoff</cite> based neighbor calculation method
+described above.
+If the value is specified as 0 or <cite>‘adaptive’</cite>, the <cite>adaptive-cutoff</cite> method is used.</li>
+<li><strong>nlimit</strong> (<em>int</em>) – only used if <cite>cutoff=’adaptive’</cite>. The number of atoms used to calculate the adaptive
+cutoff.</li>
+<li><strong>threshold</strong> (<em>float</em>) – only used if <cite>cutoff=’adaptive’</cite>. The threshold for the adaptive cutoff. If the average
+distance between host atom and <cite>nlimit</cite> neighbors of it is <cite>a</cite>, and <cite>threshold</cite> is 2, then
+host atom will have neighbors between <cite>a</cite> and <cite>2a</cite>.</li>
 <li><strong>filter</strong> (string - <cite>None</cite> or <cite>type</cite>, default None) – apply a filter to nearest neighbor calculation. If the <cite>filter</cite> keyword is set to
 <cite>type</cite>, only atoms of the same type would be included in the neighbor calculations.</li>
 </ul>
@@ -1061,24 +1058,27 @@ If False, return the non averaged ones</li>
 
 <dl class="method">
 <dt id="pybop.core.System.read_inputfile">
-<code class="descname">read_inputfile</code><span class="sig-paren">(</span><em>filename</em>, <em>format='lammps-dump'</em>, <em>use_c=False</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.read_inputfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.read_inputfile" title="Permalink to this definition">¶</a></dt>
+<code class="descname">read_inputfile</code><span class="sig-paren">(</span><em>filename</em>, <em>format='lammps-dump'</em>, <em>frame=-1</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.read_inputfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.read_inputfile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Read input file containing the information of a time slice from a molecular dynamics
 simulation.</p>
 <p>The format of the input file is specified using the <cite>format</cite> keyword. Currently only
 a <cite>lammps-dump</cite> file is supported. However, this restriction can easily be overcome
 using the <cite>assign_particles</cite> method from system where a list of atoms and box vectors
 are directly provided to the system.</p>
+<p><cite>use_c</cite> is no deprecated and no longer used to ease transition to python 3.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>filename</strong> (<em>string</em>) – name of the input file to be read in</li>
-<li><strong>format</strong> (<cite>lammps-dump</cite>) – format of the input file</li>
+<li><strong>format</strong> (string, <cite>lammps-dump</cite> or <cite>poscar</cite>) – format of the input file</li>
 <li><strong>compressed</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, force to read a <cite>gz</cite> compressed format. However, if a file ends with <cite>.gz</cite>
 extension, it is automatically treated as a compressed file and this keyword is not
 necessary</li>
-<li><strong>use_c</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, use the <cite>read_particle_file</cite> method from c++ module. This might be faster
+<li><strong>frame</strong> (<em>int</em>) – If the trajectory contains more than one time slice, the slice can be specified
+using the <cite>frame</cite> option. Alert: works only with <cite>lammps-dump</cite> format.</li>
+<li><strong>use_c</strong> (<em>bool</em><em>, </em><em>default False</em><em>, </em><em>deprecated</em>) – If True, use the <cite>read_particle_file</cite> method from c++ module. This might be faster
 but only accepts file format of <cite>lammps-dump</cite> type with a particular header layout.
 Also <cite>compressed</cite> keyword doesnt work anymore. This keyword is deprecated and only
 kept for compatibility reasons. Use of this keyword is not recommended.</li>
@@ -1291,6 +1291,66 @@ and upper limits of the simulation box in x, y and z directions respectively.</l
 </dd></dl>
 
 <dl class="function">
+<dt id="pybop.traj_process.read_poscar">
+<code class="descclassname">pybop.traj_process.</code><code class="descname">read_poscar</code><span class="sig-paren">(</span><em>infile</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/traj_process.html#read_poscar"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.traj_process.read_poscar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to read a POSCAR format. Zipped files which end with a <cite>.gz</cite> can also be
+read automatically. However, if the file does not end with a <cite>.gz</cite> extension,
+keyword <cite>compressed = True</cite> can also be used.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>infile</strong> (<em>string</em>) – name of the input file</li>
+<li><strong>compressed</strong> (<em>bool</em><em>, </em><em>Default False</em>) – force to read a <cite>gz</cite> zipped file. If the filename ends with <cite>.gz</cite>, use of this keyword is not
+necessary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>atoms</strong> (list of <cite>Atom</cite> objects) – list of all atoms as created by user input</li>
+<li><strong>box</strong> (<em>list of list of floats</em>) – list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
+and upper limits of the simulation box in x, y and z directions respectively.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span> <span class="o">=</span> <span class="n">read_poscar</span><span class="p">(</span><span class="s1">&#39;POSCAR&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span> <span class="o">=</span> <span class="n">read_poscar</span><span class="p">(</span><span class="s1">&#39;POSCAR.gz&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">atoms</span><span class="p">,</span> <span class="n">box</span> <span class="o">=</span> <span class="n">read_poscar</span><span class="p">(</span><span class="s1">&#39;POSCAR.dat&#39;</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pybop.traj_process.split_traj_lammps_dump">
+<code class="descclassname">pybop.traj_process.</code><code class="descname">split_traj_lammps_dump</code><span class="sig-paren">(</span><em>infile</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/traj_process.html#split_traj_lammps_dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.traj_process.split_traj_lammps_dump" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read in a LAMMPS dump trajectory file and convert it to individual time slices.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<em>string</em>) – name of input file</li>
+<li><strong>compressed</strong> (<em>bool</em><em>, </em><em>Default False</em>) – force to read a <cite>gz</cite> zipped file. If the filename ends with <cite>.gz</cite>, use of this keyword is not
+necessary.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>snaps</strong> – a list of filenames which contain individual frames from the main trajectory.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of strings</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="pybop.traj_process.write_structure">
 <code class="descclassname">pybop.traj_process.</code><code class="descname">write_structure</code><span class="sig-paren">(</span><em>sys</em>, <em>outfile</em>, <em>format='lammps-dump'</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/traj_process.html#write_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.traj_process.write_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the state of the system to a trajectory file.</p>
@@ -1334,7 +1394,7 @@ is supported.</li>
         <a href="examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="gettingstarted.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="gettingstarted.html" class="btn btn-neutral" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -1360,16 +1420,27 @@ is supported.</li>
   
 
 
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="_static/js/theme.js"></script>
+
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

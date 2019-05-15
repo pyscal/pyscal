@@ -1,5 +1,5 @@
-src
-===
+pybop
+=====
 
 .. toctree::
    :maxdepth: 4

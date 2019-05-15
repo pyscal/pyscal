@@ -569,7 +569,7 @@ class System(pc.System):
     def __init__(self):
         self.initialized = True
 
-    def read_inputfile(self, filename, format="lammps-dump", compressed = False):
+    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False):
         """
         
         Read input file containing the information of a time slice from a molecular dynamics
@@ -587,13 +587,17 @@ class System(pc.System):
         filename : string
             name of the input file to be read in
 
-        format : `lammps-dump`
+        format : string, `lammps-dump` or `poscar`
             format of the input file
 
         compressed : bool, default False
             If True, force to read a `gz` compressed format. However, if a file ends with `.gz`
             extension, it is automatically treated as a compressed file and this keyword is not
             necessary
+
+        frame : int
+            If the trajectory contains more than one time slice, the slice can be specified
+            using the `frame` option. Alert: works only with `lammps-dump` format. 
 
         use_c : bool, default False, deprecated
             If True, use the `read_particle_file` method from c++ module. This might be faster
@@ -611,10 +615,23 @@ class System(pc.System):
         assign_particles
         """
         if format == 'lammps-dump':
-            if os.path.exists(filename):
+            if frame != -1:
+                #split the traj and returns set of filenames
+                filenames = ptp.split_traj_lammps_dump(filename, compressed=compressed)
+                #reassign filename
+                filename = filenames[frame]
+                if os.path.exists(filename):
+                    atoms, boxdims = ptp.read_lammps_dump(filename, compressed=compressed)
+                    pc.System.assign_particles(self, atoms, boxdims)
+                #now remove filenames
+                for file in filenames:
+                    os.remove(file)
+
+            elif os.path.exists(filename):
                 atoms, boxdims = ptp.read_lammps_dump(filename, compressed=compressed)
                 pc.System.assign_particles(self, atoms, boxdims)
-        
+
+
         elif format == 'poscar':
             if os.path.exists(filename):
                 atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
@@ -1116,6 +1133,8 @@ class System(pc.System):
         atomc.set_type(atom.get_type())
         atomc.set_vorovector(atom.get_vorovector())
         return atomc
+
+
 
 
 

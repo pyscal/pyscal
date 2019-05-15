@@ -17,44 +17,32 @@
   
 
   
-  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'../../',
-              VERSION:'1.0.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    
-    <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
+  
+  
     
 
   
+
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
+
+  
+  <script src="../../_static/js/modernizr.min.js"></script>
+
 </head>
 
 <body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
+
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search">
           
 
           
@@ -726,7 +714,7 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
 
-<div class="viewcode-block" id="System.read_inputfile"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.read_inputfile">[docs]</a>    <span class="k">def</span> <span class="nf">read_inputfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lammps-dump&quot;</span><span class="p">,</span> <span class="n">use_c</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="System.read_inputfile"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.read_inputfile">[docs]</a>    <span class="k">def</span> <span class="nf">read_inputfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lammps-dump&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        </span>
 <span class="sd">        Read input file containing the information of a time slice from a molecular dynamics</span>
@@ -736,13 +724,15 @@
 <span class="sd">        a `lammps-dump` file is supported. However, this restriction can easily be overcome </span>
 <span class="sd">        using the `assign_particles` method from system where a list of atoms and box vectors </span>
 <span class="sd">        are directly provided to the system.</span>
+
+<span class="sd">        `use_c` is no deprecated and no longer used to ease transition to python 3. </span>
 <span class="sd">        </span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filename : string</span>
 <span class="sd">            name of the input file to be read in</span>
 
-<span class="sd">        format : `lammps-dump`</span>
+<span class="sd">        format : string, `lammps-dump` or `poscar`</span>
 <span class="sd">            format of the input file</span>
 
 <span class="sd">        compressed : bool, default False</span>
@@ -750,7 +740,11 @@
 <span class="sd">            extension, it is automatically treated as a compressed file and this keyword is not</span>
 <span class="sd">            necessary</span>
 
-<span class="sd">        use_c : bool, default False</span>
+<span class="sd">        frame : int</span>
+<span class="sd">            If the trajectory contains more than one time slice, the slice can be specified</span>
+<span class="sd">            using the `frame` option. Alert: works only with `lammps-dump` format. </span>
+
+<span class="sd">        use_c : bool, default False, deprecated</span>
 <span class="sd">            If True, use the `read_particle_file` method from c++ module. This might be faster</span>
 <span class="sd">            but only accepts file format of `lammps-dump` type with a particular header layout.</span>
 <span class="sd">            Also `compressed` keyword doesnt work anymore. This keyword is deprecated and only</span>
@@ -766,13 +760,28 @@
 <span class="sd">        assign_particles</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;lammps-dump&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                <span class="n">filename</span> <span class="o">=</span> <span class="n">unicode</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">use_c</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">frame</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="c1">#split the traj and returns set of filenames</span>
+                <span class="n">filenames</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">split_traj_lammps_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">)</span>
+                <span class="c1">#reassign filename</span>
+                <span class="n">filename</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
                     <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_lammps_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">)</span>
                     <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">read_inputfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+                <span class="c1">#now remove filenames</span>
+                <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_lammps_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">)</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">)</span>
+
+
+        <span class="k">elif</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;poscar&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_poscar</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">)</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="System.assign_atoms"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.assign_atoms">[docs]</a>    <span class="k">def</span> <span class="nf">assign_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">box</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1035,23 +1044,37 @@
         <span class="n">atom2c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">copy_atom_to_catom</span><span class="p">(</span><span class="n">atom2</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_absdistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atom1c</span><span class="p">,</span> <span class="n">atom2c</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="System.get_neighbors"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.get_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;cutoff&quot;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="System.get_neighbors"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.get_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">get_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;cutoff&quot;</span><span class="p">,</span> <span class="n">cutoff</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nlimit</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">1.21</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        </span>
-<span class="sd">        Find neighbors of all atoms in the `System`. There are two methods to do this, the </span>
+<span class="sd">        Find neighbors of all atoms in the `System`. There are few methods to do this, the </span>
 <span class="sd">        traditional approach being the one in which the neighbors of an atom are the ones that lie</span>
 <span class="sd">        in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms</span>
 <span class="sd">        that share a Voronoi polyhedra face with the host atoms are considered its neighbors.</span>
 
+<span class="sd">        Finally there is also an adaptive cutoff method if `cutoff` is specified as `&#39;adaptive&#39;` or 0. </span>
+<span class="sd">        In this method, the six closest atoms to the</span>
+<span class="sd">        host atom are found and a cutoff distance is determined as threshold*(1/nlimit)*sum(r_ij).</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        method : `cutoff` or `voronoi`, default: `cutoff`</span>
+<span class="sd">        method : `cutoff` or `voronoi` or `adaptive-cutoff`, default: `cutoff`</span>
 <span class="sd">            `cutoff` method finds atoms within a specified cutoff distance of the host atom</span>
 <span class="sd">            `voronoi` method finds atoms that share a Voronoi polyhedra face with the host atom.</span>
 
-<span class="sd">        cutoff : float</span>
+<span class="sd">        cutoff : float or `adaptive`</span>
 <span class="sd">            the cutoff distance to be used for the `cutoff` based neighbor calculation method</span>
 <span class="sd">            described above.</span>
+<span class="sd">            If the value is specified as 0 or `&#39;adaptive&#39;`, the `adaptive-cutoff` method is used.</span>
+<span class="sd">        </span>
+<span class="sd">        nlimit : int</span>
+<span class="sd">            only used if `cutoff=&#39;adaptive&#39;`. The number of atoms used to calculate the adaptive</span>
+<span class="sd">            cutoff.</span>
+
+<span class="sd">        threshold : float</span>
+<span class="sd">            only used if `cutoff=&#39;adaptive&#39;`. The threshold for the adaptive cutoff. If the average</span>
+<span class="sd">            distance between host atom and `nlimit` neighbors of it is `a`, and `threshold` is 2, then</span>
+<span class="sd">            host atom will have neighbors between `a` and `2a`.</span>
 
 <span class="sd">        filter : string - `None` or `type`, default None</span>
 <span class="sd">            apply a filter to nearest neighbor calculation. If the `filter` keyword is set to</span>
@@ -1074,12 +1097,15 @@
             <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">set_filter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;cutoff&#39;</span><span class="p">:</span>
-            <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">set_neighbordistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span>
-            <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_all_neighbors_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cutoff</span><span class="o">==</span><span class="s1">&#39;adaptive&#39;</span> <span class="ow">or</span> <span class="n">cutoff</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_all_neighbors_adaptive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nlimit</span><span class="p">,</span> <span class="n">threshold</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>    
+                <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">set_neighbordistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cutoff</span><span class="p">)</span>
+                <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_all_neighbors_normal</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;voronoi&#39;</span><span class="p">:</span>
             <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_all_neighbors_voronoi</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
-
+            
 
 <div class="viewcode-block" id="System.reset_neighbors"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.reset_neighbors">[docs]</a>    <span class="k">def</span> <span class="nf">reset_neighbors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1216,7 +1242,7 @@
         <span class="n">atom</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_x</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_cluster</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_cluster</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_neighbors</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">())</span>
-        <span class="n">atom</span><span class="o">.</span><span class="n">set_neighborweights</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">())</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">set_neighborweights</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_neighborweights</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_allq</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_allq</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_allaq</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_allaq</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
@@ -1244,7 +1270,7 @@
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_cluster</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_cluster</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_neighbors</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">())</span>
-        <span class="n">atomc</span><span class="o">.</span><span class="n">set_neighborweights</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">())</span>
+        <span class="n">atomc</span><span class="o">.</span><span class="n">set_neighborweights</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_neighborweights</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_allq</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_allq</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_allaq</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_allaq</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_id</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">())</span>
@@ -1252,6 +1278,8 @@
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_type</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_type</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_vorovector</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_vorovector</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">atomc</span></div></div>
+
+
 
 
 
@@ -1319,16 +1347,27 @@
   
 
 
+  
+
+    
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+  
+
+  <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
   <script type="text/javascript">
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
