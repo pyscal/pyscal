@@ -197,7 +197,7 @@ def read_poscar(infile, compressed = False):
 
     return atoms, boxdims
 
-def write_structure(sys, outfile, format = 'lammps-dump', compressed = False):
+def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, customkey=None, customvals=None):
     """
     Write the state of the system to a trajectory file. 
 
@@ -238,11 +238,18 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False):
     dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
     dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
     dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
-    dump.write("ITEM: ATOMS id type x y z\n")
-    for atom in atoms:
+    if customkey != None:
+        title_str = "ITEM: ATOMS id type x y z %s\n"% customkey
+    else:
+        title_str = "ITEM: ATOMS id type x y z\n"
+    dump.write(title_str)
+    for cc, atom in enumerate(atoms):
         pos = atom.get_x()
-        dump.write(("%d %d %f %f %f\n") %
-                   (atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2]))
+        if customkey != None:
+            atomline = ("%d %d %f %f %f %d\n")%(atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2], customvals[cc])
+        else:
+            atomline = ("%d %d %f %f %f\n")%(atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2])
+        dump.write(atomline)
 
     dump.close()
 
