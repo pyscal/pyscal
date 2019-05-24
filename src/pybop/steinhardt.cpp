@@ -936,6 +936,37 @@ void System::find_clusters(){
         }
 } 
 
+//we have to test with a recursive algorithm - to match the values that is presented
+//in Grisells code.
+void System::harvest_cluster(const int ti, const int clusterindex){
+
+    int neigh;
+    for(int i=0; i<atoms[ti].n_neighbors; i++){
+        neigh = atoms[ti].neighbors[i];
+        if(!atoms[neigh].issolid) continue;
+        if (atoms[neigh].belongsto==-1){
+            atoms[neigh].belongsto = clusterindex;
+            harvest_cluster(neigh, clusterindex);
+        }
+    }
+}
+
+void System::find_clusters_recursive(){
+
+    int clusterindex;
+    clusterindex = 0;
+
+    for (int ti= 0;ti<nop;ti++){
+        if (!atoms[ti].issolid) continue;
+        if (atoms[ti].belongsto==-1){
+            clusterindex += 1;
+            atoms[ti].belongsto = clusterindex;
+            harvest_cluster(ti, clusterindex);
+        }
+
+    }
+}
+
 
 int System::largest_cluster(){
 
@@ -1003,7 +1034,8 @@ int System::calculate_nucsize()
 
         find_solids();
         //cout<<"step 4"<<endl;
-        find_clusters();
+        //find_clusters();
+        find_clusters_recursive();
         //cout<<"step 5"<<endl;
         greatestbelongsto = largest_cluster();
         //cout<<"step 6"<<endl;

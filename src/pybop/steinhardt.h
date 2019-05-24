@@ -187,6 +187,8 @@ class System{
         int cluster_criteria(int,int );
         void find_solids();
         void find_clusters();
+        void harvest_cluster(const int, const int);
+        void find_clusters_recursive();
         int largest_cluster();
         void set_nucsize_parameters(double,int,double,double);
         //void set_inputfile(string);
