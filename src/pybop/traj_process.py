@@ -48,6 +48,7 @@ def read_lammps_dump(infile, compressed = False):
     #now go through the file line by line            
     paramsread = False
     atoms = []
+    triclinic = False
 
     for count, line in enumerate(f):
         if not paramsread:
@@ -57,11 +58,18 @@ def read_lammps_dump(infile, compressed = False):
             #box dims in lines 5,6,7
             elif count == 5:
                 raw = line.strip().split()
+                if len(raw) == 3:
+                    xy = float(raw[2])
                 boxx = [float(raw[0]), float(raw[1])]
             elif count == 6:
+                if len(raw) == 3:
+                    xz = float(raw[2])
                 raw = line.strip().split()
                 boxy = [float(raw[0]), float(raw[1])]
             elif count == 7:
+                if len(raw) == 3:
+                    yz = float(raw[2])
+                    triclinic = True
                 raw = line.strip().split()
                 boxz = [float(raw[0]), float(raw[1])]
                 boxdims = [boxx, boxy, boxz]
