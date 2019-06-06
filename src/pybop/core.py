@@ -568,6 +568,7 @@ class System(pc.System):
     """
     def __init__(self):
         self.initialized = True
+        pc.System.__init__(self)
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False):
         """

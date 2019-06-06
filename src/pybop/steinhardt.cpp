@@ -184,6 +184,7 @@ void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> box
     //boxd is a vector of 6 values - [xlow, xhigh, ylow, yhigh, zlow, zhigh]
     nop = atomitos.size();
     atoms = new Atom[nop];
+    //triclinic = 0;
 
     boxdims[0][0] = boxd[0][0];
     boxdims[0][1] = boxd[0][1];
