@@ -146,7 +146,7 @@
 <span></span><span class="kn">import</span> <span class="nn">pybop.ccore</span> <span class="k">as</span> <span class="nn">pc</span>
 <span class="kn">import</span> <span class="nn">pybop.traj_process</span> <span class="k">as</span> <span class="nn">ptp</span>
 <span class="kn">import</span> <span class="nn">os</span>
-
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Definitions of class Atom.</span>
@@ -766,17 +766,26 @@
                 <span class="c1">#reassign filename</span>
                 <span class="n">filename</span> <span class="o">=</span> <span class="n">filenames</span><span class="p">[</span><span class="n">frame</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                    <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_lammps_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">)</span>
+                    <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">triclinic</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_lammps_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">,</span> <span class="n">check_triclinic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">box_vectors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">triclinic</span><span class="p">:</span>
+                        <span class="c1">#we have to input rotation matrix and the inverse rotation matrix</span>
+                        <span class="n">rot</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">T</span>
+                        <span class="n">rotinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
+                        <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_triclinic_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotinv</span><span class="p">)</span>
                 <span class="c1">#now remove filenames</span>
                 <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
 
             <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_lammps_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">)</span>
+                <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">triclinic</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_lammps_dump</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">,</span> <span class="n">check_triclinic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">box_vectors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">)</span>
-
-
+                <span class="k">if</span> <span class="n">triclinic</span><span class="p">:</span>
+                    <span class="c1">#we have to input rotation matrix and the inverse rotation matrix</span>
+                    <span class="n">rot</span> <span class="o">=</span> <span class="n">box</span><span class="o">.</span><span class="n">T</span>
+                    <span class="n">rotinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
+                    <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_triclinic_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rot</span><span class="p">,</span> <span class="n">rotinv</span><span class="p">)</span>
+                
         <span class="k">elif</span> <span class="nb">format</span> <span class="o">==</span> <span class="s1">&#39;poscar&#39;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
                 <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span> <span class="o">=</span> <span class="n">ptp</span><span class="o">.</span><span class="n">read_poscar</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">compressed</span><span class="o">=</span><span class="n">compressed</span><span class="p">)</span>

@@ -1255,7 +1255,7 @@ and upper limits of the simulation box in x, y and z directions respectively.</l
 <p>This file contains the methods for processing of a trajectory</p>
 <dl class="function">
 <dt id="pybop.traj_process.read_lammps_dump">
-<code class="descclassname">pybop.traj_process.</code><code class="descname">read_lammps_dump</code><span class="sig-paren">(</span><em>infile</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/traj_process.html#read_lammps_dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.traj_process.read_lammps_dump" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pybop.traj_process.</code><code class="descname">read_lammps_dump</code><span class="sig-paren">(</span><em>infile</em>, <em>compressed=False</em>, <em>check_triclinic=False</em>, <em>box_vectors=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/traj_process.html#read_lammps_dump"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.traj_process.read_lammps_dump" title="Permalink to this definition">¶</a></dt>
 <dd><p>Function to read a lammps dump file format - single time slice. This is essentially the same as
 C++ read, but can have variable headers, reads in type and so on. So if verstility is required,
 this function is better. C++ version might be faster.
@@ -1269,13 +1269,19 @@ end with a <cite>.gz</cite> extension, keyword <cite>compressed = True</cite> ca
 <li><strong>infile</strong> (<em>string</em>) – name of the input file</li>
 <li><strong>compressed</strong> (<em>bool</em><em>, </em><em>Default False</em>) – force to read a <cite>gz</cite> zipped file. If the filename ends with <cite>.gz</cite>, use of this keyword is not
 necessary.</li>
+<li><strong>check_triclinic</strong> (<em>bool</em><em>, </em><em>Default false</em>) – If true check if the sim box is triclinic.</li>
+<li><strong>box_vectors</strong> (<em>bool</em><em>, </em><em>default False</em>) – If true, return the full box vectors along with <cite>boxdims</cite> which gives upper and lower bounds.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
 <li><strong>atoms</strong> (list of <cite>Atom</cite> objects) – list of all atoms as created by user input</li>
-<li><strong>box</strong> (<em>list of list of floats</em>) – list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
-and upper limits of the simulation box in x, y and z directions respectively.</li>
+<li><strong>boxdims</strong> (<em>list of list of floats</em>) – The dimensions of the box. This is of the form [[xlo, xhi],[ylo, yhi],[zlo, zhi]] where <cite>lo</cite> and <cite>hi</cite> are
+the upper and lower bounds of the simulation box along each axes. For triclinic boxes, this is scaled to
+[0, scalar length of the vector].</li>
+<li><strong>box</strong> (<em>list of list of floats</em>) – list of the type [[x1, x2, x3], [y1, y2, y3], [zz1, z2, z3]] which are the box vectors. Only returned if
+<cite>box_vectors</cite> is set to True.</li>
+<li><strong>triclinic</strong> (<em>bool</em>) – True if the box is triclinic. Only returned if <cite>check_triclinic</cite> is set to True</li>
 </ul>
 </p>
 </td>
@@ -1352,7 +1358,7 @@ necessary.</li>
 
 <dl class="function">
 <dt id="pybop.traj_process.write_structure">
-<code class="descclassname">pybop.traj_process.</code><code class="descname">write_structure</code><span class="sig-paren">(</span><em>sys</em>, <em>outfile</em>, <em>format='lammps-dump'</em>, <em>compressed=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/traj_process.html#write_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.traj_process.write_structure" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pybop.traj_process.</code><code class="descname">write_structure</code><span class="sig-paren">(</span><em>sys</em>, <em>outfile</em>, <em>format='lammps-dump'</em>, <em>compressed=False</em>, <em>customkey=None</em>, <em>customvals=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/traj_process.html#write_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.traj_process.write_structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the state of the system to a trajectory file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

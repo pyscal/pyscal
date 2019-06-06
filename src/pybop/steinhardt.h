@@ -194,6 +194,7 @@ class System{
         //void set_inputfile(string);
         void set_neighbordistance(double);
         void assign_particles( vector<Atom>, vector<vector<double>>);
+        void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
         void get_largest_cluster_atoms();
         //functions to set the list of reqd qs
         //again, error checking would be amazing here.
@@ -213,10 +214,16 @@ class System{
         //array for box
         double boxdims[3][2];
         string inputfile;
+        
         double neighbordistance;
+
         double threshold;
         double avgthreshold;
         int maxclusterid;
+
+        double rot[3][3];
+        double rotinv[3][3];
+        int triclinic;
 
         //variables for a filter
         int filter;

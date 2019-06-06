@@ -7,7 +7,7 @@ import numpy as np
 import gzip
 
 #functions that are not wrapped from C++
-def read_lammps_dump(infile, compressed = False):
+def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False):
     """
     Function to read a lammps dump file format - single time slice. This is essentially the same as 
     C++ read, but can have variable headers, reads in type and so on. So if verstility is required,
@@ -22,14 +22,24 @@ def read_lammps_dump(infile, compressed = False):
     compressed : bool, Default False
         force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
         necessary.
+    check_triclinic : bool, Default false
+        If true check if the sim box is triclinic.
+    box_vectors : bool, default False
+        If true, return the full box vectors along with `boxdims` which gives upper and lower bounds.
 
     Returns
     -------
     atoms : list of `Atom` objects
         list of all atoms as created by user input
+    boxdims : list of list of floats
+        The dimensions of the box. This is of the form [[xlo, xhi],[ylo, yhi],[zlo, zhi]] where `lo` and `hi` are
+        the upper and lower bounds of the simulation box along each axes. For triclinic boxes, this is scaled to
+        [0, scalar length of the vector].
     box : list of list of floats
-        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
-        and upper limits of the simulation box in x, y and z directions respectively.
+        list of the type [[x1, x2, x3], [y1, y2, y3], [zz1, z2, z3]] which are the box vectors. Only returned if
+        `box_vectors` is set to True.
+    triclinic : bool
+        True if the box is triclinic. Only returned if `check_triclinic` is set to True
 
     Examples
     --------
@@ -49,6 +59,7 @@ def read_lammps_dump(infile, compressed = False):
     paramsread = False
     atoms = []
     triclinic = False
+    volume_fraction = 1.00
 
     for count, line in enumerate(f):
         if not paramsread:
@@ -58,21 +69,23 @@ def read_lammps_dump(infile, compressed = False):
             #box dims in lines 5,6,7
             elif count == 5:
                 raw = line.strip().split()
+                boxx = [float(raw[0]), float(raw[1])]
                 if len(raw) == 3:
                     xy = float(raw[2])
-                boxx = [float(raw[0]), float(raw[1])]
             elif count == 6:
-                if len(raw) == 3:
-                    xz = float(raw[2])
                 raw = line.strip().split()
                 boxy = [float(raw[0]), float(raw[1])]
+                if len(raw) == 3:
+                    xz = float(raw[2])
             elif count == 7:
+                raw = line.strip().split()
+                boxz = [float(raw[0]), float(raw[1])]
                 if len(raw) == 3:
                     yz = float(raw[2])
                     triclinic = True
-                raw = line.strip().split()
-                boxz = [float(raw[0]), float(raw[1])]
-                boxdims = [boxx, boxy, boxz]
+                    tilts = [xy, xz, yz]
+                #boxdims = [boxx, boxy, boxz]
+
             #header is here
             elif count == 8:
                 raw = line.strip().split()
@@ -94,7 +107,48 @@ def read_lammps_dump(infile, compressed = False):
     #close files
     f.close()
 
-    return atoms, boxdims
+    if triclinic:
+        #process triclinic box
+        amin = min([0.0, tilts[0], tilts[1] ,tilts[0]+tilts[1]])
+        amax = max([0.0, tilts[0], tilts[1] ,tilts[0]+tilts[1]])
+        bmin = min([0.0, tilts[2]])
+        bmax = max([0.0, tilts[2]])
+        xlo = boxx[0] - amin
+        xhi = boxx[1] - amax
+        ylo = boxy[0] - bmin
+        yhi = boxy[1] - bmax
+        zlo = boxz[0]
+        zhi = boxz[1]
+        
+        #triclinic cell
+        a = np.array([xhi-xlo, 0, 0])
+        b = np.array([tilts[0], yhi-ylo, 0])
+        c = np.array([tilts[1], tilts[2], zhi-zlo])
+
+        rot = np.array([a, b, c]).T
+        rotinv = np.linalg.inv(rot)
+        ortho_origin = np.array([boxx[0], boxy[0], boxz[0]])
+
+        for atom in atoms:
+            #correct zero of the atomic positions (shift box to origin)
+            dist = np.array(atom.get_x()) - ortho_origin
+            atom.set_x(dist)
+
+        #finally change boxdims - to triclinic box size
+        box = np.array([a, b, c])
+        boxdims = np.array([[0, np.sqrt(np.sum(a**2))],[0, np.sqrt(np.sum(b**2))],[0, np.sqrt(np.sum(c**2))]])
+    else:
+        box = np.array([[boxx[1]-boxx[0], 0, 0],[0, boxy[1]-boxy[0], 0],[0, 0, boxz[1]-boxz[0]]])
+        boxdims = np.array([[boxx[0], boxx[1]],[boxy[0], boxy[1]],[boxz[0], boxz[1]]])
+    
+    if box_vectors and check_triclinic:
+        return atoms, boxdims, box, triclinic
+    elif box_vectors:
+        return atoms, boxdims, box
+    elif check_triclinic:
+        return atoms, boxdims, triclinic
+    else:
+        return atoms, boxdims
 
 def read_poscar(infile, compressed = False):
     """

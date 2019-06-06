@@ -79,6 +79,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("find_clusters",&System::find_clusters)
         .def("find_largest_cluster",&System::largest_cluster)
         .def("set_filter",&System::sfilter)
+        .def("assign_triclinic_params",&System::assign_triclinic_params)
         ;
 
 

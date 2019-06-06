@@ -152,7 +152,7 @@
 <span class="kn">import</span> <span class="nn">gzip</span>
 
 <span class="c1">#functions that are not wrapped from C++</span>
-<div class="viewcode-block" id="read_lammps_dump"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.read_lammps_dump">[docs]</a><span class="k">def</span> <span class="nf">read_lammps_dump</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="read_lammps_dump"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.read_lammps_dump">[docs]</a><span class="k">def</span> <span class="nf">read_lammps_dump</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">check_triclinic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">box_vectors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Function to read a lammps dump file format - single time slice. This is essentially the same as </span>
 <span class="sd">    C++ read, but can have variable headers, reads in type and so on. So if verstility is required,</span>
@@ -167,14 +167,24 @@
 <span class="sd">    compressed : bool, Default False</span>
 <span class="sd">        force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not</span>
 <span class="sd">        necessary.</span>
+<span class="sd">    check_triclinic : bool, Default false</span>
+<span class="sd">        If true check if the sim box is triclinic.</span>
+<span class="sd">    box_vectors : bool, default False</span>
+<span class="sd">        If true, return the full box vectors along with `boxdims` which gives upper and lower bounds.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    atoms : list of `Atom` objects</span>
 <span class="sd">        list of all atoms as created by user input</span>
+<span class="sd">    boxdims : list of list of floats</span>
+<span class="sd">        The dimensions of the box. This is of the form [[xlo, xhi],[ylo, yhi],[zlo, zhi]] where `lo` and `hi` are</span>
+<span class="sd">        the upper and lower bounds of the simulation box along each axes. For triclinic boxes, this is scaled to</span>
+<span class="sd">        [0, scalar length of the vector].</span>
 <span class="sd">    box : list of list of floats</span>
-<span class="sd">        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower</span>
-<span class="sd">        and upper limits of the simulation box in x, y and z directions respectively.</span>
+<span class="sd">        list of the type [[x1, x2, x3], [y1, y2, y3], [zz1, z2, z3]] which are the box vectors. Only returned if</span>
+<span class="sd">        `box_vectors` is set to True.</span>
+<span class="sd">    triclinic : bool</span>
+<span class="sd">        True if the box is triclinic. Only returned if `check_triclinic` is set to True</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -193,6 +203,8 @@
     <span class="c1">#now go through the file line by line            </span>
     <span class="n">paramsread</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">triclinic</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">volume_fraction</span> <span class="o">=</span> <span class="mf">1.00</span>
 
     <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">paramsread</span><span class="p">:</span>
@@ -203,13 +215,22 @@
             <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
                 <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="n">boxx</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">xy</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
                 <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="n">boxy</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">xz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">7</span><span class="p">:</span>
                 <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="n">boxz</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span>
-                <span class="n">boxdims</span> <span class="o">=</span> <span class="p">[</span><span class="n">boxx</span><span class="p">,</span> <span class="n">boxy</span><span class="p">,</span> <span class="n">boxz</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">yz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                    <span class="n">triclinic</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">tilts</span> <span class="o">=</span> <span class="p">[</span><span class="n">xy</span><span class="p">,</span> <span class="n">xz</span><span class="p">,</span> <span class="n">yz</span><span class="p">]</span>
+                <span class="c1">#boxdims = [boxx, boxy, boxz]</span>
+
             <span class="c1">#header is here</span>
             <span class="k">elif</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
                 <span class="n">raw</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -231,7 +252,48 @@
     <span class="c1">#close files</span>
     <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span></div>
+    <span class="k">if</span> <span class="n">triclinic</span><span class="p">:</span>
+        <span class="c1">#process triclinic box</span>
+        <span class="n">amin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tilts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tilts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">tilts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">tilts</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">amax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tilts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tilts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">,</span><span class="n">tilts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">tilts</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+        <span class="n">bmin</span> <span class="o">=</span> <span class="nb">min</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tilts</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+        <span class="n">bmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">tilts</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+        <span class="n">xlo</span> <span class="o">=</span> <span class="n">boxx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">amin</span>
+        <span class="n">xhi</span> <span class="o">=</span> <span class="n">boxx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">amax</span>
+        <span class="n">ylo</span> <span class="o">=</span> <span class="n">boxy</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">bmin</span>
+        <span class="n">yhi</span> <span class="o">=</span> <span class="n">boxy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">bmax</span>
+        <span class="n">zlo</span> <span class="o">=</span> <span class="n">boxz</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">zhi</span> <span class="o">=</span> <span class="n">boxz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        
+        <span class="c1">#triclinic cell</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xhi</span><span class="o">-</span><span class="n">xlo</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">tilts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">yhi</span><span class="o">-</span><span class="n">ylo</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">tilts</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">tilts</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">zhi</span><span class="o">-</span><span class="n">zlo</span><span class="p">])</span>
+
+        <span class="n">rot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+        <span class="n">rotinv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">rot</span><span class="p">)</span>
+        <span class="n">ortho_origin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">boxx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxz</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+            <span class="c1">#correct zero of the atomic positions (shift box to origin)</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">())</span> <span class="o">-</span> <span class="n">ortho_origin</span>
+            <span class="n">atom</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
+
+        <span class="c1">#finally change boxdims - to triclinic box size</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span><span class="p">])</span>
+        <span class="n">boxdims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="p">))],[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">b</span><span class="o">**</span><span class="mi">2</span><span class="p">))],[</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">c</span><span class="o">**</span><span class="mi">2</span><span class="p">))]])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">box</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">boxx</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">boxx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="n">boxy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">boxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">boxz</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">boxz</span><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
+        <span class="n">boxdims</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">boxx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxx</span><span class="p">[</span><span class="mi">1</span><span class="p">]],[</span><span class="n">boxy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxy</span><span class="p">[</span><span class="mi">1</span><span class="p">]],[</span><span class="n">boxz</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxz</span><span class="p">[</span><span class="mi">1</span><span class="p">]]])</span>
+    
+    <span class="k">if</span> <span class="n">box_vectors</span> <span class="ow">and</span> <span class="n">check_triclinic</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">,</span> <span class="n">box</span><span class="p">,</span> <span class="n">triclinic</span>
+    <span class="k">elif</span> <span class="n">box_vectors</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">,</span> <span class="n">box</span>
+    <span class="k">elif</span> <span class="n">check_triclinic</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span><span class="p">,</span> <span class="n">triclinic</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span></div>
 
 <div class="viewcode-block" id="read_poscar"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.read_poscar">[docs]</a><span class="k">def</span> <span class="nf">read_poscar</span><span class="p">(</span><span class="n">infile</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -342,7 +404,7 @@
 
     <span class="k">return</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">boxdims</span></div>
 
-<div class="viewcode-block" id="write_structure"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.write_structure">[docs]</a><span class="k">def</span> <span class="nf">write_structure</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;lammps-dump&#39;</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="write_structure"><a class="viewcode-back" href="../../pybop.html#pybop.traj_process.write_structure">[docs]</a><span class="k">def</span> <span class="nf">write_structure</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span> <span class="n">outfile</span><span class="p">,</span> <span class="nb">format</span> <span class="o">=</span> <span class="s1">&#39;lammps-dump&#39;</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">customkey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">customvals</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Write the state of the system to a trajectory file. </span>
 
@@ -383,11 +445,18 @@
     <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boxdims</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxdims</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boxdims</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxdims</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
     <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">boxdims</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxdims</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]))</span>
-    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;ITEM: ATOMS id type x y z</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">customkey</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">title_str</span> <span class="o">=</span> <span class="s2">&quot;ITEM: ATOMS id type x y z </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">%</span> <span class="n">customkey</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">title_str</span> <span class="o">=</span> <span class="s2">&quot;ITEM: ATOMS id type x y z</span><span class="se">\n</span><span class="s2">&quot;</span>
+    <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">title_str</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">cc</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">atoms</span><span class="p">):</span>
         <span class="n">pos</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span>
-        <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span> <span class="o">%</span>
-                   <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_type</span><span class="p">(),</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">customkey</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">atomline</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%d</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_type</span><span class="p">(),</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">customvals</span><span class="p">[</span><span class="n">cc</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">atomline</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="s2"> </span><span class="si">%f</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">%</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_id</span><span class="p">(),</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_type</span><span class="p">(),</span> <span class="n">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">pos</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">dump</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">atomline</span><span class="p">)</span>
 
     <span class="n">dump</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 

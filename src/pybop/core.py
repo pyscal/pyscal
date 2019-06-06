@@ -1,7 +1,7 @@
 import pybop.ccore as pc
 import pybop.traj_process as ptp
 import os
-
+import numpy as np
 
 """
 Definitions of class Atom.
@@ -621,17 +621,26 @@ class System(pc.System):
                 #reassign filename
                 filename = filenames[frame]
                 if os.path.exists(filename):
-                    atoms, boxdims = ptp.read_lammps_dump(filename, compressed=compressed)
+                    atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
                     pc.System.assign_particles(self, atoms, boxdims)
+                    if triclinic:
+                        #we have to input rotation matrix and the inverse rotation matrix
+                        rot = box.T
+                        rotinv = np.linalg.inv(rot)
+                        pc.System.assign_triclinic_params(self, rot, rotinv)
                 #now remove filenames
                 for file in filenames:
                     os.remove(file)
 
             elif os.path.exists(filename):
-                atoms, boxdims = ptp.read_lammps_dump(filename, compressed=compressed)
+                atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
                 pc.System.assign_particles(self, atoms, boxdims)
-
-
+                if triclinic:
+                    #we have to input rotation matrix and the inverse rotation matrix
+                    rot = box.T
+                    rotinv = np.linalg.inv(rot)
+                    pc.System.assign_triclinic_params(self, rot, rotinv)
+                
         elif format == 'poscar':
             if os.path.exists(filename):
                 atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)

@@ -19,6 +19,7 @@ System::System(){
     qsfound = 0;
     fileread = 0;
     filter = 0;
+    triclinic = 0;
 
 }
 
@@ -41,6 +42,18 @@ double System::dfactorial(int l,int m){
     }
     return (1.00/fac);
 
+}
+
+void System::assign_triclinic_params(vector<vector<double>> drot, vector<vector<double>> drotinv){
+
+    for(int i=0; i<3; i++){
+        for(int j=0; j<3; j++){
+            rot[i][j] = drot[i][j];
+            rotinv[i][j] = drotinv[i][j];
+        }
+    }
+    
+    triclinic = 1;
 }
 
 void System::sbox(vector<vector <double>> boxd) {
@@ -232,38 +245,124 @@ void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> box
 
 double System::get_abs_distance(int ti ,int tj,double &diffx ,double &diffy,double &diffz){
   
-    double abs;
+    double abs, ax, ay, az;
     diffx = atoms[tj].posx - atoms[ti].posx;
     diffy = atoms[tj].posy - atoms[ti].posy;
     diffz = atoms[tj].posz - atoms[ti].posz;
+    
+    if (triclinic == 1){
         
-    //nearest image
-    if (diffx> boxx/2.0) {diffx-=boxx;};
-    if (diffx<-boxx/2.0) {diffx+=boxx;};
-    if (diffy> boxy/2.0) {diffy-=boxy;};
-    if (diffy<-boxy/2.0) {diffy+=boxy;};
-    if (diffz> boxz/2.0) {diffz-=boxz;};
-    if (diffz<-boxz/2.0) {diffz+=boxz;};
-    abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+        //convert to the triclinic system
+        ax = rotinv[0][0]*diffx + rotinv[0][1]*diffy + rotinv[0][2]*diffz;
+        ay = rotinv[1][0]*diffx + rotinv[1][1]*diffy + rotinv[1][2]*diffz;
+        az = rotinv[2][0]*diffx + rotinv[2][1]*diffy + rotinv[2][2]*diffz; 
+        
+        //scale to match the triclinic box size
+        diffx = ax*boxx;
+        diffy = ay*boxy;
+        diffz = az*boxz;
+
+        //now check pbc
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+        
+        //now divide by box vals - scale down the size
+        diffx = diffx/boxx;
+        diffy = diffy/boxy;
+        diffz = diffz/boxz;
+
+        //now transform back to normal system
+        ax = rot[0][0]*diffx + rot[0][1]*diffy + rot[0][2]*diffz;
+        ay = rot[1][0]*diffx + rot[1][1]*diffy + rot[1][2]*diffz;
+        az = rot[2][0]*diffx + rot[2][1]*diffy + rot[2][2]*diffz;
+
+        //now assign to diffs and calculate distnace
+        diffx = ax;
+        diffy = ay;
+        diffz = az;
+
+        //finally distance
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+        
+    }
+    else{
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);        
+    }
     return abs;
 }
 
 //function for binding
 double System::get_abs_distance(Atom atom1 , Atom atom2 ){
   
-    double abs;
+    double abs, ax, ay, az;
     double diffx = atom1.posx - atom2.posx;
     double diffy = atom1.posy - atom2.posy;
     double diffz = atom1.posz - atom2.posz;
         
-    //nearest image
-    if (diffx> boxx/2.0) {diffx-=boxx;};
-    if (diffx<-boxx/2.0) {diffx+=boxx;};
-    if (diffy> boxy/2.0) {diffy-=boxy;};
-    if (diffy<-boxy/2.0) {diffy+=boxy;};
-    if (diffz> boxz/2.0) {diffz-=boxz;};
-    if (diffz<-boxz/2.0) {diffz+=boxz;};
-    abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+    if (triclinic == 1){
+        
+        //convert to the triclinic system
+        ax = rotinv[0][0]*diffx + rotinv[0][1]*diffy + rotinv[0][2]*diffz;
+        ay = rotinv[1][0]*diffx + rotinv[1][1]*diffy + rotinv[1][2]*diffz;
+        az = rotinv[2][0]*diffx + rotinv[2][1]*diffy + rotinv[2][2]*diffz; 
+        
+        //scale to match the triclinic box size
+        diffx = ax*boxx;
+        diffy = ay*boxy;
+        diffz = az*boxz;
+
+        //now check pbc
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+        
+        //now divide by box vals - scale down the size
+        diffx = diffx/boxx;
+        diffy = diffy/boxy;
+        diffz = diffz/boxz;
+
+        //now transform back to normal system
+        ax = rot[0][0]*diffx + rot[0][1]*diffy + rot[0][2]*diffz;
+        ay = rot[1][0]*diffx + rot[1][1]*diffy + rot[1][2]*diffz;
+        az = rot[2][0]*diffx + rot[2][1]*diffy + rot[2][2]*diffz;
+
+        //now assign to diffs and calculate distnace
+        diffx = ax;
+        diffy = ay;
+        diffz = az;
+
+        //finally distance
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+        
+    }
+    else{
+
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);        
+    }
+
     return abs;
 }
 
@@ -294,16 +393,6 @@ void System::get_all_neighbors_normal(){
 
     if (!fileread) { read_particle_file(inputfile); }
 
-    //for (int ti = 0;ti<nop;ti++){
-        
-    //    atoms[ti].n_neighbors=0;
-    //    for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
-    //                    
-    //        atoms[ti].neighbors[tn] = NILVALUE;
-    //        atoms[ti].neighbordist[tn] = -1.0;
-    //    }
-    //}
-
 
     for (int ti=0; ti<nop; ti++){
         if (atoms[ti].isneighborset == 0){
@@ -311,11 +400,9 @@ void System::get_all_neighbors_normal(){
                 if(ti==tj) { continue; }
                 d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
                 if (d < neighbordistance){
-
                     if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
                         continue;
                     }
-
                     atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
                     atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
                     //weight is set to 1.0, unless manually reset
