@@ -488,7 +488,7 @@ void System::get_all_neighbors_voronoi(){
     int i;
     int ti,id,tnx,tny,tnz;
     int n3, n4, n5, n6;
-    double rx,ry,rz,tsum, fa, x, y, z;
+    double rx,ry,rz,tsum, fa, x, y, z, vol;
     vector<int> neigh,f_vert;
     vector<double> facearea, v;
     voronoicell_neighbor c;
@@ -515,6 +515,7 @@ void System::get_all_neighbors_voronoi(){
             c.neighbors(neigh);
             c.face_orders(f_vert);
             c.vertices(x,y,z,v);
+            vol = c.volume();
             tsum = 0;
             vector <double> dummyweights;
             vector <int> dummyneighs;
@@ -556,6 +557,7 @@ void System::get_all_neighbors_voronoi(){
             atoms[ti].vorovector[1] = n4;
             atoms[ti].vorovector[2] = n5;
             atoms[ti].vorovector[3] = n6;
+            atoms[ti].volume = vol;
             //assign to the atom
             //atoms[ti].vorovector = nvector;
 
@@ -1274,6 +1276,7 @@ int Atom::gloc(){ return loc; }
 void Atom::sloc(int idd){ loc=idd; }
 int Atom::gtype(){ return type; }
 void Atom::stype(int idd){ type=idd; }
+double Atom::gvolume(){ return volume; }
 
 vector<double> Atom::gallq(){
     vector<double> allq;

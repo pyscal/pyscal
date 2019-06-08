@@ -116,6 +116,33 @@ class Atom(pc.Atom):
         if len(pos) == 3:
             pc.Atom.set_x(self, pos)
 
+    def get_volume(self):
+        """
+        
+        Get the voronoi colume of the atom. Meaningful values are only returned if the neighbors
+        are calculated using voronoi method.
+
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        volume : float
+            voronoi volume of the atom.
+
+        Examples
+        --------
+        >>> volume = atom.get_volume()
+
+        See also
+        --------
+        find_neighbors
+        Atom
+        System      
+        """
+        vol = pc.Atom.get_volume(self)
+        return vol
 
     def get_cluster(self):
         """

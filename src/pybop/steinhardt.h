@@ -83,6 +83,8 @@ class Atom{
     
         int frenkelnumber;
         double avq6q6;
+        //volume calculated by voronoi tesselation
+        double volume;
 
         int belongsto;
         int lcluster;
@@ -97,6 +99,7 @@ class Atom{
 
         //we need some functions to fetch atom properties
         vector<double> gx();
+        double gvolume();
         void sx(vector<double>);
         //int* gx();
         //double gy();
