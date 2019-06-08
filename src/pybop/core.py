@@ -1198,6 +1198,7 @@ class System(pc.System):
         atom.set_loc(atomc.get_loc())
         atom.set_type(atomc.get_type())
         atom.set_vorovector(atomc.get_vorovector())
+        atom.set_volume(atomc.get_volume())
         return atom
 
     def copy_atom_to_catom(self, atom):
@@ -1226,6 +1227,7 @@ class System(pc.System):
         atomc.set_loc(atom.get_loc())
         atomc.set_type(atom.get_type())
         atomc.set_vorovector(atom.get_vorovector())
+        atomc.set_volume(atom.get_volume())
         return atomc
 
 

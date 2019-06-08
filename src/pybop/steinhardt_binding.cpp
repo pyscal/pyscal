@@ -50,7 +50,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_aqlm",&Atom::gaqlm)
         .def("get_vorovector",&Atom::gvorovector)
         .def("set_vorovector",&Atom::svorovector)
-        .def("get_volume",&Atom::gvolume); 
+        .def("get_volume",&Atom::gvolume)
+        .def("set_volume",&Atom::svolume); 
 
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")

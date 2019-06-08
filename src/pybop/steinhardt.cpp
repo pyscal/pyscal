@@ -1277,6 +1277,7 @@ void Atom::sloc(int idd){ loc=idd; }
 int Atom::gtype(){ return type; }
 void Atom::stype(int idd){ type=idd; }
 double Atom::gvolume(){ return volume; }
+void Atom::svolume(double vv){ volume = vv; }
 
 vector<double> Atom::gallq(){
     vector<double> allq;
