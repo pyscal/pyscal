@@ -713,6 +713,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="System.read_inputfile"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.read_inputfile">[docs]</a>    <span class="k">def</span> <span class="nf">read_inputfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;lammps-dump&quot;</span><span class="p">,</span> <span class="n">frame</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">compressed</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -816,7 +817,58 @@
 <span class="sd">        --------</span>
 <span class="sd">        read_inputfile</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span>        </div>
+        <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">assign_particles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">,</span> <span class="n">box</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="System.calculate_rdf"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.calculate_rdf">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_rdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">histobins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">histomin</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">histomax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the radial distribution function. It is calculated by finding distances</span>
+<span class="sd">        between all pairs of atoms and then creating a histogram from it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        histobins : int</span>
+<span class="sd">            number of bins in the histogram</span>
+<span class="sd">        histomin : float, optional</span>
+<span class="sd">            minimum value of the distance histogram, if not specified, 0.0 is taken as the</span>
+<span class="sd">            minimum.</span>
+<span class="sd">        histomax : float, optional</span>
+<span class="sd">            maximum value of the distance histogram. If not specified, the maximum value</span>
+<span class="sd">            in all pair distances is used.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        hist : array of ints</span>
+<span class="sd">            The values of histogram</span>
+<span class="sd">        bin_edges : array of floats</span>
+<span class="sd">            Bin edges of length len(hist)+1</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_pairdistances</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">histomax</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">histomax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+
+        <span class="n">hist</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">histobins</span><span class="p">,</span> <span class="nb">range</span><span class="o">=</span><span class="p">(</span><span class="n">histomin</span><span class="p">,</span> <span class="n">histomax</span><span class="p">))</span>
+        <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">bin_edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1">#normalise by number of atoms</span>
+        <span class="n">total_nos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">hist</span><span class="p">)</span>
+        <span class="n">hist</span> <span class="o">=</span> <span class="n">hist</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">total_nos</span><span class="p">)</span>
+
+        <span class="n">factor</span> <span class="o">=</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">bin_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">bin_edges</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">histomin</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">normed_hist</span> <span class="o">=</span> <span class="n">hist</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="o">/</span><span class="p">(</span><span class="n">factor</span><span class="o">*</span><span class="n">bin_edges</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">normed_hist</span> <span class="o">=</span> <span class="n">hist</span><span class="o">/</span><span class="p">(</span><span class="n">factor</span><span class="o">*</span><span class="n">bin_edges</span><span class="p">)</span>
+
+        <span class="c1">#finally particle density</span>
+        <span class="n">boxvecs</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_boxvecs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">rho</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">boxvecs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">boxvecs</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">boxvecs</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">normed_hist</span><span class="o">/=</span><span class="n">rho</span>
+
+        <span class="k">return</span> <span class="n">normed_hist</span><span class="p">,</span> <span class="n">bin_edges</span></div>
+
+
 
 <div class="viewcode-block" id="System.get_largestcluster"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.get_largestcluster">[docs]</a>    <span class="k">def</span> <span class="nf">get_largestcluster</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -965,23 +1017,31 @@
         <span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">copy_catom_to_atom</span><span class="p">(</span><span class="n">xx</span><span class="p">)</span> <span class="k">for</span> <span class="n">xx</span> <span class="ow">in</span> <span class="n">atomcs</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">atoms</span></div>
 
-<div class="viewcode-block" id="System.get_box"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.get_box">[docs]</a>    <span class="k">def</span> <span class="nf">get_box</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="System.get_box"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.get_box">[docs]</a>    <span class="k">def</span> <span class="nf">get_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box_vectors</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        </span>
 <span class="sd">        Get the dimensions of the simulation box.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        None</span>
+<span class="sd">        box_vectors : bool, default False</span>
+<span class="sd">            If True, return the whole box dimesions.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        boxdims : list of box dimensions of length 2</span>
+<span class="sd">        boxdims : list of box dimensions</span>
+<span class="sd">            If `box_vectors` is false:</span>
 <span class="sd">            the return value consists of the vector of values in the form-</span>
 <span class="sd">            [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]</span>
+<span class="sd">            If `box_vectors` is true:</span>
+<span class="sd">            return the box vectors of the form</span>
+<span class="sd">            [[x1, x2, x3], [y1, y2, y3], [z1, z2, z3]]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">box6dim</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_box</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-        <span class="n">pbox</span> <span class="o">=</span> <span class="p">[[</span><span class="n">box6dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box6dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">box6dim</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box6dim</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span> <span class="p">[</span><span class="n">box6dim</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">box6dim</span><span class="p">[</span><span class="mi">5</span><span class="p">]]]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">box_vectors</span><span class="p">:</span>
+            <span class="n">box6dim</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_box</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">pbox</span> <span class="o">=</span> <span class="p">[[</span><span class="n">box6dim</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box6dim</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span><span class="n">box6dim</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box6dim</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span> <span class="p">[</span><span class="n">box6dim</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="n">box6dim</span><span class="p">[</span><span class="mi">5</span><span class="p">]]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pbox</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">get_boxvecs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pbox</span></div>
 
 <div class="viewcode-block" id="System.set_box"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.set_box">[docs]</a>    <span class="k">def</span> <span class="nf">set_box</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">box</span><span class="p">):</span>

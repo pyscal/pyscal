@@ -802,6 +802,35 @@ If False, return the non averaged ones</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="pybop.core.System.calculate_rdf">
+<code class="descname">calculate_rdf</code><span class="sig-paren">(</span><em>histobins=100</em>, <em>histomin=0.0</em>, <em>histomax=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.calculate_rdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.calculate_rdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate the radial distribution function. It is calculated by finding distances
+between all pairs of atoms and then creating a histogram from it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>histobins</strong> (<em>int</em>) – number of bins in the histogram</li>
+<li><strong>histomin</strong> (<em>float</em><em>, </em><em>optional</em>) – minimum value of the distance histogram, if not specified, 0.0 is taken as the
+minimum.</li>
+<li><strong>histomax</strong> (<em>float</em><em>, </em><em>optional</em>) – maximum value of the distance histogram. If not specified, the maximum value
+in all pair distances is used.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>hist</strong> (<em>array of ints</em>) – The values of histogram</li>
+<li><strong>bin_edges</strong> (<em>array of floats</em>) – Bin edges of length len(hist)+1</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="pybop.core.System.copy_atom_to_catom">
 <code class="descname">copy_atom_to_catom</code><span class="sig-paren">(</span><em>atom</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.copy_atom_to_catom"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.copy_atom_to_catom" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used to copy a python <cite>Atom</cite> object to C++ <cite>Atom</cite> object.</p>
@@ -922,18 +951,22 @@ in the <cite>System</cite>.</p>
 
 <dl class="method">
 <dt id="pybop.core.System.get_box">
-<code class="descname">get_box</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_box" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_box</code><span class="sig-paren">(</span><em>box_vectors=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.get_box"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.get_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the dimensions of the simulation box.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>box_vectors</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, return the whole box dimesions.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>boxdims</strong> – the return value consists of the vector of values in the form-
-[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>boxdims</strong> – If <cite>box_vectors</cite> is false:
+the return value consists of the vector of values in the form-
+[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+If <cite>box_vectors</cite> is true:
+return the box vectors of the form
+[[x1, x2, x3], [y1, y2, y3], [z1, z2, z3]]</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of box dimensions of length 2</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of box dimensions</td>
 </tr>
 </tbody>
 </table>
