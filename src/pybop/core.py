@@ -672,7 +672,56 @@ class System(pc.System):
         --------
         read_inputfile
         """
-        pc.System.assign_particles(self, atoms, box)        
+        pc.System.assign_particles(self, atoms, box)
+
+    def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
+        """
+        Calculate the radial distribution function. It is calculated by finding distances
+        between all pairs of atoms and then creating a histogram from it.
+
+        Parameters
+        ----------
+        histobins : int
+            number of bins in the histogram
+        histomin : float, optional
+            minimum value of the distance histogram, if not specified, 0.0 is taken as the
+            minimum.
+        histomax : float, optional
+            maximum value of the distance histogram. If not specified, the maximum value
+            in all pair distances is used.
+
+        Returns
+        -------
+        rdf : array of ints
+            Radial distribution function
+        r : array of floats
+            radius in distance units
+
+        """
+        distances = pc.System.get_pairdistances(self)
+
+        if histomax == None:
+            histomax = max(distances)
+
+        hist, bin_edges = np.histogram(distances, bins=histobins, range=(histomin, histomax))
+        edgewidth = np.abs(bin_edges[1]-bin_edges[0])
+        hist = hist.astype(float)
+        r = bin_edges[:-1]
+
+        #get box density
+        boxvecs = pc.System.get_boxvecs(self)
+        vol = np.dot(np.cross(boxvecs[0], boxvecs[1]), boxvecs[2])
+        natoms = pc.System.get_nop(self)
+        rho = natoms/vol
+
+        shell_vols = (4./3.)*np.pi*((r+edgewidth)**3 - r**3)
+        shell_rho = hist/shell_vols
+        #now divide to get final value
+        rdf = shell_rho/rho
+
+        return rdf, r
+
+
 
     def get_largestcluster(self):
         """
@@ -821,23 +870,31 @@ class System(pc.System):
         atoms = [self.copy_catom_to_atom(xx) for xx in atomcs]
         return atoms
 
-    def get_box(self):
+    def get_box(self, box_vectors=False):
         """
         
         Get the dimensions of the simulation box.
 
         Parameters
         ----------
-        None
+        box_vectors : bool, default False
+            If True, return the whole box dimesions.
 
         Returns
         -------
-        boxdims : list of box dimensions of length 2
+        boxdims : list of box dimensions
+            If `box_vectors` is false:
             the return value consists of the vector of values in the form-
             [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+            If `box_vectors` is true:
+            return the box vectors of the form
+            [[x1, x2, x3], [y1, y2, y3], [z1, z2, z3]]
         """
-        box6dim = pc.System.get_box(self)
-        pbox = [[box6dim[0], box6dim[1]], [box6dim[2], box6dim[3]], [box6dim[4], box6dim[5]]]
+        if not box_vectors:
+            box6dim = pc.System.get_box(self)
+            pbox = [[box6dim[0], box6dim[1]], [box6dim[2], box6dim[3]], [box6dim[4], box6dim[5]]]
+        else:
+            pbox = pc.System.get_boxvecs(self)
         return pbox
 
     def set_box(self, box):

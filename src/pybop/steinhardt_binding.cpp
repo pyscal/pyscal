@@ -63,6 +63,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_atom", &System::satom)
         .def("get_allatoms",&System::gallatoms)
         .def("get_box",&System::gboxdims)
+        .def("get_nop",&System::gnop)
         .def("set_box",&System::sbox)
         .def("get_qvals",&System::gqvals)
         .def("get_aqvals",&System::gaqvals)
@@ -80,6 +81,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("find_largest_cluster",&System::largest_cluster)
         .def("set_filter",&System::sfilter)
         .def("assign_triclinic_params",&System::assign_triclinic_params)
+        .def("get_boxvecs",&System::gboxvecs)
+        .def("get_pairdistances",&System::get_pairdistances)
         ;
 
 

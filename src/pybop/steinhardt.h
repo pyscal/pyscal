@@ -214,6 +214,7 @@ class System{
         //array for box
         double boxdims[3][2];
         string inputfile;
+        vector<double> get_pairdistances();
         
         double neighbordistance;
 
@@ -240,6 +241,7 @@ class System{
         vector<double> gaqvals(int qq);
         vector<int> rq_backup;
         vector<double> gbox();
+        vector<vector<double>> gboxvecs();
         void sbox(vector<vector<double>>);
         vector<double> gboxdims();
         

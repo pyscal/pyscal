@@ -385,6 +385,23 @@ void System::sfilter(int fno){
     filter = fno;
 }
 
+vector<double> System::get_pairdistances(){
+    
+    vector<double> res;
+    double d;
+    double diffx,diffy,diffz;
+
+    for (int ti=0; ti<nop; ti++){
+        for (int tj=ti; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+            res.emplace_back(d);
+
+        }
+    }
+    return res;
+}
+
 void System::get_all_neighbors_normal(){
 
     
@@ -1189,6 +1206,35 @@ vector<double> System::gbox(){
     qres.emplace_back(boxy);
     qres.emplace_back(boxz);
     return qres; 
+}
+
+vector<vector<double>> System::gboxvecs(){
+    vector<vector<double>> qres;
+    vector<double> dqres;
+    if (triclinic==1){
+        for(int i=0; i<3; i++){
+            dqres.clear();
+            for(int j=0; j<3; j++){
+                dqres.emplace_back(rot[j][i]);
+            }
+            qres.emplace_back(dqres);
+        }
+    }
+    else{
+        for(int i=0; i<3; i++){
+            dqres.clear();
+            for(int j=0; j<3; j++){
+                if(i==j){
+                    dqres.emplace_back(boxdims[i][1]-boxdims[i][0]);
+                }
+                else{
+                    dqres.emplace_back(0.0);
+                }
+            }
+            qres.emplace_back(dqres);
+        }
+    }
+    return qres;
 }
 
 vector<double> System::gboxdims(){
