@@ -116,7 +116,7 @@ class Atom(pc.Atom):
         if len(pos) == 3:
             pc.Atom.set_x(self, pos)
 
-    def get_volume(self):
+    def get_volume(self, averaged = False):
         """
         
         Get the voronoi colume of the atom. Meaningful values are only returned if the neighbors
@@ -124,7 +124,8 @@ class Atom(pc.Atom):
 
         Parameters
         ----------
-        None
+        averaged : bool, default False
+            If True, averaged version of the volume is returned.
         
         Returns
         -------
@@ -141,7 +142,11 @@ class Atom(pc.Atom):
         Atom
         System      
         """
-        vol = pc.Atom.get_volume(self)
+        if averaged:
+            vol = pc.Atom.get_avgvolume(self)
+        else:    
+            vol = pc.Atom.get_volume(self)
+        
         return vol
 
     def get_cluster(self):
@@ -1199,6 +1204,7 @@ class System(pc.System):
         atom.set_type(atomc.get_type())
         atom.set_vorovector(atomc.get_vorovector())
         atom.set_volume(atomc.get_volume())
+        atom.set_avgvolume(atomc.get_avgvolume())
         return atom
 
     def copy_atom_to_catom(self, atom):
@@ -1228,6 +1234,7 @@ class System(pc.System):
         atomc.set_type(atom.get_type())
         atomc.set_vorovector(atom.get_vorovector())
         atomc.set_volume(atom.get_volume())
+        atomc.set_avgvolume(atom.get_avgvolume())
         return atomc
 
 

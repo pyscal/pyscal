@@ -85,8 +85,11 @@ class Atom{
         double avq6q6;
         //volume calculated by voronoi tesselation
         double volume;
+        double avgvolume;
         double gvolume();
+        double gavgvolume();
         void svolume(double);
+        void savgvolume(double);
 
         int belongsto;
         int lcluster;
@@ -200,6 +203,9 @@ class System{
         void assign_particles( vector<Atom>, vector<vector<double>>);
         void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
         void get_largest_cluster_atoms();
+
+        //average volumes
+        void find_average_volume();
         //functions to set the list of reqd qs
         //again, error checking would be amazing here.
         void set_reqd_qs(vector<int>);

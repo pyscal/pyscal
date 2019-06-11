@@ -51,7 +51,9 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_vorovector",&Atom::gvorovector)
         .def("set_vorovector",&Atom::svorovector)
         .def("get_volume",&Atom::gvolume)
-        .def("set_volume",&Atom::svolume); 
+        .def("set_volume",&Atom::svolume)
+        .def("get_avgvolume",&Atom::gavgvolume)
+        .def("set_avgvolume",&Atom::savgvolume); 
 
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")
@@ -85,6 +87,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("assign_triclinic_params",&System::assign_triclinic_params)
         .def("get_boxvecs",&System::gboxvecs)
         .def("get_pairdistances",&System::get_pairdistances)
+        .def("find_average_volume",&System::find_average_volume)
         ;
 
 

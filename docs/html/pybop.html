@@ -435,6 +435,33 @@ If False, return the non averaged ones</li>
 </dd></dl>
 
 <dl class="method">
+<dt id="pybop.core.Atom.get_volume">
+<code class="descname">get_volume</code><span class="sig-paren">(</span><em>averaged=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_volume" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the voronoi colume of the atom. Meaningful values are only returned if the neighbors
+are calculated using voronoi method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>averaged</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, averaged version of the volume is returned.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>volume</strong> – voronoi volume of the atom.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">volume</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">get_volume</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-meth docutils literal notranslate"><span class="pre">find_neighbors()</span></code>, <a class="reference internal" href="#pybop.core.Atom" title="pybop.core.Atom"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Atom()</span></code></a>, <a class="reference internal" href="#pybop.core.System" title="pybop.core.System"><code class="xref py py-meth docutils literal notranslate"><span class="pre">System()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="method">
 <dt id="pybop.core.Atom.get_vorovector">
 <code class="descname">get_vorovector</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_vorovector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_vorovector" title="Permalink to this definition">¶</a></dt>
 <dd><p>get the voronoi structure identification vector. Returns a
@@ -820,8 +847,8 @@ in all pair distances is used.</li>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li><strong>hist</strong> (<em>array of ints</em>) – The values of histogram</li>
-<li><strong>bin_edges</strong> (<em>array of floats</em>) – Bin edges of length len(hist)+1</li>
+<li><strong>rdf</strong> (<em>array of ints</em>) – Radial distribution function</li>
+<li><strong>r</strong> (<em>array of floats</em>) – radius in distance units</li>
 </ul>
 </p>
 </td>

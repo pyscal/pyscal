@@ -594,6 +594,10 @@ void System::get_all_neighbors_voronoi(){
     //mark end of neighbor calc
     neighborsfound = 1;
 
+    //now calculate the averged volume
+    find_average_volume();
+    
+
 }
 
 
@@ -925,6 +929,22 @@ void System::calculate_aq(vector <int> qs){
 
     }
 }
+
+void System::find_average_volume(){
+    double vv;
+    int nn;
+    
+    for (int ti= 0;ti<nop;ti++){
+        nn = atoms[ti].n_neighbors;
+        vv = atoms[ti].volume;
+        for (int ci = 0;ci<nn;ci++){
+            vv += atoms[atoms[ti].neighbors[ci]].volume;
+        }
+        vv = vv/(double(nn+1));
+        atoms[ti].avgvolume = vv;
+    }
+}
+
 
 //also has to be overloaded - could be a useful function
 double System::get_number_from_bond(int ti,int tj){
@@ -1278,6 +1298,8 @@ int Atom::gtype(){ return type; }
 void Atom::stype(int idd){ type=idd; }
 double Atom::gvolume(){ return volume; }
 void Atom::svolume(double vv){ volume = vv; }
+double Atom::gavgvolume(){ return avgvolume; }
+void Atom::savgvolume(double vv){ avgvolume = vv; }
 
 vector<double> Atom::gallq(){
     vector<double> allq;
