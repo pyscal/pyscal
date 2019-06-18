@@ -31,3 +31,7 @@ Highlights
 .. [#]  Mickel, W, kapfer, SC, Shroder-Turk, GE, Mecke, K. JCP 138, 2013.
 .. [#]  Auer, S, Frenkel, D. APS 173, 2005., Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.
 .. [#]  Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.
+
+Citing the work
+---------------
+We are currently preparing a publication. Until it is ready, if you want to use the code in your work, it would be great if you let `me <mailto:sarath.menon@rub.de>`_ know about it. 
