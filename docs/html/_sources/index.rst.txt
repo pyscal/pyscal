@@ -26,24 +26,29 @@ Highlights
 .. [#]  Auer, S, Frenkel, D. APS 173, 2005., Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.
 .. [#]  Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.
 
-Documentation
--------------
+First steps
+-----------
 
 .. toctree::
     
     gettingstarted
-    pybop
     examples
     jupyter
 
-Contributing and extending
---------------------------
-**pybop** welcomes contribution and extension to the module. Rather than local modifications, we request that the modifications be submitted through a pull request. **pybop** follows the `pep8 <https://www.python.org/dev/peps/pep-0008/>`_ style. The quality of the code can be checked by `pylint <https://www.pylint.org/>`_ library by running ``pylint yourscript.py``. Rather than the style of code, what is more important is the documentation. We request that all improvements are documented in detail.
+API documentation
+-----------------
 
-Help and support
-----------------
-In case of bugs and feature improvements, you are welcome to create a new issue on the `github repo <https://github.com/srmnitc/pybop>`_. In case of other questions, please contact `us <mailto:sarath.menon@rub.de>`_.
+.. toctree::
+    
+    pybop
+	
+Support, contributing and extending
+-----------------------------------
 
-Citing the work
----------------
-We are currently preparing a publication. Until it is ready, if you want to use the code in your work, it would be great if you let `me <mailto:sarath.menon@rub.de>`_ know about it. 
+.. toctree::
+    
+    extending
+    helpandsupport
+    citing
+    acknowledgements
+
