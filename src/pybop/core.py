@@ -51,7 +51,8 @@ class Atom(pc.Atom):
     def __init__(self, pos=[0,0,0], id=0, type=1):
         """
         Deafults args
-        """     
+        """
+        pc.Atom.__init__(self)     
         pc.Atom.set_x(self, pos)
         pc.Atom.set_id(self, id)
         pc.Atom.set_type(self, type)
