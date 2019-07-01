@@ -9,7 +9,7 @@
 
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
-   :width: 10 %
+   :width: 15 %
 
 pybop
 =================================
