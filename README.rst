@@ -9,8 +9,8 @@
 
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
-   :width: 50 %
-   
+   :width: 20 %
+
 pybop
 =================================
 complete documentation with examples available `here <https://srmnitc.github.io/pybop/index.html>`_.
