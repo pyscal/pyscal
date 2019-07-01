@@ -6,7 +6,11 @@
 .. image:: https://codecov.io/gh/srmnitc/pybop/branch/master/graph/badge.svg?token=tzM81RBcYQ
   :target: https://codecov.io/gh/srmnitc/pybop
   :width: 50 %
- 
+
+.. image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
+   :width: 50 %
+   
 pybop
 =================================
 complete documentation with examples available `here <https://srmnitc.github.io/pybop/index.html>`_.

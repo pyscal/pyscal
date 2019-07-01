@@ -1,6 +1,10 @@
 Getting started
 ===============
 
+Trying **pybop**
+----------------
+You can try some of the examples provided with **pybop** without installing the package using binder. Please use `this link <https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F>`_ to try the package. 
+
 Installation
 ------------
 

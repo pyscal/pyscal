@@ -32,9 +32,7 @@ Although bond-orientational order parameters can be calculated using atomistic s
 
 ``pybop`` can read in output files containing atomistic simulation data in the LAMMPS [@Plimpton:1995] [dump format](https://lammps.sandia.gov/doc/dump.html) and POSCAR format used by ab initio simulation package VASP. In order to improve the functionality, an easy interface is provided to extended the type of input file formats. In addition, both cubic and triclinic simulation cells are also supported in this package.  
 
-Various features of ``pybop`` including documentation and example usage is available in the [pybop website](https://srmnitc.github.io/pybop/html/index.html). Examples       
-
-## Statement of need
+Various features of ``pybop`` including documentation and example usage is available in the [pybop website](https://srmnitc.github.io/pybop/html/index.html). Examples including installation of the package to calculation of bond-orientational order parameters are provided in the above url. Alternatively, ``pybop`` provides a [binder environment](https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F) to try the example cases before installation.       
 
 # Acknowledgements
 
