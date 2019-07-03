@@ -4,14 +4,17 @@ import numpy as np
 import pybop.core as pc
 import pybop.crystal_structures as pcs
 
+#@profile
 def test_basic_system():
     #basic system tests
     sys = pc.System()
-    sys.set_box([[0,1],[0,1],[0,1]])
-    assert sys.get_box() == [[0,1],[0,1],[0,1]]
+    #sys.set_box([[0,1],[0,1],[0,1]])
+    #assert sys.get_box() == [[0,1],[0,1],[0,1]]
     #sys.read_inputfile("conf.dump")
+    #del sys
 
 
+#@profile
 def test_system_read():
     sys = pc.System()
     sys.read_inputfile('tests/conf.dump')
@@ -37,7 +40,8 @@ def test_system_read():
     #check few atoms
     filtered_atoms = [ atom for atom in atoms if atom.get_id() == 204]
     assert filtered_atoms[0].get_x() == [-0.10301, -6.35752, -6.44787]
-
+    #del sys
+#@profile
 def test_system_atom_access():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc')
@@ -50,3 +54,6 @@ def test_system_atom_access():
     sys.set_atom(atom)
     atom = sys.get_atom(0)
     assert atom.get_x() == [0.1, 0.1, 0.1]    
+    #del sys
+
+

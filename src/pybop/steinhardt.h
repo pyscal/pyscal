@@ -186,7 +186,8 @@ class System{
         System();
         ~System();
 
-        Atom* atoms;
+        //Atom* atoms;
+        vector<Atom> atoms;
     
         void read_particle_file(string);
         //void read_particle_instance(int,int);
