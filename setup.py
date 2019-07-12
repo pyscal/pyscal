@@ -72,7 +72,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pybop',
-    version='1.0.0',
+    version='1.0.1',
     author='Sarath Menon',
     author_email='sarath.menon@rub.de',
     description='A hybrid C++/python module for calculation of Steinhardt Parameters',
