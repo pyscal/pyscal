@@ -88,6 +88,7 @@ setup(
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     download_url = 'https://github.com/dask/dask/archive/1.1.1.tar.gz',
+    url = 'https://github.com/srmnitc/pybop',
     install_requires=['numpy'],
     classifiers=[
         'Programming Language :: Python :: 3',
