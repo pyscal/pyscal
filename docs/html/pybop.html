@@ -456,14 +456,14 @@ If False, return the non averaged ones</li>
 
 <dl class="method">
 <dt id="pybop.core.Atom.get_volume">
-<code class="descname">get_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_volume" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_volume</code><span class="sig-paren">(</span><em>averaged=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the voronoi colume of the atom. Meaningful values are only returned if the neighbors
 are calculated using voronoi method.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>averaged</strong> (<em>bool</em><em>, </em><em>default False</em>) – If True, averaged version of the volume is returned.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>volume</strong> – voronoi volume of the atom.</td>
 </tr>
