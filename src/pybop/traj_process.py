@@ -316,6 +316,32 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
     dump.close()
 
 
+def split_trajectory(infile, format='lammps-dump', compressed=False):
+    """
+    Read in a trajectory file and convert it to individual time slices.
+
+    Parameters
+    ----------
+    
+    filename : string
+        name of input file
+    format : format of the input file
+        only `lammps-dump` is supported now. 
+    compressed : bool, Default False
+        force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
+        necessary.
+
+    Returns
+    -------
+    snaps : list of strings
+        a list of filenames which contain individual frames from the main trajectory.    
+    """
+    snaps = []
+
+    if format=='lammps-dump':
+        snaps = split_traj_lammps_dump(infile, compressed = compressed)
+
+    return snaps
 
 
 def split_traj_lammps_dump(infile, compressed = False):

@@ -20,21 +20,12 @@
   <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
   
     
-      <script type="text/javascript">
-          var DOCUMENTATION_OPTIONS = {
-              URL_ROOT:'./',
-              VERSION:'1.0.0',
-              LANGUAGE:'None',
-              COLLAPSE_INDEX:false,
-              FILE_SUFFIX:'.html',
-              HAS_SOURCE:  true,
-              SOURCELINK_SUFFIX: '.txt'
-          };
-      </script>
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
         <script type="text/javascript" src="_static/jquery.js"></script>
         <script type="text/javascript" src="_static/underscore.js"></script>
         <script type="text/javascript" src="_static/doctools.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -170,48 +161,35 @@
 <a class="reference external image-reference" href="https://travis-ci.com/srmnitc/pybop"><img alt="https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&amp;branch=master" src="https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&amp;branch=master" style="width: 20%;" /></a>
 <a class="reference external image-reference" href="https://codecov.io/gh/srmnitc/pybop"><img alt="https://codecov.io/gh/srmnitc/pybop/branch/master/graph/badge.svg?token=tzM81RBcYQ" src="https://codecov.io/gh/srmnitc/pybop/branch/master/graph/badge.svg?token=tzM81RBcYQ" style="width: 20%;" /></a>
 <a class="reference external image-reference" href="https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="20%" /></a>
-<p><strong>pybop</strong> is a python module for calculation of Steinhardt’s bond order parameters <a class="footnote-reference" href="#id6" id="id1">[1]</a>. The core functionality of <strong>pybop</strong> is written in C++ with python wrappers using <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/intro.html">pybind11</a> . This allows for fast calculations with possibilities for seamless expansion in python.</p>
+<p><strong>pybop</strong> is a python module for calculation of Steinhardt’s bond order parameters <a class="footnote-reference brackets" href="#id6" id="id1">1</a>. The core functionality of <strong>pybop</strong> is written in C++ with python wrappers using <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/intro.html">pybind11</a> . This allows for fast calculations with possibilities for seamless expansion in python.</p>
 <p>Stenhardt’s order parameters or local bond order parameters are widely used in simulations to determine crystal structure of atoms. They are also used to identify if an atom is solid or liquid and the identify the solid atoms in a liquid, which is often used an order parameter to study progress of reaction during solidification. Additionally <strong>pybop</strong> provides an easy environment for reading in snapshots from molecular dynamics trajectories, allowing for easy post-processing of simulation data. <strong>pybop</strong> is inspired by <a class="reference external" href="https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html">BondOrderAnalysis</a> code, but has since incorporated many additions and modifications. The main highlights of <strong>pybop</strong> are given below.</p>
 <div class="section" id="highlights">
 <h2>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Fast and efficient library using C++.</li>
-<li>Calculation of Steinhardts order parameters and their averaged version <a class="footnote-reference" href="#id7" id="id2">[2]</a>.</li>
-<li>Links with <a class="reference external" href="http://math.lbl.gov/voro++/">Voro++</a> code, to enable weighted calculation of local bond order parameters <a class="footnote-reference" href="#id8" id="id3">[3]</a>.</li>
-<li>An environment for easy processing of simulation data.</li>
-<li>Distinction of solid and liquid atoms using q6 parameter <a class="footnote-reference" href="#id9" id="id4">[4]</a>.</li>
-<li>Cluster algorithms of solid atoms to find largest cluster of solid atoms in liquid <a class="footnote-reference" href="#id10" id="id5">[5]</a>.</li>
+<li><p>Fast and efficient library using C++.</p></li>
+<li><p>Calculation of Steinhardts order parameters and their averaged version <a class="footnote-reference brackets" href="#id7" id="id2">2</a>.</p></li>
+<li><p>Links with <a class="reference external" href="http://math.lbl.gov/voro++/">Voro++</a> code, to enable weighted calculation of local bond order parameters <a class="footnote-reference brackets" href="#id8" id="id3">3</a>.</p></li>
+<li><p>An environment for easy processing of simulation data.</p></li>
+<li><p>Distinction of solid and liquid atoms using q6 parameter <a class="footnote-reference brackets" href="#id9" id="id4">4</a>.</p></li>
+<li><p>Cluster algorithms of solid atoms to find largest cluster of solid atoms in liquid <a class="footnote-reference brackets" href="#id10" id="id5">5</a>.</p></li>
 </ul>
-<table class="docutils footnote" frame="void" id="id6" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Steinhardt, PJ, Nelson, DR, Ronchetti, M. PRB 28, 1983.</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id7" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Lechner, W, Dellago, C. JCP 129, 2008.</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id8" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Mickel, W, kapfer, SC, Shroder-Turk, GE, Mecke, K. JCP 138, 2013.</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id9" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Auer, S, Frenkel, D. APS 173, 2005., Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.</td></tr>
-</tbody>
-</table>
-<table class="docutils footnote" frame="void" id="id10" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.</td></tr>
-</tbody>
-</table>
+<dl class="footnote brackets">
+<dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Steinhardt, PJ, Nelson, DR, Ronchetti, M. PRB 28, 1983.</p>
+</dd>
+<dt class="label" id="id7"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>Lechner, W, Dellago, C. JCP 129, 2008.</p>
+</dd>
+<dt class="label" id="id8"><span class="brackets"><a class="fn-backref" href="#id3">3</a></span></dt>
+<dd><p>Mickel, W, kapfer, SC, Shroder-Turk, GE, Mecke, K. JCP 138, 2013.</p>
+</dd>
+<dt class="label" id="id9"><span class="brackets"><a class="fn-backref" href="#id4">4</a></span></dt>
+<dd><p>Auer, S, Frenkel, D. APS 173, 2005., Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.</p>
+</dd>
+<dt class="label" id="id10"><span class="brackets"><a class="fn-backref" href="#id5">5</a></span></dt>
+<dd><p>Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.</p>
+</dd>
+</dl>
 </div>
 <div class="section" id="first-steps">
 <h2>First steps<a class="headerlink" href="#first-steps" title="Permalink to this headline">¶</a></h2>
@@ -247,7 +225,7 @@
 <li class="toctree-l3"><a class="reference internal" href="example3basic.html">Calculating bond order parameters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="example3basic.html#perfect-structures">Perfect structures</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="example3basic.html#read-in-the-input-files">Read in the input files</a></li>
-<li class="toctree-l5"><a class="reference internal" href="example3basic.html#cutoff-neighbor-method"><span class="math notranslate nohighlight">\(q_4-q_6\)</span> cutoff neighbor method</a></li>
+<li class="toctree-l5"><a class="reference internal" href="example3basic.html#q-4-q-6-cutoff-neighbor-method"><span class="math notranslate nohighlight">\(q_4-q_6\)</span> cutoff neighbor method</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="example3basic.html#structures-with-thermal-vibrations">Structures with thermal vibrations</a><ul>
