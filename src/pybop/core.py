@@ -662,6 +662,8 @@ class System(pc.System):
                         rot = box.T
                         rotinv = np.linalg.inv(rot)
                         pc.System.assign_triclinic_params(self, rot, rotinv)
+                else:
+                    raise FileNotFoundError("input file not found")
                 #now remove filenames
                 for file in filenames:
                     os.remove(file)
@@ -674,11 +676,15 @@ class System(pc.System):
                     rot = box.T
                     rotinv = np.linalg.inv(rot)
                     pc.System.assign_triclinic_params(self, rot, rotinv)
-                
+            else:
+                raise FileNotFoundError("input file not found")
+
         elif format == 'poscar':
             if os.path.exists(filename):
                 atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
                 pc.System.assign_particles(self, atoms, boxdims)
+            else:
+                raise FileNotFoundError("input file not found")
 
 
     def assign_atoms(self, atoms, box):
