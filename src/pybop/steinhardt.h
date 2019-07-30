@@ -151,6 +151,11 @@ class Atom{
         void saq(int, double);
         vector <vector<double>> gaqlm(int);
 
+        int gsolid();
+        void ssolid(int);
+        int gstructure();
+        void sstructure(int);
+
         //for custom values
         vector <double> custom;
         void scustom(vector <double>);
