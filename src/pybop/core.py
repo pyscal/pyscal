@@ -1140,18 +1140,25 @@ class System(pc.System):
         """
         pc.System.calculate_frenkelnumbers(self)
 
-    def find_clusters(self):
+    def find_clusters(self, recursive = True, largest = True):
         """
         Find the clusters of all atoms in the system. Go through all the atoms and cluster them
-        together.
+        together based on the `issolid` parameter of the atom. To cluster based on any user defined criteria,
+        you can use `set_solid` method of `Atom` to explicitely set the `issolid` value.
 
         Parameters
         ----------
-        None
+        recursive : Bool, default True
+            If True, use a recursive clustering algorithm, otherwise use an id based clustering.
+            The difference in values between two methods can be upto 3 particles.
+        largest : Bool, default True
+            If True, return the number of particles in the largest cluster.
         
         Returns
         -------
-        None
+        cluster : int
+            The size of the largest cluster in the system. Only returned if `largest` is set to True.
+        
 
         See also
         --------
@@ -1160,7 +1167,14 @@ class System(pc.System):
         find_largest_cluster
         set_nucsize_parameters
         """
-        pc.System.find_clusters(self)
+        if recursive:
+            pc.System.find_clusters_recursive(self)
+        else:    
+            pc.System.find_clusters(self)
+
+        if largest:
+            cluster = pc.System.find_largest_cluster(self)
+            return cluster            
 
     def find_largest_cluster(self):
         """

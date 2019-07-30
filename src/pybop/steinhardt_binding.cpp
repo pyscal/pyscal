@@ -86,6 +86,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond)
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
         .def("find_clusters",&System::find_clusters)
+        .def("find_clusters_recursive",&System::find_clusters_recursive)
         .def("find_largest_cluster",&System::largest_cluster)
         .def("set_filter",&System::sfilter)
         .def("assign_triclinic_params",&System::assign_triclinic_params)
