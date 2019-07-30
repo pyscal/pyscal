@@ -1231,7 +1231,7 @@ double Atom::gavgvolume(){ return avgvolume; }
 void Atom::savgvolume(double vv){ avgvolume = vv; }
 int Atom::gsolid(){ return issolid; }
 void Atom::ssolid(int idd){ issolid=idd; }
-int Atom::gstructure(){ return stucture; }
+int Atom::gstructure(){ return structure; }
 void Atom::sstructure(int idd){ structure=idd; }
 
 vector<double> Atom::gallq(){

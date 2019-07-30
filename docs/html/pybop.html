@@ -407,6 +407,40 @@ If False, return the non averaged ones</p></li>
 </dd></dl>
 
 <dl class="method">
+<dt id="pybop.core.Atom.get_solid">
+<code class="sig-name descname">get_solid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_solid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_solid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find if an atom is solid or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>issolid</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>1 if solid, 0 otherwise</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybop.core.Atom.get_structure">
+<code class="sig-name descname">get_structure</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the structure of an atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>structure</strong></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>structural value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="pybop.core.Atom.get_type">
 <code class="sig-name descname">get_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.get_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.get_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>get  the type(species) of the atom.</p>
@@ -637,6 +671,40 @@ If False, return the non averaged ones</p></li>
 </dd></dl>
 
 <dl class="method">
+<dt id="pybop.core.Atom.set_solid">
+<code class="sig-name descname">set_solid</code><span class="sig-paren">(</span><em class="sig-param">issolid</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_solid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_solid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find if an atom is solid or not.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>issolid</strong> (<em>int</em><em>, </em><em>0</em><em> or </em><em>1</em>) – 1 if the atom is set to solid, 0 otherwise</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="pybop.core.Atom.set_structure">
+<code class="sig-name descname">set_structure</code><span class="sig-paren">(</span><em class="sig-param">structure</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_structure"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_structure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the structure of an atom.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>structure</strong> (<em>int</em>) – structure of the atom</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
 <dt id="pybop.core.Atom.set_type">
 <code class="sig-name descname">set_type</code><span class="sig-paren">(</span><em class="sig-param">tt</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#Atom.set_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.Atom.set_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>set  the type of the atom.</p>
@@ -863,18 +931,23 @@ in all pair distances is used.</p></li>
 
 <dl class="method">
 <dt id="pybop.core.System.find_clusters">
-<code class="sig-name descname">find_clusters</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.find_clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.find_clusters" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">find_clusters</code><span class="sig-paren">(</span><em class="sig-param">recursive=True</em>, <em class="sig-param">largest=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pybop/core.html#System.find_clusters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pybop.core.System.find_clusters" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find the clusters of all atoms in the system. Go through all the atoms and cluster them
-together.</p>
+together based on the <cite>issolid</cite> parameter of the atom. To cluster based on any user defined criteria,
+you can use <cite>set_solid</cite> method of <cite>Atom</cite> to explicitely set the <cite>issolid</cite> value.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>None</strong> – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>recursive</strong> (<em>Bool</em><em>, </em><em>default True</em>) – If True, use a recursive clustering algorithm, otherwise use an id based clustering.
+The difference in values between two methods can be upto 3 particles.</p></li>
+<li><p><strong>largest</strong> (<em>Bool</em><em>, </em><em>default True</em>) – If True, return the number of particles in the largest cluster.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p></p>
+<dd class="field-even"><p><strong>cluster</strong> – The size of the largest cluster in the system. Only returned if <cite>largest</cite> is set to True.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>None</p>
+<dd class="field-odd"><p>int</p>
 </dd>
 </dl>
 <div class="admonition seealso">

@@ -273,6 +273,68 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Atom.get_solid"><a class="viewcode-back" href="../../pybop.html#pybop.core.Atom.get_solid">[docs]</a>    <span class="k">def</span> <span class="nf">get_solid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find if an atom is solid or not.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        issolid : 1 if solid, 0 otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="o">.</span><span class="n">get_solid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Atom.get_structure"><a class="viewcode-back" href="../../pybop.html#pybop.core.Atom.get_structure">[docs]</a>    <span class="k">def</span> <span class="nf">get_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the structure of an atom.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        structure : structural value</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="o">.</span><span class="n">get_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Atom.set_solid"><a class="viewcode-back" href="../../pybop.html#pybop.core.Atom.set_solid">[docs]</a>    <span class="k">def</span> <span class="nf">set_solid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">issolid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find if an atom is solid or not.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        issolid : int, 0 or 1 </span>
+<span class="sd">            1 if the atom is set to solid, 0 otherwise</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">issolid</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]:</span> 
+            <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="o">.</span><span class="n">set_solid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">issolid</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Value of issolid should be either 0 or 1&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Atom.set_structure"><a class="viewcode-back" href="../../pybop.html#pybop.core.Atom.set_structure">[docs]</a>    <span class="k">def</span> <span class="nf">set_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the structure of an atom.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure : int</span>
+<span class="sd">            structure of the atom</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="Atom.get_volume"><a class="viewcode-back" href="../../pybop.html#pybop.core.Atom.get_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">averaged</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        </span>
@@ -1296,18 +1358,25 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">calculate_frenkelnumbers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="System.find_clusters"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.find_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">find_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="System.find_clusters"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.find_clusters">[docs]</a>    <span class="k">def</span> <span class="nf">find_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">recursive</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">largest</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find the clusters of all atoms in the system. Go through all the atoms and cluster them</span>
-<span class="sd">        together.</span>
+<span class="sd">        together based on the `issolid` parameter of the atom. To cluster based on any user defined criteria,</span>
+<span class="sd">        you can use `set_solid` method of `Atom` to explicitely set the `issolid` value.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        None</span>
+<span class="sd">        recursive : Bool, default True</span>
+<span class="sd">            If True, use a recursive clustering algorithm, otherwise use an id based clustering.</span>
+<span class="sd">            The difference in values between two methods can be upto 3 particles.</span>
+<span class="sd">        largest : Bool, default True</span>
+<span class="sd">            If True, return the number of particles in the largest cluster.</span>
 <span class="sd">        </span>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        None</span>
+<span class="sd">        cluster : int</span>
+<span class="sd">            The size of the largest cluster in the system. Only returned if `largest` is set to True.</span>
+<span class="sd">        </span>
 
 <span class="sd">        See also</span>
 <span class="sd">        --------</span>
@@ -1316,7 +1385,14 @@
 <span class="sd">        find_largest_cluster</span>
 <span class="sd">        set_nucsize_parameters</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">find_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+            <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">find_clusters_recursive</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>    
+            <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">find_clusters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">largest</span><span class="p">:</span>
+            <span class="n">cluster</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">find_largest_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">cluster</span>            </div>
 
 <div class="viewcode-block" id="System.find_largest_cluster"><a class="viewcode-back" href="../../pybop.html#pybop.core.System.find_largest_cluster">[docs]</a>    <span class="k">def</span> <span class="nf">find_largest_cluster</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1357,6 +1433,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">atom</span> <span class="o">=</span> <span class="n">Atom</span><span class="p">()</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_x</span><span class="p">())</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">set_solid</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_solid</span><span class="p">())</span>
+        <span class="n">atom</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_structure</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_cluster</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_cluster</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_neighbors</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">())</span>
         <span class="n">atom</span><span class="o">.</span><span class="n">set_neighborweights</span><span class="p">(</span><span class="n">atomc</span><span class="o">.</span><span class="n">get_neighborweights</span><span class="p">())</span>
@@ -1387,6 +1465,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">atomc</span> <span class="o">=</span> <span class="n">pc</span><span class="o">.</span><span class="n">Atom</span><span class="p">()</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_x</span><span class="p">())</span>
+        <span class="n">atomc</span><span class="o">.</span><span class="n">set_solid</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_solid</span><span class="p">())</span>
+        <span class="n">atomc</span><span class="o">.</span><span class="n">set_structure</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_structure</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_cluster</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_cluster</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_neighbors</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_neighbors</span><span class="p">())</span>
         <span class="n">atomc</span><span class="o">.</span><span class="n">set_neighborweights</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">get_neighborweights</span><span class="p">())</span>
