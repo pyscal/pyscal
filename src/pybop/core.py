@@ -117,6 +117,68 @@ class Atom(pc.Atom):
         if len(pos) == 3:
             pc.Atom.set_x(self, pos)
 
+    def get_solid(self):
+        """
+        Find if an atom is solid or not.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        issolid : 1 if solid, 0 otherwise
+        """
+        return pc.Atom.get_solid(self)
+
+    def get_structure(self):
+        """
+        Get the structure of an atom.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        structure : structural value
+        """
+        return pc.Atom.get_structure(self)
+
+    def set_solid(self, issolid):
+        """
+        Find if an atom is solid or not.
+
+        Parameters
+        ----------
+        issolid : int, 0 or 1 
+            1 if the atom is set to solid, 0 otherwise
+
+        Returns
+        -------
+        None
+        """
+        if int(issolid) in [0, 1]: 
+            pc.Atom.set_solid(self, int(issolid))
+        else:
+            raise ValueError("Value of issolid should be either 0 or 1")
+
+    def set_structure(self, structure):
+        """
+        Set the structure of an atom.
+
+        Parameters
+        ----------
+        structure : int
+            structure of the atom
+
+        Returns
+        -------
+        None
+        """
+        return pc.Atom.set_structure(self, structure)
+
+
     def get_volume(self, averaged = False):
         """
         
@@ -1215,6 +1277,8 @@ class System(pc.System):
         """
         atom = Atom()
         atom.set_x(atomc.get_x())
+        atom.set_solid(atomc.get_solid())
+        atom.set_structure(atomc.get_structure())
         atom.set_cluster(atomc.get_cluster())
         atom.set_neighbors(atomc.get_neighbors())
         atom.set_neighborweights(atomc.get_neighborweights())
@@ -1245,6 +1309,8 @@ class System(pc.System):
         """
         atomc = pc.Atom()
         atomc.set_x(atom.get_x())
+        atomc.set_solid(atom.get_solid())
+        atomc.set_structure(atom.get_structure())
         atomc.set_cluster(atom.get_cluster())
         atomc.set_neighbors(atom.get_neighbors())
         atomc.set_neighborweights(atom.get_neighborweights())
