@@ -541,40 +541,86 @@ void System::get_all_neighbors_adaptive(int nlimit, double prefactor){
 
     //double prefactor = 1.21;
     double summ;
+    double boxvol;
+    //some guesswork here
+    if (triclinic==1){
+        double a1, a2, a3, b1, b2, b3, c1, c2, c3;
+        //rot is the cell vectors transposed
+        a1 = rot[0][0];
+        a2 = rot[1][0];
+        a3 = rot[2][0];
+        b1 = rot[0][1];
+        b2 = rot[1][1];
+        b3 = rot[2][1];
+        c1 = rot[0][2];
+        c2 = rot[1][2];
+        c3 = rot[2][2];
+        boxvol = c1*(a2*b3-a3*b2) - c2*(a1*b3-b1*a3) + c3*(a1*b2-a2*b1);
+    }
+    else{
+        boxvol = boxx*boxy*boxz;    
+    }
+    
+    double guessvol = boxvol/float(nop);
+    double guessdist = cbrt(guessvol);
+    //some padding here
+    guessdist = 4*guessdist;
+
+    struct datom{
+        double dist;
+        size_t  index;
+    };
+
+    struct by_dist{
+        bool operator()(datom const &datom1, datom const &datom2){
+            return (datom1.dist < datom2.dist);
+        }
+    };
+
+    vector<datom> atomitos;
+    //atomitos.reserve(nop);
 
     if (!fileread) { read_particle_file(inputfile); }
 
     for (int ti=0; ti<nop; ti++){
         if (atoms[ti].isneighborset == 0){
             //clear vectors
-            nids.clear();
-            dists.clear();
-            sorted_dists.clear();
+            //nids.clear();
+            //dists.clear();
+            //sorted_dists.clear();
+            atomitos.clear();
+            //atomitos.reserve(nop);
 
             //start looping over every other particle
             for (int tj=0; tj<nop; tj++){
                 if(ti==tj) { continue; }
                 d = get_abs_distance(ti,tj,diffx,diffy,diffz);
                 //add the ids of atom, and distance to the list
-                nids.emplace_back(tj);
-                dists.emplace_back(d);
-                sorted_dists.emplace_back(d);
+                //nids.emplace_back(tj);
+                //dists.emplace_back(d);
+                //sorted_dists.emplace_back(d);
+                if (d <= guessdist){
+                    datom x = {d, tj};
+                    atomitos.emplace_back(x);
+
+                }
             }
 
             //we have all the info now. Pick the top six
             //first sort distances
             
-            sort(sorted_dists.begin(), sorted_dists.end());
+            sort(atomitos.begin(), atomitos.end(), by_dist());
+            
             summ = 0;
             for(int i=0; i<nlimit; i++){
-                summ+=sorted_dists[i];
+                summ+=atomitos[i].dist;
             }
             dcut = prefactor*(1.0/float(nlimit))*summ;
 
             //now we are ready to loop over again, but over the lists        
-            for(int j=0; j<dists.size(); j++){
-                int tj = nids[j];
-                if (dists[j] < dcut){
+            for(int j=0; j<nop; j++){
+                int tj = atomitos[j].index;
+                if (atomitos[j].dist < dcut){
 
                     if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
                         continue;
@@ -594,6 +640,9 @@ void System::get_all_neighbors_adaptive(int nlimit, double prefactor){
                     atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
                     atoms[ti].n_neighbors += 1;   
 
+                }
+                else{
+                    break;
                 }                
             }
         }
