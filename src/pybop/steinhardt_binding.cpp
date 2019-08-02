@@ -69,6 +69,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("calculate_nucsize",&System::calculate_nucsize)
         .def("get_atom",  &System::gatom)
         .def("set_atom", &System::satom)
+        .def("set_alpha", &System::salpha)
         .def("get_allatoms",&System::gallatoms)
         .def("get_box",&System::gboxdims)
         .def("get_nop",&System::gnop)
