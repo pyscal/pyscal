@@ -9,7 +9,6 @@ Definitions of class Atom.
 """
 class Atom(pc.Atom):
     """
-    This line was added for test
     A c++ class for holding the properties of a single atom. Various properties of the atom
     can be accessed through member functions which are described below in detail. Atoms can
     be created individually or directly by reading in a file. Check the examples for more 
