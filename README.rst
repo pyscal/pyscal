@@ -17,7 +17,7 @@
 
 pybop
 =================================
-complete documentation with examples available `here <https://srmnitc.github.io/pybop/index.html>`_.
+complete documentation with examples available `here <https://pybop.readthedocs.io/>`_.
 
 **pybop** is a python module for calculation of Steinhardt's bond order parameters [#]_. The core functionality of **pybop** is written in C++ with python wrappers using `pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_ . This allows for fast calculations with possibilities for seamless expansion in python. 
 
