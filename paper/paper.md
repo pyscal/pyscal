@@ -24,15 +24,20 @@ bibliography: paper.bib
 
 # Summary
 
-Bond-orientational order parameters introduced by [@Steinhardt:1983,@Auer:2005] have been widely used in distinction of different crystal structures like body-centred cubic, face-centred cubic and hexagonal closed packed structures in computational studies in materials science[@Lechner:2011,@DiazLeines:2017]. Furthermore, the bond order parameters parameters are used to distinguish solid and liquid particles in computer simulations of crystallisation during solidification[@DiazLeines:2017]. 
+Atomistic simulation methods provide an insight into materials and their properties from an atomistic perspective. These methods often produce large amounts of data in terms of atomic positions over time, the analysis of which is crucial to study underlying mechanisms. Many computational analysis methods have been developed to determine the local environment of a particle, which are used for various purposes such as the distinction of a particle as solid or liquid, to identify the crystal structure they long to, to identify defects in a crystalline state etc. to name a few. (Stukowski). 
 
-Although bond-orientational order parameters can be calculated using atomistic simulation program like LAMMPS [@Plimpton:1995] or other codes like, they lack in ease of use and flexibility in a post-processing environment. ``pybop`` is designed to address the above issues, by providing a python library for calculation of bond order parameters intended for post-processing of simulation data. While python provides easy extension and flexibility, ``pybop`` ensures the speed and efficiency of calculations as the core code for ``pybop`` is written in C++, which is then ported to python using ``pybind11`` [@Jakob:2016]. 
+Bond orientational order parameters introduced by Steinhardt(steinhardt), have been used extensively(citations). These parameters, which are rotationally invariant are defined by,
 
-``pybop`` can perform a variety of calculations including the bond order parameters $q_{i}$ where $i = \{2,3 \to 12\}$, and the averaged versions [@Lechner:2008] which has been to improve the resolution in identification of crystal structures. Furthermore, ``pybop`` can also be used to calculate weighted $q_{i}$ [@Mickel:2013] where the contributions are weighted by the voronoi face area shared with adjacent atoms, the calculation of which is enabled with the help of Voro++ code [@Rycroft:2009] integrated into ``pybop``. Additionally, distinction of liquid and solid atoms based on these parameters [@DiazLeines:2017] is also incorporated into the package. Various other quantities like radial distribution function, coordination number and voronoi volume of individual particles, for example, can also be calculated.
 
-``pybop`` can read in output files containing atomistic simulation data in the LAMMPS [@Plimpton:1995] [dump format](https://lammps.sandia.gov/doc/dump.html) and POSCAR format used by ab initio simulation package VASP. In order to improve the functionality, an easy interface is provided to extended the type of input file formats. In addition, both cubic and triclinic simulation cells are also supported in this package.  
+$$ \bar{q}_l (i) =  \Big(  \frac{2\pi}{2l+1}  \sum_{m=-l}^l \Big| \frac{1}{N(i)} \sum_{j=1}^{N(i)} Y_{lm}(\pmb{r}_{ij}) \Big|^2 \Big )^{\frac{1}{2}} $$
 
-Various features of ``pybop`` including documentation and example usage is available in the [pybop website](https://srmnitc.github.io/pybop/html/index.html). Examples including installation of the package to calculation of bond-orientational order parameters are provided in the above url. Alternatively, ``pybop`` provides a [binder environment](https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F) to try the example cases before installation.       
+where $Y_{lm}$ are the spherical harmonics and $N(i)$ is the number of nearest neighbours of particle $i$. $\pmb{r}_{ij}$ is the displacement vector connecting particles $i$ and $j$ and $l$ and $m$ are both intergers with $m \in [-l,+l]$. $q_4$ and $q_6$ are often used for distinction of crystal structures. Furthermore, the averaged version of the order parameters was introduced to improve the resolution by averaging over the bond order parameters of nearest neighbour particles.
+
+At high temperatures, atomic positions   
+
+
+
+
 
 # Acknowledgements
 
