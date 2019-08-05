@@ -1067,7 +1067,7 @@ class System(pc.System):
         atom2c = self.copy_atom_to_catom(atom2)
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
-    def get_neighbors(self, method="cutoff", cutoff=None, nlimit=6, threshold=1.21, filter=None):
+    def get_neighbors(self, method="cutoff", cutoff=None, nlimit=6, threshold=1.21, filter=None, voroexp=1):
         """
         
         Find neighbors of all atoms in the `System`. There are few methods to do this, the 
@@ -1101,7 +1101,12 @@ class System(pc.System):
 
         filter : string - `None` or `type`, default None
             apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
-            `type`, only atoms of the same type would be included in the neighbor calculations. 
+            `type`, only atoms of the same type would be included in the neighbor calculations.
+
+        voroexp : int, default 1 
+            power of the neighbor weight used to weight the contribution of each atom towards the q 
+            values. Higher powers can sometimes lead to better resolution. Works only with `voronoi`
+            neighbour method. See  arXiv:1906.08111v1 for more details.
         
         Returns
         -------
@@ -1127,6 +1132,7 @@ class System(pc.System):
                 pc.System.get_all_neighbors_normal(self)
 
         elif method == 'voronoi':
+            pc.System.set_alpha(self, int(voroexp))
             pc.System.get_all_neighbors_voronoi(self)
             
 
@@ -1150,14 +1156,12 @@ class System(pc.System):
         """
         pc.System.reset_allneighbors(self)
 
-    def calculate_q(self, q, averaged = False, voroexp=1):
+    def calculate_q(self, q, averaged = False):
         """
         Find the bond order parameter q for all atoms. Any of the q parameters from 2-12 can be provided.
         If the averaged versions are to be calculated, the keyword `averaged = True` should be set.
         See Lechner, Dellago, JCP 129, 2008. for a description of the
-        averaged bond order parameters. If the value of `voroexp` scales the value of the facearea contribution
-        from each neighbor to the host atom. It is only used if `voronoi` method is used for calculation of
-        neighbors. 
+        averaged bond order parameters. 
 
         Parameters
         ----------
@@ -1166,9 +1170,6 @@ class System(pc.System):
         averaged : bool, default False
             If True, return the averaged q values,
             If False, return the non averaged ones
-        voroexp : int, default 1
-            The value for scaling of face area contributions when calculation of q parameters based on the voronoi
-            approach. 
 
         Returns
         -------
@@ -1179,7 +1180,6 @@ class System(pc.System):
         else:
             qq = q
         
-        pc.System.set_alpha(self, int(voroexp))
         pc.System.calculate_q(self, qq)
 
         if averaged:
