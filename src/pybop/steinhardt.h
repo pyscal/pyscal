@@ -183,7 +183,7 @@ class System{
         //void process_neighbor_noincrement(int, int);
         void process_neighbor(int, int);
         //new version only needs prefactor - which is a safe cutoff
-        void get_all_neighbors_adaptive(double);
+        int get_all_neighbors_adaptive(double);
 
         void get_all_neighbors_voronoi();
         void reset_all_neighbors();

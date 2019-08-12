@@ -2,6 +2,7 @@ import pybop.ccore as pc
 import pybop.traj_process as ptp
 import os
 import numpy as np
+import warnings
 
 """
 Definitions of class Atom.
@@ -1067,7 +1068,7 @@ class System(pc.System):
         atom2c = self.copy_atom_to_catom(atom2)
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
-    def get_neighbors(self, method="cutoff", cutoff=None, threshold=3, filter=None):
+    def get_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None):
         """
         
         Find neighbors of all atoms in the `System`. There are few methods to do this, the 
@@ -1092,7 +1093,7 @@ class System(pc.System):
 
         threshold : float
             only used if `cutoff='adaptive'`. A threshold which is used as safe limit. Adaptive cutoff
-            uses a padding over the intial guessed "neighbor distance". By default it is three. In case
+            uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
             of a warning that ``threshold`` is inadequate, it should be further increased. High/low value
             of this parameter will correspond to the time taken for finding neighbors.
 
@@ -1118,7 +1119,28 @@ class System(pc.System):
 
         if method == 'cutoff':
             if cutoff=='adaptive' or cutoff==0:
-                pc.System.get_all_neighbors_adaptive(self, threshold)
+                warnings.warn("Adaptive cutoff neighbr method has changed considerably. Please check the, \
+                    documentation for the new method.")
+                if threshold < 1:
+                    raise ValueError("value of threshold should be at least 1.00")
+                finished = pc.System.get_all_neighbors_adaptive(self, threshold)
+                #if it finished without finding neighbors
+                if not finished:
+                    finallydone = False
+                    for i in range(1,10):
+                        #threshold value is probably too low
+                        #try increasing threshold
+                        warnings.warn("Could not find adaptive cutoff. trying with a higher threshold", RuntimeWarning)
+                        pc.System.reset_allneighbors(self)
+                        newfinished = pc.System.get_all_neighbors_adaptive(self, threshold*i)
+                        if newfinished:
+                            finallydone = True
+                            warnings.warn("found neighbors with higher threshold than default/user input")
+                            break
+                    
+                    if not finallydone:
+                        raise RuntimeError("Adaptive cutoff could not be converged. This is most likely, \
+                        due to a low threshold value. Try increasing it.") 
             else:    
                 pc.System.set_neighbordistance(self, cutoff)
                 pc.System.get_all_neighbors_normal(self)

@@ -342,63 +342,43 @@ void System::get_all_neighbors_normal(){
 
 
     for (int ti=0; ti<nop; ti++){
-        if (atoms[ti].isneighborset == 0){
-            for (int tj=ti; tj<nop; tj++){
-                if(ti==tj) { continue; }
-                d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
-                if (d < neighbordistance){
-                    if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                        continue;
-                    }
-                    atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
-                    atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
-                    //weight is set to 1.0, unless manually reset
-                    atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
-                    atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
-                    atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
-                    atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
-                    convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                    atoms[ti].n_r[atoms[ti].n_neighbors] = r;
-                    atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
-                    atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
-                    atoms[ti].n_neighbors += 1;   
-
-                    atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
-                    atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
-                    //weight is set to 1.0, unless manually reset
-                    atoms[tj].neighborweight[atoms[tj].n_neighbors] = 1.00;
-                    atoms[tj].n_diffx[atoms[tj].n_neighbors] = -diffx;
-                    atoms[tj].n_diffy[atoms[tj].n_neighbors] = -diffy;
-                    atoms[tj].n_diffz[atoms[tj].n_neighbors] = -diffz;
-                    convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
-                    atoms[tj].n_r[atoms[tj].n_neighbors] = r;
-                    atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
-                    atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
-                    atoms[tj].n_neighbors +=1;
+        for (int tj=ti; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
+            if (d < neighbordistance){
+                if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                    continue;
                 }
+                process_neighbor(ti, tj);
+
+                atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
+                atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
+                //weight is set to 1.0, unless manually reset
+                atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
+                atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
+                atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
+                atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
+                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                atoms[ti].n_r[atoms[ti].n_neighbors] = r;
+                atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
+                atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
+                atoms[ti].n_neighbors += 1;   
+
+                atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
+                atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
+                //weight is set to 1.0, unless manually reset
+                atoms[tj].neighborweight[atoms[tj].n_neighbors] = 1.00;
+                atoms[tj].n_diffx[atoms[tj].n_neighbors] = -diffx;
+                atoms[tj].n_diffy[atoms[tj].n_neighbors] = -diffy;
+                atoms[tj].n_diffz[atoms[tj].n_neighbors] = -diffz;
+                convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
+                atoms[tj].n_r[atoms[tj].n_neighbors] = r;
+                atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
+                atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
+                atoms[tj].n_neighbors +=1;
             }
         }
-        //if neighbors are already read in
-        else {
-            //only loop over neighbors
-            for (int tj=0; tj<atoms[ti].n_neighbors; tj++){
         
-                d = get_abs_distance(ti,atoms[ti].neighbors[tj],diffx,diffy,diffz); 
-                //atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
-                atoms[ti].neighbordist[tj] = d;
-                //weight is set to 1.0, unless manually reset
-                //atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
-                atoms[ti].n_diffx[tj] = diffx;
-                atoms[ti].n_diffy[tj] = diffy;
-                atoms[ti].n_diffz[tj] = diffz;
-                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                atoms[ti].n_r[tj] = r;
-                atoms[ti].n_phi[tj] = phi;
-                atoms[ti].n_theta[tj] = theta;
-                //atoms[ti].n_neighbors += 1;   
-                
-            }   
-        }
     }
 
     //mark end of neighbor calc
@@ -558,7 +538,7 @@ void System::process_neighbor(int ti, int tj){
 }
 
 
-void System::get_all_neighbors_adaptive(double prefactor){
+int System::get_all_neighbors_adaptive(double prefactor){
 
     /*
     A new adaptive algorithm. Similar to the old ones, we guess a basic distance with padding,
@@ -570,7 +550,7 @@ void System::get_all_neighbors_adaptive(double prefactor){
     double d, dcut;
     double diffx,diffy,diffz;
     double r,theta,phi;
-    int m;
+    int m, maxneighs, finished;
     
     vector<int> nids;
     vector<double> dists, sorted_dists;
@@ -647,6 +627,11 @@ void System::get_all_neighbors_adaptive(double prefactor){
 
         //we have all the info now. Pick the top six
         //first sort distances
+        //check if its zero size
+        if (atomitos.size() == 0){
+            return 0;
+        }
+        
         sort(atomitos.begin(), atomitos.end(), by_dist());
         
         //start with initial routine
@@ -681,7 +666,9 @@ void System::get_all_neighbors_adaptive(double prefactor){
         dcut = summ/float(m-2);
         
         //now start loop
-        while( dcut >= atomitos[m].dist){
+        maxneighs = atomitos.size();
+
+        while( (m < maxneighs) && (dcut >= atomitos[m].dist)){
             //increase m
             m = m+1;
             //cout<<m<<endl;
@@ -697,10 +684,20 @@ void System::get_all_neighbors_adaptive(double prefactor){
             dcut = summ/float(m-2);
         }
 
+        //find if there was an error
+        if (m==maxneighs){
+            finished = 0;
+            break;
+        } else{
+            finished = 1;
+        }
+
     }
 
     //mark end of neighbor calc
     neighborsfound = 1;
+    return finished;
+
 
 }
 
