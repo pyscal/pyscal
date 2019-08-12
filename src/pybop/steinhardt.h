@@ -180,7 +180,7 @@ class System{
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors_normal();
         //helper functions
-        void process_neighbor_noincrement(int, int);
+        //void process_neighbor_noincrement(int, int);
         void process_neighbor(int, int);
         //new version only needs prefactor - which is a safe cutoff
         void get_all_neighbors_adaptive(double);

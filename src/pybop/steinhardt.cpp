@@ -557,35 +557,6 @@ void System::process_neighbor(int ti, int tj){
 
 }
 
-void System::process_neighbor_noincrement(int ti, int tj){
-    /*
-    Calculate all info and add it to list
-    ti - loc of host atom
-    tj - loc of neighbor in list of ti
-     d - interatomic distance
-
-     But : this one does not increment the list
-     This can be used if you know neighbors already
-     */
-    
-    double d, diffx, diffy, diffz;
-    double r, phi, theta;
-    
-    d = get_abs_distance(ti,atoms[ti].neighbors[tj],diffx,diffy,diffz); 
-    
-    atoms[ti].neighbordist[tj] = d;
-    atoms[ti].n_diffx[tj] = diffx;
-    atoms[ti].n_diffy[tj] = diffy;
-    atoms[ti].n_diffz[tj] = diffz;
-    
-    convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-    
-    atoms[ti].n_r[tj] = r;
-    atoms[ti].n_phi[tj] = phi;
-    atoms[ti].n_theta[tj] = theta;
-   
-}
-
 
 void System::get_all_neighbors_adaptive(double prefactor){
 
@@ -659,58 +630,95 @@ void System::get_all_neighbors_adaptive(double prefactor){
 
     //now starts the main loop
     for (int ti=0; ti<nop; ti++){
-        if (atoms[ti].isneighborset == 0){
-            //clear vector
-            atomitos.clear();
-            //start looping over every other particle
-            for (int tj=0; tj<nop; tj++){
-                if(ti==tj) { continue; }
-                d = get_abs_distance(ti,tj,diffx,diffy,diffz);
-                
-                if (d <= guessdist){
-                    datom x = {d, tj};
-                    atomitos.emplace_back(x);
-
-                }
-            }
-
-            //we have all the info now. Pick the top six
-            //first sort distances
-            sort(atomitos.begin(), atomitos.end(), by_dist());
+        
+        //clear vector
+        atomitos.clear();
+        //start looping over every other particle
+        for (int tj=0; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
             
-            //start with initial routine
-            m = 3;
-            summ = 0;
-            for(int i=0 ; i<m; i++){
-                summ += atomitos[i].dist;
-                int tj = atomitos[i].index;
-                process_neighbor(ti, tj);
-            }
-            
-            //find cutoff
-            dcut = summ/float(m-2);
-            
-            //now start loop
-            while( dcut > atomitos[m+1].dist){
-                //increase m
-                m = m+1;
-                
-                //here now we can add this to the list neighbors and process things
-                int tj = atomitos[m].index;
-                process_neighbor(ti, tj);
+            if (d <= guessdist){
+                datom x = {d, tj};
+                atomitos.emplace_back(x);
 
-                //find new dcut
-                summ = summ + atomitos[m].dist;
-                dcut = summ/float(m-2);
             }
-        }       
-        //if neighbors are already read in
-        else {
-            //only loop over neighbors
-            for (int tj=0; tj<atoms[ti].n_neighbors; tj++){
-                process_neighbor_noincrement(ti, tj);                
-            }   
         }
+
+        //we have all the info now. Pick the top six
+        //first sort distances
+        sort(atomitos.begin(), atomitos.end(), by_dist());
+        
+        //start with initial routine
+        m = 3;        //clear vector
+        atomitos.clear();
+        //start looping over every other particle
+        for (int tj=0; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+            
+            if (d <= guessdist){
+                datom x = {d, tj};
+                atomitos.emplace_back(x);
+
+            }
+        }
+
+        //we have all the info now. Pick the top six
+        //first sort distances
+        sort(atomitos.begin(), atomitos.end(), by_dist());
+        
+        //start with initial routine
+        m = 3;
+        summ = 0;
+        for(int i=0 ; i<m; i++){
+            summ += atomitos[i].dist;
+            int tj = atomitos[i].index;
+            process_neighbor(ti, tj);
+        }
+        
+        //find cutoff
+        dcut = summ/float(m-2);
+        
+        //now start loop
+        while( dcut > atomitos[m+1].dist){
+            //increase m
+            m = m+1;
+            
+            //here now we can add this to the list neighbors and process things
+            int tj = atomitos[m].index;
+            process_neighbor(ti, tj);
+
+            //find new dcut
+            summ = summ + atomitos[m].dist;
+            dcut = summ/float(m-2);
+        }
+        summ = 0;
+        for(int i=0 ; i<m; i++){
+            summ += atomitos[i].dist;
+            int tj = atomitos[i].index;
+            process_neighbor(ti, tj);
+        }
+        
+        //find cutoff
+        dcut = summ/float(m-2);
+        
+        //now start loop
+        while( dcut > atomitos[m+1].dist){
+            //increase m
+            m = m+1;
+            
+            //here now we can add this to the list neighbors and process things
+            int tj = atomitos[m].index;
+            process_neighbor(ti, tj);
+
+            //find new dcut
+            summ = summ + atomitos[m].dist;
+            dcut = summ/float(m-2);
+        }
+              
+        //if neighbors are already read in
+
     }
 
     //mark end of neighbor calc
