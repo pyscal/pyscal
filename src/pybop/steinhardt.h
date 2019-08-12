@@ -179,7 +179,12 @@ class System{
         void YLM(int , int , double , double , double &, double &);
         void QLM(int ,int ,double ,double ,double &, double & );
         void get_all_neighbors_normal();
-        void get_all_neighbors_adaptive(int, double);
+        //helper functions
+        //void process_neighbor_noincrement(int, int);
+        void process_neighbor(int, int);
+        //new version only needs prefactor - which is a safe cutoff
+        int get_all_neighbors_adaptive(double);
+
         void get_all_neighbors_voronoi();
         void reset_all_neighbors();
         void calculate_complexQLM_6();

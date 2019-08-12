@@ -348,65 +348,44 @@ void System::get_all_neighbors_normal(){
 
     if (!fileread) { read_particle_file(inputfile); }
 
-
     for (int ti=0; ti<nop; ti++){
-        if (atoms[ti].isneighborset == 0){
-            for (int tj=ti; tj<nop; tj++){
-                if(ti==tj) { continue; }
-                d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
-                if (d < neighbordistance){
-                    if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                        continue;
-                    }
-                    atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
-                    atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
-                    //weight is set to 1.0, unless manually reset
-                    atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
-                    atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
-                    atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
-                    atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
-                    convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                    atoms[ti].n_r[atoms[ti].n_neighbors] = r;
-                    atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
-                    atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
-                    atoms[ti].n_neighbors += 1;   
-
-                    atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
-                    atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
-                    //weight is set to 1.0, unless manually reset
-                    atoms[tj].neighborweight[atoms[tj].n_neighbors] = 1.00;
-                    atoms[tj].n_diffx[atoms[tj].n_neighbors] = -diffx;
-                    atoms[tj].n_diffy[atoms[tj].n_neighbors] = -diffy;
-                    atoms[tj].n_diffz[atoms[tj].n_neighbors] = -diffz;
-                    convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
-                    atoms[tj].n_r[atoms[tj].n_neighbors] = r;
-                    atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
-                    atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
-                    atoms[tj].n_neighbors +=1;
+        for (int tj=ti; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz); 
+            if (d < neighbordistance){
+                if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                    continue;
                 }
+                //process_neighbor(ti, tj);
+
+                atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
+                atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
+                //weight is set to 1.0, unless manually reset
+                atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
+                atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
+                atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
+                atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
+                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                atoms[ti].n_r[atoms[ti].n_neighbors] = r;
+                atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
+                atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
+                atoms[ti].n_neighbors += 1;   
+
+                atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
+                atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
+                //weight is set to 1.0, unless manually reset
+                atoms[tj].neighborweight[atoms[tj].n_neighbors] = 1.00;
+                atoms[tj].n_diffx[atoms[tj].n_neighbors] = -diffx;
+                atoms[tj].n_diffy[atoms[tj].n_neighbors] = -diffy;
+                atoms[tj].n_diffz[atoms[tj].n_neighbors] = -diffz;
+                convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
+                atoms[tj].n_r[atoms[tj].n_neighbors] = r;
+                atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
+                atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
+                atoms[tj].n_neighbors +=1;
             }
         }
-        //if neighbors are already read in
-        else {
-            //only loop over neighbors
-            for (int tj=0; tj<atoms[ti].n_neighbors; tj++){
         
-                d = get_abs_distance(ti,atoms[ti].neighbors[tj],diffx,diffy,diffz); 
-                //atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
-                atoms[ti].neighbordist[tj] = d;
-                //weight is set to 1.0, unless manually reset
-                //atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
-                atoms[ti].n_diffx[tj] = diffx;
-                atoms[ti].n_diffy[tj] = diffy;
-                atoms[ti].n_diffz[tj] = diffz;
-                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                atoms[ti].n_r[tj] = r;
-                atoms[ti].n_phi[tj] = phi;
-                atoms[ti].n_theta[tj] = theta;
-                //atoms[ti].n_neighbors += 1;   
-                
-            }   
-        }
     }
 
     //mark end of neighbor calc
@@ -540,102 +519,197 @@ void System::get_all_neighbors_voronoi(){
 
 }
 
+void System::process_neighbor(int ti, int tj){
+    /*
+    Calculate all info and add it to list
+    ti - loc of host atom
+    tj - loc of the neighbor
+     d - interatomic distance
+     */
+    
+    double d, diffx, diffy, diffz;
+    double r, phi, theta;
 
-void System::get_all_neighbors_adaptive(int nlimit, double prefactor){
+    d = get_abs_distance(ti, tj, diffx,diffy,diffz);
+    
+    atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
+    atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
+    //weight is set to 1.0, unless manually reset
+    atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
+    atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
+    atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
+    atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
+    convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+    atoms[ti].n_r[atoms[ti].n_neighbors] = r;
+    atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
+    atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
+    atoms[ti].n_neighbors += 1;   
 
+}
+
+
+int System::get_all_neighbors_adaptive(double prefactor){
+    /*
+    A new adaptive algorithm. Similar to the old ones, we guess a basic distance with padding,
+    and sort them up.
+    After that, we use the algorithm by in J. Chem. Phys. 136, 234107 (2012) to find the list of
+    neighbors.
+     */
+    
     //reset voronoi flag
     voronoiused = 0;
-
+  
     double d, dcut;
     double diffx,diffy,diffz;
     double r,theta,phi;
+    int m, maxneighs, finished;
+    
     vector<int> nids;
     vector<double> dists, sorted_dists;
 
     //double prefactor = 1.21;
     double summ;
+    double boxvol;
+    
+    //some guesswork here
+    //find the box volumes
+    if (triclinic==1){
+        double a1, a2, a3, b1, b2, b3, c1, c2, c3;
+        //rot is the cell vectors transposed
+        a1 = rot[0][0];
+        a2 = rot[1][0];
+        a3 = rot[2][0];
+        b1 = rot[0][1];
+        b2 = rot[1][1];
+        b3 = rot[2][1];
+        c1 = rot[0][2];
+        c2 = rot[1][2];
+        c3 = rot[2][2];
+        boxvol = c1*(a2*b3-a3*b2) - c2*(a1*b3-b1*a3) + c3*(a1*b2-a2*b1);
+    }
+    else{
+        boxvol = boxx*boxy*boxz;    
+    }
+    
+    //now find the volume per particle
+    double guessvol = boxvol/float(nop);
 
+    //guess the side of a cube that is occupied by an atom - this is a guess distance
+    double guessdist = cbrt(guessvol);
+    
+    //now add some safe padding - this is the prefactor which we will read in
+    guessdist = prefactor*guessdist;
+
+    //create a structure for sorting
+    struct datom{
+        double dist;
+        size_t  index;
+    };
+
+    //create another for the sorting algorithm
+    struct by_dist{
+        bool operator()(datom const &datom1, datom const &datom2){
+            return (datom1.dist < datom2.dist);
+        }
+    };
+
+    //a vector of atoms - vectors are needed for fast sorting
+    vector<datom> atomitos;
+
+    //if file is not read - read it in at this point
+    //we have to work on indicator functions
     if (!fileread) { read_particle_file(inputfile); }
 
+    //now starts the main loop
     for (int ti=0; ti<nop; ti++){
-        if (atoms[ti].isneighborset == 0){
-            //clear vectors
-            nids.clear();
-            dists.clear();
-            sorted_dists.clear();
-
-            //start looping over every other particle
-            for (int tj=0; tj<nop; tj++){
-                if(ti==tj) { continue; }
-                d = get_abs_distance(ti,tj,diffx,diffy,diffz);
-                //add the ids of atom, and distance to the list
-                nids.emplace_back(tj);
-                dists.emplace_back(d);
-                sorted_dists.emplace_back(d);
-            }
-
-            //we have all the info now. Pick the top six
-            //first sort distances
+        
+        //clear vector
+        atomitos.clear();
+        //start looping over every other particle
+        for (int tj=0; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
             
-            sort(sorted_dists.begin(), sorted_dists.end());
-            summ = 0;
-            for(int i=0; i<nlimit; i++){
-                summ+=sorted_dists[i];
-            }
-            dcut = prefactor*(1.0/float(nlimit))*summ;
+            if (d <= guessdist){
+                datom x = {d, tj};
+                atomitos.emplace_back(x);
 
-            //now we are ready to loop over again, but over the lists        
-            for(int j=0; j<dists.size(); j++){
-                int tj = nids[j];
-                if (dists[j] < dcut){
-
-                    if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                        continue;
-                    }
-
-                    d = get_abs_distance(ti,tj,diffx,diffy,diffz);
-                    atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
-                    atoms[ti].neighbordist[atoms[ti].n_neighbors] =d;
-                    //weight is set to 1.0, unless manually reset
-                    atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
-                    atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
-                    atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
-                    atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
-                    convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                    atoms[ti].n_r[atoms[ti].n_neighbors] = r;
-                    atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
-                    atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
-                    atoms[ti].n_neighbors += 1;   
-
-                }                
             }
         }
-        
-        //if neighbors are already read in
-        else {
-            //only loop over neighbors
-            for (int tj=0; tj<atoms[ti].n_neighbors; tj++){
-        
-                d = get_abs_distance(ti,atoms[ti].neighbors[tj],diffx,diffy,diffz); 
-                //atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
-                atoms[ti].neighbordist[tj] = d;
-                //weight is set to 1.0, unless manually reset
-                //atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
-                atoms[ti].n_diffx[tj] = diffx;
-                atoms[ti].n_diffy[tj] = diffy;
-                atoms[ti].n_diffz[tj] = diffz;
-                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                atoms[ti].n_r[tj] = r;
-                atoms[ti].n_phi[tj] = phi;
-                atoms[ti].n_theta[tj] = theta;
-                //atoms[ti].n_neighbors += 1;   
-                
-            }   
+
+        //we have all the info now. Pick the top six
+        //first sort distances
+        //check if its zero size
+        if (atomitos.size() == 0){
+            return 0;
         }
+        
+        sort(atomitos.begin(), atomitos.end(), by_dist());
+        
+        //start with initial routine
+       //clear vector
+        atomitos.clear();
+        //start looping over every other particle
+        for (int tj=0; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+            
+            if (d <= guessdist){
+                datom x = {d, tj};
+                atomitos.emplace_back(x);
+
+            }
+        }
+
+        //we have all the info now. Pick the top six
+        //first sort distances
+        sort(atomitos.begin(), atomitos.end(), by_dist());
+        
+        //start with initial routine
+        m = 3;
+        summ = 0;
+        for(int i=0 ; i<m; i++){
+            summ += atomitos[i].dist;
+            int tj = atomitos[i].index;
+            process_neighbor(ti, tj);
+        }
+        
+        //find cutoff
+        dcut = summ/float(m-2);
+        
+        //now start loop
+        maxneighs = atomitos.size();
+
+        while( (m < maxneighs) && (dcut >= atomitos[m].dist)){
+            //increase m
+            m = m+1;
+            //cout<<m<<endl;
+            //cout<<dcut<<endl;
+            //cout<<atomitos[m].dist<<endl;
+            
+            //here now we can add this to the list neighbors and process things
+            int tj = atomitos[m].index;
+            process_neighbor(ti, tj);
+
+            //find new dcut
+            summ = summ + atomitos[m].dist;
+            dcut = summ/float(m-2);
+        }
+
+        //find if there was an error
+        if (m==maxneighs){
+            finished = 0;
+            break;
+        } else{
+            finished = 1;
+        }
+
     }
 
     //mark end of neighbor calc
     neighborsfound = 1;
+    return finished;
+
 
 }
 

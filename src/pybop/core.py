@@ -2,6 +2,7 @@ import pybop.ccore as pc
 import pybop.traj_process as ptp
 import os
 import numpy as np
+import warnings
 
 """
 Definitions of class Atom.
@@ -1067,7 +1068,8 @@ class System(pc.System):
         atom2c = self.copy_atom_to_catom(atom2)
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
-    def get_neighbors(self, method="cutoff", cutoff=None, nlimit=6, threshold=1.21, filter=None, voroexp=1):
+
+    def get_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, voroexp=1):
         """
         
         Find neighbors of all atoms in the `System`. There are few methods to do this, the 
@@ -1076,8 +1078,8 @@ class System(pc.System):
         that share a Voronoi polyhedra face with the host atoms are considered its neighbors.
 
         Finally there is also an adaptive cutoff method if `cutoff` is specified as `'adaptive'` or 0. 
-        In this method, the six closest atoms to the
-        host atom are found and a cutoff distance is determined as threshold*(1/nlimit)*sum(r_ij).
+        In this method, the neighbors are found according to the algorithm specified in
+        J. Chem. Phys. 136, 234107 (2012).
 
         Parameters
         ----------
@@ -1089,15 +1091,12 @@ class System(pc.System):
             the cutoff distance to be used for the `cutoff` based neighbor calculation method
             described above.
             If the value is specified as 0 or `'adaptive'`, the `adaptive-cutoff` method is used.
-        
-        nlimit : int
-            only used if `cutoff='adaptive'`. The number of atoms used to calculate the adaptive
-            cutoff.
 
         threshold : float
-            only used if `cutoff='adaptive'`. The threshold for the adaptive cutoff. If the average
-            distance between host atom and `nlimit` neighbors of it is `a`, and `threshold` is 2, then
-            host atom will have neighbors between `a` and `2a`.
+            only used if `cutoff='adaptive'`. A threshold which is used as safe limit. Adaptive cutoff
+            uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
+            of a warning that ``threshold`` is inadequate, it should be further increased. High/low value
+            of this parameter will correspond to the time taken for finding neighbors.
 
         filter : string - `None` or `type`, default None
             apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
@@ -1126,8 +1125,30 @@ class System(pc.System):
 
         if method == 'cutoff':
             if cutoff=='adaptive' or cutoff==0:
-                pc.System.get_all_neighbors_adaptive(self, nlimit, threshold)
-            else:    
+                warnings.warn("Adaptive cutoff neighbr method has changed considerably. Please check the, \
+                    documentation for the new method.")
+                if threshold < 1:
+                    raise ValueError("value of threshold should be at least 1.00")
+                finished = pc.System.get_all_neighbors_adaptive(self, threshold)
+                #if it finished without finding neighbors
+                if not finished:
+                    finallydone = False
+                    for i in range(1,10):
+                        #threshold value is probably too low
+                        #try increasing threshold
+                        warnings.warn("Could not find adaptive cutoff. trying with a higher threshold", RuntimeWarning)
+                        pc.System.reset_allneighbors(self)
+                        newfinished = pc.System.get_all_neighbors_adaptive(self, threshold*i)
+                        if newfinished:
+                            finallydone = True
+                            warnings.warn("found neighbors with higher threshold than default/user input")
+                            break
+                    
+                    if not finallydone:
+                        raise RuntimeError("Adaptive cutoff could not be converged. This is most likely, \
+                        due to a low threshold value. Try increasing it.") 
+            else:
+                #warnings.warn("THIS RAN")    
                 pc.System.set_neighbordistance(self, cutoff)
                 pc.System.get_all_neighbors_normal(self)
 
