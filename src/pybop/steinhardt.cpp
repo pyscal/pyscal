@@ -650,7 +650,7 @@ void System::get_all_neighbors_adaptive(double prefactor){
         sort(atomitos.begin(), atomitos.end(), by_dist());
         
         //start with initial routine
-        m = 3;        //clear vector
+       //clear vector
         atomitos.clear();
         //start looping over every other particle
         for (int tj=0; tj<nop; tj++){
@@ -681,9 +681,12 @@ void System::get_all_neighbors_adaptive(double prefactor){
         dcut = summ/float(m-2);
         
         //now start loop
-        while( dcut > atomitos[m+1].dist){
+        while( dcut >= atomitos[m].dist){
             //increase m
             m = m+1;
+            //cout<<m<<endl;
+            //cout<<dcut<<endl;
+            //cout<<atomitos[m].dist<<endl;
             
             //here now we can add this to the list neighbors and process things
             int tj = atomitos[m].index;
@@ -693,31 +696,6 @@ void System::get_all_neighbors_adaptive(double prefactor){
             summ = summ + atomitos[m].dist;
             dcut = summ/float(m-2);
         }
-        summ = 0;
-        for(int i=0 ; i<m; i++){
-            summ += atomitos[i].dist;
-            int tj = atomitos[i].index;
-            process_neighbor(ti, tj);
-        }
-        
-        //find cutoff
-        dcut = summ/float(m-2);
-        
-        //now start loop
-        while( dcut > atomitos[m+1].dist){
-            //increase m
-            m = m+1;
-            
-            //here now we can add this to the list neighbors and process things
-            int tj = atomitos[m].index;
-            process_neighbor(ti, tj);
-
-            //find new dcut
-            summ = summ + atomitos[m].dist;
-            dcut = summ/float(m-2);
-        }
-              
-        //if neighbors are already read in
 
     }
 
