@@ -50,6 +50,11 @@ def test_neighbors_system():
     atoms = sys.get_allatoms()
     assert atoms[0].get_coordination() == 14
 
+    sys.get_neighbors(method = 'cutoff', cutoff=0, threshold=1)
+    #any atom should have 8 neighbors
+    atoms = sys.get_allatoms()
+    assert atoms[0].get_coordination() == 14
+
 def test_neighbors_system_filter():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2])

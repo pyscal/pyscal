@@ -28,6 +28,13 @@ def test_set_type():
     atom.set_type(2)
     assert atom.get_type() == 2
 
+def test_set_solid():
+    atom = pc.Atom(pos=[0,0,0], id=1, type=1)
+    atom.set_solid(1)
+    assert atom.get_solid() == 1
+    with pytest.raises(ValueError):
+        atom.set_solid(2)
+
 def test_neighbors():
     atom = pc.Atom(pos=[0,0,0], id=1)
     atom.set_neighbors([1,2])
