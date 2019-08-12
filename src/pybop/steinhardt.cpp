@@ -340,7 +340,6 @@ void System::get_all_neighbors_normal(){
 
     if (!fileread) { read_particle_file(inputfile); }
 
-
     for (int ti=0; ti<nop; ti++){
         for (int tj=ti; tj<nop; tj++){
             if(ti==tj) { continue; }
@@ -349,7 +348,7 @@ void System::get_all_neighbors_normal(){
                 if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
                     continue;
                 }
-                process_neighbor(ti, tj);
+                //process_neighbor(ti, tj);
 
                 atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
                 atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;

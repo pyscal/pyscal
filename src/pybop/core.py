@@ -1141,7 +1141,8 @@ class System(pc.System):
                     if not finallydone:
                         raise RuntimeError("Adaptive cutoff could not be converged. This is most likely, \
                         due to a low threshold value. Try increasing it.") 
-            else:    
+            else:
+                #warnings.warn("THIS RAN")    
                 pc.System.set_neighbordistance(self, cutoff)
                 pc.System.get_all_neighbors_normal(self)
 
