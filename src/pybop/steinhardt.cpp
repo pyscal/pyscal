@@ -20,6 +20,8 @@ System::System(){
     fileread = 0;
     filter = 0;
     triclinic = 0;
+    alpha = 1;
+    voronoiused = 0;
 
 }
 
@@ -103,7 +105,10 @@ void System::read_particle_file(string nn){
   
  }
 
+void System::salpha(int a){
 
+    alpha = a;
+}
 
 //this function allows for handling custom formats of atoms and so on
 void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> boxd ){
@@ -334,6 +339,9 @@ vector<double> System::get_pairdistances(){
 void System::get_all_neighbors_normal(){
 
     
+    //reset voronoi flag
+    voronoiused = 0;
+
     double d;
     double diffx,diffy,diffz;
     double r,theta,phi;
@@ -389,6 +397,8 @@ void System::get_all_neighbors_normal(){
 //if neighbor method voronoi is selected.
 void System::get_all_neighbors_voronoi(){
 
+    //reset voronoi flag
+    voronoiused = 1;
 
     double d;
     double diffx,diffy,diffz;
@@ -405,6 +415,7 @@ void System::get_all_neighbors_voronoi(){
     vector<int> idss;
     //vector<int> nvector;
     double weightsum;
+
 
     if (!fileread) { read_particle_file(inputfile); }
 
@@ -486,7 +497,7 @@ void System::get_all_neighbors_voronoi(){
                 d = get_abs_distance(ti,neigh[tj],diffx,diffy,diffz); 
                 atoms[ti].neighbordist[tj] = d;
                 //weight is set to 1.0, unless manually reset
-                atoms[ti].neighborweight[tj] = facearea[tj]/weightsum;
+                atoms[ti].neighborweight[tj] = pow(facearea[tj], alpha)/weightsum;
                 atoms[ti].n_diffx[tj] = diffx;
                 atoms[ti].n_diffy[tj] = diffy;
                 atoms[ti].n_diffz[tj] = diffz;
@@ -538,7 +549,6 @@ void System::process_neighbor(int ti, int tj){
 
 
 int System::get_all_neighbors_adaptive(double prefactor){
-
     /*
     A new adaptive algorithm. Similar to the old ones, we guess a basic distance with padding,
     and sort them up.
@@ -546,6 +556,9 @@ int System::get_all_neighbors_adaptive(double prefactor){
     neighbors.
      */
     
+    //reset voronoi flag
+    voronoiused = 0;
+  
     double d, dcut;
     double diffx,diffy,diffz;
     double r,theta,phi;
@@ -854,9 +867,9 @@ void System::calculate_q(vector <int> qs){
                 }
             
             //the weights are not normalised,
-            if(weightsum>1.01){
-                realti = realti/weightsum;
-                imgti = imgti/weightsum;                
+            if(!voronoiused){
+                realti = realti/float(weightsum);
+                imgti = imgti/float(weightsum);                
             }
             
             

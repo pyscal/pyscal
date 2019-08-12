@@ -236,6 +236,12 @@ class System{
         double boxdims[3][2];
         string inputfile;
         vector<double> get_pairdistances();
+        //power of face area weighting
+        int alpha;
+        void salpha(int);
+        //indicator function - 1 if voronoi method is used
+        //will be reset if any other method is used
+        int voronoiused;
         
         double neighbordistance;
 
