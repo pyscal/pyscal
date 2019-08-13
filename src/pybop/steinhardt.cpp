@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include "voro++.hh"
 #include "string.h"
-
+#include <chrono>
 using namespace voro;
 
 /*
@@ -570,7 +570,7 @@ int System::get_all_neighbors_adaptive(double prefactor){
     //double prefactor = 1.21;
     double summ;
     double boxvol;
-    
+
     //some guesswork here
     //find the box volumes
     if (triclinic==1){
@@ -591,6 +591,7 @@ int System::get_all_neighbors_adaptive(double prefactor){
         boxvol = boxx*boxy*boxz;    
     }
     
+
     //now find the volume per particle
     double guessvol = boxvol/float(nop);
 
@@ -620,6 +621,7 @@ int System::get_all_neighbors_adaptive(double prefactor){
     //we have to work on indicator functions
     if (!fileread) { read_particle_file(inputfile); }
 
+    
     //now starts the main loop
     for (int ti=0; ti<nop; ti++){
         
@@ -644,25 +646,6 @@ int System::get_all_neighbors_adaptive(double prefactor){
             return 0;
         }
         
-        sort(atomitos.begin(), atomitos.end(), by_dist());
-        
-        //start with initial routine
-       //clear vector
-        atomitos.clear();
-        //start looping over every other particle
-        for (int tj=0; tj<nop; tj++){
-            if(ti==tj) { continue; }
-            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
-            
-            if (d <= guessdist){
-                datom x = {d, tj};
-                atomitos.emplace_back(x);
-
-            }
-        }
-
-        //we have all the info now. Pick the top six
-        //first sort distances
         sort(atomitos.begin(), atomitos.end(), by_dist());
         
         //start with initial routine
@@ -703,6 +686,8 @@ int System::get_all_neighbors_adaptive(double prefactor){
         } else{
             finished = 1;
         }
+
+        break;
 
     }
 
