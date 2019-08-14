@@ -14,22 +14,22 @@ class Atom(pc.Atom):
     can be accessed through member functions which are described below in detail. Atoms can
     be created individually or directly by reading in a file. Check the examples for more 
     details on how atoms are created. For creating atoms directly from an input file check
-    the documentation of `System` class.
+    the documentation of ``System`` class.
 
-    Although an `Atom` object can be created independently, Atoms should be thought of 
-    inherently as members of the `System` class. All the properties that define an `atom` are
-    relative to the `System` class. `System` has a list of all atoms using which the neighbors
-    of an atom, if its solid and so on can be calculated. All the calculated properties of an
-    atom which depend on any other atom hence should be calculated through `System`. Please
+    Although an ``Atom`` object can be created independently, ``Atom``s should be thought of 
+    inherently as members of the ``System`` class. All the properties that define an ``Atom`` are
+    relative to the ``System`` class. ``System`` has a list of all atoms using which the neighbors
+    of an ``Atom``, if its solid and so on can be calculated. All the calculated properties of an
+    ``Atom`` which depend on any other ``Atom`` hence should be calculated through ``System``. Please
     check the examples section of the documentation for more details. 
 
     Parameters
     ----------
     pos : list of floats of length 3, default [0,0,0]
-        position of the `Atom`
+        position of the ``Atom``
 
     id : int, default 0
-        id of the `Atom`
+        id of the ``Atom``
 
     Examples
     --------
@@ -42,8 +42,8 @@ class Atom(pc.Atom):
 
     See also
     --------
-    get_x
-    set_x
+    get_pos
+    set_pos
     set_id
     get_id
     System
@@ -59,10 +59,10 @@ class Atom(pc.Atom):
         pc.Atom.set_type(self, type)
 
     #now wrapping for other normal functions
-    def get_x(self):
+    def get_pos(self):
         """
         
-        Get the position of the atom. Meaningful values are only returned if the atoms are
+        Get the position of the ``Atom``. Meaningful values are only returned if the atoms are
         set before using this function.
 
         Parameters
@@ -71,34 +71,34 @@ class Atom(pc.Atom):
         
         Returns
         -------
-        x : array of float
-            contains the position of the atom in the form [posx, posy, posz], where
-            posx is the x coordinate of the atom, posy is the y coordinate and posz 
+        pos : array of float
+            contains the position of the atom in the form ``[posx, posy, posz]``, where
+            ``posx`` is the x coordinate of the atom, ``posy`` is the y coordinate and ``posz`` 
             is the z coordinate. 
 
         Examples
         --------
         >>> atom = Atom()
-        >>> x = atom.get_x()
+        >>> x = atom.get_pos()
 
         See also
         --------
-        set_x
+        set_pos
         Atom
         System      
         """
         x = pc.Atom.get_x(self)
         return x
 
-    def set_x(self, pos):
+    def set_pos(self, pos):
         """
         
-        Set the position of the atom. 
+        Set the position of the ``Atom``. 
 
         Parameters
         ----------
-        x : list of floats of length 3
-            list contains three values which are the position coordinates of the atom with
+        pos : list of floats of length 3
+            list contains three values which are the position coordinates of the ``Atom`` with
             respect to the simulation box.
 
         Returns
@@ -108,15 +108,20 @@ class Atom(pc.Atom):
         Examples
         --------
         >>> atom = Atom()
-        >>> x = atom.set_x([23.0, 45.2, 34.2])
+        >>> x = atom.set_pos([23.0, 45.2, 34.2])
 
         See also
         --------
-        get_x
+        get_pos
 
         """
         if len(pos) == 3:
-            pc.Atom.set_x(self, pos)
+            if np.array(pos).dtype == 'float':
+                pc.Atom.set_x(self, pos)
+            else:
+                raise TypeError("Position values should be float.")
+        else:
+            raise ValueError("Length of position array should be 3.")
 
     def get_solid(self):
         """
@@ -128,7 +133,9 @@ class Atom(pc.Atom):
 
         Returns
         -------
-        issolid : 1 if solid, 0 otherwise
+        issolid : int
+            1 if solid  
+            0 otherwise
         """
         return pc.Atom.get_solid(self)
 
@@ -142,7 +149,9 @@ class Atom(pc.Atom):
 
         Returns
         -------
-        structure : structural value
+        structure : int  
+            structural value. As of now it is not calculated using
+            any inbuilt function.
         """
         return pc.Atom.get_structure(self)
 
@@ -177,7 +186,7 @@ class Atom(pc.Atom):
         -------
         None
         """
-        return pc.Atom.set_structure(self, structure)
+        pc.Atom.set_structure(self, structure)
 
 
     def get_volume(self, averaged = False):
