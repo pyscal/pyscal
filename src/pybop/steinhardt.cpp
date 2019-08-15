@@ -687,8 +687,6 @@ int System::get_all_neighbors_adaptive(double prefactor){
             finished = 1;
         }
 
-        break;
-
     }
 
     //mark end of neighbor calc

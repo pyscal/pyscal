@@ -16,11 +16,11 @@ class Atom(pc.Atom):
     details on how atoms are created. For creating atoms directly from an input file check
     the documentation of ``System`` class.
 
-    Although an ``Atom`` object can be created independently, ``Atom``s should be thought of 
-    inherently as members of the ``System`` class. All the properties that define an ``Atom`` are
+    Although an ``Atom`` object can be created independently, ``Atom`` should be thought of 
+    inherently as members of the ``System`` class. All the properties that define an atom are
     relative to the ``System`` class. ``System`` has a list of all atoms using which the neighbors
     of an ``Atom``, if its solid and so on can be calculated. All the calculated properties of an
-    ``Atom`` which depend on any other ``Atom`` hence should be calculated through ``System``. Please
+    atom which depend on any other atom, hence should be calculated through ``System``. Please
     check the examples section of the documentation for more details. 
 
     Parameters
@@ -197,7 +197,7 @@ class Atom(pc.Atom):
 
         Parameters
         ----------
-        averaged : bool, default False
+        averaged : bool, default False  
             If True, averaged version of the volume is returned.
         
         Returns
@@ -209,11 +209,7 @@ class Atom(pc.Atom):
         --------
         >>> volume = atom.get_volume()
 
-        See also
-        --------
-        find_neighbors
-        Atom
-        System      
+  
         """
         if averaged:
             vol = pc.Atom.get_avgvolume(self)
@@ -226,7 +222,7 @@ class Atom(pc.Atom):
         """
         Get the cluster properties of the atom. The cluster properties of the atom
         include four different properties as listed below. The properties are only
-        returned if they are calculated before using 'calculate_nucsize' function 
+        returned if they are calculated before using ``calculate_nucsize`` function 
         before.
 
         Parameters
@@ -235,12 +231,12 @@ class Atom(pc.Atom):
         
         Returns
         -------
-        cluster : list of int of length 4
-            cluster is a vector of four values. they are described below-
-                issolid - which is 1 if the atom is solid, 0 otherwise
-                issurface - 1 if the atom has liquid neighbors, 0 otherwise
-                lcluster - 1 if the atom belongs to the largest cluster, 0 otherwise
-                belongsto - which gives the id of the cluster that the atom belongs to.
+        cluster : list of int of length 4  
+            ``cluster`` is a vector of four values. they are described below-  
+                ``issolid`` : which is 1 if the atom is solid, 0 otherwise  
+                ``issurface`` : 1 if the atom has liquid neighbors, 0 otherwise  
+                ``lcluster`` : 1 if the atom belongs to the largest cluster, 0 otherwise  
+                ``belongsto`` : which gives the id of the cluster that the atom belongs to.  
         
         Examples
         --------
@@ -260,7 +256,7 @@ class Atom(pc.Atom):
         
         Returns the neighbors indices of the atom. The list returned consistes of the indices
         of neighbor atom which indicate their position in the list of all atoms. The neighbors
-        of an atom can be calculated from the `System` object that it belongs to.
+        of an atom can be calculated from the ``System`` object that it belongs to.
 
         Parameters
         ----------
@@ -314,7 +310,7 @@ class Atom(pc.Atom):
     def get_coordination(self):
         """
         
-        Returns the coordination number of the atom. `get_allneighbors` function of the `System` class
+        Returns the coordination number of the atom. ``System.get_neighbors`` function
         has to be used before accessing coordination numbers. 
 
         Parameters
@@ -342,14 +338,14 @@ class Atom(pc.Atom):
     def get_neighborweights(self):
         """
         
-        Get the neighbor weights of the atom. The neighbor weights are used weight the 
+        Get the neighbor weights of the atom. The neighbor weights are used to weight the 
         contribution of each neighboring atom towards the q value of the host atom. By 
         default, each neighbor has a weight of 1 each. However, if the neighbors are calculated
-        using the `System.get_allneighbors(method='voronoi')`, each neighbor atom gets a 
+        using the  ``System.get_neighbors(method='voronoi')``, each neighbor atom gets a 
         weight proportional to the face area shared between the neighboring atom and the 
-        host atom. This can sometimes be helpful in controlling the contribution of atoms
-        with low face areas due to the thermal vibrations at high temperature.
-
+        host atom (or higher powers - check the documentation). This can sometimes be helpful 
+        in controlling the contribution of atoms with low face areas due to the thermal vibrations at high temperature.
+        
         Parameters
         ----------
         None
@@ -403,7 +399,7 @@ class Atom(pc.Atom):
         get q value of the atom. The q value can be either normal or can
         be averaged according to Lechner, W, Dellago, C. JCP 129, 2008.
         The averaged version can be obtained by using keyword
-        `averaged = True`.
+        ``averaged = True``.
 
         Parameters
         ----------
@@ -446,7 +442,7 @@ class Atom(pc.Atom):
 
     def set_q(self, q, d, averaged = False):
         """
-        set the q value of the atom. If `averaged = True`, sets the averaged versions of
+        set the q value of the atom. If ``averaged = True``, sets the averaged versions of
         the q parameters.
 
         Parameters
@@ -455,8 +451,8 @@ class Atom(pc.Atom):
             number of the required q - from 2-12
         d : float or list of floats
             the q value to set
-        averaged : bool, default False
-            If True, return the averaged q values,
+        averaged : bool, default False  
+            If True, return the averaged q values,  
             If False, return the non averaged ones            
 
         Returns
@@ -540,7 +536,7 @@ class Atom(pc.Atom):
     def get_loc(self):
         """
         
-        get  the location of the atom.
+        get  the location of the atom in the array of all atoms in ``System``
 
         Parameters
         ----------
@@ -564,7 +560,8 @@ class Atom(pc.Atom):
     def set_loc(self, idd):
         """
         
-        set  the loc of the atom.
+        set  the ``loc`` of the atom. When an atom is put back in the ``System``, it will
+        be reset if another atom exists in that ``loc``
 
         Parameters
         ----------
@@ -584,12 +581,13 @@ class Atom(pc.Atom):
         get_loc
 
         """
+        warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
         pc.Atom.set_loc(self, idd)
 
     def get_type(self):
         """
         
-        get  the type(species) of the atom.
+        get  the ``type`` (species) of the atom.
 
         Parameters
         ----------
@@ -633,14 +631,17 @@ class Atom(pc.Atom):
         get_type
 
         """
-        pc.Atom.set_type(self, tt)
+        if isinstance(tt, int):
+            pc.Atom.set_type(self, tt)
+        else:
+            raise ValueError("type value should be integer")
 
 
     def get_vorovector(self):
         """
         get the voronoi structure identification vector. Returns a
-        vector of the form (n3, n4, n5, n6), where n3 is the number
-        of faces with 3 vertices, n4 is the number of faces with 4
+        vector of the form ``(n3, n4, n5, n6)``, where ``n3`` is the number
+        of faces with 3 vertices, ``n4`` is the number of faces with 4
         vertices and so on. This can be used to identify structures.
 
         Parameters
@@ -649,14 +650,18 @@ class Atom(pc.Atom):
 
         Returns
         -------
-        vorovector : array like, int
+        vorovector : array like, int  
             array of the form (n3, n4, n5, n6)
         """
         return pc.Atom.get_vorovector(self)
 
+#------------------------------------------------------------------------------------------------------------
 """
 System class definitions
 """
+#------------------------------------------------------------------------------------------------------------
+
+
 class System(pc.System):
     """
     A c++ class for holding the properties of a system. A `System` consists of two
