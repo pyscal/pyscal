@@ -116,9 +116,10 @@ class Atom(pc.Atom):
 
         """
         if len(pos) == 3:
-            if np.array(pos).dtype == 'float':
+            try:
+                pos = np.array(pos).astype(float)
                 pc.Atom.set_x(self, pos)
-            else:
+            except:
                 raise TypeError("Position values should be float.")
         else:
             raise ValueError("Length of position array should be 3.")
@@ -762,6 +763,8 @@ class System(pc.System):
                 pc.System.assign_particles(self, atoms, boxdims)
             else:
                 raise FileNotFoundError("input file not found")
+        else:
+            raise TypeError("format recieved an unknown option")
 
 
     def assign_atoms(self, atoms, box):
@@ -968,7 +971,7 @@ class System(pc.System):
         atomc = self.copy_atom_to_catom(atom)
         pc.System.set_atom(self, atomc)
 
-    def get_allatoms(self):
+    def get_atoms(self):
         """
         
         Get a list of all `Atom` objects that belong to the system.

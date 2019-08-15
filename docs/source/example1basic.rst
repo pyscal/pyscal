@@ -7,18 +7,18 @@ Getting started with pybop
   this example would be made available soon.
 | We start by importing the module
 
-.. code:: ipython2
+.. code:: ipython3
 
     import pybop.core as pc
     import numpy as np
 
-The System class
-~~~~~~~~~~~~~~~~
+The ``System`` class
+~~~~~~~~~~~~~~~~~~~~
 
 ``System`` is the basic class of pydoc and is required to be setup in
 order to perform any calculations. It can be set up as easily as-
 
-.. code:: ipython2
+.. code:: ipython3
 
     sys = pc.System()
 
@@ -33,13 +33,13 @@ simulation box dimensions \* the information regarding individual atoms.
 | The unitcell has 2 atoms and their positions are [0,0,0] and [0.5,
   0.5, 0.5].
 
-.. code:: ipython2
+.. code:: ipython3
 
     sys.set_box([[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]])
 
 We can easily check if everything worked by getting the box dimensions
 
-.. code:: ipython2
+.. code:: ipython3
 
     box = sys.get_box()
     box
@@ -49,19 +49,19 @@ We can easily check if everything worked by getting the box dimensions
 
 .. parsed-literal::
 
-    [0.0, 1.0, 0.0, 1.0, 0.0, 1.0]
+    [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]]
 
 
 
-The Atom class
-~~~~~~~~~~~~~~
+The ``Atom`` class
+~~~~~~~~~~~~~~~~~~
 
 | The next part is assigning the atoms. This can be done using the
   ``Atom`` class. Here, we will only look at the basic properties of
   ``Atom`` class. For a more detailed description, check the examples.
 | Now lets create two atoms.
 
-.. code:: ipython2
+.. code:: ipython3
 
     atom1 = pc.Atom()
     atom2 = pc.Atom()
@@ -69,16 +69,23 @@ The Atom class
 Now two empty atom objects are created. The major poperties of an atom
 are its positions and id. Lets set this up.
 
-.. code:: ipython2
+.. code:: ipython3
 
-    atom1.set_x([0, 0, 0])
+    atom1.set_pos([0., 0., 0.])
     atom1.set_id(0)
-    atom2.set_x([0.5, 0.5, 0.5])
+    atom2.set_pos([0.5, 0.5, 0.5])
     atom2.set_id(1)
+
+Alternatively, atom objects can also be set up as
+
+.. code:: ipython3
+
+    atom1 = pc.Atom(pos=[0., 0., 0.], id=0)
+    atom2 = pc.Atom(pos=[0.5, 0.5, 0.5], id=1)
 
 We can check the details of the atom by querying it
 
-.. code:: ipython2
+.. code:: ipython3
 
     x1 = atom1.get_x()
     x1
@@ -92,6 +99,71 @@ We can check the details of the atom by querying it
 
 
 
+Combining ``System`` and ``Atom``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Now that we have created the atoms, we can assign them to the system. We
+can also assign the same box we created before.
+
+.. code:: ipython3
+
+    sys = pc.System()
+    sys.assign_atoms([atom1, atom2], box)
+
+That sets up the system completely. It has both of it’s constituents -
+atoms and the simulation box. We can check if everything works
+correctly.
+
+.. code:: ipython3
+
+    atoms = sys.get_atoms()
+
+
+.. parsed-literal::
+
+    /home/menonsqr/anaconda2/envs/p3env/lib/python3.7/site-packages/pybop-1.0.1-py3.7-linux-x86_64.egg/pybop/core.py:585: UserWarning: If the loc of atom is changed and set to system, it will overwrite the existing data, if any.
+      warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
+
+
+This returns all the atoms of the system. Once you have all the atoms,
+you can modify any one and set it back to the system. The following
+statement will set the type of the first atom to 2.
+
+.. code:: ipython3
+
+    atom = atoms[0]
+    atom.set_type(2)
+
+Lets verify if it was done properly
+
+.. code:: ipython3
+
+    atom.get_type()
+
+
+
+
+.. parsed-literal::
+
+    2
+
+
+
+Now we can push the atom back to the system
+
+.. code:: ipython3
+
+    sys.set_atom(atom)
+
+We can also get individual atoms from the system instead of getting all
+of them
+
+.. code:: ipython3
+
+    atom = sys.get_atom(0)
+
+the above statement will return the atom at position 0
+
 Reading in an input file
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -100,16 +172,21 @@ Reading in an input file
   difficult to set each of them
 | individually. In this situation we can read in input file directly. An
   example input file containing 500 atoms in a simulation box can be
-  read in automatically.
+  read in automatically. The file we use for this example is a file of
+  the `lammps-dump <https://lammps.sandia.gov/doc/dump.html>`__ format.
+  ``pybop`` can also read in POSCAR files. In principle, ``pybop`` only
+  needs the atom positions and simulation box size, so you can write a
+  python function to process the input file, extract the details and
+  pass to ``pybop``.
 
-.. code:: ipython2
+.. code:: ipython3
 
     sys = pc.System()
     sys.read_inputfile('conf.dump')
 
 Once again, lets check if the box dimensions are read in correctly
 
-.. code:: ipython2
+.. code:: ipython3
 
     box = sys.get_box()
     box
@@ -119,13 +196,13 @@ Once again, lets check if the box dimensions are read in correctly
 
 .. parsed-literal::
 
-    [-7.66608, 11.1901, -7.66915, 11.1931, -7.74357, 11.2676]
+    [[-7.66608, 11.1901], [-7.66915, 11.1931], [-7.74357, 11.2676]]
 
 
 
 Now we can get all atoms that belong to this system
 
-.. code:: ipython2
+.. code:: ipython3
 
     atoms = sys.get_allatoms()
     len(atoms)
@@ -143,7 +220,7 @@ Now we can get all atoms that belong to this system
   atoms in total. Once again, individual atom properties can be
 | accessed as before.
 
-.. code:: ipython2
+.. code:: ipython3
 
     atoms[0].get_x()
 
