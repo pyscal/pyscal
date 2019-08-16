@@ -32,13 +32,13 @@ def test_create_multislice_dump():
     #now this file should have info of both - read it in
     sys3 = pc.System()
     sys3.read_inputfile("tests/bcc3.dat", frame=1)
-    atoms = sys3.get_allatoms()
+    atoms = sys3.get_atoms()
     assert atoms[0].get_x() == [0.01,0,0]    
 
     #now this file should have info of both - read it in
     sys4 = pc.System()
     sys4.read_inputfile("tests/bcc3.dat", frame=0)
-    atoms = sys4.get_allatoms()
+    atoms = sys4.get_atoms()
     assert atoms[0].get_x() == [0.0,0,0]
 
     #now cleanup

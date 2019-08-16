@@ -11,7 +11,7 @@ def test_q_4():
     #sys.get_neighbors(method = 'voronoi')
     sys.get_neighbors(method = 'cutoff', cutoff=0.9)
     sys.calculate_q([4, 6], averaged=True)
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert np.round(atoms[0].get_q(4), decimals=2) == 0.51
     assert np.round(atoms[0].get_q(4, averaged=True), decimals=2) == 0.51
     assert np.round(atoms[0].get_q([4, 6])[0], decimals=2) == 0.51

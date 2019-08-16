@@ -7,7 +7,7 @@ import pybop.crystal_structures as pcs
 def test_lammps_dump():
     sys = pc.System()
     sys.read_inputfile('tests/conf.dump')
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert len(atoms) == 500
 
     #check box
@@ -20,7 +20,7 @@ def test_lammps_dump():
     #now check the same for zipped file
     sys = pc.System()
     sys.read_inputfile('tests/conf.dump.gz')
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert len(atoms) == 500
 
     #check box
@@ -33,7 +33,7 @@ def test_lammps_dump():
 def test_poscar():
     sys = pc.System()
     sys.read_inputfile('tests/POSCAR', format='poscar')
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert len(atoms) == 42
 
     #now assert atoms of different types

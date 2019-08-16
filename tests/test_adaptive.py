@@ -14,12 +14,12 @@ def test_neighbors_system():
     #cutoff method - first shell only
     sys.get_neighbors(method = 'cutoff', cutoff=0)
     #any atom should have 8 neighbors
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 14
 
     sys.get_neighbors(method = 'cutoff', cutoff=0, threshold=1)
     #any atom should have 8 neighbors
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 14
 
     sys.calculate_q(8, averaged=True)

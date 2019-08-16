@@ -11,7 +11,7 @@ def test_system_nucsize():
     sys.assign_atoms(atoms, boxdims)
 
     #test that atoms are set properly
-    assert len(sys.get_allatoms()) == 16
+    assert len(sys.get_atoms()) == 16
 
     #now calculate nucsize
     sys.set_nucsize_parameters(0.867, 6, 0.5, 0.5)
@@ -19,7 +19,7 @@ def test_system_nucsize():
     assert sys.calculate_nucsize() == 16
 
     #check the atom cluster props
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     atom = atoms[0]
     cluster = atom.get_cluster()
     assert atom.get_cluster() == [1,0,1,1]

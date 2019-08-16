@@ -18,7 +18,7 @@ def test_basic_system():
 def test_system_read():
     sys = pc.System()
     sys.read_inputfile('tests/conf.dump')
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert len(atoms) == 500
 
     #check box
@@ -31,7 +31,7 @@ def test_system_read():
     #now check the same for zipped file
     sys = pc.System()
     sys.read_inputfile('tests/conf.dump.gz')
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     assert len(atoms) == 500
 
     #check box
