@@ -9,10 +9,10 @@ authors:
     orcid: 0000-0002-6776-1213
     affiliation: 1
   - name: Grisell D$\'{i}$az Leines
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-3048-5315
     affiliation: 1
   - name: Jutta Rogal
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-6268-380X
     affiliation: 1
 affiliations:
  - name: Interdisciplinary centre for advanced materials simulation, Ruhr-Universit$\"{a}t$ Bochum, 44780     Bochum, Germany
