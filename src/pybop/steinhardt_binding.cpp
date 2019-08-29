@@ -94,6 +94,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_boxvecs",&System::gboxvecs)
         .def("get_pairdistances",&System::get_pairdistances)
         .def("find_average_volume",&System::find_average_volume)
+        .def("set_face_cutoff",&System::set_face_cutoff)
         ;
 
 

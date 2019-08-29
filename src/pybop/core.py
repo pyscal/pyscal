@@ -1086,7 +1086,7 @@ class System(pc.System):
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
 
-    def get_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, voroexp=1):
+    def get_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, voroexp=1, face_cutoff=0.002):
         """
         
         Find neighbors of all atoms in the `System`. There are few methods to do this, the 
@@ -1123,6 +1123,11 @@ class System(pc.System):
             power of the neighbor weight used to weight the contribution of each atom towards the q 
             values. Higher powers can sometimes lead to better resolution. Works only with `voronoi`
             neighbour method. See  arXiv:1906.08111v1 for more details.
+
+        face_cutoff : double, default 0.002
+            The minimum fraction of total voronoi face area a single phase should have in order to
+            include it in the analysis of voronoi polyhedra to find (n_3, n_4, n_5, n_6) vector.
+            See ``Atom.get_vorovector`` for more details about the output.
         
         Returns
         -------
@@ -1170,6 +1175,7 @@ class System(pc.System):
                 pc.System.get_all_neighbors_normal(self)
 
         elif method == 'voronoi':
+            pc.System.set_face_cutoff(self, face_cutoff)
             pc.System.set_alpha(self, int(voroexp))
             pc.System.get_all_neighbors_voronoi(self)
             

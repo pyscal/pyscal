@@ -393,6 +393,12 @@ void System::get_all_neighbors_normal(){
 
 }
 
+//add a function to set the cutoff for face area in identification
+//of voronoi polyhedra
+void System::set_face_cutoff(double fcut){
+    face_cutoff = fcut;
+}
+
 //overloaded function; would be called
 //if neighbor method voronoi is selected.
 void System::get_all_neighbors_voronoi(){
@@ -452,7 +458,7 @@ void System::get_all_neighbors_voronoi(){
             n6 = 0;
 
             for(int i=0; i<f_vert.size(); i++){
-                if ((facearea[i]/weightsum) < 0.002){
+                if ((facearea[i]/weightsum) < face_cutoff){
                     continue;
                 }
 

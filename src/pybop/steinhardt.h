@@ -242,6 +242,9 @@ class System{
         //indicator function - 1 if voronoi method is used
         //will be reset if any other method is used
         int voronoiused;
+        //face cutoff
+        double face_cutoff;
+        void set_face_cutoff(double);
         
         double neighbordistance;
 
