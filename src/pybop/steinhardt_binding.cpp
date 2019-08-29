@@ -57,7 +57,10 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_volume",&Atom::gvolume)
         .def("set_volume",&Atom::svolume)
         .def("get_avgvolume",&Atom::gavgvolume)
-        .def("set_avgvolume",&Atom::savgvolume); 
+        .def("set_avgvolume",&Atom::savgvolume)
+        .def("get_facevertices", &Atom::gfacevertices)
+        .def("set_facevertices", &Atom::sfacevertices)
+        ; 
 
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")

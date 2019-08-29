@@ -656,6 +656,25 @@ class Atom(pc.Atom):
         """
         return pc.Atom.get_vorovector(self)
 
+    def get_facevertices(self):
+        """
+        get the number of vertices of the voronoi face shared between an atom and its neighbors. 
+        Returns a vector with number of entries equal to the number of neighbors. 
+        The corresponding atom indices can be obtained through ``Atom.get_neighbors``
+        A shorter version of this vector
+        in a condensed form is available through ``Atom.get_vorovector``.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        facevertices : array like, int
+            array of the vertices  
+        """
+        return pc.Atom.get_facevertices(self)
+
 #------------------------------------------------------------------------------------------------------------
 """
 System class definitions
@@ -1340,6 +1359,7 @@ class System(pc.System):
         atom.set_vorovector(atomc.get_vorovector())
         atom.set_volume(atomc.get_volume())
         atom.set_avgvolume(atomc.get_avgvolume())
+        atom.set_facevertices(atomc.get_facevertices())
         return atom
 
     def copy_atom_to_catom(self, atom):
@@ -1372,6 +1392,7 @@ class System(pc.System):
         atomc.set_vorovector(atom.get_vorovector())
         atomc.set_volume(atom.get_volume())
         atomc.set_avgvolume(atom.get_avgvolume())
+        atomc.set_facevertices(atom.get_facevertices())
         return atomc
 
 

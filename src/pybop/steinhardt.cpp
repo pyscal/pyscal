@@ -504,6 +504,7 @@ void System::get_all_neighbors_voronoi(){
                 atoms[ti].neighbordist[tj] = d;
                 //weight is set to 1.0, unless manually reset
                 atoms[ti].neighborweight[tj] = pow(facearea[tj], alpha)/weightsum;
+                atoms[ti].facevertices[tj] = f_vert[tj];
                 atoms[ti].n_diffx[tj] = diffx;
                 atoms[ti].n_diffy[tj] = diffy;
                 atoms[ti].n_diffz[tj] = diffz;
@@ -1467,6 +1468,21 @@ vector<double> Atom::gneighborweights(){
     }
     return rqlms;
 }
+
+void Atom::sfacevertices(vector<int> nss){
+    for(int i=0; i<nss.size(); i++){
+        facevertices[i] = nss[i];
+    }
+}
+
+vector<int> Atom::gfacevertices(){
+    vector <int> rqlms;
+    for(int i=0; i<n_neighbors; i++){
+        rqlms.emplace_back(facevertices[i]);
+    }
+    return rqlms;
+}
+
 
 vector<int> Atom::gvorovector(){
     vector <int> voro;

@@ -70,6 +70,7 @@ class Atom{
         int neighbors[MAXNUMBEROFNEIGHBORS];
         double neighbordist[MAXNUMBEROFNEIGHBORS];
         double neighborweight[MAXNUMBEROFNEIGHBORS];
+        int facevertices[MAXNUMBEROFNEIGHBORS];
         double n_diffx[MAXNUMBEROFNEIGHBORS];
         double n_diffy[MAXNUMBEROFNEIGHBORS];
         double n_diffz[MAXNUMBEROFNEIGHBORS];
@@ -116,6 +117,9 @@ class Atom{
         //function to set neighbors
         void sneighbors(vector<int> nns);
         vector<int> gneighbors();
+        vector<int> gfacevertices();
+        void sfacevertices(vector<int>);
+
         int gnneighbors();
         void sneighborweights(vector<double> nns);
         vector<double> gneighborweights();
