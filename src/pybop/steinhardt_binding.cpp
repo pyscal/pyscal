@@ -81,6 +81,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_aqvals",&System::gaqvals)
         .def("get_absdistance", (double (System::*) (Atom, Atom))  &System::get_abs_distance)
         .def("get_all_neighbors_normal",&System::get_all_neighbors_normal)
+        .def("get_all_neighbors_sann",&System::get_all_neighbors_sann)
         .def("get_all_neighbors_adaptive",&System::get_all_neighbors_adaptive)
         .def("get_all_neighbors_voronoi",&System::get_all_neighbors_voronoi)
         .def("set_neighbordistance", &System::set_neighbordistance)

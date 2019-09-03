@@ -555,7 +555,7 @@ void System::process_neighbor(int ti, int tj){
 }
 
 
-int System::get_all_neighbors_adaptive(double prefactor){
+int System::get_all_neighbors_sann(double prefactor){
     /*
     A new adaptive algorithm. Similar to the old ones, we guess a basic distance with padding,
     and sort them up.
@@ -700,6 +700,139 @@ int System::get_all_neighbors_adaptive(double prefactor){
     neighborsfound = 1;
     return finished;
 
+
+}
+
+
+int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padding){
+
+    double d, dcut;
+    double diffx,diffy,diffz;
+    double r,theta,phi;
+    int m, maxneighs, finished;
+
+    //vector<int> nids;
+    //vector<double> dists, sorted_dists;
+
+    //double prefactor = 1.21;
+    double summ;
+    double boxvol;
+
+    //some guesswork here
+    //find the box volumes
+    if (triclinic==1){
+        double a1, a2, a3, b1, b2, b3, c1, c2, c3;
+        //rot is the cell vectors transposed
+        a1 = rot[0][0];
+        a2 = rot[1][0];
+        a3 = rot[2][0];
+        b1 = rot[0][1];
+        b2 = rot[1][1];
+        b3 = rot[2][1];
+        c1 = rot[0][2];
+        c2 = rot[1][2];
+        c3 = rot[2][2];
+        boxvol = c1*(a2*b3-a3*b2) - c2*(a1*b3-b1*a3) + c3*(a1*b2-a2*b1);
+    }
+    else{
+        boxvol = boxx*boxy*boxz;    
+    }
+    
+
+    //now find the volume per particle
+    double guessvol = boxvol/float(nop);
+
+    //guess the side of a cube that is occupied by an atom - this is a guess distance
+    double guessdist = cbrt(guessvol);
+    
+    //now add some safe padding - this is the prefactor which we will read in
+    guessdist = prefactor*guessdist;
+
+    //create a structure for sorting
+    struct datom{
+        double dist;
+        size_t  index;
+    };
+
+    //create another for the sorting algorithm
+    struct by_dist{
+        bool operator()(datom const &datom1, datom const &datom2){
+            return (datom1.dist < datom2.dist);
+        }
+    };
+
+    //a vector of atoms - vectors are needed for fast sorting
+    vector<datom> atomitos;
+
+    //if file is not read - read it in at this point
+    //we have to work on indicator functions
+    if (!fileread) { read_particle_file(inputfile); }
+
+    
+    //now starts the main loop
+    for (int ti=0; ti<nop; ti++){
+        
+        //clear vector
+        atomitos.clear();
+        //start looping over every other particle
+        for (int tj=0; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+            
+            if (d <= guessdist){
+                datom x = {d, tj};
+                atomitos.emplace_back(x);
+
+            }
+        }
+
+        //we have all the info now. Pick the top six
+        //first sort distances
+        //check if its zero size
+        if (atomitos.size() == 0){
+            return 0;
+        }
+        
+        sort(atomitos.begin(), atomitos.end(), by_dist());
+
+        summ = 0;
+        for(int i=0; i<nlimit; i++){
+            summ += atomitos[i].dist;
+        }
+        dcut = padding*(1.0/float(nlimit))*summ;
+        
+        //now we are ready to loop over again, but over the lists        
+        for(int j=0; j<atomitos.size(); j++){
+            int tj = atomitos[j].index;
+            if (atomitos[j].dist < dcut){
+
+                if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                    continue;
+                }
+
+                d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+                atoms[ti].neighbors[atoms[ti].n_neighbors] = tj; 
+                atoms[ti].neighbordist[atoms[ti].n_neighbors] =d;
+                //weight is set to 1.0, unless manually reset
+                atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00; 
+                atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
+                atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
+                atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
+                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                atoms[ti].n_r[atoms[ti].n_neighbors] = r;
+                atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
+                atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
+                atoms[ti].n_neighbors += 1;   
+
+            }                
+        }
+    
+    }
+        
+
+    //mark end of neighbor calc
+    neighborsfound = 1;
+    return 1;
 
 }
 
