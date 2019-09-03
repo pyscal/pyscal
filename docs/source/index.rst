@@ -48,6 +48,13 @@ First steps
     examples
     jupyter
 
+Methods
+-------
+
+.. toctree::
+
+    steinhardtparameters
+
 API documentation
 -----------------
 
