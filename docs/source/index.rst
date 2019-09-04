@@ -53,6 +53,7 @@ Methods
 
 .. toctree::
 
+    nearestneighbormethods
     steinhardtparameters
 
 API documentation
