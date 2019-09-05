@@ -27,10 +27,5 @@ jobs:
       
         pip install pytest
         pytest --cov-report term-missing --cov=pyscal tests/
-    
-    - name: Upload coverage to Codecov  
-      uses: codecov/codecov-action@v1.0.2
-      with:
-        token: ${{secrets.CODECOV_TOKEN}}
-        file: ./coverage
+ 
         
