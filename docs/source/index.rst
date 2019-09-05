@@ -6,16 +6,16 @@
 pyscal
 =================================
 
-.. image:: https://travis-ci.com/srmnitc/pyscal.svg?token=YHSadJsCHYKmVDyUgtqh&branch=master
-    :target: https://travis-ci.com/srmnitc/pyscal
+.. image:: https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&branch=master
+    :target: https://travis-ci.com/srmnitc/pybop
     :width: 20 %
 
-.. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg?token=tzM81RBcYQ
+.. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/srmnitc/pyscal
   :width: 20 %
 
 .. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples%2F
+   :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
    :width: 20 %
 
 

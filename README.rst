@@ -7,9 +7,9 @@
   :target: https://codecov.io/gh/srmnitc/pybop
   :width: 50 %
 
-.. image:: https://readthedocs.org/projects/pybop/badge/?version=latest
-  :target: https://pybop.readthedocs.io/en/latest/?badge=latest
-  :width: 50%
+.. image:: https://readthedocs.org/projects/pyscal/badge/?version=latest
+    :target: https://pyscal.readthedocs.io/en/latest/?badge=latest
+    :width: 50%
 
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
