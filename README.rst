@@ -15,6 +15,10 @@
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
    :width: 13 %
 
+.. image:: https://github.com/srmnitc/pyscal/workflows/continuous_integration/badge.svg
+    :target: https://github.com/srmnitc/pyscal/actions
+    :width: 50%
+
 pyscal
 =================================
 complete documentation with examples available `here <https://pyscal.readthedocs.io/>`_.
