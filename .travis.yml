@@ -3,13 +3,13 @@ dist: xenial
 language: python
 jobs:
   include: 
-    - python: "3.6"
+    - python: "3.7"
     - python: "2.7"
 install:
   - pip install -r requirements_dev.txt
   - pip install -e .
 script:
-  - pytest --cov-report term-missing --cov=pybop tests/
+  - pytest --cov-report term-missing --cov=pyscal tests/
 
 env:
   - CODECOV_TOKEN="9a576708-79d8-4899-880b-8aa1124531e1"
