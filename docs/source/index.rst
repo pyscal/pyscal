@@ -52,9 +52,9 @@ Methods
 -------
 
 .. toctree::
-
-    nearestneighbormethods
-    steinhardtparameters
+    
+    methods
+    
 
 API documentation
 -----------------
