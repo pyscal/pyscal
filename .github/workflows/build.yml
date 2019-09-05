@@ -1,4 +1,4 @@
-name: continuous_integration
+name: build
 
 on: [push]
 
