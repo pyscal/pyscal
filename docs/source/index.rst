@@ -71,6 +71,7 @@ Support, contributing and extending
     extending
     helpandsupport
     common_issues
+    license
     citing
     acknowledgements
 
