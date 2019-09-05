@@ -24,7 +24,7 @@ neighbors.
 
 .. code:: ipython3
 
-    import pybop.core as pc
+    import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
     sys.get_neighbors(method='cutoff', cutoff=3)
@@ -61,7 +61,7 @@ Solid angle based nearest neighbor algorithm (SANN)
 
 .. code:: ipython3
 
-    import pybop.core as pc
+    import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
     sys.get_neighbors(method='cutoff', cutoff='sann')
@@ -92,7 +92,7 @@ This method can be chosen by,
 
 .. code:: ipython3
 
-    import pybop.core as pc
+    import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
     sys.get_neighbors(method='cutoff', cutoff='adaptive')
@@ -112,7 +112,7 @@ Voronoi tessellation. Neighbors can be calculated using this method by,
 
 .. code:: ipython3
 
-    import pybop.core as pc
+    import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
     sys.get_neighbors(method='voronoi')

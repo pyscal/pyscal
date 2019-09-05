@@ -1,4 +1,4 @@
-Methods implemented in ``pybop``
+Methods implemented in ``pyscal``
 --------------------------------
 
 .. toctree::

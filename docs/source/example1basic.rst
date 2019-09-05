@@ -1,15 +1,15 @@
 
-Getting started with pybop
+Getting started with pyscal
 --------------------------
 
-| This example illustrates basic functionality of pybop python library
+| This example illustrates basic functionality of pyscal python library
   by setting up a system and reading in atoms. An interactive version of
   this example would be made available soon.
 | We start by importing the module
 
 .. code:: ipython3
 
-    import pybop.core as pc
+    import pyscal.core as pc
     import numpy as np
 
 The ``System`` class
@@ -121,7 +121,7 @@ correctly.
 
 .. parsed-literal::
 
-    /home/menonsqr/anaconda2/envs/p3env/lib/python3.7/site-packages/pybop-1.0.1-py3.7-linux-x86_64.egg/pybop/core.py:585: UserWarning: If the loc of atom is changed and set to system, it will overwrite the existing data, if any.
+    /home/menonsqr/anaconda2/envs/p3env/lib/python3.7/site-packages/pyscal-1.0.1-py3.7-linux-x86_64.egg/pyscal/core.py:585: UserWarning: If the loc of atom is changed and set to system, it will overwrite the existing data, if any.
       warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
 
 
@@ -174,10 +174,10 @@ Reading in an input file
   example input file containing 500 atoms in a simulation box can be
   read in automatically. The file we use for this example is a file of
   the `lammps-dump <https://lammps.sandia.gov/doc/dump.html>`__ format.
-  ``pybop`` can also read in POSCAR files. In principle, ``pybop`` only
+  ``pyscal`` can also read in POSCAR files. In principle, ``pyscal`` only
   needs the atom positions and simulation box size, so you can write a
   python function to process the input file, extract the details and
-  pass to ``pybop``.
+  pass to ``pyscal``.
 
 .. code:: ipython3
 

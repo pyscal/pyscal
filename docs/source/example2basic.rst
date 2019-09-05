@@ -8,7 +8,7 @@ Calculating coordination numbers
 
 .. code:: ipython3
 
-    import pybop.core as pc
+    import pyscal.core as pc
     import numpy as np
     import matplotlib.pyplot as plt
 
@@ -16,12 +16,12 @@ Read in a file
 ~~~~~~~~~~~~~~
 
 The first step is setting up a system. We can create atoms and
-simulation box using the ``pybop.crystal_structures`` module. Let’s
+simulation box using the ``pyscal.crystal_structures`` module. Let’s
 start by importing the module.
 
 .. code:: ipython3
 
-    import pybop.crystal_structures as pcs
+    import pyscal.crystal_structures as pcs
 
 .. code:: ipython3
 
@@ -125,7 +125,7 @@ Voronoi method calculates the voronoi polyhedra of all atoms. Any atom
 that shares a voronoi face area with the host atom are considered
 neighbors. Voronoi polyhedra is calculated using the Voro++ code.
 However, you dont need to install this specifically as it is linked to
-pybop.
+pyscal.
 
 .. code:: ipython3
 

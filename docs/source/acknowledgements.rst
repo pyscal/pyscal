@@ -8,7 +8,7 @@ Developers
 Acknowledgements
 ----------------
 
-We acknowledge `Bond order analysis <https://homepage.univie.ac.at/wolfgang.lechner/>`_ code for the inspiration and the base for what later grew to be ``pybop``. We are also thankful to the developers of `Voro++ <math.lbl.gov/voro++/>`_ and `pybind11 <https://pybind11.readthedocs.io/en/stable/>`_ for developing the great tools that we could use in ``pybop``.
+We acknowledge `Bond order analysis <https://homepage.univie.ac.at/wolfgang.lechner/>`_ code for the inspiration and the base for what later grew to be ``pyscal``. We are also thankful to the developers of `Voro++ <math.lbl.gov/voro++/>`_ and `pybind11 <https://pybind11.readthedocs.io/en/stable/>`_ for developing the great tools that we could use in ``pyscal``.
 
 We thank the following people for helping with testing the code and providing valuable feedback.  
 

@@ -12,7 +12,7 @@ are widely used in literature.
 
 .. code:: ipython2
 
-    import pybop.core as pc
+    import pyscal.core as pc
     import numpy as np
     import matplotlib.pyplot as plt
 

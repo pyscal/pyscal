@@ -1,9 +1,9 @@
-``pybop`` License
+``pyscal`` License
 -----------------
 
-``pybop`` uses the `GNU General Public License Version 3 <https://www.gnu.org/licenses/gpl-3.0.en.html>`_ . A full description is available in the above link or in the repository. 
+``pyscal`` uses the `GNU General Public License Version 3 <https://www.gnu.org/licenses/gpl-3.0.en.html>`_ . A full description is available in the above link or in the repository. 
 
-In addition, ``pybop`` license of other codes that ``pybop`` uses are given below-    
+In addition, ``pyscal`` license of other codes that ``pyscal`` uses are given below-    
 
 Voro++ license
 ~~~~~~~~~~~~~~

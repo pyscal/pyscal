@@ -1,29 +1,29 @@
-pybop package
+pyscal package
 =============
 
 Submodules
 ----------
 
-pybop.core module
+pyscal.core module
 -----------------
 
-.. automodule:: pybop.core
+.. automodule:: pyscal.core
    :members:
    :undoc-members:
    :show-inheritance:
 
-pybop.crystal\_structures module
+pyscal.crystal\_structures module
 --------------------------------
 
-.. automodule:: pybop.crystal_structures
+.. automodule:: pyscal.crystal_structures
    :members:
    :undoc-members:
    :show-inheritance:
 
-pybop.traj\_process module
+pyscal.traj\_process module
 --------------------------
 
-.. automodule:: pybop.traj_process
+.. automodule:: pyscal.traj_process
    :members:
    :undoc-members:
    :show-inheritance:
@@ -32,7 +32,7 @@ pybop.traj\_process module
 Module contents
 ---------------
 
-.. automodule:: pybop
+.. automodule:: pyscal
    :members:
    :undoc-members:
    :show-inheritance:
