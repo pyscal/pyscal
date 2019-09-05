@@ -1,7 +1,7 @@
 
-.. image:: https://travis-ci.com/srmnitc/pybop.svg?token=YHSadJsCHYKmVDyUgtqh&branch=master
-    :target: https://travis-ci.com/srmnitc/pybop
-    :width: 50 %
+.. image:: https://github.com/srmnitc/pyscal/workflows/build/badge.svg
+    :target: https://github.com/srmnitc/pyscal/actions
+    :width: 13%
 
 .. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/srmnitc/pyscal
@@ -15,9 +15,6 @@
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
    :width: 13 %
 
-.. image:: https://github.com/srmnitc/pyscal/workflows/continuous_integration/badge.svg
-    :target: https://github.com/srmnitc/pyscal/actions
-    :width: 50%
 
 pyscal
 =================================
