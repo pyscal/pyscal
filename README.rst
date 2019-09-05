@@ -3,8 +3,8 @@
     :target: https://travis-ci.com/srmnitc/pybop
     :width: 50 %
 
-.. image:: https://codecov.io/gh/srmnitc/pybop/branch/master/graph/badge.svg?token=tzM81RBcYQ
-  :target: https://codecov.io/gh/srmnitc/pybop
+.. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/srmnitc/pyscal
   :width: 50 %
 
 .. image:: https://readthedocs.org/projects/pyscal/badge/?version=latest
@@ -15,13 +15,13 @@
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
    :width: 13 %
 
-pybop
+pyscal
 =================================
-complete documentation with examples available `here <https://pybop.readthedocs.io/>`_.
+complete documentation with examples available `here <https://pyscal.readthedocs.io/>`_.
 
-**pybop** is a python module for calculation of Steinhardt's bond order parameters [#]_. The core functionality of **pybop** is written in C++ with python wrappers using `pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_ . This allows for fast calculations with possibilities for seamless expansion in python. 
+**pyscal** is a python module for calculation of Steinhardt's bond order parameters [#]_. The core functionality of **pyscal** is written in C++ with python wrappers using `pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_ . This allows for fast calculations with possibilities for seamless expansion in python. 
 
-Stenhardt's order parameters or local bond order parameters are widely used in simulations to determine crystal structure of atoms. They are also used to identify if an atom is solid or liquid and the identify the solid atoms in a liquid, which is often used an order parameter to study progress of reaction during solidification. Additionally **pybop** provides an easy environment for reading in snapshots from molecular dynamics trajectories, allowing for easy post-processing of simulation data. **pybop** is inspired by `BondOrderAnalysis <https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html>`_ code, but has since incorporated many additions and modifications. The main highlights of **pybop** are given below.
+Stenhardt's order parameters or local bond order parameters are widely used in simulations to determine crystal structure of atoms. They are also used to identify if an atom is solid or liquid and the identify the solid atoms in a liquid, which is often used an order parameter to study progress of reaction during solidification. Additionally **pyscal** provides an easy environment for reading in snapshots from molecular dynamics trajectories, allowing for easy post-processing of simulation data. **pyscal** is inspired by `BondOrderAnalysis <https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html>`_ code, but has since incorporated many additions and modifications. The main highlights of **pyscal** are given below.
 
 Highlights
 ----------
