@@ -1,9 +1,9 @@
 import pytest
 import os,sys,inspect
 import numpy as np
-import pybop.core as pc
-import pybop.crystal_structures as pcs
-import pybop.traj_process as ptp
+import pyscal.core as pc
+import pyscal.crystal_structures as pcs
+import pyscal.traj_process as ptp
 
 def test_create_multislice_dump():
     """

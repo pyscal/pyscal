@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-project(pybop)
+project(pyscal)
 #------------------------------------------------------
 
 # Set source directory
 #------------------------------------------------------
 # main directory for steinhardt cpp modules
-set(SOURCE_DIR "src/pybop")
+set(SOURCE_DIR "src/pyscal")
 #sub directory for voro lib
 set(SSOURCE_DIR "lib/voro++")
 

@@ -75,7 +75,7 @@ class CMakeBuild(build_ext):
 
 
 setup(
-    name='pybop',
+    name='pyscal',
     version='1.0.1',
     author='Sarath Menon',
     author_email='sarath.menon@rub.de',
@@ -87,12 +87,12 @@ setup(
     # and nowhere else
     package_dir={'':'src'},
     # add an extension module named 'python_cpp_example' to the package 
-    ext_modules=[CMakeExtension('pybop/ccore')],
+    ext_modules=[CMakeExtension('pyscal/ccore')],
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
     download_url = 'https://github.com/dask/dask/archive/1.1.1.tar.gz',
-    url = 'https://github.com/srmnitc/pybop',
+    url = 'https://github.com/srmnitc/pyscal',
     install_requires=['numpy'],
     classifiers=[
         'Programming Language :: Python :: 3',

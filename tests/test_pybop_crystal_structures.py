@@ -1,5 +1,5 @@
 
-import pybop.crystal_structures as pcs
+import pyscal.crystal_structures as pcs
 import os
 
 def test_create_structure():
