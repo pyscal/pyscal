@@ -16,7 +16,7 @@ Read in a file
 ~~~~~~~~~~~~~~
 
 The first step is setting up a system. We can create atoms and
-simulation box using the ``pyscal.crystal_structures`` module. Let’s
+simulation box using the ``pyscal.crystal_structures`` module. Let's
 start by importing the module.
 
 .. code:: ipython3
@@ -43,7 +43,8 @@ Calculating neighbors
 We start by calculating the neighbors of each atom in the system. There
 are two ways to do this, using a ``cutoff`` method and using a
 ``voronoi`` polyhedra method. We will try with both of them. First we
-try with cutoff system.
+try with cutoff system - which has three sub options. We will check each
+of them in detail.
 
 Cutoff method
 ^^^^^^^^^^^^^
@@ -60,6 +61,13 @@ Now lets get all the atoms.
 .. code:: ipython3
 
     atoms = sys.get_atoms()
+
+
+.. parsed-literal::
+
+    /home/users/menonsqr/anaconda3/envs/ml/lib/python3.7/site-packages/pyscal-1.0.1-py3.7-linux-x86_64.egg/pyscal/core.py:585: UserWarning: If the loc of atom is changed and set to system, it will overwrite the existing data, if any.
+      warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
+
 
 lets try accessing the coordination number of an atom
 
@@ -118,6 +126,49 @@ Now lets plot and see the results
 .. image:: output_23_1.png
 
 
+Adaptive cutoff methods
+~~~~~~~~~~~~~~~~~~~~~~~
+
+``pyscal`` also has adaptive cutoff methods implemented. These methods
+remove the restriction on having the same cutoff. A distinct cutoff is
+selected for each atom during runtime. ``pyscal`` uses two distinct
+algorithms to do this - ``sann`` and ``adaptive``. Please check the
+documentation for a explanation of these algorithms. For the purpose of
+this example, we will use the ``adaptive`` algorithm.
+
+``adaptive algorithm``
+
+.. code:: ipython3
+
+    sys.get_neighbors(method='cutoff', cutoff='adaptive', padding=1.5)
+    atoms = sys.get_atoms()
+    coord = [atom.get_coordination() for atom in atoms]
+
+Now lets plot
+
+.. code:: ipython3
+
+    nos, counts = np.unique(coord, return_counts=True)
+    plt.bar(nos, counts, color="#AD1457")
+    plt.ylabel("density")
+    plt.xlabel("coordination number")
+    plt.title("Cutoff adaptive method")
+
+
+
+
+.. parsed-literal::
+
+    Text(0.5, 1.0, 'Cutoff adaptive method')
+
+
+
+
+.. image:: output_29_1.png
+
+
+The adaptive method also gives similar results!
+
 Voronoi method
 ~~~~~~~~~~~~~~
 
@@ -125,7 +176,7 @@ Voronoi method calculates the voronoi polyhedra of all atoms. Any atom
 that shares a voronoi face area with the host atom are considered
 neighbors. Voronoi polyhedra is calculated using the Voro++ code.
 However, you dont need to install this specifically as it is linked to
-pyscal.
+pybop.
 
 .. code:: ipython3
 
@@ -158,13 +209,13 @@ And visualise the results
 
 
 
-.. image:: output_30_1.png
+.. image:: output_37_1.png
 
 
 Finally..
 ~~~~~~~~~
 
-Both methods find the coordination number, and the results are
+All methods find the coordination number, and the results are
 comparable. Cutoff method is very sensitive to the choice of cutoff
 radius, but voronoi method can slightly overestimate the neighbors due
 to thermal vibrations.

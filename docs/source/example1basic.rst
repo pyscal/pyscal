@@ -1,11 +1,9 @@
 
-Getting started with pyscal
+Getting started with pybop
 --------------------------
 
-| This example illustrates basic functionality of pyscal python library
-  by setting up a system and reading in atoms. An interactive version of
-  this example would be made available soon.
-| We start by importing the module
+This example illustrates basic functionality of pyscal python library by
+setting up a system and reading in atoms.
 
 .. code:: ipython3
 
@@ -15,7 +13,7 @@ Getting started with pyscal
 The ``System`` class
 ~~~~~~~~~~~~~~~~~~~~
 
-``System`` is the basic class of pydoc and is required to be setup in
+``System`` is the basic class of pyscal and is required to be setup in
 order to perform any calculations. It can be set up as easily as-
 
 .. code:: ipython3
@@ -110,7 +108,7 @@ can also assign the same box we created before.
     sys = pc.System()
     sys.assign_atoms([atom1, atom2], box)
 
-That sets up the system completely. It has both of it’s constituents -
+That sets up the system completely. It has both of it's constituents -
 atoms and the simulation box. We can check if everything works
 correctly.
 
@@ -121,7 +119,7 @@ correctly.
 
 .. parsed-literal::
 
-    /home/menonsqr/anaconda2/envs/p3env/lib/python3.7/site-packages/pyscal-1.0.1-py3.7-linux-x86_64.egg/pyscal/core.py:585: UserWarning: If the loc of atom is changed and set to system, it will overwrite the existing data, if any.
+    /home/users/menonsqr/anaconda3/envs/ml/lib/python3.7/site-packages/pyscal-1.0.1-py3.7-linux-x86_64.egg/pyscal/core.py:585: UserWarning: If the loc of atom is changed and set to system, it will overwrite the existing data, if any.
       warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
 
 
@@ -174,10 +172,10 @@ Reading in an input file
   example input file containing 500 atoms in a simulation box can be
   read in automatically. The file we use for this example is a file of
   the `lammps-dump <https://lammps.sandia.gov/doc/dump.html>`__ format.
-  ``pyscal`` can also read in POSCAR files. In principle, ``pyscal`` only
-  needs the atom positions and simulation box size, so you can write a
-  python function to process the input file, extract the details and
-  pass to ``pyscal``.
+  ``pyscal`` can also read in POSCAR files. In principle, ``pyscal``
+  only needs the atom positions and simulation box size, so you can
+  write a python function to process the input file, extract the details
+  and pass to ``pyscal``.
 
 .. code:: ipython3
 
@@ -204,7 +202,7 @@ Now we can get all atoms that belong to this system
 
 .. code:: ipython3
 
-    atoms = sys.get_allatoms()
+    atoms = sys.get_atoms()
     len(atoms)
 
 
