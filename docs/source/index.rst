@@ -36,10 +36,10 @@ Highlights
 * clustering of particles based on a user defined property.  
 * methods for calculating radial distribution function, voronoi volume of particles, number of vertices and face area of voronoi polyhedra and coordination number.
 
-.. [1]  Steinhardt, PJ, Nelson, DR, Ronchetti, M. PRB 28, 1983.
-.. [2]  Lechner, W, Dellago, C. JCP 129, 2008.
-.. [3]  Mickel, W, kapfer, SC, Shroder-Turk, GE, Mecke, K. JCP 138, 2013.
-.. [4]  Auer, S, Frenkel, D. APS 173, 2005.
+.. [1]  `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.  
+.. [2]  `Lechner, W, Dellago, C, J Chem Phys, 2013 <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_.  
+.. [3]  `Mickel, W, Kapfer, SC, Schroder-Turk, GE, Mecke, K, J Chem Phys 138, 2013 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.  
+.. [4]  `Auer, S, Frenkel, D. Adv Polym Sci 173, 2005 <https://link.springer.com/chapter/10.1007/b99429>`_.
 
 First steps
 -----------

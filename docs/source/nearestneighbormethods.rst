@@ -66,10 +66,10 @@ Solid angle based nearest neighbor algorithm (SANN) [2]_
     sys.read_inputfile('conf.dump')
     sys.get_neighbors(method='cutoff', cutoff='sann')
 
-| Since SANN algorithm involves sorting, a sufficiently large cutoff is
-  used in the beginning to reduce the number entries to be sorted. This
-  parameter is calculated by,
-| 
+Since SANN algorithm involves sorting, a sufficiently large cutoff is
+used in the beginning to reduce the number entries to be sorted. This
+parameter is calculated by,
+ 
 
   .. math::  r_{initial} = \mathrm{threshold} \times \bigg(\frac{\mathrm{Simulation~box~volume}}{\mathrm{Number~of~particles}}\bigg)^{\frac{1}{3}}
 
@@ -134,6 +134,6 @@ Voronoi tessellation. Neighbors can be calculated using this method by,
   .. math::  W_{ij} = \frac{A_{ij}^2}{\sum_{j=1}^N A_{ij}}
 
 
-.. [1] Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983.  
-.. [2] van Meel, JA, Filion, L, Valeriani, C, Frenkel, D, J Chem Phys 234107, 2012.  
-.. [3] Stukowski, A, Model Simul Mater SC 20, 2012.  
+.. [1] `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.  
+.. [2] `van Meel, JA, Filion, L, Valeriani, C, Frenkel, D, J Chem Phys 234107, 2012 <https://aip.scitation.org/doi/full/10.1063/1.4729313>`_.  
+.. [3] `Stukowski, A, Model Simul Mater SC 20, 2012 <https://iopscience.iop.org/article/10.1088/0965-0393/20/4/045021/meta>`_.    
