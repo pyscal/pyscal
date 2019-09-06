@@ -1,0 +1,981 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyscal 1.0.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/_static/css/theme.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html#document-index" class="icon icon-home"> pyscal
+          
+
+          
+          </a>
+
+          
+            
+            
+            
+              <div class="version">
+                latest
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-gettingstarted">Getting started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#trying-pyscal">Trying <code class="docutils literal notranslate"><span class="pre">pyscal</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#tests">Tests</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-examples">Examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#basic-examples">Basic examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#document-example1basic">Getting started with pyscal</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="index.html#the-system-class">The <code class="docutils literal notranslate"><span class="pre">System</span></code> class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#the-atom-class">The <code class="docutils literal notranslate"><span class="pre">Atom</span></code> class</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#combining-system-and-atom">Combining <code class="docutils literal notranslate"><span class="pre">System</span></code> and <code class="docutils literal notranslate"><span class="pre">Atom</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#reading-in-an-input-file">Reading in an input file</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#document-example2basic">Calculating coordination numbers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="index.html#read-in-a-file">Read in a file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#calculating-neighbors">Calculating neighbors</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="index.html#cutoff-method">Cutoff method</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#voronoi-method">Voronoi method</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#finally">Finally..</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#advanced-examples">Advanced examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#document-example3basic">Calculating bond order parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="index.html#perfect-structures">Perfect structures</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="index.html#read-in-the-input-files">Read in the input files</a></li>
+<li class="toctree-l5"><a class="reference internal" href="index.html#q-4-q-6-cutoff-neighbor-method"><span class="math notranslate nohighlight">\(q_4-q_6\)</span> cutoff neighbor method</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#structures-with-thermal-vibrations">Structures with thermal vibrations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="index.html#cutoff-method">cutoff method</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#voronoi-method-for-neighbors">Voronoi method for neighbors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-methods">Methods implemented in <code class="docutils literal notranslate"><span class="pre">pyscal</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#document-nearestneighbormethods">Methods to calculate neighbors of a particle</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#fixed-cutoff-method">Fixed cutoff method</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#adaptive-cutoff-methods">Adaptive cutoff methods</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="index.html#solid-angle-based-nearest-neighbor-algorithm-sann">Solid angle based nearest neighbor algorithm (SANN)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="index.html#adaptive-cutoff-method">Adaptive cutoff method</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#voronoi-tessellation">Voronoi tessellation</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#document-steinhardtparameters">Steinhardt’s bond orientational order parameters</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#steinhardt-s-parameters">Steinhardt’s parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="index.html#averaged-steinhardt-s-parameters">Averaged Steinhardt’s parameters</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-extending">Extending and contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#document-existing">Contributions to existing features</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#reporting-and-fixing-bugs">Reporting and fixing bugs</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#document-newfeatures">New feautures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="index.html#setting-up-local-environment">Setting up local environment</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-helpandsupport">Help and support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-common_issues">Common issues</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-license"><code class="docutils literal notranslate"><span class="pre">pyscal</span></code> License</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#voro-license">Voro++ license</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#pybind-11-license">pybind 11 license</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-citing">Citing the code</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-acknowledgements">Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#acknowledgements">Acknowledgements</a></li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html#document-index">pyscal</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html#document-index">Docs</a> &raquo;</li>
+        
+      <li>pyscal 1.0.0 documentation</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            
+              <a href="https://github.com/srmnitc/pyscal/blob/master/docs/source/index.rst" class="fa fa-github"> Edit on GitHub</a>
+            
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="pyscal">
+<h1>pyscal<a class="headerlink" href="#pyscal" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://travis-ci.com/srmnitc/pyscal"><img alt="https://travis-ci.com/srmnitc/pyscal.svg?branch=master" src="https://travis-ci.com/srmnitc/pyscal.svg?branch=master" style="width: 20%;" /></a>
+<a class="reference external image-reference" href="https://codecov.io/gh/srmnitc/pyscal"><img alt="https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg" src="https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg" width="20%" /></a>
+<a class="reference external image-reference" href="https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F"><img alt="https://mybinder.org/badge_logo.svg" src="https://mybinder.org/badge_logo.svg" width="20%" /></a>
+<a class="reference external image-reference" href="https://www.gnu.org/licenses/gpl-3.0"><img alt="https://img.shields.io/badge/License-GPLv3-blue.svg" src="https://img.shields.io/badge/License-GPLv3-blue.svg" width="20%" /></a>
+<p><strong>pyscal</strong> is a python module for calculation of Steinhardt’s bond order parameters <a class="footnote-reference" href="#id6" id="id1">[1]</a>. The core functionality of <strong>pyscal</strong> is written in C++ with python wrappers using <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/intro.html">pybind11</a> . This allows for fast calculations with possibilities for seamless expansion in python.</p>
+<p>Stenhardt’s order parameters or local bond order parameters are widely used in simulations to determine crystal structure of atoms. They are also used to identify if an atom is solid or liquid and the identify the solid atoms in a liquid, which is often used an order parameter to study progress of reaction during solidification. Additionally <strong>pyscal</strong> provides an easy environment for reading in snapshots from molecular dynamics trajectories, allowing for easy post-processing of simulation data. <strong>pyscal</strong> is inspired by <a class="reference external" href="https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html">BondOrderAnalysis</a> code, but has since incorporated many additions and modifications. The main highlights of <strong>pyscal</strong> are given below.</p>
+<div class="section" id="highlights">
+<h2>Highlights<a class="headerlink" href="#highlights" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fast and efficient library using C++.</li>
+<li>Calculation of Steinhardts order parameters and their averaged version <a class="footnote-reference" href="#id7" id="id2">[2]</a>.</li>
+<li>Links with <a class="reference external" href="http://math.lbl.gov/voro++/">Voro++</a> code, to enable weighted calculation of local bond order parameters <a class="footnote-reference" href="#id8" id="id3">[3]</a>.</li>
+<li>An environment for easy processing of simulation data.</li>
+<li>Distinction of solid and liquid atoms using q6 parameter <a class="footnote-reference" href="#id9" id="id4">[4]</a>.</li>
+<li>Cluster algorithms of solid atoms to find largest cluster of solid atoms in liquid <a class="footnote-reference" href="#id10" id="id5">[5]</a>.</li>
+</ul>
+<table class="docutils footnote" frame="void" id="id6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Steinhardt, PJ, Nelson, DR, Ronchetti, M. PRB 28, 1983.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id2">[2]</a></td><td>Lechner, W, Dellago, C. JCP 129, 2008.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id3">[3]</a></td><td>Mickel, W, kapfer, SC, Shroder-Turk, GE, Mecke, K. JCP 138, 2013.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id4">[4]</a></td><td>Auer, S, Frenkel, D. APS 173, 2005., Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[5]</a></td><td>Diaz Leines, G, Drautz, R, Rogal, J. JCP 146, 2017.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="first-steps">
+<h2>First steps<a class="headerlink" href="#first-steps" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<span id="document-gettingstarted"></span><div class="section" id="getting-started">
+<h3>Getting started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="trying-pyscal">
+<h4>Trying <code class="docutils literal notranslate"><span class="pre">pyscal</span></code><a class="headerlink" href="#trying-pyscal" title="Permalink to this headline">¶</a></h4>
+<p>You can try some of the examples provided with <code class="docutils literal notranslate"><span class="pre">pyscal</span></code> without installing the package using binder. Please use <a class="reference external" href="https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples%2F">this link</a> to try the package.</p>
+</div>
+<div class="section" id="installation">
+<h4>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h4>
+<p><strong>From the repository</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">pyscal</span></code> needs <code class="docutils literal notranslate"><span class="pre">cmake</span></code> to compile the C++ part of the code. Please check <a class="reference external" href="https://cmake.org/install/">here</a> for documentation on how to install cmake.</p>
+<p>Once cmake is available, clone the <strong>pyscal</strong> repository by <cite>git clone https://github.com/srmnitc/pyscal.git</cite>.
+After cloning the repository, <strong>pyscal</strong> can be installed by running <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code> from main code directory. It can be uninstalled by <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">uninstall</span> <span class="pre">pathsampling</span></code>. All the dependencies of <strong>pyscal</strong> are installed automatically.</p>
+</div>
+<div class="section" id="tests">
+<h4>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h4>
+<p><strong>pyscal</strong> also contains automated tests which use the <a class="reference external" href="https://docs.pytest.org/en/latest/">pytest</a> python library, which can be installed by <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">pytest</span></code>. The tests can be run by executing the command <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/</span></code> from the main code directory.</p>
+<p>It is good idea to run the tests to check if everything is installed properly.</p>
+</div>
+</div>
+<span id="document-examples"></span><div class="section" id="examples">
+<h3>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h3>
+<p>Different examples illustrating the functionality of this module is provided in this section</p>
+<div class="section" id="basic-examples">
+<h4>Basic examples<a class="headerlink" href="#basic-examples" title="Permalink to this headline">¶</a></h4>
+<div class="toctree-wrapper compound">
+<span id="document-example1basic"></span><div class="section" id="getting-started-with-pyscal">
+<h5>Getting started with pyscal<a class="headerlink" href="#getting-started-with-pyscal" title="Permalink to this headline">¶</a></h5>
+<div class="line-block">
+<div class="line">This example illustrates basic functionality of pyscal python library
+by setting up a system and reading in atoms. An interactive version of
+this example would be made available soon.</div>
+<div class="line">We start by importing the module</div>
+</div>
+<div class="section" id="the-system-class">
+<h6>The <code class="docutils literal notranslate"><span class="pre">System</span></code> class<a class="headerlink" href="#the-system-class" title="Permalink to this headline">¶</a></h6>
+<p><code class="docutils literal notranslate"><span class="pre">System</span></code> is the basic class of pydoc and is required to be setup in
+order to perform any calculations. It can be set up as easily as-</p>
+<p><code class="docutils literal notranslate"><span class="pre">sys</span></code> is a <code class="docutils literal notranslate"><span class="pre">System</span></code> object. But at this point, it is completely
+empty. We have to populate the system with two major information- * the
+simulation box dimensions * the information regarding individual atoms.</p>
+<div class="line-block">
+<div class="line">Let us try setting up a small system, which is the bcc unitcell of
+lattice constant 1. The simulation box dimensions of such a unit cell
+would be [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]] where the first set
+correspond to the x axis, second to y axis and so on.</div>
+<div class="line">The unitcell has 2 atoms and their positions are [0,0,0] and [0.5,
+0.5, 0.5].</div>
+</div>
+<p>We can easily check if everything worked by getting the box dimensions</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-atom-class">
+<h6>The <code class="docutils literal notranslate"><span class="pre">Atom</span></code> class<a class="headerlink" href="#the-atom-class" title="Permalink to this headline">¶</a></h6>
+<div class="line-block">
+<div class="line">The next part is assigning the atoms. This can be done using the
+<code class="docutils literal notranslate"><span class="pre">Atom</span></code> class. Here, we will only look at the basic properties of
+<code class="docutils literal notranslate"><span class="pre">Atom</span></code> class. For a more detailed description, check the examples.</div>
+<div class="line">Now lets create two atoms.</div>
+</div>
+<p>Now two empty atom objects are created. The major poperties of an atom
+are its positions and id. Lets set this up.</p>
+<p>Alternatively, atom objects can also be set up as</p>
+<p>We can check the details of the atom by querying it</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="combining-system-and-atom">
+<h6>Combining <code class="docutils literal notranslate"><span class="pre">System</span></code> and <code class="docutils literal notranslate"><span class="pre">Atom</span></code><a class="headerlink" href="#combining-system-and-atom" title="Permalink to this headline">¶</a></h6>
+<p>Now that we have created the atoms, we can assign them to the system. We
+can also assign the same box we created before.</p>
+<p>That sets up the system completely. It has both of it’s constituents -
+atoms and the simulation box. We can check if everything works
+correctly.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">menonsqr</span><span class="o">/</span><span class="n">anaconda2</span><span class="o">/</span><span class="n">envs</span><span class="o">/</span><span class="n">p3env</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">python3</span><span class="o">.</span><span class="mi">7</span><span class="o">/</span><span class="n">site</span><span class="o">-</span><span class="n">packages</span><span class="o">/</span><span class="n">pyscal</span><span class="o">-</span><span class="mf">1.0</span><span class="o">.</span><span class="mi">1</span><span class="o">-</span><span class="n">py3</span><span class="o">.</span><span class="mi">7</span><span class="o">-</span><span class="n">linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">egg</span><span class="o">/</span><span class="n">pyscal</span><span class="o">/</span><span class="n">core</span><span class="o">.</span><span class="n">py</span><span class="p">:</span><span class="mi">585</span><span class="p">:</span> <span class="ne">UserWarning</span><span class="p">:</span> <span class="n">If</span> <span class="n">the</span> <span class="n">loc</span> <span class="n">of</span> <span class="n">atom</span> <span class="ow">is</span> <span class="n">changed</span> <span class="ow">and</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">system</span><span class="p">,</span> <span class="n">it</span> <span class="n">will</span> <span class="n">overwrite</span> <span class="n">the</span> <span class="n">existing</span> <span class="n">data</span><span class="p">,</span> <span class="k">if</span> <span class="nb">any</span><span class="o">.</span>
+  <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;If the loc of atom is changed and set to system, it will overwrite the existing data, if any.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This returns all the atoms of the system. Once you have all the atoms,
+you can modify any one and set it back to the system. The following
+statement will set the type of the first atom to 2.</p>
+<p>Lets verify if it was done properly</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2</span>
+</pre></div>
+</div>
+<p>Now we can push the atom back to the system</p>
+<p>We can also get individual atoms from the system instead of getting all
+of them</p>
+<p>the above statement will return the atom at position 0</p>
+</div>
+<div class="section" id="reading-in-an-input-file">
+<h6>Reading in an input file<a class="headerlink" href="#reading-in-an-input-file" title="Permalink to this headline">¶</a></h6>
+<div class="line-block">
+<div class="line">We are all set! The <code class="docutils literal notranslate"><span class="pre">System</span></code> is ready for calculations. However, in
+most realistic simulation situations, we have many atoms and it can be
+difficult to set each of them</div>
+<div class="line">individually. In this situation we can read in input file directly. An
+example input file containing 500 atoms in a simulation box can be
+read in automatically. The file we use for this example is a file of
+the <a class="reference external" href="https://lammps.sandia.gov/doc/dump.html">lammps-dump</a> format.
+<code class="docutils literal notranslate"><span class="pre">pyscal</span></code> can also read in POSCAR files. In principle, <code class="docutils literal notranslate"><span class="pre">pyscal</span></code> only
+needs the atom positions and simulation box size, so you can write a
+python function to process the input file, extract the details and
+pass to <code class="docutils literal notranslate"><span class="pre">pyscal</span></code>.</div>
+</div>
+<p>Once again, lets check if the box dimensions are read in correctly</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[[</span><span class="o">-</span><span class="mf">7.66608</span><span class="p">,</span> <span class="mf">11.1901</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">7.66915</span><span class="p">,</span> <span class="mf">11.1931</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mf">7.74357</span><span class="p">,</span> <span class="mf">11.2676</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>Now we can get all atoms that belong to this system</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">500</span>
+</pre></div>
+</div>
+<div class="line-block">
+<div class="line">We can see that all the atoms are read in correctly and there are 500
+atoms in total. Once again, individual atom properties can be</div>
+<div class="line">accessed as before.</div>
+</div>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="o">-</span><span class="mf">5.66782</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.06781</span><span class="p">,</span> <span class="o">-</span><span class="mf">6.58151</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Thats it! Now we are ready for some calculations. You can find more in
+the examples section of the documentation.</p>
+</div>
+</div>
+<span id="document-example2basic"></span><div class="section" id="calculating-coordination-numbers">
+<h5>Calculating coordination numbers<a class="headerlink" href="#calculating-coordination-numbers" title="Permalink to this headline">¶</a></h5>
+<div class="line-block">
+<div class="line">In this example, we will read in a snapshot from an MD simulation and
+then calculate the coordination number distribution.</div>
+<div class="line">This example assumes that you read the basic example.</div>
+</div>
+<div class="section" id="read-in-a-file">
+<h6>Read in a file<a class="headerlink" href="#read-in-a-file" title="Permalink to this headline">¶</a></h6>
+<p>The first step is setting up a system. We can create atoms and
+simulation box using the <code class="docutils literal notranslate"><span class="pre">pyscal.crystal_structures</span></code> module. Let’s
+start by importing the module.</p>
+<p>The above function creates an bcc crystal of 6x6x6 unit cells with a
+lattice constant of 4.00 along with a simulation box that encloses the
+particles. We can then create a <code class="docutils literal notranslate"><span class="pre">System</span></code> and assign the atoms and box
+to it.</p>
+</div>
+<div class="section" id="calculating-neighbors">
+<h6>Calculating neighbors<a class="headerlink" href="#calculating-neighbors" title="Permalink to this headline">¶</a></h6>
+<p>We start by calculating the neighbors of each atom in the system. There
+are two ways to do this, using a <code class="docutils literal notranslate"><span class="pre">cutoff</span></code> method and using a
+<code class="docutils literal notranslate"><span class="pre">voronoi</span></code> polyhedra method. We will try with both of them. First we
+try with cutoff system.</p>
+<div class="section" id="cutoff-method">
+<h7>Cutoff method<a class="headerlink" href="#cutoff-method" title="Permalink to this headline">¶</a></h7>
+<p>Cutoff method takes cutoff distance value and finds all atoms within the
+cutoff distance of the host atom.</p>
+<p>Now lets get all the atoms.</p>
+<p>lets try accessing the coordination number of an atom</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">14</span>
+</pre></div>
+</div>
+<p>As we would expect for a bcc type lattice, we see that the atom has 14
+neighbors (8 in the first shell and 6 in the second). Lets try a more
+interesting example by reading in a bcc system with thermal vibrations.
+Thermal vibrations lead to distortion in atomic positions, and hence
+there will be a distribution of coordination numbers.</p>
+<p>We can loop over all atoms and create a histogram of the results</p>
+<p>Now lets plot and see the results</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Cutoff method&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/output_23_1.png" src="_images/output_23_1.png" />
+</div>
+</div>
+<div class="section" id="voronoi-method">
+<h6>Voronoi method<a class="headerlink" href="#voronoi-method" title="Permalink to this headline">¶</a></h6>
+<p>Voronoi method calculates the voronoi polyhedra of all atoms. Any atom
+that shares a voronoi face area with the host atom are considered
+neighbors. Voronoi polyhedra is calculated using the Voro++ code.
+However, you dont need to install this specifically as it is linked to
+pyscal.</p>
+<p>Once again, lets get all atoms and find their coordination</p>
+<p>And visualise the results</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Text</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;Voronoi method&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="_images/output_30_1.png" src="_images/output_30_1.png" />
+</div>
+<div class="section" id="finally">
+<h6>Finally..<a class="headerlink" href="#finally" title="Permalink to this headline">¶</a></h6>
+<p>Both methods find the coordination number, and the results are
+comparable. Cutoff method is very sensitive to the choice of cutoff
+radius, but voronoi method can slightly overestimate the neighbors due
+to thermal vibrations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="advanced-examples">
+<h4>Advanced examples<a class="headerlink" href="#advanced-examples" title="Permalink to this headline">¶</a></h4>
+<div class="toctree-wrapper compound">
+<span id="document-example3basic"></span><div class="section" id="calculating-bond-order-parameters">
+<h5>Calculating bond order parameters<a class="headerlink" href="#calculating-bond-order-parameters" title="Permalink to this headline">¶</a></h5>
+<p>This example illustrates the calculation of bond order parameters. Bond
+order parameters, represented by <span class="math notranslate nohighlight">\(q_l\)</span> and their averaged
+versions, <span class="math notranslate nohighlight">\(\bar{q}_l\)</span> have been used for identifying atoms belong
+to different crystal structures. In this example, we will consider one
+MD snapshot each for bcc, fcc, hcp and liquid, and calculate the
+<span class="math notranslate nohighlight">\(q_4\)</span> and <span class="math notranslate nohighlight">\(q_6\)</span> parameters and their averaged versions which
+are widely used in literature.</p>
+<p>We will consider two sets of MD snapshots, first a set of perfect bcc,
+fcc and hcp configurations and another set with thermal vibrations.</p>
+<div class="section" id="perfect-structures">
+<h6>Perfect structures<a class="headerlink" href="#perfect-structures" title="Permalink to this headline">¶</a></h6>
+<div class="section" id="read-in-the-input-files">
+<h7>Read in the input files<a class="headerlink" href="#read-in-the-input-files" title="Permalink to this headline">¶</a></h7>
+<p>First <code class="docutils literal notranslate"><span class="pre">System</span></code> objects are created for each of the different
+configurations and the input files are read in.</p>
+<p>The next major step is calculation of neighbors. There are two ways to
+calculate neighbors, by using a cutoff distance or by using the voronoi
+cells. We will try both approaches, but start with the cutoff method.</p>
+</div>
+<div class="section" id="q-4-q-6-cutoff-neighbor-method">
+<h7><span class="math notranslate nohighlight">\(q_4-q_6\)</span> cutoff neighbor method<a class="headerlink" href="#q-4-q-6-cutoff-neighbor-method" title="Permalink to this headline">¶</a></h7>
+<p>We have used a cutoff of 3 here, but this is a parameter that has to be
+tuned. Using a different cutoff for each structure is possible, but it
+would complicate the method if the system has a mix of structures. Now
+we can calculate the <span class="math notranslate nohighlight">\(q_4\)</span> and <span class="math notranslate nohighlight">\(q_6\)</span> distributions</p>
+<p>Thats it! Now lets gather the results and plot them.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">Legend</span> <span class="n">at</span> <span class="mh">0x7f0bdd5a5290</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/output_15_1.png" src="_images/output_15_1.png" />
+<p>Firstly, we can see that all the atoms fall on one specific point which
+is due to the absence of thermal vibrations. Next, all the points are
+well separated and show good distinction. However, in most cases the
+atomic positions are affected by thermal vibrations and hence show a
+spread in the distribution. We will take a look at this in the next
+case..</p>
+</div>
+</div>
+<div class="section" id="structures-with-thermal-vibrations">
+<h6>Structures with thermal vibrations<a class="headerlink" href="#structures-with-thermal-vibrations" title="Permalink to this headline">¶</a></h6>
+<p>Lets start with reading in the MD configurations</p>
+<p>Similar to the last example, we use the cutoff method</p>
+<div class="section" id="cutoff-method">
+<h7>cutoff method<a class="headerlink" href="#cutoff-method" title="Permalink to this headline">¶</a></h7>
+<p>And now, calculate q parameters</p>
+<p>Gather the q vales and plot them</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">Legend</span> <span class="n">at</span> <span class="mh">0x7f0bdd441c10</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/output_27_1.png" src="_images/output_27_1.png" />
+<p>This is not so great as the first case, we can see that the thermal
+vibrations cause the distributions to spread a lot and overlap with each
+other. Lechner and Dellago proposed using the averaged distributions,
+<span class="math notranslate nohighlight">\(\bar{q}_4-\bar{q}-6\)</span> to better distinguish the distributions.
+Lets try that.</p>
+<p>Lets see if these distributions are better..</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">Legend</span> <span class="n">at</span> <span class="mh">0x7f0bd6cb1950</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/output_32_1.png" src="_images/output_32_1.png" />
+<p>This looks much better! We can see that the resolution is much better
+than the non averaged versions.</p>
+</div>
+</div>
+<div class="section" id="voronoi-method-for-neighbors">
+<h6>Voronoi method for neighbors<a class="headerlink" href="#voronoi-method-for-neighbors" title="Permalink to this headline">¶</a></h6>
+<p>Finally, we will try the Voronoi method to identify neighbors. This
+method has the advantage that it is parameter-free. Lets see how it
+does. We can use the existing systems we created, but recalculate the
+neighbors.</p>
+<p>We calculate q params and plot the values</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">matplotlib</span><span class="o">.</span><span class="n">legend</span><span class="o">.</span><span class="n">Legend</span> <span class="n">at</span> <span class="mh">0x7f0bdd57a950</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<img alt="_images/output_40_1.png" src="_images/output_40_1.png" />
+<p>This method also distinguishes the structures well, except for some
+overlap between fcc and bcc regions. However, there is the distinct
+advantage that its parameter free.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="methods">
+<h2>Methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<span id="document-methods"></span><div class="section" id="methods-implemented-in-pyscal">
+<h3>Methods implemented in <code class="docutils literal notranslate"><span class="pre">pyscal</span></code><a class="headerlink" href="#methods-implemented-in-pyscal" title="Permalink to this headline">¶</a></h3>
+<div class="toctree-wrapper compound">
+<span id="document-nearestneighbormethods"></span><div class="section" id="methods-to-calculate-neighbors-of-a-particle">
+<h4>Methods to calculate neighbors of a particle<a class="headerlink" href="#methods-to-calculate-neighbors-of-a-particle" title="Permalink to this headline">¶</a></h4>
+<p>Calculation of the local environment relies on what the local
+environment is, and it involves finding the neighbors of a particle. The
+various neighbor calculation methods are discussed here.</p>
+<div class="section" id="fixed-cutoff-method">
+<h5>Fixed cutoff method<a class="headerlink" href="#fixed-cutoff-method" title="Permalink to this headline">¶</a></h5>
+<p>The most common method to calculate the neighbors of an atom is using a
+cutoff radius. The neighborhood of an atom for calculation of
+Steinhardt’s parameters is often carried out using this method. A cutoff
+is selected based on the properties of the system, one of the common
+methods is to select the cutoff in a way that it coincides with the
+first minimum of the radial distribution function. Once a cutoff is
+decided, the neighbors of an atom are those that fall within this
+selected radius. The following code snippet will use the cutoff method
+to calculate neighbors. Please check the examples section of basic use
+of the module. <code class="docutils literal notranslate"><span class="pre">conf.dump</span></code> is assumed to be the input file containing
+simulation snapshot. A cutoff radius of 3 is assumed for calculation of
+neighbors.</p>
+</div>
+<div class="section" id="adaptive-cutoff-methods">
+<h5>Adaptive cutoff methods<a class="headerlink" href="#adaptive-cutoff-methods" title="Permalink to this headline">¶</a></h5>
+<p>Selecting a hard cutoff radius gives rise to some problems such as-</p>
+<ul class="simple">
+<li>Atomic vibrations due to temperature makes the selection of a cutoff
+difficult.</li>
+<li>If there is more than one structure present in the system, for
+example, bcc and fcc, the selection of cutoff such that it includes
+the first shell of both structures can be difficult.</li>
+</ul>
+<p>With the aim of rectifying these problems, various adaptive approaches
+have been proposed. Two of the methods implemented in the module is
+discussed below.</p>
+<div class="section" id="solid-angle-based-nearest-neighbor-algorithm-sann">
+<h6>Solid angle based nearest neighbor algorithm (SANN)<a class="headerlink" href="#solid-angle-based-nearest-neighbor-algorithm-sann" title="Permalink to this headline">¶</a></h6>
+<div class="line-block">
+<div class="line">SANN algorithm determines the cutoff radius by counting the solid
+angles around an atom and equating it to <span class="math notranslate nohighlight">\(4\pi\)</span>. The algorithm
+solves the following equation iteratively.</div>
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[R_i^{(m)} = \frac{\sum_{j=1}^m r_{i,j}}{m-2} &lt; r_{i, m+1}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">where <span class="math notranslate nohighlight">\(i\)</span> is the host atom, <span class="math notranslate nohighlight">\(j\)</span> are it’s neighbors.
+<span class="math notranslate nohighlight">\(R_i\)</span> is the cutoff radius for each particle <span class="math notranslate nohighlight">\(i\)</span> which is
+found by increasing the neighbor of neighbors <span class="math notranslate nohighlight">\(m\)</span>. For a
+description of the algorithm and more details, please check. SANN
+algorithm can be used to find the neighbors by,</div>
+</div>
+<div class="line-block">
+<div class="line">Since SANN algorithm involves sorting, a sufficiently large cutoff is
+used in the beginning to reduce the number entries to be sorted. This
+parameter is calculated by,</div>
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}r_{initial} = \mathrm{threshold} \times \bigg(\frac{\mathrm{Simulation~box~volume}}{\mathrm{Number~of~particles}}\bigg)^{\frac{1}{3}}\\a tunable ``threshold`` parameter can be set through function\end{aligned}\end{align} \]</div>
+<p>arguments.</p>
+</div></blockquote>
+</div>
+<div class="section" id="adaptive-cutoff-method">
+<h6>Adaptive cutoff method<a class="headerlink" href="#adaptive-cutoff-method" title="Permalink to this headline">¶</a></h6>
+<div class="line-block">
+<div class="line">An adaptive cutoff specific for each atom can also be found using an
+algorithm similar to adaptive common neighbor analysis. This adaptive
+cutoff is calculated by first making a list of all neighbor distances
+for each atom similar to SANN method. Once this list is available,
+then the cutoff is calculated from,</div>
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[r_{cut}(i) = \mathrm{padding}\times \bigg(\frac{1}{\mathrm{nlimit}} \sum_{j=1}^{\mathrm{nlimit}} r_{ij} \bigg)\]</div>
+</div></blockquote>
+<p>This method can be chosen by,</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">padding</span></code> and <code class="docutils literal notranslate"><span class="pre">nlimit</span></code> parameters in the above equation can be
+tuned using the respective keywords.</p>
+<p>Either of the adaptive method can be used to find neighbors, which can
+then be used to calculate Steinhardt’s parameters or averaged versions.</p>
+</div>
+</div>
+<div class="section" id="voronoi-tessellation">
+<h5>Voronoi tessellation<a class="headerlink" href="#voronoi-tessellation" title="Permalink to this headline">¶</a></h5>
+<p>Voronoi tessellation provides a completely parameter free geometric
+approach for calculation of neighbors. <code class="docutils literal notranslate"><span class="pre">Voro++</span></code> code is used for
+Voronoi tessellation. Neighbors can be calculated using this method by,</p>
+<div class="line-block">
+<div class="line">Finding neighbors using Voronoi tessellation also calculates a weight
+for each neighbor. The weight of a neighbor <span class="math notranslate nohighlight">\(j\)</span> towards a host
+atom <span class="math notranslate nohighlight">\(i\)</span> is given by,</div>
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[W_{ij} = \frac{A_{ij}}{\sum_{j=1}^N A_{ij}}\]</div>
+</div></blockquote>
+<div class="line-block">
+<div class="line">where <span class="math notranslate nohighlight">\(N\)</span> are all the neighbors identified through Voronoi
+tessellation. This weight can be used later for calculation of
+weighted Steinhardt’s parameters. Optionally, it is possible to choose
+the exponent for this weight. Option <code class="docutils literal notranslate"><span class="pre">voroexp</span></code> is used to set this
+option. For example if <code class="docutils literal notranslate"><span class="pre">voroexp=2</span></code>, the weight would be calculated
+as,</div>
+<div class="line"><br /></div>
+</div>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[W_{ij} = \frac{A_{ij}^2}{\sum_{j=1}^N A_{ij}}\]</div>
+</div></blockquote>
+</div>
+</div>
+<span id="document-steinhardtparameters"></span><div class="section" id="steinhardt-s-bond-orientational-order-parameters">
+<h4>Steinhardt’s bond orientational order parameters<a class="headerlink" href="#steinhardt-s-bond-orientational-order-parameters" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="steinhardt-s-parameters">
+<h5>Steinhardt’s parameters<a class="headerlink" href="#steinhardt-s-parameters" title="Permalink to this headline">¶</a></h5>
+<p>Steinhardt’s bond orientational order parameters are a set of parameters
+based on the local atomic environment. These parameters have been used
+extensively for various uses such as distinction of crystal structures,
+identification of solid and liquid atoms and identification of defects.</p>
+<p>These parameters, which are rotationally and translationally invariant
+are defined by,</p>
+<div class="math notranslate nohighlight">
+\[q_l (i) =  \Big(  \frac{4\pi}{2l+1}  \sum_{m=-l}^l | q_{lm}(i) |^2 \Big )^{\frac{1}{2}}\]</div>
+<p>where,</p>
+<div class="math notranslate nohighlight">
+\[q_{lm} (i) =  \frac{1}{N(i)} \sum_{j=1}^{N(i)} Y_{lm}(\pmb{r}_{ij})\]</div>
+<p>in which <span class="math notranslate nohighlight">\(Y_{lm}\)</span> are the spherical harmonics and <span class="math notranslate nohighlight">\(N(i)\)</span> is
+the number of neighbours of particle <span class="math notranslate nohighlight">\(i\)</span>, <span class="math notranslate nohighlight">\(\pmb{r}_{ij}\)</span> is
+the vector connecting particles <span class="math notranslate nohighlight">\(i\)</span> and <span class="math notranslate nohighlight">\(j\)</span>, and <span class="math notranslate nohighlight">\(l\)</span>
+and <span class="math notranslate nohighlight">\(m\)</span> are both intergers with <span class="math notranslate nohighlight">\(m \in [-l,+l]\)</span>. Various
+parameters have found specific uses, such as <span class="math notranslate nohighlight">\(q_2\)</span> and <span class="math notranslate nohighlight">\(q_6\)</span>
+for identification of crystallinity, <span class="math notranslate nohighlight">\(q_6\)</span> for identification of
+solidity, and <span class="math notranslate nohighlight">\(q_4\)</span> and <span class="math notranslate nohighlight">\(q_6\)</span> for distinction of crystal
+structures. The traditional method makes use of a cutoff radius which
+takes into account the neighbors of an atom. The cutoff can be chosen
+based on different methods available. Once the cutoff is chosen and
+neighbors are calculated, the calculation of Steinhardt parameters are
+straightforward.</p>
+</div>
+<div class="section" id="averaged-steinhardt-s-parameters">
+<h5>Averaged Steinhardt’s parameters<a class="headerlink" href="#averaged-steinhardt-s-parameters" title="Permalink to this headline">¶</a></h5>
+<p>At high temperatures, thermal vibrations affect the atomic positions.
+This in turn leads to overlapping distributions of <span class="math notranslate nohighlight">\(q_l\)</span>
+parameters, which in turn leads to difficulty in identification of
+crystal structures. In order to address this problem, the averaged
+version <span class="math notranslate nohighlight">\(\bar{q}_l\)</span> of Steinhardt’s parameters was introduced by
+Lechner and Dellago. <span class="math notranslate nohighlight">\(\bar{q}_l\)</span> is given by,</p>
+<div class="math notranslate nohighlight">
+\[\bar{q}_l (i) =  \Big(  \frac{4\pi}{2l+1}  \sum_{m=-l}^l \Big| \frac{1}{\tilde{N}(i)} \sum_{k=0}^{\tilde{N}(i)} q_{lm}(k) \Big|^2 \Big )^{\frac{1}{2}}\]</div>
+<p>where the sum from <span class="math notranslate nohighlight">\(k=0\)</span> to <span class="math notranslate nohighlight">\(\tilde{N}(i)\)</span> is over all the
+neighbors and the particle itself. The averaged parameters takes into
+account the first neighbor shell and also information from the
+neighboring atoms and thus reduces the overlap between the
+distributions. Averaged versions can be calculated by setting the
+keyword <code class="docutils literal notranslate"><span class="pre">averaged=True</span></code> as follows.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="api-documentation">
+<h2>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+<div class="section" id="support-contributing-and-extending">
+<h2>Support, contributing and extending<a class="headerlink" href="#support-contributing-and-extending" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<span id="document-extending"></span><div class="section" id="extending-and-contributing">
+<h3>Extending and contributing<a class="headerlink" href="#extending-and-contributing" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">pyscal</span></code> welcomes and appreciates contribution and extension to the module. Rather than local modifications, we request that the modifications be submitted through a pull request, so that the module can be continuously improved.</p>
+<p>The following links will help you get started with contributing to <code class="docutils literal notranslate"><span class="pre">pyscal</span></code>.</p>
+<div class="toctree-wrapper compound">
+<span id="document-existing"></span><div class="section" id="contributions-to-existing-features">
+<h4>Contributions to existing features<a class="headerlink" href="#contributions-to-existing-features" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="reporting-and-fixing-bugs">
+<h5>Reporting and fixing bugs<a class="headerlink" href="#reporting-and-fixing-bugs" title="Permalink to this headline">¶</a></h5>
+<p>In case a bug is found in the module, it can be reported on the <a class="reference external" href="https://github.com/srmnitc/pyscal/issues">issues page of the repository</a>. After clicking on the new issue button, there is template already provided for Bug report. Please choose this and make sure the necessary fields are filled. Once a bug is reported, the status can once again monitored on the issues page. Additionally, you are of course very welcome to fix any existing bugs.</p>
+</div>
+</div>
+<span id="document-newfeatures"></span><div class="section" id="new-feautures">
+<h4>New feautures<a class="headerlink" href="#new-feautures" title="Permalink to this headline">¶</a></h4>
+<p>If you have an idea for new feature, you can submit a feature idea
+through the <a class="reference external" href="https://github.com/srmnitc/pyscal/issues">issues page of the
+repository</a>. After choosing
+new issue, please choose the template for feature request. As much as
+information as you can provide about the new feauture would be greatly
+helpful. Additionally, you could also work on feature requests already
+on the issues page. The following instructions will help you get started
+with local feature development.</p>
+<div class="section" id="setting-up-local-environment">
+<h5>Setting up local environment<a class="headerlink" href="#setting-up-local-environment" title="Permalink to this headline">¶</a></h5>
+<ol class="arabic simple">
+<li>The first step is to fork <code class="docutils literal notranslate"><span class="pre">pyscal</span></code>. A detailed tutorial on forking
+can be found
+<a class="reference external" href="https://help.github.com/en/articles/fork-a-repo">here</a>. After
+forking, clone the repository to your local machine.</li>
+<li>We recommend creating a virtual environment to test new features or
+improvements to features. See this
+<a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">link</a>
+for help on managing environments.</li>
+<li>Once the environment is set up, you can create a new branch for your
+feature by <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">checkout</span> <span class="pre">-b</span> <span class="pre">new_feauture</span></code>.</li>
+<li>Now implement the necessary feature.</li>
+<li>Once done, you can reinstall <code class="docutils literal notranslate"><span class="pre">pyscal</span></code> by
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">setup.py</span> <span class="pre">install</span></code>. After that please make sure that the
+existing tests work by running <code class="docutils literal notranslate"><span class="pre">pytest</span> <span class="pre">tests/</span></code> from the main module
+folder.</li>
+<li>If the tests work, you are almost done! If the new feature is not
+covered in existing tests, you can to write a new test in the tests
+folder. <code class="docutils literal notranslate"><span class="pre">pyscal</span></code> uses pytest for tests. <a class="reference external" href="http://doc.pytest.org/en/latest/getting-started.html">This
+link</a> will
+help you get started.</li>
+<li>Add the necessary docstrings for the new functions implemented.
+<code class="docutils literal notranslate"><span class="pre">pyscal</span></code> uses the <a class="reference external" href="https://numpydoc.readthedocs.io/en/latest/format.html">numpy docstring
+format</a> for
+documentation.</li>
+<li>Bonus task: Set up few examples that document how the feature works
+in the <code class="docutils literal notranslate"><span class="pre">docs/source/</span></code> folder and link it to the examples section.</li>
+<li>Final step - Submit a pull request through github. Before you submit,
+please make sure that the new feature is documented and has tests.
+Once the request is submitted, automated tests would be done. Your
+pull request will fail the tests if - the unit tests fail, or if the
+test coverage falls below 80%. If all tests are successful, your
+feauture will be incorporated to <code class="docutils literal notranslate"><span class="pre">pyscal</span></code> and your contributions
+will be credited.</li>
+</ol>
+<p>If you have trouble with any of the steps, or you need help, please
+<a class="reference external" href="mailto:sarath&#46;menon&#37;&#52;&#48;rub&#46;de">send an email</a> and we will be happy to
+help! All of the contributions are greatly appreciated and will be
+credited in Developers/Acknowledgements page.</p>
+</div>
+</div>
+</div>
+</div>
+<span id="document-helpandsupport"></span><div class="section" id="help-and-support">
+<h3>Help and support<a class="headerlink" href="#help-and-support" title="Permalink to this headline">¶</a></h3>
+<p>In case of bugs and feature improvements, you are welcome to create a new issue on the <a class="reference external" href="https://github.com/srmnitc/pyscal">github repo</a>. You are also welcome to fix a bug or implement a feature. Please see the <a class="reference external" href="https://pyscal.readthedocs.io/en/latest/extending.html">extending and contributing</a> section for more details.</p>
+<p>Any other questions or suggestions are welcome, please contact <a class="reference external" href="mailto:sarath&#46;menon&#37;&#52;&#48;rub&#46;de">us</a>.</p>
+</div>
+<span id="document-common_issues"></span><div class="section" id="common-issues">
+<h3>Common issues<a class="headerlink" href="#common-issues" title="Permalink to this headline">¶</a></h3>
+<p><strong>Installation of the package without administrator privileges</strong>
+In case of any problems with installation, we recommend that you install the package in a conda environment. Details on managing and creating environments can be found <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html">here</a> .</p>
+<p><strong>C++11 is not available</strong>
+<code class="docutils literal notranslate"><span class="pre">pyscal</span></code> needs C++11 to install and run. In case you do not have c++11, it can be installed in a conda environment by following this <a class="reference external" href="https://anaconda.org/anaconda/gcc">link</a> . After installing gcc, once the conda environment is reactivated, the environment variables are set. The installation should proceed now without problems.</p>
+</div>
+<span id="document-license"></span><div class="section" id="pyscal-license">
+<h3><code class="docutils literal notranslate"><span class="pre">pyscal</span></code> License<a class="headerlink" href="#pyscal-license" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">pyscal</span></code> uses the <a class="reference external" href="https://www.gnu.org/licenses/gpl-3.0.en.html">GNU General Public License Version 3</a> . A full description is available in the above link or in the repository.</p>
+<p>In addition, <code class="docutils literal notranslate"><span class="pre">pyscal</span></code> license of other codes that <code class="docutils literal notranslate"><span class="pre">pyscal</span></code> uses are given below-</p>
+<div class="section" id="voro-license">
+<h4>Voro++ license<a class="headerlink" href="#voro-license" title="Permalink to this headline">¶</a></h4>
+<p>Voro++ Copyright (c) 2008, The Regents of the University of California, through Lawrence Berkeley National Laboratory (subject to receipt of any required approvals from the U.S. Dept. of Energy). All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
+<ol class="arabic simple">
+<li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+<li>Neither the name of the University of California, Lawrence Berkeley National Laboratory, U.S. Dept. of Energy nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</li>
+</ol>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+<p>You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the features, functionality or performance of the source code (“Enhancements”) to anyone; however, if you choose to make your Enhancements available either publicly, or directly to Lawrence Berkeley National Laboratory, without imposing a separate written license agreement for such Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free perpetual license to install, use, modify, prepare derivative works, incorporate into other computer software, distribute, and sublicense such enhancements or derivative works thereof, in binary and source code form.</p>
+</div>
+<div class="section" id="pybind-11-license">
+<h4>pybind 11 license<a class="headerlink" href="#pybind-11-license" title="Permalink to this headline">¶</a></h4>
+<p>Copyright (c) 2016 Wenzel Jakob (<a class="reference external" href="mailto:wenzel&#46;jakob&#37;&#52;&#48;epfl&#46;ch">wenzel<span>&#46;</span>jakob<span>&#64;</span>epfl<span>&#46;</span>ch</a>), All rights reserved.</p>
+<p>Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:</p>
+<ol class="arabic simple">
+<li>Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.</li>
+<li>Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.</li>
+<li>Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.</li>
+</ol>
+<p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</p>
+<p>You are under no obligation whatsoever to provide any bug fixes, patches, or upgrades to the features, functionality or performance of the source code (“Enhancements”) to anyone; however, if you choose to make your Enhancements available either publicly, or directly to the author of this software, without imposing a separate written license agreement for such Enhancements, then you hereby grant the following license: a non-exclusive, royalty-free perpetual license to install, use, modify, prepare derivative works, incorporate into other computer software, distribute, and sublicense such enhancements or derivative works thereof, in binary and source code form.</p>
+</div>
+</div>
+<span id="document-citing"></span><div class="section" id="citing-the-code">
+<h3>Citing the code<a class="headerlink" href="#citing-the-code" title="Permalink to this headline">¶</a></h3>
+<p>We are currently preparing a publication. Until it is ready, if you want to use the code in your work, it would be great if you let <a class="reference external" href="mailto:sarath&#46;menon&#37;&#52;&#48;rub&#46;de">me</a> know about it.</p>
+</div>
+<span id="document-acknowledgements"></span><div class="section" id="developers">
+<h3>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference external" href="http://www.icams.de/content/people/icams-staff-members/?detail=1583">Sarath Menon</a></li>
+<li><a class="reference external" href="http://www.icams.de/content/people/icams-staff-members/?detail=1124">Grisell Diaz Leines</a></li>
+<li><a class="reference external" href="http://www.icams.de/content/people/icams-staff-members/?detail=129">Jutta Rogal</a></li>
+</ul>
+</div>
+<div class="section" id="acknowledgements">
+<h3>Acknowledgements<a class="headerlink" href="#acknowledgements" title="Permalink to this headline">¶</a></h3>
+<p>We acknowledge <a class="reference external" href="https://homepage.univie.ac.at/wolfgang.lechner/">Bond order analysis</a> code for the inspiration and the base for what later grew to be <code class="docutils literal notranslate"><span class="pre">pyscal</span></code>. We are also thankful to the developers of <a class="reference external" href="math.lbl.gov/voro++/">Voro++</a> and <a class="reference external" href="https://pybind11.readthedocs.io/en/stable/">pybind11</a> for developing the great tools that we could use in <code class="docutils literal notranslate"><span class="pre">pyscal</span></code>.</p>
+<p>We thank the following people for helping with testing the code and providing valuable feedback.</p>
+<ul class="simple">
+<li>Abril Azocar Guzman</li>
+<li>Alberto Ferrari</li>
+<li>Yanyan Liang</li>
+</ul>
+<p>We also thank Mahesh Prasad for the helpful discussions in the implementation of this module.</p>
+<p>Sarath Menon acknowledges a scholarship from the <a class="reference external" href="https://www.mpie.de/2747306/doctoral_programme">International Max Planck Research School for Interface Controlled Materials for Energy Conversion</a>, and is grateful for the help and support received during the <a class="reference external" href="https://www.e-cam2020.eu/event/4424/?instance_id=71">E-CAM High Throughput Computing ESDW</a> held in <a class="reference external" href="https://www.polito.it/?lang=en">Turin</a> in 2018 and 2019. Grisell Diaz Leines acknowledges the support by the Mexican National Council for Science and Technology (CONACYT) through project 232090 and by the German Research Foundation
+(DFG) through project RO 3073/6-1.</p>
+<p>This module was developed at the <a href="#id1"><span class="problematic" id="id2">`Interdisciplinary Centre for Advanced Materials Simulation &lt;http://www.icams.de/content`_</span></a>,  at the Ruhr University Bochum &lt;<a class="reference external" href="https://www.ruhr-uni-bochum.de/en">https://www.ruhr-uni-bochum.de/en</a>, Germany.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sarath Menon, Grisell Diaz Leines, Jutta Rogal
+      
+        <span class="commit">
+          Revision <code>51c018a2</code>.
+        </span>
+      
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: latest
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+      <dl>
+        <dt>Versions</dt>
+        
+          <dd><a href="/en/latest/">latest</a></dd>
+        
+          <dd><a href="/en/stable/">stable</a></dd>
+        
+      </dl>
+      <dl>
+        <dt>Downloads</dt>
+        
+          <dd><a href="//readthedocs.org/projects/pyscal/downloads/pdf/latest/">pdf</a></dd>
+        
+          <dd><a href="//readthedocs.org/projects/pyscal/downloads/htmlzip/latest/">html</a></dd>
+        
+          <dd><a href="//readthedocs.org/projects/pyscal/downloads/epub/latest/">epub</a></dd>
+        
+      </dl>
+      <dl>
+        <dt>On Read the Docs</dt>
+          <dd>
+            <a href="//readthedocs.org/projects/pyscal/?fromdocs=pyscal">Project Home</a>
+          </dd>
+          <dd>
+            <a href="//readthedocs.org/builds/pyscal/?fromdocs=pyscal">Builds</a>
+          </dd>
+      </dl>
+      <hr/>
+      Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+  </div>
+
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+   
+
+</body>
+</html>
