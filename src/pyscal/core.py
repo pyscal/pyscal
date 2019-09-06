@@ -10,26 +10,34 @@ Definitions of class Atom.
 """
 class Atom(pc.Atom):
     """
+    Class to store atom details.
+
+    Parameters
+    ----------
+    pos : list of floats of length 3
+        position of the `Atom`, default [0,0,0]
+
+    id : int
+        id of the `Atom`, default 0
+
+    type : int
+        type of the `Atom`, default 1
+
+    Notes
+    -----
     A c++ class for holding the properties of a single atom. Various properties of the atom
     can be accessed through member functions which are described below in detail. Atoms can
     be created individually or directly by reading in a file. Check the examples for more 
     details on how atoms are created. For creating atoms directly from an input file check
-    the documentation of ``System`` class.
+    the documentation of `System` class.
 
-    Although an ``Atom`` object can be created independently, ``Atom`` should be thought of 
-    inherently as members of the ``System`` class. All the properties that define an atom are
-    relative to the ``System`` class. ``System`` has a list of all atoms using which the neighbors
-    of an ``Atom``, if its solid and so on can be calculated. All the calculated properties of an
-    atom which depend on any other atom, hence should be calculated through ``System``. Please
+    Although an `Atom` object can be created independently, `Atom` should be thought of 
+    inherently as members of the `System` class. All the properties that define an atom are
+    relative to the `System` class. `System` has a list of all atoms using which the neighbors
+    of an `Atom`, if its solid and so on can be calculated. All the calculated properties of an
+    atom which depend on any other atom, hence should be calculated through `System`. Please
     check the examples section of the documentation for more details. 
 
-    Parameters
-    ----------
-    pos : list of floats of length 3, default [0,0,0]
-        position of the ``Atom``
-
-    id : int, default 0
-        id of the ``Atom``
 
     Examples
     --------
@@ -39,14 +47,6 @@ class Atom(pc.Atom):
     >>> atom.set_x([23.0, 45.2, 34.2])
     >>> #now set id
     >>> atom.set_id(23)
-
-    See also
-    --------
-    get_pos
-    set_pos
-    set_id
-    get_id
-    System
     
     """
     def __init__(self, pos=[0,0,0], id=0, type=1):
@@ -62,8 +62,7 @@ class Atom(pc.Atom):
     def get_pos(self):
         """
         
-        Get the position of the ``Atom``. Meaningful values are only returned if the atoms are
-        set before using this function.
+        Get the position of the `Atom`. 
 
         Parameters
         ----------
@@ -72,20 +71,20 @@ class Atom(pc.Atom):
         Returns
         -------
         pos : array of float
-            contains the position of the atom in the form ``[posx, posy, posz]``, where
-            ``posx`` is the x coordinate of the atom, ``posy`` is the y coordinate and ``posz`` 
+            contains the position of the atom in the form `[posx, posy, posz]`, where
+            `posx` is the x coordinate of the atom, `posy` is the y coordinate and `posz` 
             is the z coordinate. 
+
+        Notes
+        -----
+        Meaningful values are only returned if the atoms are
+        set before using this function.
 
         Examples
         --------
         >>> atom = Atom()
         >>> x = atom.get_pos()
-
-        See also
-        --------
-        set_pos
-        Atom
-        System      
+      
         """
         x = pc.Atom.get_x(self)
         return x
@@ -98,7 +97,7 @@ class Atom(pc.Atom):
         Parameters
         ----------
         pos : list of floats of length 3
-            list contains three values which are the position coordinates of the ``Atom`` with
+            list contains three values which are the position coordinates of the `Atom` with
             respect to the simulation box.
 
         Returns
@@ -109,10 +108,6 @@ class Atom(pc.Atom):
         --------
         >>> atom = Atom()
         >>> x = atom.set_pos([23.0, 45.2, 34.2])
-
-        See also
-        --------
-        get_pos
 
         """
         if len(pos) == 3:
@@ -135,8 +130,8 @@ class Atom(pc.Atom):
         Returns
         -------
         issolid : int
-            1 if solid  
-            0 otherwise
+            1 if solid, 0 otherwise
+        
         """
         return pc.Atom.get_solid(self)
 
@@ -151,23 +146,29 @@ class Atom(pc.Atom):
         Returns
         -------
         structure : int  
-            structural value. As of now it is not calculated using
-            any inbuilt function.
+            structural value
+        
+        Notes
+        -----
+        As of now it is not calculated using any inbuilt function. This can be used to store
+        structure values that are calculated using other methods.
+
         """
         return pc.Atom.get_structure(self)
 
     def set_solid(self, issolid):
         """
-        Find if an atom is solid or not.
+        Set the solidity of atom
 
         Parameters
         ----------
-        issolid : int, 0 or 1 
+        issolid : {0, 1} 
             1 if the atom is set to solid, 0 otherwise
 
         Returns
         -------
         None
+
         """
         if int(issolid) in [0, 1]: 
             pc.Atom.set_solid(self, int(issolid))
@@ -180,7 +181,7 @@ class Atom(pc.Atom):
 
         Parameters
         ----------
-        structure : int
+        structure : int 
             structure of the atom
 
         Returns
@@ -193,18 +194,24 @@ class Atom(pc.Atom):
     def get_volume(self, averaged = False):
         """
         
-        Get the voronoi colume of the atom. Meaningful values are only returned if the neighbors
-        are calculated using voronoi method.
+        Get the voronoi volume of the atom. 
 
         Parameters
         ----------
-        averaged : bool, default False  
-            If True, averaged version of the volume is returned.
+        averaged : bool  
+            If True, averaged version of the volume is returned, default False
         
         Returns
         -------
         volume : float
             voronoi volume of the atom.
+
+        Notes
+        -----
+        Calculation of volume happens during the neighbor calculation method. Meaningful 
+        values are only returned if the neighbors are calculated using voronoi method.
+        If keyword `averaged` is set to True, the volume of an atom is calculated as an
+        average over itself and its neighbors. 
 
         Examples
         --------
@@ -221,10 +228,7 @@ class Atom(pc.Atom):
 
     def get_cluster(self):
         """
-        Get the cluster properties of the atom. The cluster properties of the atom
-        include four different properties as listed below. The properties are only
-        returned if they are calculated before using ``calculate_nucsize`` function 
-        before.
+        Get the cluster properties of the atom. 
 
         Parameters
         ----------
@@ -233,20 +237,21 @@ class Atom(pc.Atom):
         Returns
         -------
         cluster : list of int of length 4  
-            ``cluster`` is a vector of four values. they are described below-  
-                ``issolid`` : which is 1 if the atom is solid, 0 otherwise  
-                ``issurface`` : 1 if the atom has liquid neighbors, 0 otherwise  
-                ``lcluster`` : 1 if the atom belongs to the largest cluster, 0 otherwise  
-                ``belongsto`` : which gives the id of the cluster that the atom belongs to.  
+            `cluster` is a vector of four values. they are described below-  
+                `issolid` : which is 1 if the atom is solid, 0 otherwise  
+                `issurface` : 1 if the atom has liquid neighbors, 0 otherwise  
+                `lcluster` : 1 if the atom belongs to the largest cluster, 0 otherwise  
+                `belongsto` : which gives the id of the cluster that the atom belongs to.  
         
+        
+        Notes
+        -----
+        The cluster properties of the atom include four different properties. The properties are only
+        returned if they are calculated before using ``calculate_nucsize`` function before.
+
         Examples
         --------
         >>> cinfo = atom.get_cluster()
-
-        See also
-        --------
-        set_nucsize_parameters
-        calculate_nucsize
 
         """
         x = pc.Atom.get_cluster(self)
@@ -255,9 +260,7 @@ class Atom(pc.Atom):
     def get_neighbors(self):
         """
         
-        Returns the neighbors indices of the atom. The list returned consistes of the indices
-        of neighbor atom which indicate their position in the list of all atoms. The neighbors
-        of an atom can be calculated from the ``System`` object that it belongs to.
+        Returns the neighbors indices of the atom. 
 
         Parameters
         ----------
@@ -268,15 +271,15 @@ class Atom(pc.Atom):
         x : list of int
             list of neighbor indices of the atom.
 
+        Notes
+        -----
+        The list returned consistes of the indices
+        of neighbor atom which indicate their position in the list of all atoms. The neighbors
+        of an atom can be calculated from the ``System`` object that it belongs to.
+
         Examples
         --------
         neighbors = atom.get_neighbors()
-
-        See also
-        --------
-        set_neighbors
-        set_neighborweights
-        get_neighborweights
 
         """
         return pc.Atom.get_neighbors(self)
@@ -311,8 +314,7 @@ class Atom(pc.Atom):
     def get_coordination(self):
         """
         
-        Returns the coordination number of the atom. ``System.get_neighbors`` function
-        has to be used before accessing coordination numbers. 
+        Returns the coordination number of the atom.  
 
         Parameters
         ----------
@@ -323,15 +325,13 @@ class Atom(pc.Atom):
         cn : int
             coordination number of the atom.
 
+        Notes
+        -----
+        ``System.get_neighbors`` function has to be used before accessing coordination numbers.
+
         Examples
         --------
         neighbors = atom.get_neighbors()
-
-        See also
-        --------
-        set_neighbors
-        set_neighborweights
-        get_neighborweights
 
         """
         return pc.Atom.get_coordination(self)
@@ -339,13 +339,7 @@ class Atom(pc.Atom):
     def get_neighborweights(self):
         """
         
-        Get the neighbor weights of the atom. The neighbor weights are used to weight the 
-        contribution of each neighboring atom towards the q value of the host atom. By 
-        default, each neighbor has a weight of 1 each. However, if the neighbors are calculated
-        using the  ``System.get_neighbors(method='voronoi')``, each neighbor atom gets a 
-        weight proportional to the face area shared between the neighboring atom and the 
-        host atom (or higher powers - check the documentation). This can sometimes be helpful 
-        in controlling the contribution of atoms with low face areas due to the thermal vibrations at high temperature.
+        Get the neighbor weights of the atom. 
         
         Parameters
         ----------
@@ -356,15 +350,24 @@ class Atom(pc.Atom):
         x : list of float
             neighbor weights
 
+        Notes
+        -----
+        The neighbor weights are used to weight the contribution of each neighboring atom towards the 
+        q value of the host atom [1]_. By default, each neighbor has a weight of 1 each. 
+        However, if the neighbors are calculated using the  `System.get_neighbors(method='voronoi')`, each neighbor 
+        atom gets a weight proportional to the face area shared between the neighboring atom and the 
+        host atom (or higher powers [2]_). This can sometimes be helpful in controlling the contribution 
+        of atoms with low face areas due to the thermal vibrations at high temperature.
+        
+        References
+        ----------
+        .. [1] Mickel, W, Kapfer, SC, Schroder-Turk, GE, Mecke, K, J Chem Phys 138, 2013
+        .. [2] Haeberle, J, Sperl, M, Born, P 2019
+
         Examples
         --------
         >>> weights = atom.get_neighborweights()
 
-        See also
-        --------
-        get_neighbors
-        set_neighbors
-        set_neighborweights
         """
 
         return pc.Atom.get_neighborweights(self)
@@ -387,47 +390,47 @@ class Atom(pc.Atom):
         --------
         >>> atom.set_neighborweights([0.1, 0.2, 0.2, 0.4, 0.1])
 
-        See also
-        --------
-        get_neighbors
-        set_neighbors
-        set_neighborweights
         """
         pc.Atom.set_neighborweights(self, weights)
 
     def get_q(self, q, averaged = False):
         """
-        get q value of the atom. The q value can be either normal or can
-        be averaged according to Lechner, W, Dellago, C. JCP 129, 2008.
-        The averaged version can be obtained by using keyword
-        ``averaged = True``.
+        get q value of the atom. 
 
         Parameters
         ----------
         q : int or list of int
             number of the required q - from 2-12
 
-        averaged : bool, default False
+        averaged : bool
             If True, return the averaged q values,
             If False, return the non averaged ones
+            default False
 
         Returns
         -------
         q : float or list of floats
             The queried q value
 
+        Notes
+        -----
+        The q value can be either normal or can be averaged [1]_
+        The averaged version can be obtained by using keyword
+        `averaged = True`.
+
+        References
+        ----------
+        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
+
         Examples
         --------
         >>> q2 = atom.get_q(2, averaged = True)
         >>> q24 = atom.get_q([2, 4])
 
-        See also
-        --------
-        set_q
-        get_aq
-        set_aq      
         """
         if isinstance(q, int):
+            if not q in range(2, 13):
+                raise ValueError("q values should be in range 2-12")
             if averaged:
                 rq = pc.Atom.get_aq(self, q)
             else:
@@ -435,6 +438,9 @@ class Atom(pc.Atom):
             return rq
 
         else:
+            for qq in q:
+                if not qq in range(2, 13):
+                    raise ValueError("q values should be in range 2-12")
             if averaged:
                 rq = [ pc.Atom.get_aq(self, qq) for qq in q ]
             else:
@@ -443,8 +449,7 @@ class Atom(pc.Atom):
 
     def set_q(self, q, d, averaged = False):
         """
-        set the q value of the atom. If ``averaged = True``, sets the averaged versions of
-        the q parameters.
+        set the q value of the atom. 
 
         Parameters
         ----------
@@ -460,23 +465,33 @@ class Atom(pc.Atom):
         -------
         None
 
+        Notes
+        -----
+        The q value can be either normal or can be averaged [1]_
+        The averaged version can be obtained by using keyword
+        `averaged = True`.
+
+        References
+        ----------
+        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
+
         Examples
         --------
         >>> atom.set_q(2, 0.24, averaged = True)
         >>> atom.set_q([2,4], [0.24, 0.05])
 
-        See also
-        --------
-        set_aq
-        get_aq
-        get_q
         """
         if isinstance(q, int):
+            if not q in range(2, 13):
+                raise ValueError("q values should be in range 2-12")
             if averaged:
                 pc.Atom.set_aq(self, q, d)
             else:
                 pc.Atom.set_q(self, q, d)
         else:
+            for qq in q:
+                if not qq in range(2, 13):
+                    raise ValueError("q values should be in range 2-12")
             if averaged:
                 for count, qq in enumerate(q):
                     pc.Atom.set_aq(self, qq, d[count])
@@ -503,9 +518,6 @@ class Atom(pc.Atom):
         --------
         >>> id = atom.get_id()
 
-        See also
-        --------
-        set_id
         """
         return pc.Atom.get_id(self)
 
@@ -527,16 +539,12 @@ class Atom(pc.Atom):
         --------
         >>> atom.set_id(2)
 
-        See also
-        --------
-        get_id
-
         """
         pc.Atom.set_id(self, idd)
 
     def get_loc(self):
         """
-        
+
         get  the location of the atom in the array of all atoms in ``System``
 
         Parameters
@@ -548,21 +556,23 @@ class Atom(pc.Atom):
         loc : int
             loc of the atom
 
+        Notes
+        -----
+        `loc` and `id` are different. The id of the atom is read in from the 
+        input file. `loc` however is the position of the atom in the list of
+        all atoms of the system.
+
         Examples
         --------
         >>> loc = atom.get_loc()
 
-        See also
-        --------
-        set_loc
         """
         return pc.Atom.get_loc(self)
 
     def set_loc(self, idd):
         """
         
-        set  the ``loc`` of the atom. When an atom is put back in the ``System``, it will
-        be reset if another atom exists in that ``loc``
+        set  the ``loc`` of the atom. 
 
         Parameters
         ----------
@@ -573,16 +583,17 @@ class Atom(pc.Atom):
         -------
         None
 
+        Notes
+        -----
+        When an atom is put back in the ``System``, it will
+        be reset if another atom exists in that ``loc``
+
         Examples
         --------
         >>> atom.set_loc(2)
 
-        See also
-        --------
-        get_loc
-
         """
-        warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
+        #warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
         pc.Atom.set_loc(self, idd)
 
     def get_type(self):
@@ -603,9 +614,6 @@ class Atom(pc.Atom):
         --------
         >>> t = atom.get_type()
 
-        See also
-        --------
-        set_type
         """
         return pc.Atom.get_type(self)
 
@@ -627,10 +635,6 @@ class Atom(pc.Atom):
         --------
         >>> atom.set_type(2)
 
-        See also
-        --------
-        get_type
-
         """
         if isinstance(tt, int):
             pc.Atom.set_type(self, tt)
@@ -640,10 +644,7 @@ class Atom(pc.Atom):
 
     def get_vorovector(self):
         """
-        get the voronoi structure identification vector. Returns a
-        vector of the form ``(n3, n4, n5, n6)``, where ``n3`` is the number
-        of faces with 3 vertices, ``n4`` is the number of faces with 4
-        vertices and so on. This can be used to identify structures.
+        get the voronoi structure identification vector. 
 
         Parameters
         ----------
@@ -653,17 +654,20 @@ class Atom(pc.Atom):
         -------
         vorovector : array like, int  
             array of the form (n3, n4, n5, n6)
+
+        Notes
+        -----
+        Returns a vector of the form ``(n3, n4, n5, n6)``, where ``n3`` is the number
+        of faces with 3 vertices, ``n4`` is the number of faces with 4
+        vertices and so on. This can be used to identify structures.
+
         """
         return pc.Atom.get_vorovector(self)
 
     def get_facevertices(self):
         """
         get the number of vertices of the voronoi face shared between an atom and its neighbors. 
-        Returns a vector with number of entries equal to the number of neighbors. 
-        The corresponding atom indices can be obtained through ``Atom.get_neighbors``
-        A shorter version of this vector
-        in a condensed form is available through ``Atom.get_vorovector``.
-
+        
         Parameters
         ----------
         None
@@ -671,7 +675,15 @@ class Atom(pc.Atom):
         Returns
         -------
         facevertices : array like, int
-            array of the vertices  
+            array of the vertices
+
+        Notes
+        -----
+        Returns a vector with number of entries equal to the number of neighbors. 
+        The corresponding atom indices can be obtained through ``Atom.get_neighbors``
+        A shorter version of this vector
+        in a condensed form is available through ``Atom.get_vorovector``.
+  
         """
         return pc.Atom.get_facevertices(self)
 
