@@ -10,7 +10,7 @@ MD snapshot each for bcc, fcc, hcp and liquid, and calculate the
 :math:`q_4` and :math:`q_6` parameters and their averaged versions which
 are widely used in literature.
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     import numpy as np
@@ -44,7 +44,7 @@ cells. We will try both approaches, but start with the cutoff method.
 :math:`q_4-q_6` cutoff neighbor method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code:: python
 
     bcc.get_neighbors(method='cutoff', cutoff=3.50)
     fcc.get_neighbors(method='cutoff', cutoff=3.50)
@@ -55,7 +55,7 @@ tuned. Using a different cutoff for each structure is possible, but it
 would complicate the method if the system has a mix of structures. Now
 we can calculate the :math:`q_4` and :math:`q_6` distributions
 
-.. code:: ipython3
+.. code:: python
 
     bcc.calculate_q([4,6])
     fcc.calculate_q([4,6])
@@ -63,13 +63,13 @@ we can calculate the :math:`q_4` and :math:`q_6` distributions
 
 Thats it! Now lets gather the results and plot them.
 
-.. code:: ipython3
+.. code:: python
 
     bccq = bcc.get_qvals([4, 6])
     fccq = fcc.get_qvals([4, 6])
     hcpq = hcp.get_qvals([4, 6])
 
-.. code:: ipython3
+.. code:: python
 
     plt.scatter(bccq[0], bccq[1], s=60, label='bcc', color='#C62828')
     plt.scatter(fccq[0], fccq[1], s=60, label='fcc', color='#FFB300')
@@ -103,7 +103,7 @@ Structures with thermal vibrations
 
 Lets start with reading in the MD configurations
 
-.. code:: ipython3
+.. code:: python
 
     bcc = pc.System()
     bcc.read_inputfile('conf.bcc', format='lammps-dump')
@@ -119,7 +119,7 @@ Similar to the last example, we use the cutoff method
 cutoff method
 ^^^^^^^^^^^^^
 
-.. code:: ipython3
+.. code:: python
 
     bcc.get_neighbors(method='cutoff', cutoff=3.50)
     fcc.get_neighbors(method='cutoff', cutoff=3.50)
@@ -128,7 +128,7 @@ cutoff method
 
 And now, calculate q parameters
 
-.. code:: ipython3
+.. code:: python
 
     bcc.calculate_q([4,6])
     fcc.calculate_q([4,6])
@@ -137,14 +137,14 @@ And now, calculate q parameters
 
 Gather the q vales and plot them
 
-.. code:: ipython3
+.. code:: python
 
     bccq = bcc.get_qvals([4, 6])
     fccq = fcc.get_qvals([4, 6])
     hcpq = hcp.get_qvals([4, 6])
     lqdq = lqd.get_qvals([4, 6])
 
-.. code:: ipython3
+.. code:: python
 
     plt.scatter(fccq[0], fccq[1], s=10, label='fcc', color='#FFB300')
     plt.scatter(hcpq[0], hcpq[1], s=10, label='hcp', color='#388E3C')
@@ -173,14 +173,14 @@ other. Lechner and Dellago proposed using the averaged distributions,
 :math:`\bar{q}_4-\bar{q}-6` to better distinguish the distributions.
 Lets try that.
 
-.. code:: ipython3
+.. code:: python
 
     bcc.calculate_q([4,6], averaged=True)
     fcc.calculate_q([4,6], averaged=True)
     hcp.calculate_q([4,6], averaged=True)
     lqd.calculate_q([4,6], averaged=True)
 
-.. code:: ipython3
+.. code:: python
 
     bccaq = bcc.get_qvals([4, 6], averaged=True)
     fccaq = fcc.get_qvals([4, 6], averaged=True)
@@ -189,7 +189,7 @@ Lets try that.
 
 Lets see if these distributions are better..
 
-.. code:: ipython3
+.. code:: python
 
     plt.scatter(fccaq[0], fccaq[1], s=10, label='fcc', color='#FFB300')
     plt.scatter(hcpaq[0], hcpaq[1], s=10, label='hcp', color='#388E3C')
@@ -223,7 +223,7 @@ method has the advantage that it is parameter-free. Lets see how it
 does. We can use the existing systems we created, but recalculate the
 neighbors.
 
-.. code:: ipython3
+.. code:: python
 
     bcc.get_neighbors(method='voronoi')
     fcc.get_neighbors(method='voronoi')
@@ -232,21 +232,21 @@ neighbors.
 
 We calculate q params and plot the values
 
-.. code:: ipython3
+.. code:: python
 
     bcc.calculate_q([4,6], averaged=True)
     fcc.calculate_q([4,6], averaged=True)
     hcp.calculate_q([4,6], averaged=True)
     lqd.calculate_q([4,6], averaged=True)
 
-.. code:: ipython3
+.. code:: python
 
     bccaq = bcc.get_qvals([4, 6], averaged=True)
     fccaq = fcc.get_qvals([4, 6], averaged=True)
     hcpaq = hcp.get_qvals([4, 6], averaged=True)
     lqdaq = lqd.get_qvals([4, 6], averaged=True)
 
-.. code:: ipython3
+.. code:: python
 
     plt.scatter(fccaq[0], fccaq[1], s=10, label='fcc', color='#FFB300')
     plt.scatter(hcpaq[0], hcpaq[1], s=10, label='hcp', color='#388E3C')

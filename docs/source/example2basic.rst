@@ -6,7 +6,7 @@ Calculating coordination numbers
   then calculate the coordination number distribution.
 | This example assumes that you read the basic example.
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     import numpy as np
@@ -19,11 +19,11 @@ The first step is setting up a system. We can create atoms and
 simulation box using the ``pyscal.crystal_structures`` module. Let's
 start by importing the module.
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.crystal_structures as pcs
 
-.. code:: ipython3
+.. code:: python
 
     atoms, box = pcs.make_crystal('bcc', lattice_constant= 4.00, repetitions=[6,6,6])
 
@@ -32,7 +32,7 @@ lattice constant of 4.00 along with a simulation box that encloses the
 particles. We can then create a ``System`` and assign the atoms and box
 to it.
 
-.. code:: ipython3
+.. code:: python
 
     sys = pc.System()
     sys.assign_atoms(atoms, box)
@@ -52,13 +52,13 @@ Cutoff method
 Cutoff method takes cutoff distance value and finds all atoms within the
 cutoff distance of the host atom.
 
-.. code:: ipython3
+.. code:: python
 
     sys.get_neighbors(method='cutoff', cutoff=4.1)
 
 Now lets get all the atoms.
 
-.. code:: ipython3
+.. code:: python
 
     atoms = sys.get_atoms()
 
@@ -71,7 +71,7 @@ Now lets get all the atoms.
 
 lets try accessing the coordination number of an atom
 
-.. code:: ipython3
+.. code:: python
 
     atoms[0].get_coordination()
 
@@ -90,7 +90,7 @@ interesting example by reading in a bcc system with thermal vibrations.
 Thermal vibrations lead to distortion in atomic positions, and hence
 there will be a distribution of coordination numbers.
 
-.. code:: ipython3
+.. code:: python
 
     sys = pc.System()
     sys.read_inputfile('conf.dump')
@@ -99,13 +99,13 @@ there will be a distribution of coordination numbers.
 
 We can loop over all atoms and create a histogram of the results
 
-.. code:: ipython3
+.. code:: python
 
     coord = [atom.get_coordination() for atom in atoms]
 
 Now lets plot and see the results
 
-.. code:: ipython3
+.. code:: python
 
     nos, counts = np.unique(coord, return_counts=True)
     plt.bar(nos, counts, color="#AD1457")
@@ -138,7 +138,7 @@ this example, we will use the ``adaptive`` algorithm.
 
 ``adaptive algorithm``
 
-.. code:: ipython3
+.. code:: python
 
     sys.get_neighbors(method='cutoff', cutoff='adaptive', padding=1.5)
     atoms = sys.get_atoms()
@@ -146,7 +146,7 @@ this example, we will use the ``adaptive`` algorithm.
 
 Now lets plot
 
-.. code:: ipython3
+.. code:: python
 
     nos, counts = np.unique(coord, return_counts=True)
     plt.bar(nos, counts, color="#AD1457")
@@ -178,20 +178,20 @@ neighbors. Voronoi polyhedra is calculated using the Voro++ code.
 However, you dont need to install this specifically as it is linked to
 pybop.
 
-.. code:: ipython3
+.. code:: python
 
     sys.get_neighbors(method='voronoi')
 
 Once again, lets get all atoms and find their coordination
 
-.. code:: ipython3
+.. code:: python
 
     atoms = sys.get_allatoms()
     coord = [atom.get_coordination() for atom in atoms]
 
 And visualise the results
 
-.. code:: ipython3
+.. code:: python
 
     nos, counts = np.unique(coord, return_counts=True)
     plt.bar(nos, counts, color="#AD1457")

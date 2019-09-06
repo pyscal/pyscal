@@ -32,7 +32,7 @@ based on different methods available. Once the cutoff is chosen and
 neighbors are calculated, the calculation of Steinhardt parameters are
 straightforward.
 
-.. code:: ipython3
+.. code:: python
 
     sys.calculate_q([4, 6])
     q = sys.get_qvals([4, 6])
@@ -56,7 +56,7 @@ neighboring atoms and thus reduces the overlap between the
 distributions. Averaged versions can be calculated by setting the
 keyword ``averaged=True`` as follows.
 
-.. code:: ipython3
+.. code:: python
 
     sys.calculate_q([4, 6], averaged=True)
     q = sys.get_qvals([4, 6], averaged=True)

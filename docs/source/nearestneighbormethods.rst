@@ -22,7 +22,7 @@ of the module. ``conf.dump`` is assumed to be the input file containing
 simulation snapshot. A cutoff radius of 3 is assumed for calculation of
 neighbors.
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     sys = pc.System()
@@ -59,7 +59,7 @@ Solid angle based nearest neighbor algorithm (SANN)
   description of the algorithm and more details, please check. SANN
   algorithm can be used to find the neighbors by,
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     sys = pc.System()
@@ -90,7 +90,7 @@ Adaptive cutoff method
 
 This method can be chosen by,
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     sys = pc.System()
@@ -110,7 +110,7 @@ Voronoi tessellation provides a completely parameter free geometric
 approach for calculation of neighbors. ``Voro++`` code is used for
 Voronoi tessellation. Neighbors can be calculated using this method by,
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     sys = pc.System()

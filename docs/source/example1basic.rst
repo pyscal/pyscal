@@ -5,7 +5,7 @@ Getting started with pybop
 This example illustrates basic functionality of pyscal python library by
 setting up a system and reading in atoms.
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     import numpy as np
@@ -16,7 +16,7 @@ The ``System`` class
 ``System`` is the basic class of pyscal and is required to be setup in
 order to perform any calculations. It can be set up as easily as-
 
-.. code:: ipython3
+.. code:: python
 
     sys = pc.System()
 
@@ -31,13 +31,13 @@ simulation box dimensions \* the information regarding individual atoms.
 | The unitcell has 2 atoms and their positions are [0,0,0] and [0.5,
   0.5, 0.5].
 
-.. code:: ipython3
+.. code:: python
 
     sys.set_box([[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]])
 
 We can easily check if everything worked by getting the box dimensions
 
-.. code:: ipython3
+.. code:: python
 
     box = sys.get_box()
     box
@@ -59,7 +59,7 @@ The ``Atom`` class
   ``Atom`` class. For a more detailed description, check the examples.
 | Now lets create two atoms.
 
-.. code:: ipython3
+.. code:: python
 
     atom1 = pc.Atom()
     atom2 = pc.Atom()
@@ -67,7 +67,7 @@ The ``Atom`` class
 Now two empty atom objects are created. The major poperties of an atom
 are its positions and id. Lets set this up.
 
-.. code:: ipython3
+.. code:: python
 
     atom1.set_pos([0., 0., 0.])
     atom1.set_id(0)
@@ -76,14 +76,14 @@ are its positions and id. Lets set this up.
 
 Alternatively, atom objects can also be set up as
 
-.. code:: ipython3
+.. code:: python
 
     atom1 = pc.Atom(pos=[0., 0., 0.], id=0)
     atom2 = pc.Atom(pos=[0.5, 0.5, 0.5], id=1)
 
 We can check the details of the atom by querying it
 
-.. code:: ipython3
+.. code:: python
 
     x1 = atom1.get_x()
     x1
@@ -103,7 +103,7 @@ Combining ``System`` and ``Atom``
 Now that we have created the atoms, we can assign them to the system. We
 can also assign the same box we created before.
 
-.. code:: ipython3
+.. code:: python
 
     sys = pc.System()
     sys.assign_atoms([atom1, atom2], box)
@@ -112,7 +112,7 @@ That sets up the system completely. It has both of it's constituents -
 atoms and the simulation box. We can check if everything works
 correctly.
 
-.. code:: ipython3
+.. code:: python
 
     atoms = sys.get_atoms()
 
@@ -127,14 +127,14 @@ This returns all the atoms of the system. Once you have all the atoms,
 you can modify any one and set it back to the system. The following
 statement will set the type of the first atom to 2.
 
-.. code:: ipython3
+.. code:: python
 
     atom = atoms[0]
     atom.set_type(2)
 
 Lets verify if it was done properly
 
-.. code:: ipython3
+.. code:: python
 
     atom.get_type()
 
@@ -149,14 +149,14 @@ Lets verify if it was done properly
 
 Now we can push the atom back to the system
 
-.. code:: ipython3
+.. code:: python
 
     sys.set_atom(atom)
 
 We can also get individual atoms from the system instead of getting all
 of them
 
-.. code:: ipython3
+.. code:: python
 
     atom = sys.get_atom(0)
 
@@ -177,14 +177,14 @@ Reading in an input file
   write a python function to process the input file, extract the details
   and pass to ``pyscal``.
 
-.. code:: ipython3
+.. code:: python
 
     sys = pc.System()
     sys.read_inputfile('conf.dump')
 
 Once again, lets check if the box dimensions are read in correctly
 
-.. code:: ipython3
+.. code:: python
 
     box = sys.get_box()
     box
@@ -200,7 +200,7 @@ Once again, lets check if the box dimensions are read in correctly
 
 Now we can get all atoms that belong to this system
 
-.. code:: ipython3
+.. code:: python
 
     atoms = sys.get_atoms()
     len(atoms)
@@ -218,7 +218,7 @@ Now we can get all atoms that belong to this system
   atoms in total. Once again, individual atom properties can be
 | accessed as before.
 
-.. code:: ipython3
+.. code:: python
 
     atoms[0].get_x()
 
