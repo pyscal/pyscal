@@ -24,7 +24,7 @@
 \PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
 \usepackage[unicode=true]{hyperref}
 \hypersetup{
-            pdftitle={pybop : A hybrid python/C++ package for calculation of bond orientational order parameters},
+            pdftitle={pyscal : python Structural Environment Calculator},
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
@@ -56,8 +56,7 @@
 \makeatother
 
 
-\title{pybop : A hybrid python/C++ package for calculation of bond
-orientational order parameters}
+\title{pyscal : python Structural Environment Calculator}
 \date{05 August 2019}
 
 \begin{document}
@@ -105,16 +104,16 @@ parameters\citep{Haeberle:2019}.
 Originally inspired by
 \href{https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html}{\texttt{BondOrderAnalysis}}
 \citep{Lechner:2010}, a C++ code for calculation of bond order
-parameters, \texttt{pybop} is a python module designed for the
+parameters, \texttt{pyscal} is a python module designed for the
 computation of bond orientational order parameters during
 post-processing of simulation data. In addition to Steinhardt parameters
 and their averaged version calculated by \texttt{BondOrderAnalysis},
-\texttt{pybop} brings together the various approaches described above in
+\texttt{pyscal} brings together the various approaches described above in
 a single python module. While python offers the advantages of
 extensibility and flexibility, the module ensures the speed and
 efficiency of the calculations by using a core code written in C++,
 which is then ported to python using \texttt{pybind11}
-\citep{Jakob:2016}. The \texttt{pybop}module includes the following
+\citep{Jakob:2016}. The \texttt{pyscal}module includes the following
 functionality-
 
 \begin{itemize}
@@ -125,7 +124,7 @@ functionality-
 \item
   weighted bond order parameters using face area of voronoi polyhedra,
   the calculation of which is enabled using Voro++ code
-  \citep{Rycroft:2009} integrated into \texttt{pybop}.
+  \citep{Rycroft:2009} integrated into \texttt{pyscal}.
 \item
   distinction of atoms as solid or liquid based on Frenkel and Auer
   approach \citep{Auer:2005}.
@@ -143,26 +142,26 @@ functionality-
   number of vertices and face area.
 \end{itemize}
 
-\texttt{pybop} uses a list of particle positions and simulation box
+\texttt{pyscal} uses a list of particle positions and simulation box
 vectors as input. It can also read in output files containing atomistic
 simulation data in the LAMMPS \citep{Plimpton:1995}
 \href{https://lammps.sandia.gov/doc/dump.html}{dump format} and
 \href{https://cms.mpi.univie.ac.at/vasp/vasp/POSCAR_file.html}{POSCAR}
 format used by \emph{ab initio} simulation package
 \href{https://www.vasp.at/}{VASP}. Orthogonal and triclinic simulation
-cells can be employed in the module. \texttt{pybop} also offers a set of
+cells can be employed in the module. \texttt{pyscal} also offers a set of
 supporting tools including those for reading, writing and splitting of
 atomic trajectory files and the creation of perfect crystal structures.
-Overall, \texttt{pybop} also acts as a tool for calculation of
+Overall, \texttt{pyscal} also acts as a tool for calculation of
 quantities based on atomic positions, and can be easily extended using
 either C++ for computationally intensive operations or python for other
-tasks that wrap over the existing features. \texttt{pybop} includes a
+tasks that wrap over the existing features. \texttt{pyscal} includes a
 documentation and various usage examples, available in the
-\href{https://pybop.readthedocs.io/en/latest/}{pybop website}. Other
+\href{https://pyscal.readthedocs.io/en/latest/}{pyscal website}. Other
 examples, including installation of the package and the calculation of
 bond orientational order parameters, are also available. Alternatively,
-\texttt{pybop} also provides a
-\href{https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples\%2F}{binder
+\texttt{pyscal} also provides a
+\href{https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples\%2F}{binder
 environment} to use the example cases before installation.
 
 \section{Acknowledgements}\label{acknowledgements}
