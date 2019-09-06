@@ -133,6 +133,6 @@ option. For example if ``voroexp=2``, the weight would be calculated as,
   .. math::  W_{ij} = \frac{A_{ij}^2}{\sum_{j=1}^N A_{ij}}
 
 
-.. [1] `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.  
-.. [2] `van Meel, JA, Filion, L, Valeriani, C, Frenkel, D, J Chem Phys 234107, 2012 <https://aip.scitation.org/doi/full/10.1063/1.4729313>`_.  
-.. [3] `Stukowski, A, Model Simul Mater SC 20, 2012 <https://iopscience.iop.org/article/10.1088/0965-0393/20/4/045021/meta>`_.    
+.. [1] `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.
+.. [2] `van Meel, JA, Filion, L, Valeriani, C, Frenkel, D, J Chem Phys 234107, 2012 <https://aip.scitation.org/doi/full/10.1063/1.4729313>`_.
+.. [3] `Stukowski, A, Model Simul Mater SC 20, 2012 <https://iopscience.iop.org/article/10.1088/0965-0393/20/4/045021/meta>`_.
