@@ -19,11 +19,12 @@
    :width: 13 %
 
 
-pyscal
-=================================
+pyscal - python Structural Environment Calculator 
+=================================================
+
 complete documentation with examples available `here <https://pyscal.readthedocs.io/>`_.
 
-**pyscal** is a python module for calculation of Steinhardt's bond order parameters [#]_. The core functionality of **pyscal** is written in C++ with python wrappers using `pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_ . This allows for fast calculations with possibilities for seamless expansion in python. 
+**pyscal** is a python module for calculation of local structural environment  including Steinhardt's bond order parameters [#]_. The core functionality of **pyscal** is written in C++ with python wrappers using `pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_ . This allows for fast calculations with possibilities for seamless expansion in python. 
 
 Stenhardt's order parameters or local bond order parameters are widely used in simulations to determine crystal structure of atoms. They are also used to identify if an atom is solid or liquid and the identify the solid atoms in a liquid, which is often used an order parameter to study progress of reaction during solidification. Additionally **pyscal** provides an easy environment for reading in snapshots from molecular dynamics trajectories, allowing for easy post-processing of simulation data. **pyscal** is inspired by `BondOrderAnalysis <https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html>`_ code, but has since incorporated many additions and modifications. The main highlights of **pyscal** are given below.
 
