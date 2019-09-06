@@ -1,5 +1,5 @@
 ---
-title: 'pybop : A hybrid python/C++ package for calculation of bond orientational order parameters'
+title: 'pyscal : python Structural Environment Calculator'
 tags:
   - Python
   - materials science
