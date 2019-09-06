@@ -14,6 +14,10 @@
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
    :width: 13 %
 
+.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
+   :target: https://www.gnu.org/licenses/gpl-3.0
+   :width: 13 %
+
 
 pyscal
 =================================
