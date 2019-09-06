@@ -2,12 +2,8 @@
 Calculating bond order parameters
 ---------------------------------
 
-This example illustrates the calculation of bond order parameters. Bond
-order parameters, represented by :math:`q_l` and their averaged
-versions, :math:`\bar{q}_l` have been used for identifying atoms belong
-to different crystal structures. In this example, we will consider one
-MD snapshot each for bcc, fcc, hcp and liquid, and calculate the
-:math:`q_4` and :math:`q_6` parameters and their averaged versions which
+This example illustrates the calculation of bond order parameters. `Bond
+order parameters <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html#steinhardt-s-parameters>`_, represented by :math:`q_l` and their `averaged versions <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html#averaged-steinhardt-s-parameters>`_, :math:`\bar{q}_l` have been used for identifying atoms belong to different crystal structures. In this example, we will consider one MD snapshot each for bcc, fcc, hcp and liquid, and calculate the :math:`q_4` and :math:`q_6` parameters and their averaged versions which
 are widely used in literature.
 
 .. code:: python
@@ -37,8 +33,8 @@ configurations and the input files are read in.
     hcp = pc.System()
     hcp.read_inputfile('conf0.hcp', format='lammps-dump')
 
-The next major step is calculation of neighbors. There are two ways to
-calculate neighbors, by using a cutoff distance or by using the voronoi
+The next major step is calculation of neighbors. There are `two ways to
+calculate neighbors <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html>`_, by using a cutoff distance or by using the voronoi
 cells. We will try both approaches, but start with the cutoff method.
 
 :math:`q_4-q_6` cutoff neighbor method
@@ -51,9 +47,7 @@ cells. We will try both approaches, but start with the cutoff method.
     hcp.get_neighbors(method='cutoff', cutoff=3.50)
 
 We have used a cutoff of 3 here, but this is a parameter that has to be
-tuned. Using a different cutoff for each structure is possible, but it
-would complicate the method if the system has a mix of structures. Now
-we can calculate the :math:`q_4` and :math:`q_6` distributions
+tuned. Now we can calculate the :math:`q_4` and :math:`q_6` distributions
 
 .. code:: python
 
@@ -81,17 +75,11 @@ Thats it! Now lets gather the results and plot them.
 
 
 
-.. parsed-literal::
-
-    <matplotlib.legend.Legend at 0x7f68c6fa3b00>
-
-
-
 
 .. image:: output_15_1.png
 
 
-Firstly, we can see that all the atoms fall on one specific point which
+Firstly, we can see that all the distribution fall on one specific point which
 is due to the absence of thermal vibrations. Next, all the points are
 well separated and show good distinction. However, in most cases the
 atomic positions are affected by thermal vibrations and hence show a
@@ -156,20 +144,11 @@ Gather the q vales and plot them
 
 
 
-
-.. parsed-literal::
-
-    <matplotlib.legend.Legend at 0x7f68c6f9aeb8>
-
-
-
-
 .. image:: output_27_1.png
 
 
-This is not so great as the first case, we can see that the thermal
-vibrations cause the distributions to spread a lot and overlap with each
-other. Lechner and Dellago proposed using the averaged distributions,
+The influence of thermal vibrations is clear here, we can see that it causes the distributions to spread a lot and overlap with each
+other. `Lechner and Dellago <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_ proposed using the `averaged distributions <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html#averaged-steinhardt-s-parameters>`_,
 :math:`\bar{q}_4-\bar{q}-6` to better distinguish the distributions.
 Lets try that.
 
@@ -199,14 +178,7 @@ Lets see if these distributions are better..
     plt.ylabel("$q_6$", fontsize=20)
     plt.legend(loc=4, fontsize=15)
 
-
-
-
-.. parsed-literal::
-
-    <matplotlib.legend.Legend at 0x7f68c6b4a048>
-
-
+    
 
 
 .. image:: output_32_1.png

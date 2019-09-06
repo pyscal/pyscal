@@ -11,13 +11,13 @@ Fixed cutoff method
 
 The most common method to calculate the neighbors of an atom is using a
 cutoff radius. The neighborhood of an atom for calculation of
-Steinhardt's parameters is often carried out using this method. A cutoff
+Steinhardt's parameters [1]_ is often carried out using this method. A cutoff
 is selected based on the properties of the system, one of the common
 methods is to select the cutoff in a way that it coincides with the
 first minimum of the radial distribution function. Once a cutoff is
 decided, the neighbors of an atom are those that fall within this
 selected radius. The following code snippet will use the cutoff method
-to calculate neighbors. Please check the examples section of basic use
+to calculate neighbors. Please check the `examples section <https://pyscal.readthedocs.io/en/latest/examples.html#basic-examples>`_ of basic use
 of the module. ``conf.dump`` is assumed to be the input file containing
 simulation snapshot. A cutoff radius of 3 is assumed for calculation of
 neighbors.
@@ -35,17 +35,17 @@ Adaptive cutoff methods
 Selecting a hard cutoff radius gives rise to some problems such as-
 
 -  Atomic vibrations due to temperature makes the selection of a cutoff
-   difficult.
+   difficult.  
 -  If there is more than one structure present in the system, for
    example, bcc and fcc, the selection of cutoff such that it includes
-   the first shell of both structures can be difficult.
+   the first shell of both structures can be difficult.  
 
 With the aim of rectifying these problems, various adaptive approaches
 have been proposed. Two of the methods implemented in the module is
 discussed below.
 
-Solid angle based nearest neighbor algorithm (SANN)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Solid angle based nearest neighbor algorithm (SANN) [2]_
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 | SANN algorithm determines the cutoff radius by counting the solid
   angles around an atom and equating it to :math:`4\pi`. The algorithm
@@ -80,7 +80,7 @@ Adaptive cutoff method
 ^^^^^^^^^^^^^^^^^^^^^^
 
 | An adaptive cutoff specific for each atom can also be found using an
-  algorithm similar to adaptive common neighbor analysis. This adaptive
+  algorithm similar to adaptive common neighbor analysis [3]_. This adaptive
   cutoff is calculated by first making a list of all neighbor distances
   for each atom similar to SANN method. Once this list is available,
   then the cutoff is calculated from,
@@ -132,3 +132,8 @@ Voronoi tessellation. Neighbors can be calculated using this method by,
 | 
 
   .. math::  W_{ij} = \frac{A_{ij}^2}{\sum_{j=1}^N A_{ij}}
+
+
+.. [1] Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983.  
+.. [2] van Meel, JA, Filion, L, Valeriani, C, Frenkel, D, J Chem Phys 234107, 2012.  
+.. [3] Stukowski, A, Model Simul Mater SC 20, 2012.  
