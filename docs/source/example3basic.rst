@@ -28,7 +28,7 @@ Read in the input files
 First ``System`` objects are created for each of the different
 configurations and the input files are read in.
 
-.. code:: ipython3
+.. code:: python
 
     bcc = pc.System()
     bcc.read_inputfile('conf0.bcc', format='lammps-dump')
