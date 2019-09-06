@@ -41,10 +41,8 @@ Calculating neighbors
 ~~~~~~~~~~~~~~~~~~~~~
 
 We start by calculating the neighbors of each atom in the system. There
-are two ways to do this, using a ```cutoff``<https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#fixed-cutoff-method>`_ method and using a
-``voronoi`` polyhedra method. We will try with both of them. First we
-try with cutoff system - which has three sub options. We will check each
-of them in detail.
+are two ways to do this, either using a `cutoff <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#fixed-cutoff-method>`_ or using a
+`voronoi <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#voronoi-tessellation>`_ polyhedra method. First the cutoff method is illustrated - which has two sub-options. 
 
 Cutoff method
 ^^^^^^^^^^^^^
@@ -62,12 +60,7 @@ Now lets get all the atoms.
 
     atoms = sys.get_atoms()
 
-
-.. parsed-literal::
-
-    /home/users/menonsqr/anaconda3/envs/ml/lib/python3.7/site-packages/pyscal-1.0.1-py3.7-linux-x86_64.egg/pyscal/core.py:585: UserWarning: If the loc of atom is changed and set to system, it will overwrite the existing data, if any.
-      warnings.warn("If the loc of atom is changed and set to system, it will overwrite the existing data, if any.")
-
+    
 
 lets try accessing the coordination number of an atom
 
@@ -85,10 +78,7 @@ lets try accessing the coordination number of an atom
 
 
 As we would expect for a bcc type lattice, we see that the atom has 14
-neighbors (8 in the first shell and 6 in the second). Lets try a more
-interesting example by reading in a bcc system with thermal vibrations.
-Thermal vibrations lead to distortion in atomic positions, and hence
-there will be a distribution of coordination numbers.
+neighbors (8 in the first shell and 6 in the second). It is important to note that you could tune the cutoff radius to select only the first shell. Now a more interesting example where a distribution of coordination numbers exist is shown. A file with a bcc system with thermal vibrations is used as input.
 
 .. code:: python
 
@@ -115,28 +105,21 @@ Now lets plot and see the results
 
 
 
-
-.. parsed-literal::
-
-    Text(0.5, 1.0, 'Cutoff method')
-
-
-
-
+    
 .. image:: output_23_1.png
 
 
 Adaptive cutoff methods
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-``pyscal`` also has adaptive cutoff methods implemented. These methods
-remove the restriction on having the same cutoff. A distinct cutoff is
+``pyscal`` also has `adaptive cutoff methods implemented <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#adaptive-cutoff-methods>`_. These methods
+remove the restriction on having a global cutoff. Separate cutoffs are
 selected for each atom during runtime. ``pyscal`` uses two distinct
-algorithms to do this - ``sann`` and ``adaptive``. Please check the
+algorithms to do this - `sann <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#solid-angle-based-nearest-neighbor-algorithm-sann>`_ and `adaptive <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#adaptive-cutoff-method>`_. Please check the
 documentation for a explanation of these algorithms. For the purpose of
-this example, we will use the ``adaptive`` algorithm.
+this example, we will use the adaptive algorithm.
 
-``adaptive algorithm``
+adaptive algorithm
 
 .. code:: python
 
@@ -156,14 +139,7 @@ Now lets plot
 
 
 
-
-.. parsed-literal::
-
-    Text(0.5, 1.0, 'Cutoff adaptive method')
-
-
-
-
+    
 .. image:: output_29_1.png
 
 
@@ -172,11 +148,11 @@ The adaptive method also gives similar results!
 Voronoi method
 ~~~~~~~~~~~~~~
 
-Voronoi method calculates the voronoi polyhedra of all atoms. Any atom
+`Voronoi method <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#voronoi-tessellation>`_ calculates the voronoi polyhedra of all atoms. Any atom
 that shares a voronoi face area with the host atom are considered
 neighbors. Voronoi polyhedra is calculated using the Voro++ code.
 However, you dont need to install this specifically as it is linked to
-pybop.
+pyscal.
 
 .. code:: python
 
@@ -200,15 +176,7 @@ And visualise the results
     plt.title("Voronoi method")
 
 
-
-
-.. parsed-literal::
-
-    Text(0.5, 1.0, 'Voronoi method')
-
-
-
-
+    
 .. image:: output_37_1.png
 
 
@@ -216,6 +184,4 @@ Finally..
 ~~~~~~~~~
 
 All methods find the coordination number, and the results are
-comparable. Cutoff method is very sensitive to the choice of cutoff
-radius, but voronoi method can slightly overestimate the neighbors due
-to thermal vibrations.
+comparable. The choice of a method depends on the problem at hand. Cutoff method is robust and fast, while Voronoi method gives a truly parameter free approach.
