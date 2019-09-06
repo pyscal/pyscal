@@ -41,7 +41,7 @@ Calculating neighbors
 ~~~~~~~~~~~~~~~~~~~~~
 
 We start by calculating the neighbors of each atom in the system. There
-are two ways to do this, using a ``cutoff`` method and using a
+are two ways to do this, using a ```cutoff``<https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#fixed-cutoff-method>`_ method and using a
 ``voronoi`` polyhedra method. We will try with both of them. First we
 try with cutoff system - which has three sub options. We will check each
 of them in detail.
