@@ -1,6 +1,5 @@
-
-.. image:: https://github.com/srmnitc/pyscal/workflows/build/badge.svg
-    :target: https://github.com/srmnitc/pyscal/actions
+.. image:: https://travis-ci.com/srmnitc/pyscal.svg?branch=master
+    :target: https://travis-ci.com/srmnitc/pyscal
     :width: 13%
 
 .. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
