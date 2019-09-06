@@ -47,17 +47,18 @@ discussed below.
 Solid angle based nearest neighbor algorithm (SANN) [2]_
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-| SANN algorithm determines the cutoff radius by counting the solid
-  angles around an atom and equating it to :math:`4\pi`. The algorithm
-  solves the following equation iteratively.
-| 
+SANN algorithm determines the cutoff radius by counting the solid
+angles around an atom and equating it to :math:`4\pi`. The algorithm
+solves the following equation iteratively.
+ 
 
-  .. math:: R_i^{(m)} = \frac{\sum_{j=1}^m r_{i,j}}{m-2} < r_{i, m+1}
-| where :math:`i` is the host atom, :math:`j` are it's neighbors.
-  :math:`R_i` is the cutoff radius for each particle :math:`i` which is
-  found by increasing the neighbor of neighbors :math:`m`. For a
-  description of the algorithm and more details, please check. SANN
-  algorithm can be used to find the neighbors by,
+.. math:: R_i^{(m)} = \frac{\sum_{j=1}^m r_{i,j}}{m-2} < r_{i, m+1}
+
+where :math:`i` is the host atom, :math:`j` are it's neighbors.
+:math:`R_i` is the cutoff radius for each particle :math:`i` which is
+found by increasing the neighbor of neighbors :math:`m`. For a
+description of the algorithm and more details, please check. SANN
+algorithm can be used to find the neighbors by,
 
 .. code:: python
 
@@ -73,18 +74,17 @@ parameter is calculated by,
 
   .. math::  r_{initial} = \mathrm{threshold} \times \bigg(\frac{\mathrm{Simulation~box~volume}}{\mathrm{Number~of~particles}}\bigg)^{\frac{1}{3}}
 
-   a tunable ``threshold`` parameter can be set through function
-  arguments.
+a tunable ``threshold`` parameter can be set through function arguments.
 
 Adaptive cutoff method
 ^^^^^^^^^^^^^^^^^^^^^^
 
-| An adaptive cutoff specific for each atom can also be found using an
-  algorithm similar to adaptive common neighbor analysis [3]_. This adaptive
-  cutoff is calculated by first making a list of all neighbor distances
-  for each atom similar to SANN method. Once this list is available,
-  then the cutoff is calculated from,
-| 
+An adaptive cutoff specific for each atom can also be found using an
+algorithm similar to adaptive common neighbor analysis [3]_. This adaptive
+cutoff is calculated by first making a list of all neighbor distances
+for each atom similar to SANN method. Once this list is available,
+then the cutoff is calculated from,
+ 
 
   .. math::  r_{cut}(i) = \mathrm{padding}\times \bigg(\frac{1}{\mathrm{nlimit}} \sum_{j=1}^{\mathrm{nlimit}} r_{ij} \bigg)
 
@@ -117,19 +117,18 @@ Voronoi tessellation. Neighbors can be calculated using this method by,
     sys.read_inputfile('conf.dump')
     sys.get_neighbors(method='voronoi')
 
-| Finding neighbors using Voronoi tessellation also calculates a weight
-  for each neighbor. The weight of a neighbor :math:`j` towards a host
-  atom :math:`i` is given by,
-| 
+Finding neighbors using Voronoi tessellation also calculates a weight
+for each neighbor. The weight of a neighbor :math:`j` towards a host
+atom :math:`i` is given by,
+ 
 
   .. math::  W_{ij} = \frac{A_{ij}}{\sum_{j=1}^N A_{ij}}
-| where :math:`N` are all the neighbors identified through Voronoi
-  tessellation. This weight can be used later for calculation of
-  weighted Steinhardt's parameters. Optionally, it is possible to choose
-  the exponent for this weight. Option ``voroexp`` is used to set this
-  option. For example if ``voroexp=2``, the weight would be calculated
-  as,
-| 
+
+where :math:`N` are all the neighbors identified through Voronoi
+tessellation. This weight can be used later for calculation of
+weighted Steinhardt's parameters. Optionally, it is possible to choose
+the exponent for this weight. Option ``voroexp`` is used to set this
+option. For example if ``voroexp=2``, the weight would be calculated as,
 
   .. math::  W_{ij} = \frac{A_{ij}^2}{\sum_{j=1}^N A_{ij}}
 
