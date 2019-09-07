@@ -660,7 +660,12 @@ class Atom(pc.Atom):
         -----
         Returns a vector of the form ``(n3, n4, n5, n6)``, where ``n3`` is the number
         of faces with 3 vertices, ``n4`` is the number of faces with 4
-        vertices and so on. This can be used to identify structures.
+        vertices and so on. This can be used to identify structures [1]_ [2]_.
+
+        References
+        ----------
+        .. [1] Finney, JL, Proc. Royal Soc. Lond. A 319, 1970
+        .. [2] Tanemura, M, Hiwatari, Y, Matsuda, H,Ogawa, T, Ogita, N, Ueda, A. Prog. Theor. Phys. 58, 1977
 
         """
         return pc.Atom.get_vorovector(self)
@@ -947,6 +952,10 @@ class System(pc.System):
         different parameters.  In order to actually complete the calculation, 
         `calculate_nucsize` has to be called after setting the parameters.
 
+        References
+        ----------
+        .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
+        .. [2] Diaz Leines, G, Drautz, R, Rogal, J, J Chem Phys 146, 2017
 
         See Also
         --------
@@ -960,14 +969,7 @@ class System(pc.System):
 
     def calculate_nucsize(self):
         """
-        Calculate the size of the largest cluster in the given system. Calculation
-        the size of the largest cluster needs various prerequisites that can be set
-        by the functions `set_nucsize_parameters`. A detailed description of the order 
-        parameter can be found in Diaz Leines et al, JCP 146(2017). 
-        http://doi.org/10.1063/1.4980082.
-
-        The number of atoms in the largest solid cluster in liquid is often used as an
-        order parameter in the study of nucleation during solidification.
+        Calculate the size of the largest cluster in the given system. 
 
         Parameters
         ----------
@@ -977,6 +979,12 @@ class System(pc.System):
         -------
         cluster size : int
             size of the largest solid cluster in liquid (number of atoms)
+
+        Notes
+        -----
+        Calculation of the the size of the largest solid cluster needs various prerequisites that can be set
+        by the functions `set_nucsize_parameters`.
+
         """
         return pc.System.calculate_nucsize(self)
 
@@ -995,6 +1003,7 @@ class System(pc.System):
         -------
         atom : Atom object
             atom object at the queried position.
+
         """
         atomc = pc.System.get_atom(self, index)
         atom = self.copy_catom_to_atom(atomc)
@@ -1003,12 +1012,7 @@ class System(pc.System):
     def set_atom(self, atom):
         """
         
-        Return the atom to its original location after modification. For example, an
-        `Atom` at location `i` in the list of all atoms in `System` can be queried by,
-        `atom = System.get_atom(i)`, then any kind of modification, for example, the 
-        position of the `Atom` can done by, `atom.set_x([2.3, 4.5, 4.5])`. After 
-        modification, the `Atom` can be set back to its position in `System` by
-        `System.set_atom(atom)`.
+        Return the atom to its original location after modification. 
 
         Parameters
         ----------
@@ -1018,6 +1022,17 @@ class System(pc.System):
         Returns
         -------
         None
+
+        Notes
+        -----
+        For example, an `Atom` at location `i` in the list of all atoms in `System` can be queried by,
+        ``atom = System.get_atom(i)``, then any kind of modification, for example, the 
+        position of the `Atom` can done by, ``atom.set_pos([2.3, 4.5, 4.5])``. After 
+        modification, the `Atom` can be set back to its position in `System` by
+        ``System.set_atom(atom)``.
+
+        If an atom already exists at that index in the list, it will be overwritten.
+        
         """
         atomc = self.copy_atom_to_catom(atom)
         pc.System.set_atom(self, atomc)
@@ -1047,18 +1062,18 @@ class System(pc.System):
 
         Parameters
         ----------
-        box_vectors : bool, default False
-            If True, return the whole box dimesions.
+        box_vectors : bool, optional
+            If True, return the whole box dimesions, default False
 
         Returns
         -------
         boxdims : list of box dimensions
             If `box_vectors` is false:
             the return value consists of the vector of values in the form-
-            [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+            `[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]`
             If `box_vectors` is true:
             return the box vectors of the form
-            [[x1, x2, x3], [y1, y2, y3], [z1, z2, z3]]
+            `[[x1, x2, x3], [y1, y2, y3], [z1, z2, z3]]`
         """
         if not box_vectors:
             box6dim = pc.System.get_box(self)
@@ -1076,7 +1091,7 @@ class System(pc.System):
         ----------
         boxdims : list of box dimensions of length 6
             the return value consists of the vector of values in the form-
-            [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+            `[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]`
 
         Returns
         -------
@@ -1086,35 +1101,49 @@ class System(pc.System):
 
     def get_qvals(self, q, averaged = False):
         """
-        Get the required q values of all atoms. The function returns a list of 
-        q values in the same order as that of the atoms in the system.
+        Get the required q values of all atoms. 
 
         Parameters
         ----------
         q : int or list of ints
             required q value from 2-12
-        averaged : bool, default False
+        
+        averaged : bool, optional
             If True, return the averaged q values,
             If False, return the non averaged ones 
+            default False
 
         Returns
         -------
         qvals : list of floats
             list of qvalue of all atoms.
+
+        Notes
+        -----
+        The function returns a list of 
+        q values in the same order as that of the atoms in the system.
+
         """
         if isinstance(q, int):
-            if averaged:
-                rq = pc.System.get_aqvals(self, q)
+            if q in range(2, 13):
+                if averaged:
+                    rq = pc.System.get_aqvals(self, q)
+                else:
+                    rq = pc.System.get_qvals(self, q)
+                return rq
             else:
-                rq = pc.System.get_qvals(self, q)
-            return rq
+                raise ValueError("the value of q should be between 2 and 12")
 
         else:
-            if averaged:
-                rq = [ pc.System.get_aqvals(self, qq) for qq in q ]
+            if q in range(2, 13):
+                if averaged:
+                    rq = [ pc.System.get_aqvals(self, qq) for qq in q ]
+                else:
+                    rq = [ pc.System.get_qvals(self, qq) for qq in q ]
+                return rq
             else:
-                rq = [ pc.System.get_qvals(self, qq) for qq in q ]
-            return rq
+                raise ValueError("the value of q should be between 2 and 12")
+
 
     def get_distance(self, atom1, atom2):
         """
@@ -1131,18 +1160,80 @@ class System(pc.System):
         -------
         distance : double
                 distance between the first and second atom.
+        
         """
+        
         atom1c = self.copy_atom_to_catom(atom1)
         atom2c = self.copy_atom_to_catom(atom2)
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
 
-    def get_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, voroexp=1, face_cutoff=0.002, padding=1.2, nlimit=6):
+    def get_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, 
+                                            voroexp=1, face_cutoff=0.002, padding=1.2, nlimit=6):
         """
         
-        Find neighbors of all atoms in the ``System``. There are few methods to do this, the 
-        traditional approach being the one in which the neighbors of an atom are the ones that lie
-        in a cutoff distance around it. The second approach is using Voronoi polyhedra. All the atoms
+        Find neighbors of all atoms in the `System`. 
+
+        Parameters
+        ----------
+        method : {'cutoff', 'voronoi'}
+            `cutoff` method finds atoms within a specified or adaptive cutoff distance of the host atom
+            `voronoi` method finds atoms that share a Voronoi polyhedra face with the host atom. Default, `cutoff`
+
+        cutoff : { float, 'sann', 'adaptive'}
+            the cutoff distance to be used for the `cutoff` based neighbor calculation method described above.
+            If the value is specified as 0 or `adaptive`, adaptive method is used.
+            If the value is specified as `sann`, sann algorithm is used.
+
+        threshold : float, optional
+            only used if ``cutoff=adaptive``. A threshold which is used as safe limit for calculation of cutoff. 
+
+            Adaptive cutoff
+            uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
+            of a warning that ``threshold`` is inadequate, it should be further increased. High/low value
+            of this parameter will correspond to the time taken for finding neighbors.
+
+        filter : {'None', 'type'}, optional
+            apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
+            `type`, only atoms of the same type would be included in the neighbor calculations. Default None.
+
+        voroexp : int, optional 
+            only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards the q 
+            values. Default 1. 
+
+            Higher powers can sometimes lead to better resolution. Works only with ``voronoi``
+            neighbour method. See  arXiv:1906.08111v1 for more details.
+
+        face_cutoff : double, optional
+            only used if ``method=voronoi``. The minimum fraction of total voronoi face area a single phase should have in order to
+            include it in the analysis of voronoi polyhedra to find (n_3, n_4, n_5, n_6) vector. Default 0.002
+
+        padding : double, optional
+            only used if ``cutoff=adaptive``. A safe padding value used after an adaptive cutoff is found. Default 1.2. 
+
+        nlimit : int, optional
+            only used if ``cutoff=adaptive``. The number of particles to be considered for the calculation of adaptive cutoff.
+            Default 6.
+        
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This function calculates the neighbors of each particle. There are several ways to do this. A complete description of
+        the methods can be `found here <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html>`_.
+
+        Method cutoff and specifying a cutoff radius uses the traditional approach being the one in which the neighbors of an atom 
+        are the ones that lie in the cutoff distance around it. 
+
+        In Method cutoff, if ``cutoff='adaptive``, an adaptive cutoff is decided during runtime for each atom to find its neighbors [1]_.
+        Setting the cutoff radius to 0 also triggers this algorithm. The cutoff for an atom i is found using,
+
+        .. math:: r_c(i) = padding * ((1/nlimit) * \sum_{j=1}^{nlimit}(r_{ij}))
+
+
+        The second approach is using Voronoi polyhedra. All the atoms
         that share a Voronoi polyhedra face with the host atoms are considered its neighbors.
 
         Finally there is also an adaptive cutoff method if ``cutoff`` is specified as ``sann``, ``adaptive`` or 0. 
@@ -1151,53 +1242,6 @@ class System(pc.System):
         used in which the cutoff for individual particles are calculated by first making a sorted list of neighbors
         and then choosing the cutoff by, rcut = padding*((1/nlimit)*(sum of nlimit number of sorted nearest distances)).
 
-        Parameters
-        ----------
-        method : ``cutoff`` or ``voronoi`` , default: ``cutoff``
-            ``cutoff`` method finds atoms within a specified or adaptive cutoff distance of the host atom
-            ``voronoi`` method finds atoms that share a Voronoi polyhedra face with the host atom.
-
-        cutoff : float or ``sann`` or ``adaptive``
-            the cutoff distance to be used for the `cutoff` based neighbor calculation method
-            described above.
-            If the value is specified as 0 or ``adaptive``, see description above.
-            If the value is specified as ``sann``, see description above.
-
-        threshold : float
-            only used if ``cutoff=adaptive``. A threshold which is used as safe limit. Adaptive cutoff
-            uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
-            of a warning that ``threshold`` is inadequate, it should be further increased. High/low value
-            of this parameter will correspond to the time taken for finding neighbors.
-
-        filter : string - ``None`` or ``type``, default ``None``
-            apply a filter to nearest neighbor calculation. If the ``filter`` keyword is set to
-            ``type``, only atoms of the same type would be included in the neighbor calculations.
-
-        voroexp : int, default 1 
-            power of the neighbor weight used to weight the contribution of each atom towards the q 
-            values. Higher powers can sometimes lead to better resolution. Works only with ``voronoi``
-            neighbour method. See  arXiv:1906.08111v1 for more details.
-
-        face_cutoff : double, default 0.002
-            The minimum fraction of total voronoi face area a single phase should have in order to
-            include it in the analysis of voronoi polyhedra to find (n_3, n_4, n_5, n_6) vector.
-            See ``Atom.get_vorovector`` for more details about the output. Works only with ``voronoi``
-            neighbour method.
-
-        padding : double, default 1.2
-            A safe padding value used after an adaptive cutoff is found. Works only if ``cutoff=adaptive``.
-
-        nlimit : int, default 6
-            The number of particles to be considered for the calculation of adaptive cutoff.  Works only 
-            if ``cutoff=adaptive``.
-        
-        Returns
-        -------
-        None
-
-        See also
-        --------
-        reset_allneighbors
         """
         #first reset all neighbors
         pc.System.reset_allneighbors(self)
