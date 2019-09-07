@@ -34,6 +34,7 @@ System::~System(){
 }
 
 vector<int> System::get_indicators(){
+    
     vector<int> indicators;
     indicators.emplace_back(nop);
     indicators.emplace_back(maxclusterid);
@@ -44,6 +45,8 @@ vector<int> System::get_indicators(){
     indicators.emplace_back(triclinic);
     indicators.emplace_back(alpha);
     indicators.emplace_back(voronoiused);
+    
+    return indicators; 
 }
 
 void System::set_indicators(vector<int> indicators){

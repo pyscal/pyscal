@@ -1,5 +1,6 @@
 import pyscal.ccore as pc
 import pyscal.traj_process as ptp
+import pyscal.pickle as pp
 import os
 import numpy as np
 import warnings
@@ -1528,6 +1529,96 @@ class System(pc.System):
         atomc.set_avgvolume(atom.get_avgvolume())
         atomc.set_facevertices(atom.get_facevertices())
         return atomc
+
+
+    def prepare_pickle(self):
+        """
+        Prepare the system for pickling and create a picklable system
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        psys : picklable system object
+
+        """
+
+        #get the basic system indicators
+        indicators = pc.System.get_indicators(self)
+
+        #get box dims and triclinic params if triclinic
+        boxdims = self.get_box()
+        if indicators[6] == 1:
+            rot = pc.System.get_triclinic_params(self)
+        else:
+            rot = 0
+
+        #now finally get atoms
+        atoms = pc.System.get_allatoms(self)
+        #convert them to picklabale atoms
+        patoms = [pp.pickle_atom(atom) for atom in atoms]
+
+        #create System instance and assign things
+        psys = pp.System()
+        psys.indicators = indicators
+        psys.atoms = patoms
+        psys.boxdims = boxdims
+        psys.rot = rot
+
+        return psys
+
+    def to_file(self, file):
+        """
+        Save a system to file
+
+        Parameters
+        ----------
+        file : string
+            name of output file
+
+        Returns
+        -------
+        None
+
+        """
+        psys = self.prepare_pickle()
+        np.save(file, psys)
+
+    def from_file(self, file):
+        """
+        Populate the empty system from file
+
+        Parameters
+        ----------
+        file : string
+            name of output file
+
+        Returns
+        -------
+        None
+
+        """
+
+        psys = np.load(file, allow_pickle=True).flatten()[0]
+        #set up indicators
+        pc.System.set_indicators(self, psys.indicators)
+        #unpickle atoms
+        hatoms = [pp.unpickle_atom(atom) for atom in psys.atoms]
+        catoms = [self.copy_atom_to_catom(atom) for atom in hatoms]
+        boxdims = psys.boxdims
+
+
+        #if triclinic, get those
+        if psys.indicators[6] == 1:
+            rot = psys.rot
+            rotinv = np.linalg.inv(rot)
+            pc.System.assign_triclinic_params(self, rot, rotinv)
+
+        #assign atoms and box
+        pc.System.reassign_particles(self, catoms, boxdims)
+
 
 
 
