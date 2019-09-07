@@ -1135,14 +1135,14 @@ class System(pc.System):
                 raise ValueError("the value of q should be between 2 and 12")
 
         else:
-            if q in range(2, 13):
-                if averaged:
-                    rq = [ pc.System.get_aqvals(self, qq) for qq in q ]
-                else:
-                    rq = [ pc.System.get_qvals(self, qq) for qq in q ]
-                return rq
+            for qq in q:
+                if not qq in range(2, 13):
+                    raise ValueError("the value of q should be between 2 and 12")
+            if averaged:
+                rq = [ pc.System.get_aqvals(self, qq) for qq in q ]
             else:
-                raise ValueError("the value of q should be between 2 and 12")
+                rq = [ pc.System.get_qvals(self, qq) for qq in q ]
+            return rq
 
 
     def get_distance(self, atom1, atom2):
@@ -1239,7 +1239,7 @@ class System(pc.System):
         In order to reduce time during sorting of distances during the adaptive methods, pyscal guesses an initial large cutoff radius.
         This is calculated as,
 
-        .. math:: r_{initial} = threshold * (simulation box volume/ number of particles)^(1/3)
+        .. math:: r_{initial} = threshold * (simulation~box~volume/ number~of~particles)^{(1/3)}
 
         threshold is a safe multiplier used for the guess value and can be set using the `threshold` keyword.
 
@@ -1251,7 +1251,7 @@ class System(pc.System):
         padding is a safe multiplier to the cutoff distance that can be set through the keyword `padding`. `nlimit` keyword sets the
         limit for the top nlimit atoms to be taken into account to calculate the cutoff radius.
 
-        In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]_. There are parameter to customise sann behaviour.
+        In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]_. There are no parameters to customise sann behaviour.
 
         The second approach is using Voronoi polyhedra. All the atoms that share a Voronoi polyhedra face with the host atoms are considered 
         its neighbors. A corresponding neighborweight is also assigned to each neighbor in the ratio of the face area between the two atoms.
@@ -1331,33 +1331,43 @@ class System(pc.System):
         Notes
         -----
         It is used automatically when neighbors are recalculated.
-        
+
         """
         pc.System.reset_allneighbors(self)
 
     def calculate_q(self, q, averaged = False):
         """
-        Find the bond order parameter q for all atoms. Any of the q parameters from 2-12 can be provided.
-        If the averaged versions are to be calculated, the keyword `averaged = True` should be set.
-        See Lechner, Dellago, JCP 129, 2008. for a description of the
-        averaged bond order parameters. 
+        Find the bond order parameter q for all atoms. 
 
         Parameters
         ----------
         qs : int or list of ints
             A list of all q params to be found from 2-12. 
-        averaged : bool, default False
+        averaged : bool
             If True, return the averaged q values,
             If False, return the non averaged ones
+            default False
 
         Returns
         -------
         None
+
+        Notes
+        -----
+        ny of the q parameters from 2-12 can be provided.
+        If the averaged versions are to be calculated, the keyword `averaged = True` should be set.
+        See Lechner, Dellago, JCP 129, 2008. for a description of the
+        averaged bond order parameters. 
+
         """
         if isinstance(q, int):
             qq = [q]
         else:
             qq = q
+
+        for ql in qq:
+            if not ql in range(2,13):
+                raise ValueError("value of q should be between 2 and 13")
         
         pc.System.calculate_q(self, qq)
 
