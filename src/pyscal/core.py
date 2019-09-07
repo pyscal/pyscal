@@ -47,12 +47,14 @@ class Atom(pc.Atom):
     >>> atom.set_x([23.0, 45.2, 34.2])
     >>> #now set id
     >>> atom.set_id(23)
+    hahahahah
     
     """
     def __init__(self, pos=[0,0,0], id=0, type=1):
         """
         Deafults args
         """
+        a=1
         pc.Atom.__init__(self)     
         pc.Atom.set_x(self, pos)
         pc.Atom.set_id(self, id)
