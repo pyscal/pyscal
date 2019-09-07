@@ -1543,6 +1543,16 @@ class System(pc.System):
         -------
         psys : picklable system object
 
+        Notes
+        -----
+        This function prepares the system object for pickling. From
+        a user perspective, the `System.to_file` method should be used
+        directly.
+
+        See also
+        --------
+        to_file()
+
         """
 
         #get the basic system indicators
@@ -1582,9 +1592,19 @@ class System(pc.System):
         -------
         None
 
+        Notes
+        -----
+        This function can be used to save a System object directly to
+        file. This retains all the calculated quantities of the system,
+        including the atoms and their properties. This can be useful to
+        restart the calculation. The function uses `numpy.save` method
+        to save the information. Hence pickling between different versions
+        of python could lead to issues.   
+
         """
         psys = self.prepare_pickle()
         np.save(file, psys)
+        
 
     def from_file(self, file):
         """
@@ -1599,9 +1619,16 @@ class System(pc.System):
         -------
         None
 
-        """
+        Notes
+        -----
+        This function can be used to set up a system
+        from a file.
 
-        psys = np.load(file, allow_pickle=True).flatten()[0]
+        """
+        if os.path.exists(file):
+            psys = np.load(file, allow_pickle=True).flatten()[0]
+        else:
+            raise FileNotFoundError("file does not exist")
         #set up indicators
         pc.System.set_indicators(self, psys.indicators)
         #unpickle atoms
