@@ -33,6 +33,32 @@ System::~System(){
     //delete [] atoms;
 }
 
+vector<int> System::get_indicators(){
+    vector<int> indicators;
+    indicators.emplace_back(nop);
+    indicators.emplace_back(maxclusterid);
+    indicators.emplace_back(neighborsfound);
+    indicators.emplace_back(qsfound);
+    indicators.emplace_back(fileread);
+    indicators.emplace_back(filter);
+    indicators.emplace_back(triclinic);
+    indicators.emplace_back(alpha);
+    indicators.emplace_back(voronoiused);
+}
+
+void System::set_indicators(vector<int> indicators){
+    
+    nop = indicators[0];
+    maxclusterid = indicators[1];
+    neighborsfound = indicators[2];
+    qsfound = indicators[3];
+    fileread = indicators[4];
+    filter = indicators[5];
+    triclinic = indicators[6];
+    alpha = indicators[7];
+    voronoiused = indicators[8];
+}
+
 /*
 Calculate factorial of a number
  */
@@ -56,6 +82,25 @@ void System::assign_triclinic_params(vector<vector<double>> drot, vector<vector<
     }
     
     triclinic = 1;
+}
+
+vector<vector<double>> System::get_triclinic_params(){
+
+    vector<vector<double>> drot;
+
+    vector<double> dummydrot;
+
+    for(int i=0; i<3; i++){
+        
+        dummydrot.clear();
+
+        for(int j=0; j<3; j++){
+            dummydrot.emplace_back(rot[i][j]);
+        }
+        drot.emplace_back(dummydrot);
+    }
+    
+    return drot;
 }
 
 void System::sbox(vector<vector <double>> boxd) {
@@ -171,6 +216,34 @@ void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> box
 
     //atomitos.shrink_to_fit();
 
+    fileread = 1;
+}
+
+
+//this function allows for handling custom formats of atoms and so on
+void System::reassign_particles( vector<Atom> atomitos, vector<vector<double>> boxd ){
+    //atomitos are just a list of Atom objects
+    //boxd is a vector of 6 values - [xlow, xhigh, ylow, yhigh, zlow, zhigh]
+    nop = atomitos.size();
+    //atoms = new Atom[nop];
+    atoms.clear();
+    atoms = atomitos;
+    
+    //triclinic = 0;
+
+    boxdims[0][0] = boxd[0][0];
+    boxdims[0][1] = boxd[0][1];
+    boxdims[1][0] = boxd[1][0];
+    boxdims[1][1] = boxd[1][1];
+    boxdims[2][0] = boxd[2][0];
+    boxdims[2][1] = boxd[2][1];
+    
+    boxx = boxd[0][1] - boxd[0][0];
+    boxy = boxd[1][1] - boxd[1][0];
+    boxz = boxd[2][1] - boxd[2][0];
+
+
+    //atomitos.shrink_to_fit();
     fileread = 1;
 }
 

@@ -69,6 +69,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_largestcluster",&System::glargestclusterid)             
         .def("set_nucsize_parameters",&System::set_nucsize_parameters)
         .def("assign_particles", &System::assign_particles)
+        .def("reassign_particles", &System::reassign_particles)
         .def("calculate_nucsize",&System::calculate_nucsize)
         .def("get_atom",  &System::gatom)
         .def("set_atom", &System::satom)
@@ -95,10 +96,13 @@ PYBIND11_MODULE(ccore, m) {
         .def("find_largest_cluster",&System::largest_cluster)
         .def("set_filter",&System::sfilter)
         .def("assign_triclinic_params",&System::assign_triclinic_params)
+        .def("get_triclinic_params",&System::get_triclinic_params)
         .def("get_boxvecs",&System::gboxvecs)
         .def("get_pairdistances",&System::get_pairdistances)
         .def("find_average_volume",&System::find_average_volume)
         .def("set_face_cutoff",&System::set_face_cutoff)
+        .def("get_indicators",&System::get_indicators)
+        .def("set_indicators",&System::set_indicators)
         ;
 
 

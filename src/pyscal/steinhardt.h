@@ -200,6 +200,8 @@ class System{
         double get_abs_distance(Atom , Atom );
         System();
         ~System();
+        vector<int> get_indicators();
+        void set_indicators(vector<int>);
 
         //Atom* atoms;
         vector<Atom> atoms;
@@ -217,7 +219,9 @@ class System{
         //void set_inputfile(string);
         void set_neighbordistance(double);
         void assign_particles( vector<Atom>, vector<vector<double>>);
+        void reassign_particles( vector<Atom>, vector<vector<double>>);
         void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
+        vector<vector<double>> get_triclinic_params();
         void get_largest_cluster_atoms();
 
         //average volumes
