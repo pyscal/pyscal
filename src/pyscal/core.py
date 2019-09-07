@@ -47,7 +47,6 @@ class Atom(pc.Atom):
     >>> atom.set_x([23.0, 45.2, 34.2])
     >>> #now set id
     >>> atom.set_id(23)
-    hahahahah
     
     """
     def __init__(self, pos=[0,0,0], id=0, type=1):
@@ -698,12 +697,13 @@ System class definitions
 
 class System(pc.System):
     """
-    A c++ class for holding the properties of a system. A `System` consists of two
+    A c++ class for holding the properties of a system. 
+
+    Notes
+    -----
+    A `System` consists of two
     major components - the simulation box and the atoms. All the associated variables
     are then calculated over these.
-
-    A `System` can be set and populated by reading an input file in lammps dump format.
-    This enables for automatic reading of all atomic positions and the simulation box.
 
     Examples
     --------
@@ -717,43 +717,47 @@ class System(pc.System):
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False):
         """
         
-        Read input file containing the information of a time slice from a molecular dynamics
-        simulation. 
-        
-        The format of the input file is specified using the `format` keyword. Currently only
-        a `lammps-dump` file is supported. However, this restriction can easily be overcome 
-        using the `assign_particles` method from system where a list of atoms and box vectors 
-        are directly provided to the system.
-
-        `use_c` is no deprecated and no longer used to ease transition to python 3. 
+        Read input file containing the information of a time slice.
         
         Parameters
         ----------
         filename : string
             name of the input file to be read in
 
-        format : string, `lammps-dump` or `poscar`
+        format : {'lammps-dump', 'poscar'}
             format of the input file
 
-        compressed : bool, default False
-            If True, force to read a `gz` compressed format. However, if a file ends with `.gz`
-            extension, it is automatically treated as a compressed file and this keyword is not
-            necessary
+        compressed : bool
+            If True, force to read a `gz` compressed format, default False.
 
         frame : int
             If the trajectory contains more than one time slice, the slice can be specified
-            using the `frame` option. Alert: works only with `lammps-dump` format. 
-
-        use_c : bool, default False, deprecated
-            If True, use the `read_particle_file` method from c++ module. This might be faster
-            but only accepts file format of `lammps-dump` type with a particular header layout.
-            Also `compressed` keyword doesnt work anymore. This keyword is deprecated and only
-            kept for compatibility reasons. Use of this keyword is not recommended.
-
+            using the `frame` option. 
+            Alert: works only with `lammps-dump` format. 
 
         Returns
         -------
         None
+
+        Notes
+        -----
+        `format` keyword specifies the format of the input file. Currently only
+        a `lammps-dump` and `poscar` files are supported. However, this restriction can easily 
+        be overcome using the `assign_particles` method from system where a list of atoms 
+        and box vectors are directly provided to the system. This function itself uses the
+        `pyscal.traj_process` module to process a file which is then assigned to system
+        using `pyscal.core.assign_atoms`.
+
+        `compressed` keyword is not required if a file ends with `.gz` extension, it is 
+        automatically treated as a compressed file and this keyword is not necessary.
+
+        `frame` keyword allows to read in a particular slice from a long trajectory. If all slices
+        need to analysed, this is a very inefficient way. For handling multiple time slices,
+        the `pyscal.traj_process` module offers a better set of tools.
+
+        Triclinic simulation boxes can also be read in for lammps-dump. No special keyword is
+        necessary.
+        
 
         See Also
         --------
@@ -763,8 +767,14 @@ class System(pc.System):
             if frame != -1:
                 #split the traj and returns set of filenames
                 filenames = ptp.split_traj_lammps_dump(filename, compressed=compressed)
+                
                 #reassign filename
-                filename = filenames[frame]
+                try:
+                    filename = filenames[frame]
+                except:
+                    raise FileNotFoundError("frame %d is not found in the trajectory"%frame)
+                
+                #now if file exists
                 if os.path.exists(filename):
                     atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
                     pc.System.assign_particles(self, atoms, boxdims)
@@ -774,7 +784,8 @@ class System(pc.System):
                         rotinv = np.linalg.inv(rot)
                         pc.System.assign_triclinic_params(self, rot, rotinv)
                 else:
-                    raise FileNotFoundError("input file not found")
+                    raise FileNotFoundError("input file %s not found"%filename)
+                
                 #now remove filenames
                 for file in filenames:
                     os.remove(file)
@@ -788,25 +799,22 @@ class System(pc.System):
                     rotinv = np.linalg.inv(rot)
                     pc.System.assign_triclinic_params(self, rot, rotinv)
             else:
-                raise FileNotFoundError("input file not found")
+                raise FileNotFoundError("input file %s not found"%filename)
 
         elif format == 'poscar':
             if os.path.exists(filename):
                 atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
                 pc.System.assign_particles(self, atoms, boxdims)
             else:
-                raise FileNotFoundError("input file not found")
+                raise FileNotFoundError("input file %s not found"%filename)
         else:
-            raise TypeError("format recieved an unknown option")
+            raise TypeError("format recieved an unknown option %s"%format)
 
 
     def assign_atoms(self, atoms, box):
         """
         
-        Assign atoms directly. Receive a vector of atom objects which is stored instead
-        of reading in the input file. If this method is used, there is no need of using
-        `read_inputfile` method. Also using this function allows for reading of multiple
-        file formats which are not supported by the inbuilt `read_inputfile` method.
+        Assign atoms and box vectors to `System`. 
 
         Parameters
         ----------
@@ -814,11 +822,18 @@ class System(pc.System):
             list consisting of all atoms
         box   : list of list of floats
             list which consists of the box dimensions in the format-
-            [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]
+            `[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]`
 
         Returns
         -------
         None
+
+        Notes
+        -----
+        Receive a vector of atom objects which is stored instead
+        of reading in the input file. If this method is used, there is no need of using
+        `read_inputfile` method. Also using this function allows for reading of multiple
+        file formats which are not supported by the inbuilt `read_inputfile` method.
 
         See Also
         --------
@@ -828,18 +843,17 @@ class System(pc.System):
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
         """
-        Calculate the radial distribution function. It is calculated by finding distances
-        between all pairs of atoms and then creating a histogram from it.
+        Calculate the radial distribution function. 
 
         Parameters
         ----------
         histobins : int
             number of bins in the histogram
         histomin : float, optional
-            minimum value of the distance histogram, if not specified, 0.0 is taken as the
-            minimum.
+            minimum value of the distance histogram. Default 0.0. 
+
         histomax : float, optional
-            maximum value of the distance histogram. If not specified, the maximum value
+            maximum value of the distance histogram. Default, the maximum value
             in all pair distances is used.
 
         Returns
@@ -877,9 +891,8 @@ class System(pc.System):
 
     def get_largestcluster(self):
         """
-        Get id of the the largest cluster. id is only available if the largest cluster has already
-        been found. Otherwise it returns the default values.
-
+        Get id of the the largest cluster. 
+        
         Parameters
         ----------
         None
@@ -889,24 +902,18 @@ class System(pc.System):
         clusterid : int 
             id of the largest cluster
 
-        See Also
-        --------
-        get_allneighbors
-        calculate_nucsize
-        set_nucsize_parameters
+        Notes
+        -----
+        id is only available if the largest cluster has already
+        been found. Otherwise it returns the default values.
+
         """
         return pc.System.get_largestcluster(self)
 
+    
     def set_nucsize_parameters(self, cutoff, minfrenkel, threshold, avgthreshold):
         """
-        Set the value of parameters for calculating the largest solid cluster in the
-        liquid, a detailed description of the order parameter can be found in  
-        Diaz Leines et al, JCP 146(2017). http://doi.org/10.1063/1.4980082.
-
-        The number of atoms in the largest solid cluster in liquid is often used as an
-        order parameter in the study of nucleation during solidification. In order to
-        actually calculate the largest solid cluster, `calculate_nucsize` has to be 
-        called after setting the parameters.
+        Set the value of parameters for distinguishing solid and liquid atoms.
 
         Parameters
         ----------
@@ -929,6 +936,17 @@ class System(pc.System):
         Returns
         -------
         None
+
+        Notes
+        -----
+        This function sets the parameters that can then be used to distinguish solid
+        and liquid atoms. The number of atoms in the largest solid cluster in liquid 
+        is often used as an order parameter in the study of nucleation during solidification. 
+        A detailed description of the order parameter can be found in [1]_ and example 
+        usage (not with this module) can be found in [2]_. This function merely sets the
+        different parameters.  In order to actually complete the calculation, 
+        `calculate_nucsize` has to be called after setting the parameters.
+
 
         See Also
         --------
