@@ -1343,7 +1343,8 @@ class System(pc.System):
         ----------
         qs : int or list of ints
             A list of all q params to be found from 2-12. 
-        averaged : bool
+        
+        averaged : bool, optional
             If True, return the averaged q values,
             If False, return the non averaged ones
             default False
@@ -1354,10 +1355,14 @@ class System(pc.System):
 
         Notes
         -----
-        ny of the q parameters from 2-12 can be provided.
-        If the averaged versions are to be calculated, the keyword `averaged = True` should be set.
-        See Lechner, Dellago, JCP 129, 2008. for a description of the
-        averaged bond order parameters. 
+        Enables calculation of the Steinhardt parameters q from 2-12. The type of
+        q values depend on the method used to calculate neighbors. See the description
+        `System.get_neighbors` for more details. If the keyword `average` is set to True,
+        the averaged versions of the bond order parameter [1]_ is returned.
+
+        References
+        ----------
+        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
 
         """
         if isinstance(q, int):
@@ -1376,9 +1381,7 @@ class System(pc.System):
 
     def calculate_frenkelnumbers(self):
         """
-        Find frenkel numbers of all atoms in the system. Frenkel number is the number of solid
-        neighbors that an atom has. A solid bond is considered between two atoms if the connection
-        betweem them is greater than 0.6.
+        Find Solid neighbors of all atoms in the system. 
 
         Parameters
         ----------
@@ -1387,42 +1390,39 @@ class System(pc.System):
         Returns
         -------
         None
+
+        Notes
+        -----
+        A solid bond is considered between two atoms if the connection
+        betweem them is greater than 0.6.
         
-        See also
-        --------
-        get_number_from_bond
-        find_clusters
-        find_largest_cluster
-        set_nucsize_parameters
         """
         pc.System.calculate_frenkelnumbers(self)
 
     def find_clusters(self, recursive = True, largest = True):
         """
-        Find the clusters of all atoms in the system. Go through all the atoms and cluster them
-        together based on the `issolid` parameter of the atom. To cluster based on any user defined criteria,
-        you can use `set_solid` method of `Atom` to explicitely set the `issolid` value.
+        Find the clusters of all atoms in the system. 
 
         Parameters
         ----------
-        recursive : Bool, default True
+        recursive : Bool, optional
             If True, use a recursive clustering algorithm, otherwise use an id based clustering.
-            The difference in values between two methods can be upto 3 particles.
-        largest : Bool, default True
-            If True, return the number of particles in the largest cluster.
+            The difference in values between two methods can be upto 3 particles. Default True.
+
+        largest : Bool, optional
+            If True, return the number of particles in the largest cluster. Default True.
         
         Returns
         -------
         cluster : int
             The size of the largest cluster in the system. Only returned if `largest` is set to True.
         
+        Notes
+        -----
+        Go through all the atoms in the system and cluster them together based on the `issolid` parameter of the atom. 
+        To cluster based on any user defined criteria, you can use `set_solid` method of `Atom` to explicitely 
+        set the `issolid` value. 
 
-        See also
-        --------
-        calculate_frenkelnumbers
-        get_number_from_bond
-        find_largest_cluster
-        set_nucsize_parameters
         """
         if recursive:
             pc.System.find_clusters_recursive(self)
@@ -1435,8 +1435,7 @@ class System(pc.System):
 
     def find_largest_cluster(self):
         """
-        Find the largest solid cluster of atoms in the system from all the clusters. `find_clusters`
-        has to be used before using this function.
+        Find the largest solid cluster of atoms in the system from all the clusters. 
 
         Parameters
         ----------
@@ -1447,12 +1446,10 @@ class System(pc.System):
         cluster : int
             the size of the largest cluster
 
-        See also
-        --------
-        calculate_frenkelnumbers
-        find_clusters
-        get_number_from_bond
-        set_nucsize_parameters
+        Notes
+        -----
+        `find_clusters` has to be used before using this function.
+
         """
         return pc.System.find_largest_cluster(self)
 
@@ -1469,6 +1466,12 @@ class System(pc.System):
         -------
         atom : python `Atom` object
             output atom
+
+        Notes
+        -----
+        This function is used to make sure that the user gets a python
+        object rather than a C++ one.
+
         """
         atom = Atom()
         atom.set_x(atomc.get_x())
@@ -1501,6 +1504,11 @@ class System(pc.System):
         -------
         atomc : C++ `Atom` object
             the input atom
+
+        Notes
+        -----
+        A python object is converted to a C++ object which is then 
+        passed on the system for calculation.
 
         """
         atomc = pc.Atom()

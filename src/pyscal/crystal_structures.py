@@ -12,21 +12,26 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
 
     Parameters
     ----------
-    structure : string , bcc, fcc or hcp
+    structure : {'bcc', 'fcc', 'hcp'}
         type of the crystal structure
-    lattice_constant : float, default 1
-        lattice constant of the crystal structure
-    repetitions : list of ints of len 3
-        of type [nx, ny, nz], repetions of the unit cell in x, y and z directions.
-    ca_ratio : float, default 1.633
-        ratio of c/a for hcp structures.
+    
+    lattice_constant : float, optional
+        lattice constant of the crystal structure, default 1
+
+    repetitions : list of ints of len 3, optional
+        of type `[nx, ny, nz]`, repetions of the unit cell in x, y and z directions.
+        default `[1, 1, 1]`.
+
+    ca_ratio : float, optional 
+        ratio of c/a for hcp structures, default 1.633
 
     Returns
     -------
     atoms : list of `Atom` objects
         list of all atoms as created by user input
+    
     box : list of list of floats
-        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
+        list of the type `[[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]]` where each of them are the lower
         and upper limits of the simulation box in x, y and z directions respectively.
 
     Examples

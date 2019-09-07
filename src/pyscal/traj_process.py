@@ -9,37 +9,47 @@ import gzip
 #functions that are not wrapped from C++
 def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False):
     """
-    Function to read a lammps dump file format - single time slice. This is essentially the same as 
-    C++ read, but can have variable headers, reads in type and so on. So if verstility is required,
-    this function is better. C++ version might be faster.
-    Zipped files which end with a `.gz` can also be read automatically. However, if the file does not
-    end with a `.gz` extension, keyword `compressed = True` can also be used.
+    Function to read a lammps dump file format - single time slice. 
 
     Parameters
     ----------
     infile : string
         name of the input file
-    compressed : bool, Default False
+
+    compressed : bool, optional
         force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
-        necessary.
-    check_triclinic : bool, Default false
-        If true check if the sim box is triclinic.
-    box_vectors : bool, default False
+        necessary. Default True.
+
+    check_triclinic : bool, optional
+        If true check if the sim box is triclinic. Default False.
+
+    box_vectors : bool, optional
         If true, return the full box vectors along with `boxdims` which gives upper and lower bounds.
+        default False.
 
     Returns
     -------
     atoms : list of `Atom` objects
         list of all atoms as created by user input
+    
     boxdims : list of list of floats
-        The dimensions of the box. This is of the form [[xlo, xhi],[ylo, yhi],[zlo, zhi]] where `lo` and `hi` are
+        The dimensions of the box. This is of the form `[[xlo, xhi],[ylo, yhi],[zlo, zhi]]` where `lo` and `hi` are
         the upper and lower bounds of the simulation box along each axes. For triclinic boxes, this is scaled to
-        [0, scalar length of the vector].
+        `[0, scalar length of the vector]`.
+    
     box : list of list of floats
-        list of the type [[x1, x2, x3], [y1, y2, y3], [zz1, z2, z3]] which are the box vectors. Only returned if
+        list of the type `[[x1, x2, x3], [y1, y2, y3], [zz1, z2, z3]]` which are the box vectors. Only returned if
         `box_vectors` is set to True.
+
     triclinic : bool
         True if the box is triclinic. Only returned if `check_triclinic` is set to True
+
+    
+    Notes
+    -----
+    Read a lammps-dump style snapshot that can have variable headers, reads in type and so on. 
+    Zipped files which end with a `.gz` can also be read automatically. However, if the file does not
+    end with a `.gz` extension, keyword `compressed = True` can also be used.
 
     Examples
     --------
@@ -152,24 +162,24 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
 def read_poscar(infile, compressed = False):
     """
-    Function to read a POSCAR format. Zipped files which end with a `.gz` can also be 
-    read automatically. However, if the file does not end with a `.gz` extension, 
-    keyword `compressed = True` can also be used.
+    Function to read a POSCAR format. 
 
     Parameters
     ----------
     infile : string
         name of the input file
-    compressed : bool, Default False
+
+    compressed : bool, optional
         force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
-        necessary.
+        necessary, Default False
 
     Returns
     -------
     atoms : list of `Atom` objects
         list of all atoms as created by user input
+    
     box : list of list of floats
-        list of the type [[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]] where each of them are the lower
+        list of the type `[[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]]` where each of them are the lower
         and upper limits of the simulation box in x, y and z directions respectively.
 
     Examples
@@ -179,6 +189,7 @@ def read_poscar(infile, compressed = False):
     >>> atoms, box = read_poscar('POSCAR.dat', compressed=True)    
 
     """
+
     raw = infile.split('.')
     if raw[-1] == 'gz' or  compressed:
         f = gzip.open(infile,'rt')            
@@ -267,13 +278,23 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
     ----------
     sys : `System` object
         the system object to be written out
+    
     outfile : string
         name of the output file
-    format : string, default `lammps-dump`
+    
+    format : string, optional
         the format of the output file, as of now only `lammps-dump` format
         is supported.
+
     compressed : bool, default false
         write a `.gz` format
+    
+    customkey : string or list of strings, optional
+        If specified, it adds this custom column to the dump file. Default None.
+
+    customvals : list or list of lists, optional
+        If `customkey` is specified, `customvals` take an array of the same length
+        as number of atoms, which contains the values to be written out.
 
     Returns
     -------
@@ -300,17 +321,53 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
     dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
     dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
     dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
+    
+    
+    #check customkey and its values
+    #if single value, make it into array
+    writecustom = False
+
     if customkey != None:
-        title_str = "ITEM: ATOMS id type x y z %s\n"% customkey
+        if not isinstance(customkey, list) or  isinstance(customkey, np.ndarray):
+            customkey = [str(customkey)]
+            customvals = np.array([customvals])
+        else:
+            ccdummy = [str(x) for x in customkey]
+            customkey = ccdummy
+        
+        #verify lengths
+        if not len(customkey) == len(customvals):
+            #print(cust)
+            #raise TypeError("length of customkey and customvals should be same. lengths %d and %d not compatible"%(len(customkey), len(customvals)))
+            raise TypeError(customkey, customvals)
+        
+        #now verify the lengths of customkey
+        for count, c in enumerate(customkey):
+            if not len(customvals[count]) == len(atoms):
+                raise TypeError("Length of customvals should be equal to number of atoms. lengths %d and %d not compatible"%(len(customvals[count]), len(atoms)))
+
+        #if everything works - change writecustom
+        writecustom = True
+
+    #now write header
+    if writecustom:
+        ckey = " ".join(customkey)
+        title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
     else:
         title_str = "ITEM: ATOMS id type x y z\n"
+
+    #write it out
     dump.write(title_str)
+    
     for cc, atom in enumerate(atoms):
         pos = atom.get_x()
-        if customkey != None:
-            atomline = ("%d %d %f %f %f %d\n")%(atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2], customvals[cc])
+        
+        if writecustom:
+            cvals = " ".join(np.array(customvals)[:, cc].astype(str))
+            atomline = ("%d %d %f %f %f %s\n")%(atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2], cvals)
         else:
             atomline = ("%d %d %f %f %f\n")%(atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2])
+
         dump.write(atomline)
 
     dump.close()
@@ -325,9 +382,11 @@ def split_trajectory(infile, format='lammps-dump', compressed=False):
     
     filename : string
         name of input file
+
     format : format of the input file
         only `lammps-dump` is supported now. 
-    compressed : bool, Default False
+    
+    compressed : bool, optional
         force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
         necessary.
 
@@ -335,7 +394,13 @@ def split_trajectory(infile, format='lammps-dump', compressed=False):
     -------
     snaps : list of strings
         a list of filenames which contain individual frames from the main trajectory.    
+    
+    Notes
+    -----
+    This is a wrapper function around `split_traj_lammps_dump` function.
+
     """
+    
     snaps = []
 
     if format=='lammps-dump':
@@ -353,9 +418,10 @@ def split_traj_lammps_dump(infile, compressed = False):
     
     filename : string
         name of input file
-    compressed : bool, Default False
+
+    compressed : bool, optional
         force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
-        necessary.
+        necessary, Default False.
 
     Returns
     -------
