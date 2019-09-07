@@ -1219,6 +1219,15 @@ class System(pc.System):
         -------
         None
 
+        Raises
+        ------
+        RuntimeWarning
+            raised when `threshold` value is too less. A low threshold value will lead to 'sann' algorithm not converging
+            in finding a neighbor. The function will try to automatically increase `threshold` and check again.
+
+        RuntimeError
+            raised when neighbor search was unsuccessful. This is due to a low `threshold` value.
+        
         Notes
         -----
         This function calculates the neighbors of each particle. There are several ways to do this. A complete description of
@@ -1227,20 +1236,36 @@ class System(pc.System):
         Method cutoff and specifying a cutoff radius uses the traditional approach being the one in which the neighbors of an atom 
         are the ones that lie in the cutoff distance around it. 
 
-        In Method cutoff, if ``cutoff='adaptive``, an adaptive cutoff is decided during runtime for each atom to find its neighbors [1]_.
+        In order to reduce time during sorting of distances during the adaptive methods, pyscal guesses an initial large cutoff radius.
+        This is calculated as,
+
+        .. math:: r_{initial} = threshold * (simulation box volume/ number of particles)^(1/3)
+
+        threshold is a safe multiplier used for the guess value and can be set using the `threshold` keyword.
+
+        In Method cutoff, if ``cutoff='adaptive'``, an adaptive cutoff is decided during runtime for each atom to find its neighbors [1]_.
         Setting the cutoff radius to 0 also triggers this algorithm. The cutoff for an atom i is found using,
 
         .. math:: r_c(i) = padding * ((1/nlimit) * \sum_{j=1}^{nlimit}(r_{ij}))
 
+        padding is a safe multiplier to the cutoff distance that can be set through the keyword `padding`. `nlimit` keyword sets the
+        limit for the top nlimit atoms to be taken into account to calculate the cutoff radius.
 
-        The second approach is using Voronoi polyhedra. All the atoms
-        that share a Voronoi polyhedra face with the host atoms are considered its neighbors.
+        In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]_. There are parameter to customise sann behaviour.
 
-        Finally there is also an adaptive cutoff method if ``cutoff`` is specified as ``sann``, ``adaptive`` or 0. 
-        In ``sann`` method, the neighbors are found according to the algorithm specified in
-        J. Chem. Phys. 136, 234107 (2012). If cutoff is chosen to be ``adaptive`` or 0, an adaptive algorithm is
-        used in which the cutoff for individual particles are calculated by first making a sorted list of neighbors
-        and then choosing the cutoff by, rcut = padding*((1/nlimit)*(sum of nlimit number of sorted nearest distances)).
+        The second approach is using Voronoi polyhedra. All the atoms that share a Voronoi polyhedra face with the host atoms are considered 
+        its neighbors. A corresponding neighborweight is also assigned to each neighbor in the ratio of the face area between the two atoms.
+        This weight can later be used to weight steinhardt parameters. Higher powers of this weight can also be used. The keyword `voroexp`
+        can be used to set this weight. If `voroexp` is set to 0, the neighbors would be calculated using Voronoi method, but Steinhardts
+        parameters could be calculated normally.
+
+        Keyword `filter` can be used to filter the neighbors based on a condition. Choosing ``filter='type'`` only considers an atom as
+        a neighbor if both the neighbor atom and host atom are of the same type.
+
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+        .. [2] van Meel, JA, Filion, L, Valeriani, C, Frenkel, D, J Chem Phys 234107, 2012
 
         """
         #first reset all neighbors
@@ -1271,7 +1296,7 @@ class System(pc.System):
                             break
                     
                     if not finallydone:
-                        raise RuntimeError("Adaptive cutoff could not be converged. This is most likely, \
+                        raise RuntimeError("sann cutoff could not be converged. This is most likely, \
                         due to a low threshold value. Try increasing it.")
             elif cutoff=='adaptive' or cutoff==0:
                 if threshold < 1:
@@ -1293,8 +1318,7 @@ class System(pc.System):
     def reset_neighbors(self):
         """
         
-        Reset the neighbors of all atoms in the system. This should be used before recalculating neighbors
-        with two different approaches.
+        Reset the neighbors of all atoms in the system. 
 
         Parameters
         ----------
@@ -1304,9 +1328,10 @@ class System(pc.System):
         -------
         None
 
-        See also
-        --------
-        get_allneighbors
+        Notes
+        -----
+        It is used automatically when neighbors are recalculated.
+        
         """
         pc.System.reset_allneighbors(self)
 
