@@ -17,6 +17,7 @@ Advanced examples
 .. toctree::
 
 	example3basic
+	pickling
 
 
     
