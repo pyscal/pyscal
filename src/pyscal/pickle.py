@@ -1,5 +1,5 @@
 import pyscal.ccore as pc
-import pyscal.core as pcc
+#import pyscal.core as pcc
 import pyscal.traj_process as ptp
 import os
 import numpy as np
@@ -78,8 +78,8 @@ def unpickle_atom(patom):
     -------
     catom : A c++ Atom object
     """
-    atomc = pcc.Atom()
-    atomc.set_pos(patom.pos)
+    atomc = pc.Atom()
+    atomc.set_x(patom.pos)
     atomc.set_solid(patom.solid)
     atomc.set_structure(patom.structure)
     atomc.set_cluster(patom.cluster)
@@ -188,43 +188,42 @@ def unpickle_system(psys):
     return sys
 
 
-def write_systems(file, systems):
+#def write_systems(file, systems):
     """
-    Write an array of systems to file
+    #Write an array of systems to file
 
-    Parameters
-    ----------
-    file : string
-        name of output file
+    #Parameters
+    #----------
+    #file : string
+    #    name of output file
 
-    systems : list of system objects
+    #systems : list of system objects
 
-    Returns
-    -------
-    None
+    #Returns
+    #-------
+    #None
 
     """
-    psystems = [sys.prepare_pickle() for sys in systems]
-    np.save(file, psystems)
+    #psystems = [sys.prepare_pickle() for sys in systems]
+    #np.save(file, psystems)
 
-def read_systems(file):
+#def read_systems(file):
     """
-    Unpickle systems from file
+    #Unpickle systems from file
 
-    Parameters
-    ----------
-    file : string
-        name of input file
+    #Parameters
+    #----------
+    #file : string
+    #    name of input file
 
-    Returns
-    -------
-    None
+    #Returns
+    #-------
+    #None
     """
 
-    psystems = np.load(file, allow_pickle=True).flatten()
-    systems = np.array([unpickle_system(system) for system in psystems])
-    return systems
-
+    #psystems = np.load(file, allow_pickle=True).flatten()
+    #systems = np.array([unpickle_system(system) for system in psystems])
+    #return systems
 
 
 

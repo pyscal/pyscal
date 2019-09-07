@@ -54,13 +54,13 @@ def test_pickle_system():
         os.remove('tests/sy.npy')
 
     #now finally test pickling of series of atoms
-    syss = [sys, sys]
-    pp.write_systems('tests/sys.npy', syss)
-    psyss = pp.read_systems('tests/sys.npy')
-    assert len(psyss) == len(syss)
+    #syss = [sys, sys]
+    #pp.write_systems('tests/sys.npy', syss)
+    #psyss = pp.read_systems('tests/sys.npy')
+    #assert len(psyss) == len(syss)
 
-    if os.path.exists('tests/sys.npy'):
-        os.remove('tests/sys.npy')
+    #if os.path.exists('tests/sys.npy'):
+    #    os.remove('tests/sys.npy')
 
 
 
