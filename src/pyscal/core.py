@@ -849,7 +849,7 @@ class System(pc.System):
         --------
         read_inputfile
         """
-        self.no_of_atoms = len(atoms)
+        #self.no_of_atoms = len(atoms)
         pc.System.assign_particles(self, atoms, box)
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
@@ -1391,17 +1391,19 @@ class System(pc.System):
 
         #start identification routine
         #first calculate q
-        pc.System.calculate_q(self, 6)
+        pc.System.calculate_q(self, [6])
+        #self.calculate_q(6)
         #calculate solid neighs
+        pc.System.set_nucsize_parameters(self, bonds, threshold, avgthreshold)
         pc.System.calculate_frenkelnumbers(self)
         #now find solids
         pc.System.find_solid_atoms(self)
 
         if cluster:
-            def _condition(atom):
+            def ccondition(atom):
                 return atom.get_solid()
 
-            lc = self.cluster_atoms(_condition, largest=True)
+            lc = self.cluster_atoms(ccondition, largest=True)
             return lc
 
     
@@ -1457,11 +1459,12 @@ class System(pc.System):
             raise RuntimeError("condition did not work")
 
         #now loop
-        for i in range(self.no_of_atoms):
+        nop = pc.System.get_nop(self)
+        for i in range(nop):
             atom = self.get_atom(i)
             cval = condition(atom)
             atom.set_condition(cval)
-            self.set_atom(i)
+            self.set_atom(atom)
 
         #atom conditions are set
         #now can clustering function
@@ -1469,7 +1472,7 @@ class System(pc.System):
 
         #done!
         lc = pc.System.find_largest_cluster(self)
-        pc.System.get_largest_cluster_atoms(self)
+        #pc.System.get_largest_cluster_atoms(self)
 
         if largest:
             return lc
@@ -1477,7 +1480,7 @@ class System(pc.System):
 
 
 
-    def calculate_nucsize(self):
+    def calculate_nucsize(self, frenkelnums, threshold, avgthreshold):
         """
         Calculate the size of the largest cluster in the given system. 
 
@@ -1496,7 +1499,12 @@ class System(pc.System):
         by the functions `set_nucsize_parameters`.
 
         """
-        warnings.warn("This function is deprecated, and will be phased out", DeprecationWarning)
+        #print("this raaan")
+        warnings.simplefilter('always', DeprecationWarning)
+        warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
+        
+        pc.System.calculate_q(self, [6])
+        pc.System.set_nucsize_parameters(self, frenkelnums, threshold, avgthreshold)
         return pc.System.calculate_nucsize(self)
 
     def calculate_frenkelnumbers(self):
@@ -1610,6 +1618,9 @@ class System(pc.System):
         atom.set_avgvolume(atomc.get_avgvolume())
         atom.set_facevertices(atomc.get_facevertices())
         atom.set_condition(atomc.get_condition())
+        atom.set_avgconnection(atomc.get_avgconnection())
+        atom.set_bonds(atomc.get_bonds())
+        #atom.set_allqcomps(atomc.get_allqcomps())
         return atom
 
     def copy_atom_to_catom(self, atom):
@@ -1649,6 +1660,9 @@ class System(pc.System):
         atomc.set_avgvolume(atom.get_avgvolume())
         atomc.set_facevertices(atom.get_facevertices())
         atomc.set_condition(atom.get_condition())
+        atomc.set_avgconnection(atom.get_avgconnection())
+        atomc.set_bonds(atom.get_bonds())
+        #atomc.set_allqcomps(atom.get_allqcomps())
         return atomc
 
 

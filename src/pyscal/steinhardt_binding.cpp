@@ -32,6 +32,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_neighborweights",&Atom::sneighborweights)
         .def("set_custom",&Atom::scustom)
         .def("get_custom",&Atom::gcustom)
+        .def("get_bonds",&Atom::gfrenkelnumber)
+        .def("set_bonds",&Atom::sfrenkelnumber)
         .def("get_q",&Atom::gq)
         .def("get_id",&Atom::gid)
         .def("set_id",&Atom::sid)
@@ -62,6 +64,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_avgvolume",&Atom::savgvolume)
         .def("get_facevertices", &Atom::gfacevertices)
         .def("set_facevertices", &Atom::sfacevertices)
+        .def("get_avgconnection", &Atom::gasij)
+        .def("set_avgconnection", &Atom::sasij)
         ; 
 
     //bindings and documentation for individual functions
@@ -106,7 +110,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_face_cutoff",&System::set_face_cutoff)
         .def("get_indicators",&System::get_indicators)
         .def("set_indicators",&System::set_indicators)
-        .def("find_solid_atoms",&System::find_solids)
+        .def("find_solid_atoms",&System::find_solid_atoms)
         ;
 
 

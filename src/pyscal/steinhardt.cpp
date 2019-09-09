@@ -1002,8 +1002,8 @@ void System::calculate_complexQLM_6(){
             
             realti = realti/(double(nn));
             imgti = imgti/(double(nn));
-            atoms[ti].realQ6[mi+6] = realti;
-            atoms[ti].imgQ6[mi+6] = imgti;
+            atoms[ti].realq[4][mi+6] = realti;
+            atoms[ti].imgq[4][mi+6] = imgti;
         }
     }
 }
@@ -1174,13 +1174,14 @@ double System::get_number_from_bond(int ti,int tj){
 
     for (int mi = 0;mi < 13;mi++){
                 
-        sumSquareti += atoms[ti].realQ6[mi]*atoms[ti].realQ6[mi] + atoms[ti].imgQ6[mi] *atoms[ti].imgQ6[mi];
-        sumSquaretj += atoms[tj].realQ6[mi]*atoms[tj].realQ6[mi] + atoms[tj].imgQ6[mi] *atoms[tj].imgQ6[mi];
-        realdotproduct += atoms[ti].realQ6[mi]*atoms[tj].realQ6[mi];
-        imgdotproduct  += atoms[ti].imgQ6[mi] *atoms[tj].imgQ6[mi];
+        sumSquareti += atoms[ti].realq[4][mi]*atoms[ti].realq[4][mi] + atoms[ti].imgq[4][mi] *atoms[ti].imgq[4][mi];
+        sumSquaretj += atoms[tj].realq[4][mi]*atoms[tj].realq[4][mi] + atoms[tj].imgq[4][mi] *atoms[tj].imgq[4][mi];
+        realdotproduct += atoms[ti].realq[4][mi]*atoms[tj].realq[4][mi];
+        imgdotproduct  += atoms[ti].imgq[4][mi] *atoms[tj].imgq[4][mi];
     }
         
     connection = (realdotproduct+imgdotproduct)/(sqrt(sumSquaretj)*sqrt(sumSquareti));
+    //cout<<connection<<endl;
     return connection;
 }
 
@@ -1248,13 +1249,15 @@ int System::cluster_criteria(int ti, int criterium){
 }
 
 
-void System::find_solids(){
+void System::find_solid_atoms(){
 
     int criteria = 0;
 
     for (int ti= 0;ti<nop;ti++){
                 
-        atoms[ti].issolid = cluster_criteria(ti,criteria);
+        //atoms[ti].issolid = cluster_criteria(ti,criteria);
+        atoms[ti].issolid = ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > avgthreshold) );
+        //atoms[ti].issolid = 1;
     }
 }
 
@@ -1318,7 +1321,7 @@ void System::harvest_cluster_old(const int ti, const int clusterindex){
         if(!atoms[neigh].issolid) continue;
         if (atoms[neigh].belongsto==-1){
             atoms[neigh].belongsto = clusterindex;
-            harvest_cluster(neigh, clusterindex);
+            harvest_cluster_old(neigh, clusterindex);
         }
     }
 }
@@ -1333,7 +1336,7 @@ void System::find_clusters_recursive_old(){
         if (atoms[ti].belongsto==-1){
             clusterindex += 1;
             atoms[ti].belongsto = clusterindex;
-            harvest_cluster(ti, clusterindex);
+            harvest_cluster_old(ti, clusterindex);
         }
 
     }
@@ -1395,16 +1398,16 @@ int System::calculate_nucsize()
         int greatestbelongsto;
         //Find all particles within a radius of neighbourdistancess
         //read_particle_file();
-        get_all_neighbors_normal();
+        //get_all_neighbors_normal();
         //Get Q6 values
         //cout<<"step 1"<<endl;
-        calculate_complexQLM_6();
+        //calculate_complexQLM_6();
         //cout<<"step 2"<<endl;
         //and the number of bonds to find the largest cluster
         calculate_frenkel_numbers();
         //cout<<"step 3"<<endl;
 
-        find_solids();
+        find_solid_atoms();
         //cout<<"step 4"<<endl;
         //find_clusters();
         find_clusters_recursive_old();
@@ -1423,7 +1426,7 @@ int System::calculate_nucsize()
 //------------------------------------------------------------------------------------------------------------------------
 //void System::set_inputfile(string nn) { inputfile = nn; }
 void System::set_neighbordistance(double nn) { neighbordistance = nn; }
-void System::set_nucsize_parameters(double cutoff, int n1, double n2, double n3 ) { neighbordistance = cutoff; minfrenkel = n1; threshold = n2; avgthreshold = n3; }
+void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) { 
     int idd = atom1.loc;
@@ -1536,6 +1539,8 @@ int Atom::gnneighbors(){
 
 double Atom::gq(int qq){ return q[qq-2]; }
 int Atom::gid(){ return id; }
+int Atom::gfrenkelnumber(){ return frenkelnumber; }
+void Atom::sfrenkelnumber(int nn){ frenkelnumber=nn; }
 void Atom::sid(int idd){ id=idd; }
 int Atom::gloc(){ return loc; }
 void Atom::sloc(int idd){ loc=idd; }
@@ -1543,6 +1548,8 @@ int Atom::gtype(){ return type; }
 void Atom::stype(int idd){ type=idd; }
 double Atom::gvolume(){ return volume; }
 void Atom::svolume(double vv){ volume = vv; }
+double Atom::gasij(){ return avq6q6; }
+void Atom::sasij(double vv){ avq6q6 = vv; }
 double Atom::gavgvolume(){ return avgvolume; }
 void Atom::savgvolume(double vv){ avgvolume = vv; }
 int Atom::gsolid(){ return issolid; }
@@ -1738,3 +1745,4 @@ void Atom::svorovector(vector<int> voro){
         vorovector[i] = voro[i];
     }
 }
+
