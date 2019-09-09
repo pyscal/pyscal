@@ -1231,7 +1231,7 @@ void System::calculate_frenkel_numbers(){
 
 //again to be overloaded?
 //maybe not now-im lazy
-int System::cluster_criteria(int ti,int criterium){
+int System::cluster_criteria(int ti, int criterium){
         
     int value=0;
           
@@ -1263,11 +1263,11 @@ void System::find_clusters(){
 
         for (int ti= 0;ti<nop;ti++){
                 
-            if (!atoms[ti].issolid) continue;
+            if (!atoms[ti].condition) continue;
             if (atoms[ti].belongsto==-1) {atoms[ti].belongsto = atoms[ti].id; }
             for (int c = 0;c<atoms[ti].n_neighbors;c++){
 
-                if(!atoms[atoms[ti].neighbors[c]].issolid) continue;
+                if(!atoms[atoms[ti].neighbors[c]].condition) continue;
                 if (atoms[atoms[ti].neighbors[c]].belongsto==-1){
                     atoms[atoms[ti].neighbors[c]].belongsto = atoms[ti].belongsto;
                 }
@@ -1285,7 +1285,7 @@ void System::harvest_cluster(const int ti, const int clusterindex){
     int neigh;
     for(int i=0; i<atoms[ti].n_neighbors; i++){
         neigh = atoms[ti].neighbors[i];
-        if(!atoms[neigh].issolid) continue;
+        if(!atoms[neigh].condition) continue;
         if (atoms[neigh].belongsto==-1){
             atoms[neigh].belongsto = clusterindex;
             harvest_cluster(neigh, clusterindex);
@@ -1294,6 +1294,36 @@ void System::harvest_cluster(const int ti, const int clusterindex){
 }
 
 void System::find_clusters_recursive(){
+
+    int clusterindex;
+    clusterindex = 0;
+
+    for (int ti= 0;ti<nop;ti++){
+        if (!atoms[ti].condition) continue;
+        if (atoms[ti].belongsto==-1){
+            clusterindex += 1;
+            atoms[ti].belongsto = clusterindex;
+            harvest_cluster(ti, clusterindex);
+        }
+
+    }
+}
+
+//old code - just keeping it here
+void System::harvest_cluster_old(const int ti, const int clusterindex){
+
+    int neigh;
+    for(int i=0; i<atoms[ti].n_neighbors; i++){
+        neigh = atoms[ti].neighbors[i];
+        if(!atoms[neigh].issolid) continue;
+        if (atoms[neigh].belongsto==-1){
+            atoms[neigh].belongsto = clusterindex;
+            harvest_cluster(neigh, clusterindex);
+        }
+    }
+}
+
+void System::find_clusters_recursive_old(){
 
     int clusterindex;
     clusterindex = 0;
@@ -1377,7 +1407,7 @@ int System::calculate_nucsize()
         find_solids();
         //cout<<"step 4"<<endl;
         //find_clusters();
-        find_clusters_recursive();
+        find_clusters_recursive_old();
         //cout<<"step 5"<<endl;
         greatestbelongsto = largest_cluster();
         //cout<<"step 6"<<endl;
@@ -1519,6 +1549,8 @@ int Atom::gsolid(){ return issolid; }
 void Atom::ssolid(int idd){ issolid=idd; }
 int Atom::gstructure(){ return structure; }
 void Atom::sstructure(int idd){ structure=idd; }
+void Atom::scondition(int idd){ condition=idd; }
+int Atom::gcondition(){ return condition; }
 
 vector<double> Atom::gallq(){
     vector<double> allq;

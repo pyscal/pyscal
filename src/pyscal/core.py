@@ -718,6 +718,10 @@ class System(pc.System):
     """
     def __init__(self):
         self.initialized = True
+        #self.solid_params_set = False
+        self.neighbors_found = False
+        #this method can be done more
+        #we can remove checks on the cpp side
         pc.System.__init__(self)
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False):
@@ -845,6 +849,7 @@ class System(pc.System):
         --------
         read_inputfile
         """
+        self.no_of_atoms = len(atoms)
         pc.System.assign_particles(self, atoms, box)
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
@@ -895,99 +900,6 @@ class System(pc.System):
 
 
 
-    def get_largestcluster(self):
-        """
-        Get id of the the largest cluster. 
-        
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        clusterid : int 
-            id of the largest cluster
-
-        Notes
-        -----
-        id is only available if the largest cluster has already
-        been found. Otherwise it returns the default values.
-
-        """
-        return pc.System.get_largestcluster(self)
-
-    
-    def set_nucsize_parameters(self, cutoff, minfrenkel, threshold, avgthreshold):
-        """
-        Set the value of parameters for distinguishing solid and liquid atoms.
-
-        Parameters
-        ----------
-        cutoff : float
-            cutoff distance for calculating neighbors
-
-        minfrenkel : int
-            Minimum number of solid bonds for an atom to be identified as
-            a solid.
-        
-        threshold : double
-            The cutoff value of connection between two atoms for them to be def
-            ined as having a bond.
-        
-        avgthreshold : double
-            Averaged value of connection between an atom and its neighbors for 
-            an atom to be solid. This threshold is known to improve the solid-liquid
-            distinction in interfaces between solid and liquid. 
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        This function sets the parameters that can then be used to distinguish solid
-        and liquid atoms. The number of atoms in the largest solid cluster in liquid 
-        is often used as an order parameter in the study of nucleation during solidification. 
-        A detailed description of the order parameter can be found in [1]_ and example 
-        usage (not with this module) can be found in [2]_. This function merely sets the
-        different parameters.  In order to actually complete the calculation, 
-        `calculate_nucsize` has to be called after setting the parameters.
-
-        References
-        ----------
-        .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
-        .. [2] Diaz Leines, G, Drautz, R, Rogal, J, J Chem Phys 146, 2017
-
-        See Also
-        --------
-        calculate_nucsize
-
-        Examples
-        --------
-        >>> st.set_nucsize_parameters(7,0.5,0.5)
-        """
-        pc.System.set_nucsize_parameters(self, cutoff, minfrenkel, threshold, avgthreshold)
-
-    def calculate_nucsize(self):
-        """
-        Calculate the size of the largest cluster in the given system. 
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        cluster size : int
-            size of the largest solid cluster in liquid (number of atoms)
-
-        Notes
-        -----
-        Calculation of the the size of the largest solid cluster needs various prerequisites that can be set
-        by the functions `set_nucsize_parameters`.
-
-        """
-        return pc.System.calculate_nucsize(self)
 
     def get_atom(self, index):
         """
@@ -1314,6 +1226,9 @@ class System(pc.System):
             pc.System.set_face_cutoff(self, face_cutoff)
             pc.System.set_alpha(self, int(voroexp))
             pc.System.get_all_neighbors_voronoi(self)
+
+        self.neighbors_found = True
+
             
 
     def reset_neighbors(self):
@@ -1379,6 +1294,210 @@ class System(pc.System):
 
         if averaged:
             pc.System.calculate_aq(self, qq)
+
+    def get_largestcluster(self):
+        """
+        Get id of the the largest cluster. 
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        clusterid : int 
+            id of the largest cluster
+
+        Notes
+        -----
+        id is only available if the largest cluster has already
+        been found. Otherwise it returns the default values.
+
+        """
+        return pc.System.get_largestcluster(self)
+
+    def find_solids(self, bonds=7, threshold=0.5, avgthreshold=0.6, cluster=True):
+        """
+        Distinguish solid and liquid atoms in the system.
+
+        Parameters
+        ----------
+        bonds : int, optional
+            Minimum number of solid bonds for an atom to be identified as
+            a solid. Default 7.
+        
+        threshold : double, optional
+            The cutoff value of connection between two atoms for them to be def
+            ined as having a bond. Default 0.5.
+        
+        avgthreshold : double, optional
+            Averaged value of connection between an atom and its neighbors for 
+            an atom to be solid. This threshold is known to improve the solid-liquid
+            distinction in interfaces between solid and liquid. Default 0.6. 
+
+        cluster : bool, optional
+            If True, cluster the solid atoms and return the number of atoms in the largest
+            cluster.
+        
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        The number of solid atoms in liquid using method found in [1]_ and example 
+        usage (not with this module) can be found in [2]_. The neighbors should be calculated
+        before running this function. Check `System.get_neighbors` method.
+
+        `bonds` define the number of solid bond required for an atom to be considered solid.
+        Two particles are said to be 'bonded' if,  
+
+        ..math :: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
+
+        where `threshold` values is also an optional parameter.
+
+        `avgthreshold` is an additional parameter to improve solid-liquid distinction.
+        In addition to having a the specified number of `bonds`, 
+
+        ..math ::  \langle s_{ij} \rangle > avgthreshold
+
+        also needs to be satisfied.
+
+
+        References
+        ----------
+        .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
+        .. [2] Diaz Leines, G, Drautz, R, Rogal, J, J Chem Phys 146, 2017
+
+        """
+        #check if neighbors are found
+        if not self.neighbors_found:
+            raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.get_neighbors.")
+        
+        if not isinstance(bonds, int):
+            raise TypeError("bonds should be interger value")
+
+        if not isinstance(threshold, float):
+            raise TypeError("threshold should be a float value")
+        else:
+            if not ((threshold >= 0 ) and (threshold <= 1 )):
+                raise ValueError("Value of threshold should be between 0 and 1")
+
+        if not isinstance(avgthreshold, float):
+            raise TypeError("avgthreshold should be a float value")
+        else:
+            if not ((avgthreshold >= 0 ) and (avgthreshold <= 1 )):
+                raise ValueError("Value of avgthreshold should be between 0 and 1")
+
+        #start identification routine
+        #first calculate q
+        pc.System.calculate_q(self, 6)
+        #calculate solid neighs
+        pc.System.calculate_frenkelnumbers(self)
+        #now find solids
+        pc.System.find_solid_atoms(self)
+
+        if cluster:
+            def _condition(atom):
+                return atom.get_solid()
+
+            lc = self.cluster_atoms(_condition, largest=True)
+            return lc
+
+    
+    def cluster_atoms(self, condition, largest = True):
+        """
+        Cluster atoms based on a property
+
+        Parameters
+        ----------
+        condition : callable
+            function which should take an `Atom` object, and give a True/False output
+
+        largest : bool
+            If True returns the size of the largest cluster. Default False.
+
+        Returns
+        -------
+        lc : int
+            Size of the largest cluster. Returned only if `largest` is True.
+        
+
+        Notes
+        -----
+        This function helps to cluster atoms based on a defined property. This property
+        is defined by the user through the function `condition`. For each atom in the
+        system, the `condition` should give a True/False values. 
+
+        When clustering happens, the code loops over each atom and its neighbors. If the
+        host atom and the neighbor both have True value for `condition`, they are put
+        in the same cluster. For example, if the atoms need to be clustered over if they 
+        are solid or not, corresponding condition would be,
+
+        .. code:: python  
+
+            def condition(atom):
+                #if both atom is solid
+                if (atom1.get_solid() == 1):
+                    return True
+                else:
+                    return False
+
+        Check examples for more details.
+
+        """
+        testatom = self.get_atom(0)
+
+        #test the condition
+        try:
+            out = condition(testatom)
+            if out not in [True, False]:
+                raise RuntimeError("The output of condition should be either True or False. Received %s"%str(out))
+        except:
+            raise RuntimeError("condition did not work")
+
+        #now loop
+        for i in range(self.no_of_atoms):
+            atom = self.get_atom(i)
+            cval = condition(atom)
+            atom.set_condition(cval)
+            self.set_atom(i)
+
+        #atom conditions are set
+        #now can clustering function
+        pc.System.find_clusters_recursive(self)
+
+        #done!
+        lc = pc.System.find_largest_cluster(self)
+        pc.System.get_largest_cluster_atoms(self)
+
+        if largest:
+            return lc
+
+
+
+
+    def calculate_nucsize(self):
+        """
+        Calculate the size of the largest cluster in the given system. 
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        cluster size : int
+            size of the largest solid cluster in liquid (number of atoms)
+
+        Notes
+        -----
+        Calculation of the the size of the largest solid cluster needs various prerequisites that can be set
+        by the functions `set_nucsize_parameters`.
+
+        """
+        warnings.warn("This function is deprecated, and will be phased out", DeprecationWarning)
+        return pc.System.calculate_nucsize(self)
 
     def calculate_frenkelnumbers(self):
         """
@@ -1490,6 +1609,7 @@ class System(pc.System):
         atom.set_volume(atomc.get_volume())
         atom.set_avgvolume(atomc.get_avgvolume())
         atom.set_facevertices(atomc.get_facevertices())
+        atom.set_condition(atomc.get_condition())
         return atom
 
     def copy_atom_to_catom(self, atom):
@@ -1528,6 +1648,7 @@ class System(pc.System):
         atomc.set_volume(atom.get_volume())
         atomc.set_avgvolume(atom.get_avgvolume())
         atomc.set_facevertices(atom.get_facevertices())
+        atomc.set_condition(atom.get_condition())
         return atomc
 
 

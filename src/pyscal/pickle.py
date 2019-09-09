@@ -31,6 +31,7 @@ class Atom:
         self.volume = None
         self.avgvolume = None
         self.facevertices = None
+        self.condition = None
 
 def pickle_atom(atom):
     """
@@ -62,6 +63,7 @@ def pickle_atom(atom):
     patom.volume = atom.get_volume()
     patom.avgvolume = atom.get_avgvolume()
     patom.facevertices = atom.get_facevertices()
+    patom.condition = atom.get_condition()
 
     return patom
 
@@ -94,6 +96,8 @@ def unpickle_atom(patom):
     atomc.set_volume(patom.volume)
     atomc.set_avgvolume(patom.avgvolume)
     atomc.set_facevertices(patom.facevertices)
+    atomc.set_condition(patom.condition)
+    
     return atomc    
 
 

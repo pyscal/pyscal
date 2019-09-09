@@ -98,6 +98,7 @@ class Atom{
         int issolid;
         int structure;
         int type;
+        int condition;
         
         
         //indicator which is 1 if neighbors are already provided
@@ -170,6 +171,9 @@ class Atom{
         vector<int> gvorovector();
         void svorovector(vector<int>);
 
+        void scondition(int);
+        int gcondition();
+
 };
 
 
@@ -214,6 +218,8 @@ class System{
         void find_clusters();
         void harvest_cluster(const int, const int);
         void find_clusters_recursive();
+        void harvest_cluster_old(const int, const int);
+        void find_clusters_recursive_old();
         int largest_cluster();
         void set_nucsize_parameters(double,int,double,double);
         //void set_inputfile(string);
