@@ -5,4 +5,5 @@ Methods implemented in ``pyscal``
     
     nearestneighbormethods
     steinhardtparameters
+    solidliquid
 
