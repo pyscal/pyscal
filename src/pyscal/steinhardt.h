@@ -91,6 +91,8 @@ class Atom{
         double gavgvolume();
         void svolume(double);
         void savgvolume(double);
+        double gasij();
+        void sasij(double);
 
         int belongsto;
         int lcluster;
@@ -98,6 +100,7 @@ class Atom{
         int issolid;
         int structure;
         int type;
+        int condition;
         
         
         //indicator which is 1 if neighbors are already provided
@@ -170,6 +173,15 @@ class Atom{
         vector<int> gvorovector();
         void svorovector(vector<int>);
 
+        void scondition(int);
+        int gcondition();
+
+        int gfrenkelnumber();
+        void sfrenkelnumber(int);
+
+        //vector<vector<vector<double>>> gallqcomps();
+        //void sallqcomps(vector<vector<vector<double>>>);
+
 };
 
 
@@ -210,12 +222,14 @@ class System{
         //void read_particle_instance(int,int);
         int calculate_nucsize();	//variant of function above
         int cluster_criteria(int,int );
-        void find_solids();
+        void find_solid_atoms();
         void find_clusters();
         void harvest_cluster(const int, const int);
         void find_clusters_recursive();
+        void harvest_cluster_old(const int, const int);
+        void find_clusters_recursive_old();
         int largest_cluster();
-        void set_nucsize_parameters(double,int,double,double);
+        void set_nucsize_parameters(int,double,double);
         //void set_inputfile(string);
         void set_neighbordistance(double);
         void assign_particles( vector<Atom>, vector<vector<double>>);

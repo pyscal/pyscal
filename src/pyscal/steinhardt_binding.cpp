@@ -32,9 +32,13 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_neighborweights",&Atom::sneighborweights)
         .def("set_custom",&Atom::scustom)
         .def("get_custom",&Atom::gcustom)
+        .def("get_bonds",&Atom::gfrenkelnumber)
+        .def("set_bonds",&Atom::sfrenkelnumber)
         .def("get_q",&Atom::gq)
         .def("get_id",&Atom::gid)
         .def("set_id",&Atom::sid)
+        .def("set_condition",&Atom::scondition)
+        .def("get_condition",&Atom::gcondition)
         .def("get_solid",&Atom::gsolid)
         .def("set_solid",&Atom::ssolid)
         .def("get_structure",&Atom::gstructure)
@@ -60,6 +64,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_avgvolume",&Atom::savgvolume)
         .def("get_facevertices", &Atom::gfacevertices)
         .def("set_facevertices", &Atom::sfacevertices)
+        .def("get_avgconnection", &Atom::gasij)
+        .def("set_avgconnection", &Atom::sasij)
         ; 
 
     //bindings and documentation for individual functions
@@ -93,7 +99,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
         .def("find_clusters",&System::find_clusters)
         .def("find_clusters_recursive",&System::find_clusters_recursive)
-        .def("find_largest_cluster",&System::largest_cluster)
+        .def("find_largest_cluster",&System::largest_cluster) 
+        .def("get_largest_cluster_atoms",&System::get_largest_cluster_atoms)
         .def("set_filter",&System::sfilter)
         .def("assign_triclinic_params",&System::assign_triclinic_params)
         .def("get_triclinic_params",&System::get_triclinic_params)
@@ -103,6 +110,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_face_cutoff",&System::set_face_cutoff)
         .def("get_indicators",&System::get_indicators)
         .def("set_indicators",&System::set_indicators)
+        .def("find_solid_atoms",&System::find_solid_atoms)
         ;
 
 

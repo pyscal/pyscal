@@ -14,9 +14,8 @@ def test_system_nucsize():
     assert len(sys.get_atoms()) == 16
 
     #now calculate nucsize
-    sys.set_nucsize_parameters(0.867, 6, 0.5, 0.5)
-    #sys.calculate_nucsize()
-    assert sys.calculate_nucsize() == 16
+    sys.get_neighbors(method='cutoff', cutoff=3.63)
+    assert 16 == sys.find_solids(bonds=6, threshold=0.5, avgthreshold=0.6, cluster=True)
 
     #check the atom cluster props
     atoms = sys.get_atoms()
@@ -30,3 +29,9 @@ def test_system_nucsize():
     sys.calculate_frenkelnumbers()
     sys.find_clusters()
     assert sys.find_largest_cluster() == 16
+
+def test_complex_system():
+    sys = pc.System()
+    sys.read_inputfile('examples/cluster.dump')
+    sys.get_neighbors(method='cutoff', cutoff=3.63)
+    assert 176 == sys.find_solids(bonds=6, threshold=0.5, avgthreshold=0.6, cluster=True)
