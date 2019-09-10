@@ -58,11 +58,12 @@ Methods
     methods
     
 
-API documentation
------------------
+pyscal reference
+----------------
 
 .. toctree::
     
+    modules
     pyscal
 	
 Support, contributing and extending

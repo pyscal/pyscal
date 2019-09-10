@@ -1,10 +1,6 @@
 pyscal Reference
 ================
 
-.. toctree::
-
-   modules
-
 Submodules
 ----------
 
