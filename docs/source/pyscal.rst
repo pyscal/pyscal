@@ -1,9 +1,6 @@
 pyscal Reference
 ================
 
-Submodules
-----------
-
 pyscal.core module
 -----------------
 
