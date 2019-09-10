@@ -304,11 +304,6 @@ class Atom(pc.Atom):
         --------
         atom.set_neighbors([0,23,11,22,334,112,11])
 
-        See also
-        --------
-        get_neighbors
-        set_neighborweights
-        get_neighborweights
         """
         pc.Atom.set_neighbors(self, neighs)
 
@@ -1352,14 +1347,14 @@ class System(pc.System):
         `bonds` define the number of solid bond required for an atom to be considered solid.
         Two particles are said to be 'bonded' if,  
 
-        ..math :: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
+        ..math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
 
         where `threshold` values is also an optional parameter.
 
         `avgthreshold` is an additional parameter to improve solid-liquid distinction.
         In addition to having a the specified number of `bonds`, 
 
-        ..math ::  \langle s_{ij} \rangle > avgthreshold
+        ..math::  \langle s_{ij} \rangle > avgthreshold
 
         also needs to be satisfied.
 
