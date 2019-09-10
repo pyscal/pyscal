@@ -87,7 +87,7 @@ html_theme_options = {
     'header_inverse': False,
     'relbar_inverse': False,
     'inner_theme': True,
-    'inner_theme_name': 'bootswatch-paper',
+    'inner_theme_name': 'bootswatch-flatly',
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
