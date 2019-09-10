@@ -1,2 +1,3 @@
 cmake
 numpy
+sphinxjp.themes.basicstrap
