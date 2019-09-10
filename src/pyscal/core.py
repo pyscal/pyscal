@@ -1354,7 +1354,7 @@ class System(pc.System):
         `avgthreshold` is an additional parameter to improve solid-liquid distinction.
         In addition to having a the specified number of `bonds`, 
 
-        .. math::  \langle s_{ij} \rangle > avgthreshold  
+        .. math::  \langle s_{ij} \\rangle > avgthreshold  
 
         also needs to be satisfied.
 
