@@ -1,5 +1,9 @@
-pyscal package
-=============
+pyscal Reference
+================
+
+.. toctree::
+
+   modules
 
 Submodules
 ----------
@@ -36,11 +40,3 @@ pyscal.pickle module
    :undoc-members:
    :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: pyscal
-   :members:
-   :undoc-members:
-   :show-inheritance:
