@@ -89,26 +89,26 @@ pygments_style = None
 #    'inner_theme_name': 'bootswatch-flatly',
 #}
 
-from better import better_theme_path
+#from better import better_theme_path
 
-html_theme_path = [better_theme_path]
-html_theme = 'better'
+#html_theme_path = [better_theme_path]
+#html_theme = 'better'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {
+#html_theme_options = {
     
-     'textcolor': '#263238',
-     'headtextcolor': '#37474F',
-     'cssfiles': ['_static/default.css'],
+#     'textcolor': '#263238',
+#     'headtextcolor': '#37474F',
+#     'cssfiles': ['_static/default.css'],
 
-}
+#}
 
-html_static_path = ['../_static']
-def setup(app):
-    app.add_stylesheet("default.css")
+#html_static_path = ['../_static']
+#def setup(app):
+#    app.add_stylesheet("default.css")
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -116,10 +116,10 @@ def setup(app):
 #html_static_path = ['../_static']
 
 #Set html_short_title to "Home" so the first breadcrumb says “Home” instead of your long project title:
-html_short_title = "Home"
-html_sidebars = {
-    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html', 'sidebarhelp.html', 'download.html'],
-}
+#html_short_title = "Home"
+#html_sidebars = {
+#    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html', 'sidebarhelp.html', 'download.html'],
+#}
 
 #font colors
 
@@ -127,8 +127,8 @@ html_sidebars = {
 #on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 #if not on_rtd:
 #        import sphinx_rtd_theme
-#html_theme = 'sphinx_rtd_theme'
-#html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
