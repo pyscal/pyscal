@@ -118,7 +118,7 @@ def setup(app):
 #Set html_short_title to "Home" so the first breadcrumb says “Home” instead of your long project title:
 html_short_title = "Home"
 html_sidebars = {
-    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html', 'sidebarhelp.html'],
+    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html', 'sidebarhelp.html', 'download.html'],
 }
 
 #font colors
