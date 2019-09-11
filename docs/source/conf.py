@@ -97,12 +97,27 @@ html_theme = 'better'
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    
+     'textcolor': '#212121',
+     'headtextcolor': '#263238',
+
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+#Set html_short_title to "Home" so the first breadcrumb says “Home” instead of your long project title:
+html_short_title = "Home"
+html_sidebars = {
+    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html'],
+}
+
+#font colors
+
+
 
 #on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 #if not on_rtd:
