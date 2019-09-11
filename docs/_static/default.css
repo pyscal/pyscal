@@ -1,0 +1,27 @@
+
+
+/* main styles */
+
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 100%;
+    color: {{ theme_textcolor }};
+    margin: 0;
+    padding: 0;
+    line-height: 135%;
+}
+
+a {
+    color: #880E4F;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #004D40;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+

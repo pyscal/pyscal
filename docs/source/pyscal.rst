@@ -2,7 +2,7 @@ pyscal Reference
 ================
 
 pyscal.core module
------------------
+------------------
 
 .. automodule:: pyscal.core
    :members:
@@ -10,7 +10,7 @@ pyscal.core module
    :show-inheritance:
 
 pyscal.crystal\_structures module
---------------------------------
+---------------------------------
 
 .. automodule:: pyscal.crystal_structures
    :members:
@@ -18,7 +18,7 @@ pyscal.crystal\_structures module
    :show-inheritance:
 
 pyscal.traj\_process module
---------------------------
+---------------------------
 
 .. automodule:: pyscal.traj_process
    :members:

@@ -48,7 +48,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ['../_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -90,6 +90,7 @@ pygments_style = None
 #}
 
 from better import better_theme_path
+
 html_theme_path = [better_theme_path]
 html_theme = 'better'
 
@@ -101,19 +102,19 @@ html_theme_options = {
     
      'textcolor': '#263238',
      'headtextcolor': '#37474F',
+     'cssfiles': ['_static/default.css'],
 
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+#html_static_path = ['../_static']
 
 #Set html_short_title to "Home" so the first breadcrumb says “Home” instead of your long project title:
 html_short_title = "Home"
 html_sidebars = {
-    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html'],
-    'index': ['searchbox.html'],	
+    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html', 'sidebarhelp.html'],
 }
 
 #font colors
