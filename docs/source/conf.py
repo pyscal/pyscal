@@ -99,8 +99,8 @@ html_theme = 'better'
 #
 html_theme_options = {
     
-     'textcolor': '#212121',
-     'headtextcolor': '#263238',
+     'textcolor': '#263238',
+     'headtextcolor': '#37474F',
 
 }
 
@@ -113,12 +113,13 @@ html_static_path = ['_static']
 html_short_title = "Home"
 html_sidebars = {
     '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html'],
+    'index': ['searchbox.html'],	
 }
 
 #font colors
 
 
-
+
 #on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 #if not on_rtd:
 #        import sphinx_rtd_theme

@@ -41,14 +41,20 @@ Highlights
 .. [3]  `Mickel, W, Kapfer, SC, Schroder-Turk, GE, Mecke, K, J Chem Phys 138, 2013 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.
 .. [4]  `Auer, S, Frenkel, D. Adv Polym Sci 173, 2005 <https://link.springer.com/chapter/10.1007/b99429>`_.
 
-First steps
------------
+Getting started
+---------------
 
 .. toctree::
     
     gettingstarted
+
+
+Examples
+--------
+
+.. toctree::
+
     examples
-    jupyter
 
 Methods
 -------
@@ -74,7 +80,19 @@ Support, contributing and extending
     extending
     helpandsupport
     common_issues
-    license
+    
+Credits
+-------
+
+.. toctree::
+
     citing
     acknowledgements
+
+License
+-------
+
+.. toctree::
+
+    license
 
