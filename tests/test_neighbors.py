@@ -15,7 +15,7 @@ def test_neighbors_system():
 
     #then lets find neighbors
     #cutoff method - first shell only
-    sys.get_neighbors(method = 'cutoff', cutoff=0.867)
+    sys.find_neighbors(method = 'cutoff', cutoff=0.867)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 8
@@ -23,20 +23,20 @@ def test_neighbors_system():
     sys.reset_neighbors()
 
     #cutoff method - second shell
-    sys.get_neighbors(method = 'cutoff', cutoff=1.1)
+    sys.find_neighbors(method = 'cutoff', cutoff=1.1)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 14
 
     #cutoff method - third shell
-    sys.get_neighbors(method = 'cutoff', cutoff=1.5)
+    sys.find_neighbors(method = 'cutoff', cutoff=1.5)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 26
 
     sys.reset_neighbors()
     #voronoi method - first shell only
-    sys.get_neighbors(method = 'voronoi')
+    sys.find_neighbors(method = 'voronoi')
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 14
@@ -51,7 +51,7 @@ def test_neighbors_system_filter():
     sys.assign_atoms(atoms, boxdims)
 
 
-    sys.get_neighbors(method = 'cutoff', cutoff=0.867)
+    sys.find_neighbors(method = 'cutoff', cutoff=0.867)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 8
@@ -70,7 +70,7 @@ def test_neighbors_system_filter():
     sys.set_atom(atoms[neighs[1]])
 
     #recalculate neighbors with filter
-    sys.get_neighbors(method = 'cutoff', cutoff=0.867, filter='type')
+    sys.find_neighbors(method = 'cutoff', cutoff=0.867, filter='type')
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 6

@@ -81,7 +81,7 @@ calculated as follows,
 
 .. code:: python
 
-    sys.get_neighbors(method='voronoi')
+    sys.find_neighbors(method='voronoi')
     sys.calculate_q([4, 6])
     q = sys.get_qvals([4, 6])
 
@@ -91,7 +91,7 @@ purpose.
 
 .. code:: python
 
-    sys.get_neighbors(method='voronoi')
+    sys.find_neighbors(method='voronoi')
     sys.calculate_q([4, 6], averaged=True)
     q = sys.get_qvals([4, 6], averaged=True)
 
@@ -102,7 +102,7 @@ during the neighbor calculation phase.
 
 .. code:: python
 
-    sys.get_neighbors(method='voronoi', voroexp=2)
+    sys.find_neighbors(method='voronoi', voroexp=2)
 
 If the value of ``voroexp`` is set to 0, the neighbors would be found
 using Voronoi method, but the calculated Steinhardt's parameters will

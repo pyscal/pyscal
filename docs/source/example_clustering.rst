@@ -29,7 +29,7 @@ neighbors can be found
 
     sys = pc.System()
     sys.read_inputfile('cluster.dump')
-    sys.get_neighbors(method='cutoff', cutoff=3.63)
+    sys.find_neighbors(method='cutoff', cutoff=3.63)
 
 Now, the neighbors are found. Next step is finding solid atoms. This can
 be done using ``System.find_solids`` method. There are few parameters
@@ -154,7 +154,7 @@ But first, set up system and find neighbors.
 
     sys = pc.System()
     sys.read_inputfile('cluster.dump')
-    sys.get_neighbors(method='cutoff', cutoff=3.63)
+    sys.find_neighbors(method='cutoff', cutoff=3.63)
 
 Now cluster
 

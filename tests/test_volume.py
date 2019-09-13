@@ -10,7 +10,7 @@ def test_q_2():
     sys = pc.System()
     sys.assign_atoms(atoms, boxdims)
     #sys.read_inputfile("tests/bcc.dat")
-    sys.get_neighbors(method = 'voronoi')
+    sys.find_neighbors(method = 'voronoi')
     atoms = sys.get_atoms()
     vols = []
     avgvols = []

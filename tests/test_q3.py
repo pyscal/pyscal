@@ -9,7 +9,7 @@ def test_q_3():
     sys = pc.System()
     sys.assign_atoms(atoms, boxdims)
     #sys.get_neighbors(method = 'voronoi')
-    sys.get_neighbors(method = 'cutoff', cutoff=0.9)
+    sys.find_neighbors(method = 'cutoff', cutoff=0.9)
     
     sys.calculate_q(3, averaged=True)
     q = sys.get_qvals(3, averaged=True)

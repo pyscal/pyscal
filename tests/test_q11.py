@@ -8,7 +8,7 @@ def test_q_11():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [4, 4, 4])
     sys = pc.System()
     sys.assign_atoms(atoms, boxdims)
-    sys.get_neighbors(method = 'voronoi')
+    sys.find_neighbors(method = 'voronoi')
 
     sys.calculate_q(11, averaged=True)
     q = sys.get_qvals(11, averaged=True)

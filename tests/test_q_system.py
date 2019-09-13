@@ -9,7 +9,7 @@ def test_q_4():
     sys = pc.System()
     sys.assign_atoms(atoms, boxdims)
     #sys.get_neighbors(method = 'voronoi')
-    sys.get_neighbors(method = 'cutoff', cutoff=0.9)
+    sys.find_neighbors(method = 'cutoff', cutoff=0.9)
     sys.calculate_q([4, 6], averaged=True)
     q = sys.get_qvals([4, 6], averaged=True)
     assert np.round(np.mean(np.array(q[0])), decimals=2) == 0.51 , "Calculated q4 value is wrong!"

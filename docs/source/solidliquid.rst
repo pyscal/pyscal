@@ -28,7 +28,7 @@ calculation of neighbors.
     import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
-    sys.get_neighbors(method='cutoff', cutoff=4)
+    sys.find_neighbors(method='cutoff', cutoff=4)
 
 Once again, there are various methods for finding neighbors. Please
 check

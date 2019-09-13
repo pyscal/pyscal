@@ -34,7 +34,7 @@ def test_pickle_system():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [1, 1, 1])
     sys = pc.System()
     sys.assign_atoms(atoms, boxdims)
-    sys.get_neighbors(method = 'voronoi')
+    sys.find_neighbors(method = 'voronoi')
 
     #test write and read system
     sys.to_file('tests/sy.npy')

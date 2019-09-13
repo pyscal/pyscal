@@ -10,7 +10,7 @@ def test_voro_props():
     sys = pc.System()
     sys.assign_atoms(atoms, boxdims)
 
-    sys.get_neighbors(method = 'voronoi')
+    sys.find_neighbors(method = 'voronoi')
     atoms = sys.get_atoms()
     atom = atoms[0]
     v = atom.get_vorovector()

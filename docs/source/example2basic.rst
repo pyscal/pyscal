@@ -52,7 +52,7 @@ cutoff distance of the host atom.
 
 .. code:: python
 
-    sys.get_neighbors(method='cutoff', cutoff=4.1)
+    sys.find_neighbors(method='cutoff', cutoff=4.1)
 
 Now lets get all the atoms.
 
@@ -84,7 +84,7 @@ neighbors (8 in the first shell and 6 in the second). It is important to note th
 
     sys = pc.System()
     sys.read_inputfile('conf.dump')
-    sys.get_neighbors(method='cutoff', cutoff=3.6)
+    sys.find_neighbors(method='cutoff', cutoff=3.6)
     atoms = sys.get_atoms()
 
 We can loop over all atoms and create a histogram of the results
@@ -123,7 +123,7 @@ adaptive algorithm
 
 .. code:: python
 
-    sys.get_neighbors(method='cutoff', cutoff='adaptive', padding=1.5)
+    sys.find_neighbors(method='cutoff', cutoff='adaptive', padding=1.5)
     atoms = sys.get_atoms()
     coord = [atom.get_coordination() for atom in atoms]
 
@@ -156,7 +156,7 @@ pyscal.
 
 .. code:: python
 
-    sys.get_neighbors(method='voronoi')
+    sys.find_neighbors(method='voronoi')
 
 Once again, lets get all atoms and find their coordination
 

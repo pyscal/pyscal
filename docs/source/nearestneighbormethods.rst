@@ -27,7 +27,7 @@ neighbors.
     import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
-    sys.get_neighbors(method='cutoff', cutoff=3)
+    sys.find_neighbors(method='cutoff', cutoff=3)
 
 Adaptive cutoff methods
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,7 +65,7 @@ algorithm can be used to find the neighbors by,
     import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
-    sys.get_neighbors(method='cutoff', cutoff='sann')
+    sys.find_neighbors(method='cutoff', cutoff='sann')
 
 Since SANN algorithm involves sorting, a sufficiently large cutoff is
 used in the beginning to reduce the number entries to be sorted. This
@@ -95,7 +95,7 @@ This method can be chosen by,
     import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
-    sys.get_neighbors(method='cutoff', cutoff='adaptive')
+    sys.find_neighbors(method='cutoff', cutoff='adaptive')
 
 The ``padding`` and ``nlimit`` parameters in the above equation can be
 tuned using the respective keywords.
@@ -115,7 +115,7 @@ Voronoi tessellation. Neighbors can be calculated using this method by,
     import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
-    sys.get_neighbors(method='voronoi')
+    sys.find_neighbors(method='voronoi')
 
 Finding neighbors using Voronoi tessellation also calculates a weight
 for each neighbor. The weight of a neighbor :math:`j` towards a host

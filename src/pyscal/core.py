@@ -30,13 +30,13 @@ class Atom(pc.Atom):
     can be accessed through member functions which are described below in detail. Atoms can
     be created individually or directly by reading in a file. Check the examples for more 
     details on how atoms are created. For creating atoms directly from an input file check
-    the documentation of `System` class.
+    the documentation of :class:`~System` class.
 
     Although an `Atom` object can be created independently, `Atom` should be thought of 
-    inherently as members of the `System` class. All the properties that define an atom are
-    relative to the `System` class. `System` has a list of all atoms using which the neighbors
+    inherently as members of the :class:`~System` class. All the properties that define an atom are
+    relative to the parent class. :class:`~System` has a list of all atoms using which the neighbors
     of an `Atom`, if its solid and so on can be calculated. All the calculated properties of an
-    atom which depend on any other atom, hence should be calculated through `System`. Please
+    atom which depend on any other atom, hence should be calculated through :class:`~System`. Please
     check the examples section of the documentation for more details. 
 
 
@@ -94,12 +94,12 @@ class Atom(pc.Atom):
     def set_pos(self, pos):
         """
         
-        Set the position of the ``Atom``. 
+        Set the position of the :class:`~Atom`. 
 
         Parameters
         ----------
         pos : list of floats of length 3
-            list contains three values which are the position coordinates of the `Atom` with
+            list contains three values which are the position coordinates of the atom with
             respect to the simulation box.
 
         Returns
@@ -200,7 +200,7 @@ class Atom(pc.Atom):
 
         Parameters
         ----------
-        averaged : bool  
+        averaged : bool, optional  
             If True, averaged version of the volume is returned, default False
         
         Returns
@@ -211,7 +211,8 @@ class Atom(pc.Atom):
         Notes
         -----
         Calculation of volume happens during the neighbor calculation method. Meaningful 
-        values are only returned if the neighbors are calculated using voronoi method.
+        values are only returned if the neighbors are calculated using voronoi method. See the
+
         If keyword `averaged` is set to True, the volume of an atom is calculated as an
         average over itself and its neighbors. 
 
@@ -324,7 +325,7 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        ``System.get_neighbors`` function has to be used before accessing coordination numbers.
+        ``System.find_neighbors`` function has to be used before accessing coordination numbers.
 
         Examples
         --------
@@ -351,7 +352,7 @@ class Atom(pc.Atom):
         -----
         The neighbor weights are used to weight the contribution of each neighboring atom towards the 
         q value of the host atom [1]_. By default, each neighbor has a weight of 1 each. 
-        However, if the neighbors are calculated using the  `System.get_neighbors(method='voronoi')`, each neighbor 
+        However, if the neighbors are calculated using the  `System.find_neighbors(method='voronoi')`, each neighbor 
         atom gets a weight proportional to the face area shared between the neighboring atom and the 
         host atom (or higher powers [2]_). This can sometimes be helpful in controlling the contribution 
         of atoms with low face areas due to the thermal vibrations at high temperature.
@@ -1076,7 +1077,7 @@ class System(pc.System):
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
 
-    def get_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, 
+    def find_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, 
                                             voroexp=1, face_cutoff=0.002, padding=1.2, nlimit=6):
         """
         
@@ -1268,7 +1269,7 @@ class System(pc.System):
         -----
         Enables calculation of the Steinhardt parameters q from 2-12. The type of
         q values depend on the method used to calculate neighbors. See the description
-        `System.get_neighbors` for more details. If the keyword `average` is set to True,
+        `System.find_neighbors` for more details. If the keyword `average` is set to True,
         the averaged versions of the bond order parameter [1]_ is returned.
 
         References
@@ -1342,7 +1343,7 @@ class System(pc.System):
         -----
         The number of solid atoms in liquid using method found in [1]_ and example 
         usage (not with this module) can be found in [2]_. The neighbors should be calculated
-        before running this function. Check `System.get_neighbors` method.
+        before running this function. Check `System.find_neighbors` method.
 
         `bonds` define the number of solid bond required for an atom to be considered solid.
         Two particles are said to be 'bonded' if,  
@@ -1367,7 +1368,7 @@ class System(pc.System):
         """
         #check if neighbors are found
         if not self.neighbors_found:
-            raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.get_neighbors.")
+            raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
         
         if not isinstance(bonds, int):
             raise TypeError("bonds should be interger value")

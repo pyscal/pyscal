@@ -42,9 +42,9 @@ cells. We will try both approaches, but start with the cutoff method.
 
 .. code:: python
 
-    bcc.get_neighbors(method='cutoff', cutoff=3.50)
-    fcc.get_neighbors(method='cutoff', cutoff=3.50)
-    hcp.get_neighbors(method='cutoff', cutoff=3.50)
+    bcc.find_neighbors(method='cutoff', cutoff=3.50)
+    fcc.find_neighbors(method='cutoff', cutoff=3.50)
+    hcp.find_neighbors(method='cutoff', cutoff=3.50)
 
 We have used a cutoff of 3 here, but this is a parameter that has to be
 tuned. Now we can calculate the :math:`q_4` and :math:`q_6` distributions
@@ -109,10 +109,10 @@ cutoff method
 
 .. code:: python
 
-    bcc.get_neighbors(method='cutoff', cutoff=3.50)
-    fcc.get_neighbors(method='cutoff', cutoff=3.50)
-    hcp.get_neighbors(method='cutoff', cutoff=3.50)
-    lqd.get_neighbors(method='cutoff', cutoff=3.50)
+    bcc.find_neighbors(method='cutoff', cutoff=3.50)
+    fcc.find_neighbors(method='cutoff', cutoff=3.50)
+    hcp.find_neighbors(method='cutoff', cutoff=3.50)
+    lqd.find_neighbors(method='cutoff', cutoff=3.50)
 
 And now, calculate q parameters
 
@@ -197,10 +197,10 @@ neighbors.
 
 .. code:: python
 
-    bcc.get_neighbors(method='voronoi')
-    fcc.get_neighbors(method='voronoi')
-    hcp.get_neighbors(method='voronoi')
-    lqd.get_neighbors(method='voronoi')
+    bcc.find_neighbors(method='voronoi')
+    fcc.find_neighbors(method='voronoi')
+    hcp.find_neighbors(method='voronoi')
+    lqd.find_neighbors(method='voronoi')
 
 We calculate q params and plot the values
 

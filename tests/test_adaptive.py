@@ -12,12 +12,12 @@ def test_neighbors_sann():
 
     #then lets find neighbors
     #SANN algo test
-    sys.get_neighbors(method = 'cutoff', cutoff='sann')
+    sys.find_neighbors(method = 'cutoff', cutoff='sann')
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 14
 
-    sys.get_neighbors(method = 'cutoff', cutoff='sann', threshold=1)
+    sys.find_neighbors(method = 'cutoff', cutoff='sann', threshold=1)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 14
@@ -40,7 +40,7 @@ def test_neighbors_adaptive():
 
     #then lets find neighbors
     #SANN algo test
-    sys.get_neighbors(method = 'cutoff', cutoff='adaptive')
+    sys.find_neighbors(method = 'cutoff', cutoff='adaptive')
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
     assert atoms[0].get_coordination() == 14

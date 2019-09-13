@@ -21,8 +21,10 @@ order to perform any calculations. It can be set up as easily as-
     sys = pc.System()
 
 ``sys`` is a ``System`` object. But at this point, it is completely
-empty. We have to populate the system with two major information- \* the
-simulation box dimensions \* the information regarding individual atoms.
+empty. We have to populate the system with two major information- 
+
+* the simulation box dimensions 
+* the information regarding individual atoms.
 
 | Let us try setting up a small system, which is the bcc unitcell of
   lattice constant 1. The simulation box dimensions of such a unit cell

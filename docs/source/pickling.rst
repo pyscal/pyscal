@@ -26,7 +26,7 @@ and :math:`\bar{q}_6` are also calculated.
 
 .. code:: python
 
-    sys.get_neighbors(method='cutoff', cutoff=3.6)
+    sys.find_neighbors(method='cutoff', cutoff=3.6)
     sys.calculate_q([4, 6], averaged=True)
 
 In order to prevent recalculation of neighbors, for example if later we
