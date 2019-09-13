@@ -25,7 +25,7 @@ calculation of neighbors.
 
 .. code:: python
 
-    import pybop.core as pc
+    import pyscal.core as pc
     sys = pc.System()
     sys.read_inputfile('conf.dump')
     sys.get_neighbors(method='cutoff', cutoff=4)

@@ -1,5 +1,5 @@
 
-Getting started with pybop
+Getting started with pyscal
 --------------------------
 
 This example illustrates basic functionality of pyscal python library by
