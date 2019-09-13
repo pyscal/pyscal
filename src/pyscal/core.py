@@ -196,7 +196,7 @@ class Atom(pc.Atom):
     def get_volume(self, averaged = False):
         """
         
-        Get the voronoi volume of the atom. 
+        Get the voronoi volume occupied by atom. 
 
         Parameters
         ----------
@@ -212,6 +212,7 @@ class Atom(pc.Atom):
         -----
         Calculation of volume happens during the neighbor calculation method. Meaningful 
         values are only returned if the neighbors are calculated using voronoi method. See the
+        :func:`~System.find_neighbors` method.
 
         If keyword `averaged` is set to True, the volume of an atom is calculated as an
         average over itself and its neighbors. 
@@ -241,16 +242,16 @@ class Atom(pc.Atom):
         -------
         cluster : list of int of length 4  
             `cluster` is a vector of four values. they are described below-  
-                `issolid` : which is 1 if the atom is solid, 0 otherwise  
-                `issurface` : 1 if the atom has liquid neighbors, 0 otherwise  
-                `lcluster` : 1 if the atom belongs to the largest cluster, 0 otherwise  
-                `belongsto` : which gives the id of the cluster that the atom belongs to.  
+                `issolid` : which is 1 if the atom is solid, 0 otherwise    
+                `issurface` : 1 if the atom has liquid neighbors, 0 otherwise    
+                `lcluster` : 1 if the atom belongs to the largest cluster, 0 otherwise    
+                `belongsto` : which gives the id of the cluster that the atom belongs to.    
         
         
         Notes
         -----
         The cluster properties of the atom include four different properties. The properties are only
-        returned if they are calculated before using ``calculate_nucsize`` function before.
+        returned if they are calculated before using :func:`~System.find_solids` function before.
 
         Examples
         --------
@@ -263,7 +264,7 @@ class Atom(pc.Atom):
     def get_neighbors(self):
         """
         
-        Returns the neighbors indices of the atom. 
+        Returns the neighbor indices of the atom. 
 
         Parameters
         ----------
@@ -276,9 +277,9 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        The list returned consistes of the indices
-        of neighbor atom which indicate their position in the list of all atoms. The neighbors
-        of an atom can be calculated from the ``System`` object that it belongs to.
+        The returned list consists of the indices
+        of neighbor atoms which indicate their position in the list of all atoms. The neighbors
+        of an atom can be calculated using :func:`~System.find_neighbors` object that it belongs to.
 
         Examples
         --------
@@ -325,7 +326,7 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        ``System.find_neighbors`` function has to be used before accessing coordination numbers.
+        :func:`~System.find_neighbors` function has to be used before accessing coordination numbers.
 
         Examples
         --------
@@ -352,7 +353,7 @@ class Atom(pc.Atom):
         -----
         The neighbor weights are used to weight the contribution of each neighboring atom towards the 
         q value of the host atom [1]_. By default, each neighbor has a weight of 1 each. 
-        However, if the neighbors are calculated using the  `System.find_neighbors(method='voronoi')`, each neighbor 
+        However, if the neighbors are calculated using the  :func:`~System.find_neighbors` using `method=voronoi`, each neighbor 
         atom gets a weight proportional to the face area shared between the neighboring atom and the 
         host atom (or higher powers [2]_). This can sometimes be helpful in controlling the contribution 
         of atoms with low face areas due to the thermal vibrations at high temperature.
@@ -400,7 +401,7 @@ class Atom(pc.Atom):
         q : int or list of int
             number of the required q - from 2-12
 
-        averaged : bool
+        averaged : bool, optional
             If True, return the averaged q values,
             If False, return the non averaged ones
             default False
@@ -455,9 +456,10 @@ class Atom(pc.Atom):
             number of the required q - from 2-12
         d : float or list of floats
             the q value to set
-        averaged : bool, default False  
+        averaged : bool, optional  
             If True, return the averaged q values,  
-            If False, return the non averaged ones            
+            If False, return the non averaged ones  
+            default False          
 
         Returns
         -------
@@ -543,7 +545,7 @@ class Atom(pc.Atom):
     def get_loc(self):
         """
 
-        get  the location of the atom in the array of all atoms in ``System``
+        get  the location of the atom in the array of all atoms in :class:`~System`
 
         Parameters
         ----------
@@ -570,7 +572,7 @@ class Atom(pc.Atom):
     def set_loc(self, idd):
         """
         
-        set  the ``loc`` of the atom. 
+        set  the `loc` of the atom. 
 
         Parameters
         ----------
@@ -583,8 +585,8 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        When an atom is put back in the ``System``, it will
-        be reset if another atom exists in that ``loc``
+        When an atom is put back in the :class:`~System`, it will
+        be reset if another atom exists in that `loc`
 
         Examples
         --------
@@ -597,7 +599,7 @@ class Atom(pc.Atom):
     def get_type(self):
         """
         
-        get  the ``type`` (species) of the atom.
+        get  the `type` (species) of the atom.
 
         Parameters
         ----------
@@ -655,8 +657,8 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        Returns a vector of the form ``(n3, n4, n5, n6)``, where ``n3`` is the number
-        of faces with 3 vertices, ``n4`` is the number of faces with 4
+        Returns a vector of the form `(n3, n4, n5, n6)`, where `n3` is the number
+        of faces with 3 vertices, `n4` is the number of faces with 4
         vertices and so on. This can be used to identify structures [1]_ [2]_.
 
         References
@@ -683,9 +685,9 @@ class Atom(pc.Atom):
         Notes
         -----
         Returns a vector with number of entries equal to the number of neighbors. 
-        The corresponding atom indices can be obtained through ``Atom.get_neighbors``
+        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
         A shorter version of this vector
-        in a condensed form is available through ``Atom.get_vorovector``.
+        in a condensed form is available through :func:`~Atom.get_vorovector`.
   
         """
         return pc.Atom.get_facevertices(self)
@@ -733,7 +735,7 @@ class System(pc.System):
         format : {'lammps-dump', 'poscar'}
             format of the input file
 
-        compressed : bool
+        compressed : bool, optional
             If True, force to read a `gz` compressed format, default False.
 
         frame : int
@@ -749,25 +751,25 @@ class System(pc.System):
         -----
         `format` keyword specifies the format of the input file. Currently only
         a `lammps-dump` and `poscar` files are supported. However, this restriction can easily 
-        be overcome using the `assign_particles` method from system where a list of atoms 
+        be overcome using the :func:`~System.assign_atoms` method from system where a list of atoms 
         and box vectors are directly provided to the system. This function itself uses the
-        `pyscal.traj_process` module to process a file which is then assigned to system
-        using `pyscal.core.assign_atoms`.
+        :func:`~pyscal.traj_process` module to process a file which is then assigned to system
+        using :func:`~System.assign_atoms`.
 
         `compressed` keyword is not required if a file ends with `.gz` extension, it is 
-        automatically treated as a compressed file and this keyword is not necessary.
+        automatically treated as a compressed file. 
 
         `frame` keyword allows to read in a particular slice from a long trajectory. If all slices
         need to analysed, this is a very inefficient way. For handling multiple time slices,
-        the `pyscal.traj_process` module offers a better set of tools.
+        the :func:`~pyscal.traj_process` module offers a better set of tools.
 
-        Triclinic simulation boxes can also be read in for lammps-dump. No special keyword is
+        Triclinic simulation boxes can also be read in for `lammps-dump`. No special keyword is
         necessary.
         
 
         See Also
         --------
-        assign_particles
+        assign_atoms
         """
         if format == 'lammps-dump':
             if frame != -1:
@@ -820,7 +822,7 @@ class System(pc.System):
     def assign_atoms(self, atoms, box):
         """
         
-        Assign atoms and box vectors to `System`. 
+        Assign atoms and box vectors to :class:`~System`. 
 
         Parameters
         ----------
@@ -837,9 +839,9 @@ class System(pc.System):
         Notes
         -----
         Receive a vector of atom objects which is stored instead
-        of reading in the input file. If this method is used, there is no need of using
-        `read_inputfile` method. Also using this function allows for reading of multiple
-        file formats which are not supported by the inbuilt `read_inputfile` method.
+        of reading in the input file. If this method is used, there is no need of using the
+        :func:`~System.read_inputfile` method. Also using this function allows for reading of multiple
+        file formats which are not supported by the inbuilt :func:`~System.read_inputfile` method.
 
         See Also
         --------
@@ -900,8 +902,8 @@ class System(pc.System):
     def get_atom(self, index):
         """
         
-        Get the `Atom` object at the queried position in the list of all atoms
-        in the `System`.
+        Get the :class:`~Atom` object at the queried position in the list of all atoms
+        in the :class:`~System`.
 
         Parameters
         ----------
@@ -934,13 +936,16 @@ class System(pc.System):
 
         Notes
         -----
-        For example, an `Atom` at location `i` in the list of all atoms in `System` can be queried by,
+        For example, an :class:`~Atom` at location `i` in the list of all atoms in :class:`System` can be queried by,
         ``atom = System.get_atom(i)``, then any kind of modification, for example, the 
         position of the `Atom` can done by, ``atom.set_pos([2.3, 4.5, 4.5])``. After 
         modification, the `Atom` can be set back to its position in `System` by
-        ``System.set_atom(atom)``.
-
-        If an atom already exists at that index in the list, it will be overwritten.
+        :func:`~System.set_atom`.
+        
+        .. warning::
+            
+            If an atom already exists at that index in the list, it will be overwritten and will
+            lead to loss of information.
         
         """
         atomc = self.copy_atom_to_catom(atom)
@@ -949,7 +954,7 @@ class System(pc.System):
     def get_atoms(self):
         """
         
-        Get a list of all `Atom` objects that belong to the system.
+        Get a list of all :class:`~Atom` objects that belong to the system.
 
         Parameters
         ----------
@@ -1081,7 +1086,7 @@ class System(pc.System):
                                             voroexp=1, face_cutoff=0.002, padding=1.2, nlimit=6):
         """
         
-        Find neighbors of all atoms in the `System`. 
+        Find neighbors of all atoms in the :class:`~System`. 
 
         Parameters
         ----------
@@ -1097,11 +1102,6 @@ class System(pc.System):
         threshold : float, optional
             only used if ``cutoff=adaptive``. A threshold which is used as safe limit for calculation of cutoff. 
 
-            Adaptive cutoff
-            uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
-            of a warning that ``threshold`` is inadequate, it should be further increased. High/low value
-            of this parameter will correspond to the time taken for finding neighbors.
-
         filter : {'None', 'type'}, optional
             apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
             `type`, only atoms of the same type would be included in the neighbor calculations. Default None.
@@ -1110,12 +1110,9 @@ class System(pc.System):
             only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards the q 
             values. Default 1. 
 
-            Higher powers can sometimes lead to better resolution. Works only with ``voronoi``
-            neighbour method. See  arXiv:1906.08111v1 for more details.
-
         face_cutoff : double, optional
             only used if ``method=voronoi``. The minimum fraction of total voronoi face area a single phase should have in order to
-            include it in the analysis of voronoi polyhedra to find (n_3, n_4, n_5, n_6) vector. Default 0.002
+            include it in the analysis of voronoi polyhedra to find `(n_3, n_4, n_5, n_6)` vector. Default 0.002
 
         padding : double, optional
             only used if ``cutoff=adaptive``. A safe padding value used after an adaptive cutoff is found. Default 1.2. 
@@ -1164,17 +1161,24 @@ class System(pc.System):
 
         The second approach is using Voronoi polyhedra. All the atoms that share a Voronoi polyhedra face with the host atoms are considered 
         its neighbors. A corresponding neighborweight is also assigned to each neighbor in the ratio of the face area between the two atoms.
-        This weight can later be used to weight steinhardt parameters. Higher powers of this weight can also be used. The keyword `voroexp`
+        This weight can later be used to weight steinhardt parameters. Higher powers of this weight can also be used [3]_. The keyword `voroexp`
         can be used to set this weight. If `voroexp` is set to 0, the neighbors would be calculated using Voronoi method, but Steinhardts
         parameters could be calculated normally.
 
         Keyword `filter` can be used to filter the neighbors based on a condition. Choosing ``filter='type'`` only considers an atom as
         a neighbor if both the neighbor atom and host atom are of the same type.
 
+        .. warning::
+
+            Adaptive cutoff uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
+            of a warning that ``threshold`` is inadequate, it should be further increased. High/low value
+            of this parameter will correspond to the time taken for finding neighbors.
+
         References
         ----------
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
         .. [2] van Meel, JA, Filion, L, Valeriani, C, Frenkel, D, J Chem Phys 234107, 2012
+        .. [3] Haeberle, J, Sperl, M, Born, P, arxiv 2019
 
         """
         #first reset all neighbors
@@ -1269,7 +1273,7 @@ class System(pc.System):
         -----
         Enables calculation of the Steinhardt parameters q from 2-12. The type of
         q values depend on the method used to calculate neighbors. See the description
-        `System.find_neighbors` for more details. If the keyword `average` is set to True,
+        :func:`~System.find_neighbors` for more details. If the keyword `average` is set to True,
         the averaged versions of the bond order parameter [1]_ is returned.
 
         References
@@ -1307,7 +1311,7 @@ class System(pc.System):
         Notes
         -----
         id is only available if the largest cluster has already
-        been found. Otherwise it returns the default values.
+        been found using the :func:`~System.find_solids` with keyword `cluster=True`. Otherwise it returns the default values.
 
         """
         return pc.System.get_largestcluster(self)
@@ -1337,13 +1341,14 @@ class System(pc.System):
         
         Returns
         -------
-        None
+        lc : int
+            Size of the largest cluster of solid atoms. Returned only if `cluster=True`.
 
         Notes
         -----
         The number of solid atoms in liquid using method found in [1]_ and example 
         usage (not with this module) can be found in [2]_. The neighbors should be calculated
-        before running this function. Check `System.find_neighbors` method.
+        before running this function. Check :func:`~System.find_neighbors` method.
 
         `bonds` define the number of solid bond required for an atom to be considered solid.
         Two particles are said to be 'bonded' if,  
@@ -1410,9 +1415,9 @@ class System(pc.System):
         Parameters
         ----------
         condition : callable
-            function which should take an `Atom` object, and give a True/False output
+            function which should take an :class:`~Atom` object, and give a True/False output
 
-        largest : bool
+        largest : bool, optional
             If True returns the size of the largest cluster. Default False.
 
         Returns
@@ -1424,8 +1429,8 @@ class System(pc.System):
         Notes
         -----
         This function helps to cluster atoms based on a defined property. This property
-        is defined by the user through the function `condition`. For each atom in the
-        system, the `condition` should give a True/False values. 
+        is defined by the user through the function `condition` which is passed as a parameter. 
+        For each atom in the system, the `condition` should give a True/False values. 
 
         When clustering happens, the code loops over each atom and its neighbors. If the
         host atom and the neighbor both have True value for `condition`, they are put
@@ -1436,10 +1441,7 @@ class System(pc.System):
 
             def condition(atom):
                 #if both atom is solid
-                if (atom1.get_solid() == 1):
-                    return True
-                else:
-                    return False
+                return (atom1.get_solid() == 1):
 
         Check examples for more details.
 
@@ -1494,6 +1496,11 @@ class System(pc.System):
         Calculation of the the size of the largest solid cluster needs various prerequisites that can be set
         by the functions `set_nucsize_parameters`.
 
+        .. warning::
+
+            This function is deprecated and will be removed in a future release. Please use
+            :func:`System.find_solids` instead.
+
         """
         #print("this raaan")
         warnings.simplefilter('always', DeprecationWarning)
@@ -1503,7 +1510,7 @@ class System(pc.System):
         pc.System.set_nucsize_parameters(self, frenkelnums, threshold, avgthreshold)
         return pc.System.calculate_nucsize(self)
 
-    def calculate_frenkelnumbers(self):
+    def calculate_solidneighbors(self):
         """
         Find Solid neighbors of all atoms in the system. 
 
@@ -1547,7 +1554,15 @@ class System(pc.System):
         To cluster based on any user defined criteria, you can use `set_solid` method of `Atom` to explicitely 
         set the `issolid` value. 
 
+        .. warning::
+
+            This function is deprecated and will be removed in a future release. Please use 
+            :func:`~System.cluster_atoms` instead.
+
         """
+        warnings.simplefilter('always', DeprecationWarning)
+        warnings.warn("This function is deprecated - use cluster_atoms instead", DeprecationWarning)
+
         if recursive:
             pc.System.find_clusters_recursive(self)
         else:    
@@ -1557,7 +1572,7 @@ class System(pc.System):
             cluster = pc.System.find_largest_cluster(self)
             return cluster            
 
-    def find_largest_cluster(self):
+    def find_largestcluster(self):
         """
         Find the largest solid cluster of atoms in the system from all the clusters. 
 
@@ -1572,7 +1587,7 @@ class System(pc.System):
 
         Notes
         -----
-        `find_clusters` has to be used before using this function.
+        :func:`System.find_clusters` has to be used before using this function.
 
         """
         return pc.System.find_largest_cluster(self)
@@ -1595,6 +1610,8 @@ class System(pc.System):
         -----
         This function is used to make sure that the user gets a python
         object rather than a C++ one.
+
+
 
         """
         atom = Atom()
@@ -1677,7 +1694,7 @@ class System(pc.System):
         Notes
         -----
         This function prepares the system object for pickling. From
-        a user perspective, the `System.to_file` method should be used
+        a user perspective, the :func:`~System.to_file` method should be used
         directly.
 
         See also
@@ -1725,12 +1742,16 @@ class System(pc.System):
 
         Notes
         -----
-        This function can be used to save a System object directly to
+        This function can be used to save a :class:`~System` object directly to
         file. This retains all the calculated quantities of the system,
         including the atoms and their properties. This can be useful to
         restart the calculation. The function uses `numpy.save` method
         to save the information. Hence pickling between different versions
-        of python could lead to issues.   
+        of python could lead to issues. 
+
+        .. warning::
+
+            Pickling between different versions of numpy or python could be incompatible. 
 
         """
         psys = self.prepare_pickle()
@@ -1753,7 +1774,13 @@ class System(pc.System):
         Notes
         -----
         This function can be used to set up a system
-        from a file.
+        from a file. A system needs to be created first.
+
+        Examples
+        --------
+
+        >>> sys = System()
+        >>> sys.from_file(filename)
 
         """
         if os.path.exists(file):
