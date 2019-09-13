@@ -1,5 +1,7 @@
 """
-This file contains the methods for processing of a trajectory
+pyscal module containing methods for processing of a trajectory. Methods for
+reading of input files formats, writing of output files etc are provided in 
+this module.
 
 """
 import pyscal.ccore as pc

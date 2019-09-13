@@ -1,5 +1,5 @@
 """
-Small module to create structures and so on
+pyscal module for creating crystal structures. 
 """
 
 import pyscal.ccore as pc

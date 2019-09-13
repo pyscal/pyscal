@@ -1,3 +1,10 @@
+"""
+pyscal module for pickling of System and Atom objects. This module contains
+pure python equivalents of C++/python hybrid classes of the same name. The
+pure python classes can store the same information and can be pickled to save
+the data. 
+"""
+
 import pyscal.ccore as pc
 #import pyscal.core as pcc
 import pyscal.traj_process as ptp
@@ -5,9 +12,6 @@ import os
 import numpy as np
 import warnings
 
-"""
-Pickling module for pyscal
-"""
 
 class Atom:
     """

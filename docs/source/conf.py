@@ -93,18 +93,24 @@ pygments_style = None
 
 #html_theme_path = [better_theme_path]
 #html_theme = 'better'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-#html_theme_options = {
+html_theme_options = {
     
-#     'textcolor': '#263238',
-#     'headtextcolor': '#37474F',
-#     'cssfiles': ['_static/default.css'],
+     'textcolor': '#263238',
+     'headtextcolor': '#37474F',
+     'cssfiles': ['_static/default.css'],
+     'fixed_sidebar': True,
+     'font_family': 'sans serif',
+     'github_banner': False,
+     'travis_button': True,
+     'sidebar_collapse': False,
 
-#}
+}
 
 #html_static_path = ['../_static']
 #def setup(app):

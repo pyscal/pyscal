@@ -1,3 +1,11 @@
+"""
+Main module of pyscal. This module contains definitions of the two major 
+classes in pyscal - the :class:`~System` and :class:`~Atom`. Both classes
+inherit the C++ classes of the same name and provide additional functionality
+by combining various methods, validation etc.
+
+"""
+
 import pyscal.ccore as pc
 import pyscal.traj_process as ptp
 import pyscal.pickle as pp
