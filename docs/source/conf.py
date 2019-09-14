@@ -82,6 +82,10 @@ pygments_style = None
 #
 #html_theme = 'basicstrap'
 
+html_theme_options = {
+    'logo_only' : True,
+}
+
 #html_theme_options = {
 #    'header_inverse': False,
 #    'relbar_inverse': False,
@@ -93,28 +97,30 @@ pygments_style = None
 
 #html_theme_path = [better_theme_path]
 #html_theme = 'better'
-html_theme = 'alabaster'
+#html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {
-    
-     'textcolor': '#263238',
-     'headtextcolor': '#37474F',
-     'cssfiles': ['_static/default.css'],
-     'fixed_sidebar': True,
-     'font_family': 'sans serif',
-     'github_banner': False,
-     'travis_button': True,
-     'sidebar_collapse': False,
+#html_theme_options = {
+#    
+#     'textcolor': '#263238',
+#     'headtextcolor': '#37474F',
+#     'cssfiles': ['_static/default.css'],
+#     'fixed_sidebar': True,
+#     'font_family': 'sans serif',
+#     'github_banner': False,
+#     'travis_button': True,
+#     'sidebar_collapse': False,#
 
-}
+#}
 
-#html_static_path = ['../_static']
-#def setup(app):
-#    app.add_stylesheet("default.css")
+html_static_path = ['../_static']
+def setup(app):
+    app.add_stylesheet("theme_extra.css")
+
+html_logo = "../_static/pyscal_logo1.png"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -130,11 +136,11 @@ html_theme_options = {
 #font colors
 
 
-#on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-#if not on_rtd:
-#        import sphinx_rtd_theme
-#html_theme = 'sphinx_rtd_theme'
-#html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if not on_rtd:
+        import sphinx_rtd_theme
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
