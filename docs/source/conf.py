@@ -14,6 +14,8 @@
 #
 import os
 import sys
+import sphinx_rtd_theme
+
 sys.path.insert(0, os.path.abspath('../../src/pyscal/'))
 
 
@@ -45,7 +47,16 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
+    'sphinx_rtd_theme',
 ]
+
+html_theme = 'sphinx_rtd_theme'
+#html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+
+html_logo = "../_static/pyscal_logo1.png"
+html_theme_options = {
+    'logo_only' : True,
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['../_templates']
@@ -132,16 +143,9 @@ def setup(app):
 #font colors
 
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if not on_rtd:
-        import sphinx_rtd_theme
-        html_theme = 'sphinx_rtd_theme'
-        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+#on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+#if not on_rtd:
 
-html_logo = "../_static/pyscal_logo1.png"
-html_theme_options = {
-    'logo_only' : True,
-}
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

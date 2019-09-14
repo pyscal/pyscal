@@ -56,11 +56,11 @@ li a, h1, h2, h3, h4 {
 }
 
 li a:hover {
-  background-color: #21618C;
-  color: white;
+  background-color: #B0BEC5;
+  color: #263238;
 }
 
 li a:hover:not(.active) {
-  background-color: #21618C;
-  color: white;
+  background-color: #B0BEC5;
+  color: #263238;
 }
