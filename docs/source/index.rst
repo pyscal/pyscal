@@ -56,6 +56,13 @@ Examples
 
     examples
 
+Download
+--------
+
+.. toctree::
+  
+    download
+
 Methods
 -------
 

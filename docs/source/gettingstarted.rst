@@ -5,6 +5,16 @@ Trying pyscal
 ----------------
 You can try some of the examples provided with pyscal without installing the package using binder. Please use `this link <https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples%2F>`_ to try the package. 
 
+Quick Installation
+------------------
+
+Quick installation can be useful when you have administrator privileges, for example, on your personal computer, laptop etc. It is recommended to directly clone the repository and set up an environment as discussed below. 
+
+* Download an archive of the pyscal library from `here <https://pyscal.readthedocs.io/en/latest/download.html>`.
+
+* Extract the downloaded version. From the extracted folder, run, ``python setup.py install``.
+ 
+
 Installation
 ------------
 
