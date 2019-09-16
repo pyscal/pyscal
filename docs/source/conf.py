@@ -58,6 +58,8 @@ html_theme_options = {
     'logo_only' : True,
 }
 
+html_extra_path = ['../_static']
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['../_templates']
 
