@@ -56,6 +56,7 @@ html_theme = 'sphinx_rtd_theme'
 html_logo = "../_static/pyscal_logo1.png"
 html_theme_options = {
     'logo_only' : True,
+    'canonical_url' : 'https://pyscal.readthedocs.io/',
 }
 
 html_extra_path = ['../_static']
