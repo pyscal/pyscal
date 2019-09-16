@@ -8,17 +8,15 @@ You can try some of the examples provided with pyscal without installing the pac
 Quick Installation
 ------------------
 
-Quick installation can be useful when you have administrator privileges, for example, on your personal computer, laptop etc. It is recommended to directly clone the repository and set up an environment as discussed below. 
+Quick installation can be useful when you have administrator privileges, for example, on your personal computer, laptop etc. It is recommended to directly clone the repository and set up an environment as discussed in the `Installation from the repository section <https://pyscal.readthedocs.io/en/latest/gettingstarted.html#installation-from-the-repository>`_
 
-* Download an archive of the pyscal library from `here <https://pyscal.readthedocs.io/en/latest/download.html>`.
+* Download an archive of the pyscal library from `here <https://pyscal.readthedocs.io/en/latest/download.html>`_.
 
 * Extract the downloaded version. From the extracted folder, run, ``python setup.py install``.
- 
 
-Installation
-------------
 
-**From the repository**
+Installation from the repository
+--------------------------------
 
 Dependencies for the C++ part  
 
