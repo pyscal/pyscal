@@ -210,9 +210,6 @@ void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> box
             } 
         }
 
-        for (int tn = 0; tn<4; tn++){
-            atom.vorovector[tn] = -1;
-        }
         atoms.emplace_back(atom);
         
     }
@@ -487,10 +484,10 @@ void System::get_all_neighbors_voronoi(){
     double r,theta,phi;
     int i;
     int ti,id,tnx,tny,tnz;
-    int n3, n4, n5, n6;
+
     double rx,ry,rz,tsum, fa, x, y, z, vol;
-    vector<int> neigh,f_vert;
-    vector<double> facearea, v;
+    vector<int> neigh,f_vert, vert_nos;
+    vector<double> facearea, v, faceperimeters;
     voronoicell_neighbor c;
     vector< vector<double> > nweights;
     vector< vector<int> > nneighs;
@@ -515,7 +512,10 @@ void System::get_all_neighbors_voronoi(){
             c.face_areas(facearea);
             c.neighbors(neigh);
             c.face_orders(f_vert);
+            c.face_vertices(vert_nos);
             c.vertices(x,y,z,v);
+            c.face_perimeters(faceperimeters);
+
             vol = c.volume();
             tsum = 0;
             vector <double> dummyweights;
@@ -527,38 +527,11 @@ void System::get_all_neighbors_voronoi(){
             	weightsum += facearea[i];
             }
             
-            //find vertices index
-            n3 = 0;
-            n4 = 0;
-            n5 = 0;
-            n6 = 0;
-
-            for(int i=0; i<f_vert.size(); i++){
-                if ((facearea[i]/weightsum) < face_cutoff){
-                    continue;
-                }
-
-                if (f_vert[i] == 3){
-                    n3++;
-                }
-                else if (f_vert[i] == 4){
-                    n4++;
-                }
-                else if (f_vert[i] == 5){
-                    n5++;
-                }
-                else if (f_vert[i] == 6){
-                    n6++;
-                }
-            }
 
             //assign to nvector
-            //nvector.clear();
-            atoms[ti].vorovector[0] = n3;
-            atoms[ti].vorovector[1] = n4;
-            atoms[ti].vorovector[2] = n5;
-            atoms[ti].vorovector[3] = n6;
             atoms[ti].volume = vol;
+            atoms[ti].vertex_vectors = v;
+            atoms[ti].vertex_numbers = vert_nos;
             //assign to the atom
             //atoms[ti].vorovector = nvector;
 
@@ -581,6 +554,7 @@ void System::get_all_neighbors_voronoi(){
                 //weight is set to 1.0, unless manually reset
                 atoms[ti].neighborweight[tj] = pow(facearea[tj], alpha)/weightsum;
                 atoms[ti].facevertices[tj] = f_vert[tj];
+                atoms[ti].faceperimeters[tj] = faceperimeters[tj];
                 atoms[ti].n_diffx[tj] = diffx;
                 atoms[ti].n_diffy[tj] = diffy;
                 atoms[ti].n_diffz[tj] = diffz;
@@ -1731,18 +1705,33 @@ vector<int> Atom::gfacevertices(){
     return rqlms;
 }
 
-
-vector<int> Atom::gvorovector(){
-    vector <int> voro;
-    for(int i=0; i<4; i++){
-        voro.emplace_back(vorovector[i]);
-    }
-    return voro;
+void Atom::svertex_numbers(vector<int> nss){
+    vertex_numbers = nss;
 }
 
-void Atom::svorovector(vector<int> voro){
-    for(int i=0; i<4; i++){
-        vorovector[i] = voro[i];
+vector<int> Atom::gvertex_numbers(){
+    return vertex_numbers;
+}
+
+void Atom::svertex_vectors(vector<double> nss){
+    vertex_vectors = nss;
+}
+
+vector<double> Atom::gvertex_vectors(){
+    return vertex_vectors;
+}
+
+void Atom::sfaceperimeters(vector<double> nss){
+    for(int i=0; i<nss.size(); i++){
+        faceperimeters[i] = nss[i];
     }
+}
+
+vector<double> Atom::gfaceperimeters(){
+    vector <double> rqlms;
+    for(int i=0; i<n_neighbors; i++){
+        rqlms.emplace_back(faceperimeters[i]);
+    }
+    return rqlms;
 }
 

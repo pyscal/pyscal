@@ -71,6 +71,8 @@ class Atom{
         double neighbordist[MAXNUMBEROFNEIGHBORS];
         double neighborweight[MAXNUMBEROFNEIGHBORS];
         int facevertices[MAXNUMBEROFNEIGHBORS];
+        int faceverticenumbers[MAXNUMBEROFNEIGHBORS];
+        double faceperimeters[MAXNUMBEROFNEIGHBORS];
         double n_diffx[MAXNUMBEROFNEIGHBORS];
         double n_diffy[MAXNUMBEROFNEIGHBORS];
         double n_diffz[MAXNUMBEROFNEIGHBORS];
@@ -78,6 +80,15 @@ class Atom{
         double n_phi[MAXNUMBEROFNEIGHBORS];
         double n_theta[MAXNUMBEROFNEIGHBORS];
         int n_neighbors;
+
+        //vertex vectors
+        vector<double> vertex_vectors;
+        vector<int> vertex_numbers;
+        vector<double> gvertex_vectors();
+        void svertex_vectors(vector<double>);
+        vector<int> gvertex_numbers();
+        void svertex_numbers(vector<int>);
+
 
 
         double realQ6[13],imgQ6[13];
@@ -122,6 +133,8 @@ class Atom{
         vector<int> gneighbors();
         vector<int> gfacevertices();
         void sfacevertices(vector<int>);
+        vector<double> gfaceperimeters();
+        void sfaceperimeters(vector<double>);
 
         int gnneighbors();
         void sneighborweights(vector<double> nns);
@@ -167,11 +180,6 @@ class Atom{
         vector <double> custom;
         void scustom(vector <double>);
         vector<double> gcustom();
-
-        //for vorocell identification
-        int vorovector[4];
-        vector<int> gvorovector();
-        void svorovector(vector<int>);
 
         void scondition(int);
         int gcondition();

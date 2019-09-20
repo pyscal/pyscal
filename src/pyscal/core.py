@@ -650,13 +650,14 @@ class Atom(pc.Atom):
             raise ValueError("type value should be integer")
 
 
-    def get_vorovector(self):
+    def get_vorovector(self, cutoff=1E-3):
         """
         get the voronoi structure identification vector. 
 
         Parameters
         ----------
-        None
+        cutoff : float, optional
+            minimum edge length required for an edge to be considered
 
         Returns
         -------
@@ -675,7 +676,51 @@ class Atom(pc.Atom):
         .. [2] Tanemura, M, Hiwatari, Y, Matsuda, H,Ogawa, T, Ogita, N, Ueda, A. Prog. Theor. Phys. 58, 1977
 
         """
-        return pc.Atom.get_vorovector(self)
+        #get the list of vertice numbers of all possible faces
+        face_vertices = pc.Atom.get_facevertices(self)
+
+        #now get the vertex nos - essentially the vertices that make up each face
+        vertex_nos = pc.Atom.get_vertexnumbers(self)
+        #get position of vertices
+        vertex_pos = pc.Atom.get_vertexvectors(self)
+
+        #start looping over and eliminating short edges
+        st = 1
+        refined_edges = []
+
+        for vno in face_vertices:
+
+            vphase = vertex_nos[st:st+vno]
+            edgecount = 0
+            
+            #now calculate the length f each edge
+            for i in range(-1, len(vphase)-1):
+                #get pairs of indices
+                #verts are i, i+1
+                ipos = vertex_pos[vphase[i]*3:vphase[i]*3+3]
+                jpos = vertex_pos[vphase[i+1]*3:vphase[i+1]*3+3]
+                
+                #now calculate edge length
+                edgeln = np.sqrt((ipos[0]-jpos[0])**2 + (ipos[1]-jpos[1])**2 + (ipos[2]-jpos[2])**2) 
+                
+                if edgeln > 1E-3:
+                    edgecount+=1
+            refined_edges.append(edgecount)        
+            st += (vno+1)
+
+        #now loop over refined edges and collect n3, n4, n5, n6
+        vorovector = np.zeros(4) 
+
+        for ed in refined_edges:
+            try:
+                vorovector[ed-3] += 1
+            except:
+                #if not 3,4,5,6, then ignore
+                pass
+
+        return vorovector
+
+
 
     def get_facevertices(self):
         """
@@ -699,6 +744,69 @@ class Atom(pc.Atom):
   
         """
         return pc.Atom.get_facevertices(self)
+
+    def get_faceperimeters(self):
+        """
+        get the lengths of voronoi faces shared between an atom and its neighbors. 
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        faceperimeters : array like, float
+            array of the faceperimeters
+
+        Notes
+        -----
+        Returns a vector with number of entries equal to the number of neighbors. 
+        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
+  
+        """
+        return pc.Atom.get_faceperimeters(self)
+
+    def get_vertexnumbers(self):
+        """
+        get the lengths of voronoi faces shared between an atom and its neighbors. 
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        faceperimeters : array like, float
+            array of the faceperimeters
+
+        Notes
+        -----
+        Returns a vector with number of entries equal to the number of neighbors. 
+        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
+  
+        """
+        return pc.Atom.get_vertexnumbers(self)
+
+    def get_vertexvectors(self):
+        """
+        get the lengths of voronoi faces shared between an atom and its neighbors. 
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        faceperimeters : array like, float
+            array of the faceperimeters
+
+        Notes
+        -----
+        Returns a vector with number of entries equal to the number of neighbors. 
+        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
+  
+        """
+        return pc.Atom.get_vertexvectors(self)
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -1638,6 +1746,9 @@ class System(pc.System):
         atom.set_volume(atomc.get_volume())
         atom.set_avgvolume(atomc.get_avgvolume())
         atom.set_facevertices(atomc.get_facevertices())
+        atom.set_faceperimeters(atomc.get_faceperimeters())
+        atom.set_vertexnumbers(atomc.get_vertexnumbers())
+        atom.set_vertexvectors(atomc.get_vertexvectors())
         atom.set_condition(atomc.get_condition())
         atom.set_avgconnection(atomc.get_avgconnection())
         atom.set_bonds(atomc.get_bonds())
@@ -1680,6 +1791,9 @@ class System(pc.System):
         atomc.set_volume(atom.get_volume())
         atomc.set_avgvolume(atom.get_avgvolume())
         atomc.set_facevertices(atom.get_facevertices())
+        atomc.set_faceperimeters(atom.get_faceperimeters())
+        atomc.set_vertexnumbers(atom.get_vertexnumbers())
+        atomc.set_vertexvectors(atom.get_vertexvectors())
         atomc.set_condition(atom.get_condition())
         atomc.set_avgconnection(atom.get_avgconnection())
         atomc.set_bonds(atom.get_bonds())

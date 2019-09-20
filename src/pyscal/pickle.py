@@ -35,6 +35,7 @@ class Atom:
         self.volume = None
         self.avgvolume = None
         self.facevertices = None
+        self.faceperimeters = None
         self.condition = None
         self.bonds = None
         self.avgconnection = None
@@ -69,6 +70,7 @@ def pickle_atom(atom):
     patom.volume = atom.get_volume()
     patom.avgvolume = atom.get_avgvolume()
     patom.facevertices = atom.get_facevertices()
+    patom.faceperimeters = atom.get_faceperimeters()
     patom.condition = atom.get_condition()
     patom.bonds = atom.get_bonds()
     patom.avgconnection = atom.get_avgconnection()
@@ -104,6 +106,7 @@ def unpickle_atom(patom):
     atomc.set_volume(patom.volume)
     atomc.set_avgvolume(patom.avgvolume)
     atomc.set_facevertices(patom.facevertices)
+    atomc.set_faceperimeters(patom.faceperimeters)
     atomc.set_condition(patom.condition)
     atomc.set_bonds(patom.bonds)
     atomc.set_avgconnection(patom.avgconnection)
