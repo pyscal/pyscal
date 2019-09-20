@@ -709,7 +709,7 @@ class Atom(pc.Atom):
             st += (vno+1)
 
         #now loop over refined edges and collect n3, n4, n5, n6
-        vorovector = np.zeros(4) 
+        vorovector = [0, 0, 0, 0] 
 
         for ed in refined_edges:
             try:
@@ -1741,7 +1741,7 @@ class System(pc.System):
         atom.set_id(atomc.get_id())
         atom.set_loc(atomc.get_loc())
         atom.set_type(atomc.get_type())
-        atom.set_vorovector(atomc.get_vorovector())
+        #atom.set_vorovector(atomc.get_vorovector())
         atom.set_volume(atomc.get_volume())
         atom.set_avgvolume(atomc.get_avgvolume())
         atom.set_facevertices(atomc.get_facevertices())
@@ -1786,7 +1786,7 @@ class System(pc.System):
         atomc.set_id(atom.get_id())
         atomc.set_loc(atom.get_loc())
         atomc.set_type(atom.get_type())
-        atomc.set_vorovector(atom.get_vorovector())
+        #atomc.set_vorovector(atom.get_vorovector())
         atomc.set_volume(atom.get_volume())
         atomc.set_avgvolume(atom.get_avgvolume())
         atomc.set_facevertices(atom.get_facevertices())

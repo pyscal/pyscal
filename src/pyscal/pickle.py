@@ -31,7 +31,7 @@ class Atom:
         self.id = None
         self.loc = None
         self.type = None
-        self.vorovector = None
+        #self.vorovector = None
         self.volume = None
         self.avgvolume = None
         self.facevertices = None
@@ -66,7 +66,7 @@ def pickle_atom(atom):
     patom.id = atom.get_id()
     patom.loc = atom.get_loc()
     patom.type = atom.get_type()
-    patom.vorovector = atom.get_vorovector()
+    #patom.vorovector = atom.get_vorovector()
     patom.volume = atom.get_volume()
     patom.avgvolume = atom.get_avgvolume()
     patom.facevertices = atom.get_facevertices()
@@ -102,7 +102,7 @@ def unpickle_atom(patom):
     atomc.set_id(patom.id)
     atomc.set_loc(patom.loc)
     atomc.set_type(patom.type)
-    atomc.set_vorovector(patom.vorovector)
+    #atomc.set_vorovector(patom.vorovector)
     atomc.set_volume(patom.volume)
     atomc.set_avgvolume(patom.avgvolume)
     atomc.set_facevertices(patom.facevertices)
