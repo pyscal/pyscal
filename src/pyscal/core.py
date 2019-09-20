@@ -721,19 +721,24 @@ class Atom(pc.Atom):
         return vorovector
 
 
-
-    def get_facevertices(self):
+    def get_facevertices(self, vertice_number = False, face_parameters = False):
         """
         get the number of vertices of the voronoi face shared between an atom and its neighbors. 
         
         Parameters
         ----------
-        None
+        vertice_numbers : bool, optional
+            If True, provide a list of vertice numbers - ie, for each face, a list of vertice
+            numbers that make up the face is given.
 
         Returns
         -------
         facevertices : array like, int
             array of the vertices
+
+        vertice_nos : list of list
+            list of vertice numbers that constitute each face, returned only if `vertice_numbers`
+            is True.
 
         Notes
         -----
@@ -743,11 +748,38 @@ class Atom(pc.Atom):
         in a condensed form is available through :func:`~Atom.get_vorovector`.
   
         """
-        return pc.Atom.get_facevertices(self)
+        #get the basic property
+        face_vertices = pc.Atom.get_facevertices(self)
+        
 
-    def get_faceperimeters(self):
+        #get face perimeter properties
+        if face_parameters:
+            
+            face_perimeters = pc.Atom.get_faceperimeters(self)
+            
+            #get vertice number properties
+            vertice_numbers = []
+            st = 1
+
+            if vertice_number:
+                #get the unrefined list
+                v_nos = pc.Atom.get_vertexnumbers(self)
+                #loop over and get the list
+                for vno in face_vertices:
+                    vphase = vertex_nos[st:st+vno]
+                    #append it to the list
+                    vertice_numbers.append(vphase)
+                    st += (vno+1)
+
+            return face_vertices, face_perimeters, vertice_numbers
+
+        else:
+            return face_vertices
+
+
+    def get_verticepositions(self):
         """
-        get the lengths of voronoi faces shared between an atom and its neighbors. 
+        get the vertex positions of of all vertices of the voronoi polyhde
         
         Parameters
         ----------
@@ -764,49 +796,16 @@ class Atom(pc.Atom):
         The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
   
         """
-        return pc.Atom.get_faceperimeters(self)
+        v_pos = pc.Atom.get_vertexvectors(self)
+        face_vertices = pc.Atom.get_facevertices(self)
+        vertex_positions = []
+            
+        for i in range(len(facevertices)):
+            pos = v_pos[i*3:i*3+3]
+            vertex_positions.append(pos)
 
-    def get_vertexnumbers(self):
-        """
-        get the lengths of voronoi faces shared between an atom and its neighbors. 
-        
-        Parameters
-        ----------
-        None
+        return vertex_positions
 
-        Returns
-        -------
-        faceperimeters : array like, float
-            array of the faceperimeters
-
-        Notes
-        -----
-        Returns a vector with number of entries equal to the number of neighbors. 
-        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
-  
-        """
-        return pc.Atom.get_vertexnumbers(self)
-
-    def get_vertexvectors(self):
-        """
-        get the lengths of voronoi faces shared between an atom and its neighbors. 
-        
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        faceperimeters : array like, float
-            array of the faceperimeters
-
-        Notes
-        -----
-        Returns a vector with number of entries equal to the number of neighbors. 
-        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
-  
-        """
-        return pc.Atom.get_vertexvectors(self)
 
 #------------------------------------------------------------------------------------------------------------
 """
