@@ -650,14 +650,21 @@ class Atom(pc.Atom):
             raise ValueError("type value should be integer")
 
 
-    def get_vorovector(self, cutoff=1E-3):
+    def get_vorovector(self, edge_cutoff=0.05, area_cutoff=0.01, edge_length=False):
         """
         get the voronoi structure identification vector. 
 
         Parameters
         ----------
-        cutoff : float, optional
-            minimum edge length required for an edge to be considered
+        edge_cutoff : float, optional
+            cutoff for edge length. Default 0.05.
+
+
+        area_cutoff : float, optional
+            cutoff for face area. Default 0.01.
+
+        edge_length : bool, optional
+            if True, a list of unrefined edge lengths are returned. Default false.
 
         Returns
         -------
@@ -670,6 +677,11 @@ class Atom(pc.Atom):
         of faces with 3 vertices, `n4` is the number of faces with 4
         vertices and so on. This can be used to identify structures [1]_ [2]_.
 
+        The keywords `edge_cutoff` and `area_cutoff` can be used to tune the values to minimise
+        the effect of thermal distortions. Edges are only considered in the analysis if the 
+        `edge_length/sum(edge_lengths)` is at least `edge_cutoff`. Similarly, faces are only 
+        considered in the analysis if the  `face_area/sum(face_areas)` is at least `face_cutoff`.
+
         References
         ----------
         .. [1] Finney, JL, Proc. Royal Soc. Lond. A 319, 1970
@@ -678,6 +690,7 @@ class Atom(pc.Atom):
         """
         #get the list of vertice numbers of all possible faces
         face_vertices = pc.Atom.get_facevertices(self)
+        neighbor_weights = pc.Atom.get_neighborweights(self)
 
         #now get the vertex nos - essentially the vertices that make up each face
         vertex_nos = pc.Atom.get_vertexnumbers(self)
@@ -687,11 +700,13 @@ class Atom(pc.Atom):
         #start looping over and eliminating short edges
         st = 1
         refined_edges = []
+        edge_lengths = []
 
         for vno in face_vertices:
 
             vphase = vertex_nos[st:st+vno]
             edgecount = 0
+            dummy_edge_lengths = []
             
             #now calculate the length f each edge
             for i in range(-1, len(vphase)-1):
@@ -702,50 +717,63 @@ class Atom(pc.Atom):
                 
                 #now calculate edge length
                 edgeln = np.sqrt((ipos[0]-jpos[0])**2 + (ipos[1]-jpos[1])**2 + (ipos[2]-jpos[2])**2) 
+                dummy_edge_lengths.append(edgeln)
                 
-                if edgeln > 1E-3:
-                    edgecount+=1
-            refined_edges.append(edgecount)        
+            edge_lengths.append(dummy_edge_lengths)        
             st += (vno+1)
+
+        #now all the edge lengths are saved
+        for c, ed in enumerate(edge_lengths):
+            #normalise the edge lengths
+            norm = (ed/np.sum(ed))
+            #apply face area cutoff
+            if (neighbor_weights[c] > area_cutoff):
+                #check for edge length cutoff
+                edgecount = len([cc for cc,x in enumerate(norm) if x > edge_cutoff])
+                refined_edges.append(edgecount)
 
         #now loop over refined edges and collect n3, n4, n5, n6
         vorovector = [0, 0, 0, 0] 
 
         for ed in refined_edges:
-            try:
-                vorovector[ed-3] += 1
-            except:
-                #if not 3,4,5,6, then ignore
-                pass
+            if ed == 3:
+                vorovector[0] += 1
+            elif ed == 4:
+                vorovector[1] += 1
+            elif ed == 5:
+                vorovector[2] += 1
+            elif ed == 6:
+                vorovector[3] += 1
+        
+        if edge_length:
+            return vorovector, edge_lengths
+        else:
+            return vorovector
 
-        return vorovector
 
-
-    def get_facevertices(self, vertice_number = False, face_parameters = False):
+    def get_facevertices(self, face_parameters = False):
         """
         get the number of vertices of the voronoi face shared between an atom and its neighbors. 
         
         Parameters
         ----------
-        vertice_numbers : bool, optional
-            If True, provide a list of vertice numbers - ie, for each face, a list of vertice
-            numbers that make up the face is given.
+        face_parameters : bool, optional
+            If True, provide a list of two additional quantities - a list of face perimeters and 
+            vertice numbers.
 
         Returns
         -------
         facevertices : array like, int
             array of the vertices
+        
+        face_perimeters : array like, float
+            a list of perimeters of each face, returned only if `face_parameters` is True.
 
-        vertice_nos : list of list
-            list of vertice numbers that constitute each face, returned only if `vertice_numbers`
-            is True.
+        vertice_numbers : list of list of int
+            list of vertice numbers that constitute each face, returned only if `face_parameters`
+            is True. A list of the positions of these vertices can be obtained using the
+            :func:`~Atom.get_verticepositions` method.
 
-        Notes
-        -----
-        Returns a vector with number of entries equal to the number of neighbors. 
-        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
-        A shorter version of this vector
-        in a condensed form is available through :func:`~Atom.get_vorovector`.
   
         """
         #get the basic property
@@ -761,15 +789,14 @@ class Atom(pc.Atom):
             vertice_numbers = []
             st = 1
 
-            if vertice_number:
-                #get the unrefined list
-                v_nos = pc.Atom.get_vertexnumbers(self)
-                #loop over and get the list
-                for vno in face_vertices:
-                    vphase = vertex_nos[st:st+vno]
-                    #append it to the list
-                    vertice_numbers.append(vphase)
-                    st += (vno+1)
+            #get the unrefined list
+            v_nos = pc.Atom.get_vertexnumbers(self)
+            #loop over and get the list
+            for vno in face_vertices:
+                vphase = face_vertices[st:st+vno]
+                #append it to the list
+                vertice_numbers.append(vphase)
+                st += (vno+1)
 
             return face_vertices, face_perimeters, vertice_numbers
 
@@ -779,7 +806,7 @@ class Atom(pc.Atom):
 
     def get_verticepositions(self):
         """
-        get the vertex positions of of all vertices of the voronoi polyhde
+        get the vertex positions of of all vertices of the voronoi polyhedra.
         
         Parameters
         ----------
@@ -787,14 +814,8 @@ class Atom(pc.Atom):
 
         Returns
         -------
-        faceperimeters : array like, float
-            array of the faceperimeters
+        None
 
-        Notes
-        -----
-        Returns a vector with number of entries equal to the number of neighbors. 
-        The corresponding atom indices can be obtained through :func:`~Atom.get_neighbors`
-  
         """
         v_pos = pc.Atom.get_vertexvectors(self)
         face_vertices = pc.Atom.get_facevertices(self)
