@@ -6,29 +6,6 @@ import pyscal.crystal_structures as pcs
 import pyscal.pickle as pp
 
 
-def test_pickle_atoms():
-
-    sys = pc.System()
-    sys.read_inputfile('tests/conf.dump')
-    atoms = sys.get_atoms()
-
-    #pickle and unpickel atom
-    rn = np.random.randint(0, len(atoms)-1)
-    patom = pp.pickle_atom(atoms[rn])
-    assert patom.pos == atoms[rn].get_x()
-    uatom = pp.unpickle_atom(patom)
-    #assert uatom.get_x() == atoms[0].get_x()
-
-    #pickle array of atoms
-    pp.write_atoms('tests/pk.npy', atoms)
-    ratoms = pp.read_atoms('tests/pk.npy')
-
-    assert len(ratoms) == len(atoms)
-    assert ratoms[rn].get_x() == atoms[rn].get_x()
-
-    if os.path.exists('tests/pk.npy'):
-        os.remove('tests/pk.npy')
-
 
 def test_pickle_system():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [1, 1, 1])
@@ -48,7 +25,7 @@ def test_pickle_system():
     patoms = psys.get_atoms()
 
     rn = np.random.randint(0, len(satoms)-1)
-    assert satoms[rn].get_neighbors() == patoms[rn].get_neighbors()
+    assert satoms[rn].neighbors == patoms[rn].neighbors
 
     if os.path.exists('tests/sy.npy'):
         os.remove('tests/sy.npy')
@@ -61,6 +38,3 @@ def test_pickle_system():
 
     #if os.path.exists('tests/sys.npy'):
     #    os.remove('tests/sys.npy')
-
-
-

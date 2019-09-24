@@ -33,13 +33,13 @@ def test_create_multislice_dump():
     sys3 = pc.System()
     sys3.read_inputfile("tests/bcc3.dat", frame=1)
     atoms = sys3.get_atoms()
-    assert atoms[0].get_x() == [0.01,0,0]    
+    assert atoms[0].pos == [0.01,0,0]
 
     #now this file should have info of both - read it in
     sys4 = pc.System()
     sys4.read_inputfile("tests/bcc3.dat", frame=0)
     atoms = sys4.get_atoms()
-    assert atoms[0].get_x() == [0.0,0,0]
+    assert atoms[0].pos == [0.0,0,0]
 
     #now cleanup
     os.remove("tests/bcc3.dat")
@@ -74,7 +74,7 @@ def test_customvals_dump():
 
     #clean up
     if os.path.exists("tests/bcc4.dat"):
-        os.remove("tests/bcc4.dat")    
+        os.remove("tests/bcc4.dat")
 
     #test for multiple customvals
     customks = ['one', 'two']
@@ -101,8 +101,4 @@ def test_customvals_dump():
 
     #clean up
     if os.path.exists("tests/bcc4.dat"):
-        os.remove("tests/bcc4.dat")    
-
-
-
-
+        os.remove("tests/bcc4.dat")

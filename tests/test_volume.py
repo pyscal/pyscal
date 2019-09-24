@@ -15,7 +15,7 @@ def test_q_2():
     vols = []
     avgvols = []
     for atom in atoms:
-        vols.append(atom.get_volume())
-        avgvols.append(atom.get_volume(averaged=True))
+        vols.append(atom.volume)
+        avgvols.append(atom.avg_volume)
     assert np.mean(np.array(vols)) == 0.5
     assert np.mean(np.array(avgvols)) == 0.5

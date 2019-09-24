@@ -18,7 +18,7 @@ def test_neighbors_system():
     sys.find_neighbors(method = 'cutoff', cutoff=0.867)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
-    assert atoms[0].get_coordination() == 8
+    assert atoms[0].coordination == 8
 
     sys.reset_neighbors()
 
@@ -26,20 +26,20 @@ def test_neighbors_system():
     sys.find_neighbors(method = 'cutoff', cutoff=1.1)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
-    assert atoms[0].get_coordination() == 14
+    assert atoms[0].coordination == 14
 
     #cutoff method - third shell
     sys.find_neighbors(method = 'cutoff', cutoff=1.5)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
-    assert atoms[0].get_coordination() == 26
+    assert atoms[0].coordination == 26
 
     sys.reset_neighbors()
     #voronoi method - first shell only
     sys.find_neighbors(method = 'voronoi')
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
-    assert atoms[0].get_coordination() == 14
+    assert atoms[0].coordination == 14
 
     assert np.round(sys.get_distance(atoms[0], atoms[1]), decimals=2) == 0.87
 
@@ -54,15 +54,15 @@ def test_neighbors_system_filter():
     sys.find_neighbors(method = 'cutoff', cutoff=0.867)
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
-    assert atoms[0].get_coordination() == 8
+    assert atoms[0].coordination == 8
 
     #now we take all the neighbors of atom0 and replace half of
     #them with a different type
-    neighs = atoms[0].get_neighbors()
+    neighs = atoms[0].neighbors
 
     #replace the neighs
-    atoms[neighs[0]].set_type(2)
-    atoms[neighs[1]].set_type(2)
+    atoms[neighs[0]].type = 2
+    atoms[neighs[1]].type = 2
 
     #now set these atoms back
     #for atom in atoms:
@@ -73,5 +73,4 @@ def test_neighbors_system_filter():
     sys.find_neighbors(method = 'cutoff', cutoff=0.867, filter='type')
     #any atom should have 8 neighbors
     atoms = sys.get_atoms()
-    assert atoms[0].get_coordination() == 6
-
+    assert atoms[0].coordination == 6

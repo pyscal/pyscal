@@ -23,10 +23,10 @@ def test_system_read():
 
     #check box
     assert sys.get_box() == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
-    
+
     #check few atoms
-    filtered_atoms = [ atom for atom in atoms if atom.get_id() == 204]
-    assert filtered_atoms[0].get_x() == [-0.10301, -6.35752, -6.44787]
+    filtered_atoms = [ atom for atom in atoms if atom.id == 204]
+    assert filtered_atoms[0].pos == [-0.10301, -6.35752, -6.44787]
 
     #now check the same for zipped file
     sys = pc.System()
@@ -36,10 +36,10 @@ def test_system_read():
 
     #check box
     assert sys.get_box() == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
-    
+
     #check few atoms
-    filtered_atoms = [ atom for atom in atoms if atom.get_id() == 204]
-    assert filtered_atoms[0].get_x() == [-0.10301, -6.35752, -6.44787]
+    filtered_atoms = [ atom for atom in atoms if atom.id == 204]
+    assert filtered_atoms[0].pos == [-0.10301, -6.35752, -6.44787]
     #del sys
 #@profile
 def test_system_atom_access():
@@ -48,12 +48,10 @@ def test_system_atom_access():
     sys = pc.System()
     sys.assign_atoms(atoms, boxdims)
     atom = sys.get_atom(0)
-    assert atom.get_x() == [0, 0, 0]
+    assert atom.pos == [0, 0, 0]
 
-    atom.set_x([0.1, 0.1, 0.1])
+    atom.pos = [0.1, 0.1, 0.1]
     sys.set_atom(atom)
     atom = sys.get_atom(0)
-    assert atom.get_x() == [0.1, 0.1, 0.1]    
+    assert atom.pos == [0.1, 0.1, 0.1]
     #del sys
-
-
