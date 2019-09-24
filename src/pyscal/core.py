@@ -1,5 +1,5 @@
 """
-Main module of pyscal. This module contains definitions of the two major 
+Main module of pyscal. This module contains definitions of the two major
 classes in pyscal - the :class:`~System` and :class:`~Atom`. Both classes
 inherit the C++ classes of the same name and provide additional functionality
 by combining various methods, validation etc.
@@ -36,16 +36,16 @@ class Atom(pc.Atom):
     -----
     A c++ class for holding the properties of a single atom. Various properties of the atom
     can be accessed through member functions which are described below in detail. Atoms can
-    be created individually or directly by reading in a file. Check the examples for more 
+    be created individually or directly by reading in a file. Check the examples for more
     details on how atoms are created. For creating atoms directly from an input file check
     the documentation of :class:`~System` class.
 
-    Although an `Atom` object can be created independently, `Atom` should be thought of 
+    Although an `Atom` object can be created independently, `Atom` should be thought of
     inherently as members of the :class:`~System` class. All the properties that define an atom are
     relative to the parent class. :class:`~System` has a list of all atoms using which the neighbors
     of an `Atom`, if its solid and so on can be calculated. All the calculated properties of an
     atom which depend on any other atom, hence should be calculated through :class:`~System`. Please
-    check the examples section of the documentation for more details. 
+    check the examples section of the documentation for more details.
 
 
     Examples
@@ -56,14 +56,15 @@ class Atom(pc.Atom):
     >>> atom.set_x([23.0, 45.2, 34.2])
     >>> #now set id
     >>> atom.set_id(23)
-    
+
     """
     def __init__(self, pos=[0,0,0], id=0, type=1):
         """
         Deafults args
         """
         a=1
-        pc.Atom.__init__(self)     
+        self.custom = {}
+        pc.Atom.__init__(self)
         pc.Atom.set_x(self, pos)
         pc.Atom.set_id(self, id)
         pc.Atom.set_type(self, type)
@@ -71,19 +72,19 @@ class Atom(pc.Atom):
     #now wrapping for other normal functions
     def get_pos(self):
         """
-        
-        Get the position of the `Atom`. 
+
+        Get the position of the `Atom`.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         pos : array of float
             contains the position of the atom in the form `[posx, posy, posz]`, where
-            `posx` is the x coordinate of the atom, `posy` is the y coordinate and `posz` 
-            is the z coordinate. 
+            `posx` is the x coordinate of the atom, `posy` is the y coordinate and `posz`
+            is the z coordinate.
 
         Notes
         -----
@@ -94,15 +95,15 @@ class Atom(pc.Atom):
         --------
         >>> atom = Atom()
         >>> x = atom.get_pos()
-      
+
         """
         x = pc.Atom.get_x(self)
         return x
 
     def set_pos(self, pos):
         """
-        
-        Set the position of the :class:`~Atom`. 
+
+        Set the position of the :class:`~Atom`.
 
         Parameters
         ----------
@@ -141,7 +142,7 @@ class Atom(pc.Atom):
         -------
         issolid : int
             1 if solid, 0 otherwise
-        
+
         """
         return pc.Atom.get_solid(self)
 
@@ -155,9 +156,9 @@ class Atom(pc.Atom):
 
         Returns
         -------
-        structure : int  
+        structure : int
             structural value
-        
+
         Notes
         -----
         As of now it is not calculated using any inbuilt function. This can be used to store
@@ -172,7 +173,7 @@ class Atom(pc.Atom):
 
         Parameters
         ----------
-        issolid : {0, 1} 
+        issolid : {0, 1}
             1 if the atom is set to solid, 0 otherwise
 
         Returns
@@ -180,7 +181,7 @@ class Atom(pc.Atom):
         None
 
         """
-        if int(issolid) in [0, 1]: 
+        if int(issolid) in [0, 1]:
             pc.Atom.set_solid(self, int(issolid))
         else:
             raise ValueError("Value of issolid should be either 0 or 1")
@@ -191,7 +192,7 @@ class Atom(pc.Atom):
 
         Parameters
         ----------
-        structure : int 
+        structure : int
             structure of the atom
 
         Returns
@@ -203,14 +204,14 @@ class Atom(pc.Atom):
 
     def get_volume(self, averaged = False):
         """
-        
-        Get the voronoi volume occupied by atom. 
+
+        Get the voronoi volume occupied by atom.
 
         Parameters
         ----------
-        averaged : bool, optional  
+        averaged : bool, optional
             If True, averaged version of the volume is returned, default False
-        
+
         Returns
         -------
         volume : float
@@ -218,44 +219,44 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        Calculation of volume happens during the neighbor calculation method. Meaningful 
+        Calculation of volume happens during the neighbor calculation method. Meaningful
         values are only returned if the neighbors are calculated using voronoi method. See the
         :func:`~System.find_neighbors` method.
 
         If keyword `averaged` is set to True, the volume of an atom is calculated as an
-        average over itself and its neighbors. 
+        average over itself and its neighbors.
 
         Examples
         --------
         >>> volume = atom.get_volume()
 
-  
+
         """
         if averaged:
             vol = pc.Atom.get_avgvolume(self)
-        else:    
+        else:
             vol = pc.Atom.get_volume(self)
-        
+
         return vol
 
     def get_cluster(self):
         """
-        Get the cluster properties of the atom. 
+        Get the cluster properties of the atom.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
-        cluster : list of int of length 4  
-            `cluster` is a vector of four values. they are described below-  
-                `issolid` : which is 1 if the atom is solid, 0 otherwise    
-                `issurface` : 1 if the atom has liquid neighbors, 0 otherwise    
-                `lcluster` : 1 if the atom belongs to the largest cluster, 0 otherwise    
-                `belongsto` : which gives the id of the cluster that the atom belongs to.    
-        
-        
+        cluster : list of int of length 4
+            `cluster` is a vector of four values. they are described below-
+                `issolid` : which is 1 if the atom is solid, 0 otherwise
+                `issurface` : 1 if the atom has liquid neighbors, 0 otherwise
+                `lcluster` : 1 if the atom belongs to the largest cluster, 0 otherwise
+                `belongsto` : which gives the id of the cluster that the atom belongs to.
+
+
         Notes
         -----
         The cluster properties of the atom include four different properties. The properties are only
@@ -271,13 +272,13 @@ class Atom(pc.Atom):
 
     def get_neighbors(self):
         """
-        
-        Returns the neighbor indices of the atom. 
+
+        Returns the neighbor indices of the atom.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         x : list of int
@@ -298,14 +299,14 @@ class Atom(pc.Atom):
 
     def set_neighbors(self, neighs):
         """
-        
+
         Set the neighbors of an atom manually.
 
         Parameters
         ----------
         neighs : list of ints
-            index of the neighbor atoms 
-        
+            index of the neighbor atoms
+
         Returns
         -------
         None
@@ -320,13 +321,13 @@ class Atom(pc.Atom):
 
     def get_coordination(self):
         """
-        
-        Returns the coordination number of the atom.  
+
+        Returns the coordination number of the atom.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         cn : int
@@ -345,13 +346,13 @@ class Atom(pc.Atom):
 
     def get_neighborweights(self):
         """
-        
-        Get the neighbor weights of the atom. 
-        
+
+        Get the neighbor weights of the atom.
+
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         x : list of float
@@ -359,13 +360,13 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        The neighbor weights are used to weight the contribution of each neighboring atom towards the 
-        q value of the host atom [1]_. By default, each neighbor has a weight of 1 each. 
-        However, if the neighbors are calculated using the  :func:`~System.find_neighbors` using `method=voronoi`, each neighbor 
-        atom gets a weight proportional to the face area shared between the neighboring atom and the 
-        host atom (or higher powers [2]_). This can sometimes be helpful in controlling the contribution 
+        The neighbor weights are used to weight the contribution of each neighboring atom towards the
+        q value of the host atom [1]_. By default, each neighbor has a weight of 1 each.
+        However, if the neighbors are calculated using the  :func:`~System.find_neighbors` using `method=voronoi`, each neighbor
+        atom gets a weight proportional to the face area shared between the neighboring atom and the
+        host atom (or higher powers [2]_). This can sometimes be helpful in controlling the contribution
         of atoms with low face areas due to the thermal vibrations at high temperature.
-        
+
         References
         ----------
         .. [1] Mickel, W, Kapfer, SC, Schroder-Turk, GE, Mecke, K, J Chem Phys 138, 2013
@@ -381,14 +382,14 @@ class Atom(pc.Atom):
 
     def set_neighborweights(self, weights):
         """
-        
+
         Set the neighbor weights of an atom.
 
         Parameters
         ----------
-        weights : list of floats 
-            weights of the neighbor atoms 
-        
+        weights : list of floats
+            weights of the neighbor atoms
+
         Returns
         -------
         None
@@ -402,7 +403,7 @@ class Atom(pc.Atom):
 
     def get_q(self, q, averaged = False):
         """
-        get q value of the atom. 
+        get q value of the atom.
 
         Parameters
         ----------
@@ -456,7 +457,7 @@ class Atom(pc.Atom):
 
     def set_q(self, q, d, averaged = False):
         """
-        set the q value of the atom. 
+        set the q value of the atom.
 
         Parameters
         ----------
@@ -464,10 +465,10 @@ class Atom(pc.Atom):
             number of the required q - from 2-12
         d : float or list of floats
             the q value to set
-        averaged : bool, optional  
-            If True, return the averaged q values,  
-            If False, return the non averaged ones  
-            default False          
+        averaged : bool, optional
+            If True, return the averaged q values,
+            If False, return the non averaged ones
+            default False
 
         Returns
         -------
@@ -510,7 +511,7 @@ class Atom(pc.Atom):
 
     def get_id(self):
         """
-        
+
         get  the id of the atom.
 
         Parameters
@@ -531,7 +532,7 @@ class Atom(pc.Atom):
 
     def set_id(self, idd):
         """
-        
+
         set  the id of the atom.
 
         Parameters
@@ -566,7 +567,7 @@ class Atom(pc.Atom):
 
         Notes
         -----
-        `loc` and `id` are different. The id of the atom is read in from the 
+        `loc` and `id` are different. The id of the atom is read in from the
         input file. `loc` however is the position of the atom in the list of
         all atoms of the system.
 
@@ -579,8 +580,8 @@ class Atom(pc.Atom):
 
     def set_loc(self, idd):
         """
-        
-        set  the `loc` of the atom. 
+
+        set  the `loc` of the atom.
 
         Parameters
         ----------
@@ -606,7 +607,7 @@ class Atom(pc.Atom):
 
     def get_type(self):
         """
-        
+
         get  the `type` (species) of the atom.
 
         Parameters
@@ -627,7 +628,7 @@ class Atom(pc.Atom):
 
     def set_type(self, tt):
         """
-        
+
         set  the type of the atom.
 
         Parameters
@@ -652,7 +653,7 @@ class Atom(pc.Atom):
 
     def get_vorovector(self, edge_cutoff=0.05, area_cutoff=0.01, edge_length=False):
         """
-        get the voronoi structure identification vector. 
+        get the voronoi structure identification vector.
 
         Parameters
         ----------
@@ -668,7 +669,7 @@ class Atom(pc.Atom):
 
         Returns
         -------
-        vorovector : array like, int  
+        vorovector : array like, int
             array of the form (n3, n4, n5, n6)
 
         Notes
@@ -678,8 +679,8 @@ class Atom(pc.Atom):
         vertices and so on. This can be used to identify structures [1]_ [2]_.
 
         The keywords `edge_cutoff` and `area_cutoff` can be used to tune the values to minimise
-        the effect of thermal distortions. Edges are only considered in the analysis if the 
-        `edge_length/sum(edge_lengths)` is at least `edge_cutoff`. Similarly, faces are only 
+        the effect of thermal distortions. Edges are only considered in the analysis if the
+        `edge_length/sum(edge_lengths)` is at least `edge_cutoff`. Similarly, faces are only
         considered in the analysis if the  `face_area/sum(face_areas)` is at least `face_cutoff`.
 
         References
@@ -707,19 +708,19 @@ class Atom(pc.Atom):
             vphase = vertex_nos[st:st+vno]
             edgecount = 0
             dummy_edge_lengths = []
-            
+
             #now calculate the length f each edge
             for i in range(-1, len(vphase)-1):
                 #get pairs of indices
                 #verts are i, i+1
                 ipos = vertex_pos[vphase[i]*3:vphase[i]*3+3]
                 jpos = vertex_pos[vphase[i+1]*3:vphase[i+1]*3+3]
-                
+
                 #now calculate edge length
-                edgeln = np.sqrt((ipos[0]-jpos[0])**2 + (ipos[1]-jpos[1])**2 + (ipos[2]-jpos[2])**2) 
+                edgeln = np.sqrt((ipos[0]-jpos[0])**2 + (ipos[1]-jpos[1])**2 + (ipos[2]-jpos[2])**2)
                 dummy_edge_lengths.append(edgeln)
-                
-            edge_lengths.append(dummy_edge_lengths)        
+
+            edge_lengths.append(dummy_edge_lengths)
             st += (vno+1)
 
         #now all the edge lengths are saved
@@ -733,7 +734,7 @@ class Atom(pc.Atom):
                 refined_edges.append(edgecount)
 
         #now loop over refined edges and collect n3, n4, n5, n6
-        vorovector = [0, 0, 0, 0] 
+        vorovector = [0, 0, 0, 0]
 
         for ed in refined_edges:
             if ed == 3:
@@ -744,7 +745,7 @@ class Atom(pc.Atom):
                 vorovector[2] += 1
             elif ed == 6:
                 vorovector[3] += 1
-        
+
         if edge_length:
             return vorovector, edge_lengths
         else:
@@ -753,19 +754,19 @@ class Atom(pc.Atom):
 
     def get_facevertices(self, face_parameters = False):
         """
-        get the number of vertices of the voronoi face shared between an atom and its neighbors. 
-        
+        get the number of vertices of the voronoi face shared between an atom and its neighbors.
+
         Parameters
         ----------
         face_parameters : bool, optional
-            If True, provide a list of two additional quantities - a list of face perimeters and 
+            If True, provide a list of two additional quantities - a list of face perimeters and
             vertice numbers.
 
         Returns
         -------
         facevertices : array like, int
             array of the vertices
-        
+
         face_perimeters : array like, float
             a list of perimeters of each face, returned only if `face_parameters` is True.
 
@@ -774,17 +775,17 @@ class Atom(pc.Atom):
             is True. A list of the positions of these vertices can be obtained using the
             :func:`~Atom.get_verticepositions` method.
 
-  
+
         """
         #get the basic property
         face_vertices = pc.Atom.get_facevertices(self)
-        
+
 
         #get face perimeter properties
         if face_parameters:
-            
+
             face_perimeters = pc.Atom.get_faceperimeters(self)
-            
+
             #get vertice number properties
             vertice_numbers = []
             st = 1
@@ -807,7 +808,7 @@ class Atom(pc.Atom):
     def get_verticepositions(self):
         """
         get the vertex positions of of all vertices of the voronoi polyhedra.
-        
+
         Parameters
         ----------
         None
@@ -820,7 +821,7 @@ class Atom(pc.Atom):
         v_pos = pc.Atom.get_vertexvectors(self)
         face_vertices = pc.Atom.get_facevertices(self)
         vertex_positions = []
-            
+
         for i in range(len(facevertices)):
             pos = v_pos[i*3:i*3+3]
             vertex_positions.append(pos)
@@ -837,7 +838,7 @@ System class definitions
 
 class System(pc.System):
     """
-    A c++ class for holding the properties of a system. 
+    A c++ class for holding the properties of a system.
 
     Notes
     -----
@@ -857,12 +858,14 @@ class System(pc.System):
         #this method can be done more
         #we can remove checks on the cpp side
         pc.System.__init__(self)
+        self.customkeys = None
+        self.customvals = None
 
-    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False):
+    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
         """
-        
+
         Read input file containing the information of a time slice.
-        
+
         Parameters
         ----------
         filename : string
@@ -876,8 +879,12 @@ class System(pc.System):
 
         frame : int
             If the trajectory contains more than one time slice, the slice can be specified
-            using the `frame` option. 
-            Alert: works only with `lammps-dump` format. 
+            using the `frame` option.
+            Alert: works only with `lammps-dump` format.
+
+        customkeys : list
+            A list containing names of headers of extra data that needs to be read in from the
+            input file.
 
         Returns
         -------
@@ -886,14 +893,14 @@ class System(pc.System):
         Notes
         -----
         `format` keyword specifies the format of the input file. Currently only
-        a `lammps-dump` and `poscar` files are supported. However, this restriction can easily 
-        be overcome using the :func:`~System.assign_atoms` method from system where a list of atoms 
+        a `lammps-dump` and `poscar` files are supported. However, this restriction can easily
+        be overcome using the :func:`~System.assign_atoms` method from system where a list of atoms
         and box vectors are directly provided to the system. This function itself uses the
         :func:`~pyscal.traj_process` module to process a file which is then assigned to system
         using :func:`~System.assign_atoms`.
 
-        `compressed` keyword is not required if a file ends with `.gz` extension, it is 
-        automatically treated as a compressed file. 
+        `compressed` keyword is not required if a file ends with `.gz` extension, it is
+        automatically treated as a compressed file.
 
         `frame` keyword allows to read in a particular slice from a long trajectory. If all slices
         need to analysed, this is a very inefficient way. For handling multiple time slices,
@@ -901,26 +908,35 @@ class System(pc.System):
 
         Triclinic simulation boxes can also be read in for `lammps-dump`. No special keyword is
         necessary.
-        
+
+        If `custom_keys` are provided, this extra information is read in from input files if
+        available. This information is not passed to the C++ instance of atom, and is stored
+        as a dictionary. It can be accessed directly as `atom.custom['customval']`
 
         See Also
         --------
         assign_atoms
         """
         if format == 'lammps-dump':
+            #check customkeys and assign a variable
+            customread = (len(customkeys) > 0)
+
             if frame != -1:
                 #split the traj and returns set of filenames
                 filenames = ptp.split_traj_lammps_dump(filename, compressed=compressed)
-                
+
                 #reassign filename
                 try:
                     filename = filenames[frame]
                 except:
                     raise FileNotFoundError("frame %d is not found in the trajectory"%frame)
-                
+
                 #now if file exists
                 if os.path.exists(filename):
-                    atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
+                    if customread:
+                        atoms, boxdims, box, triclinic, customvals = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                    else:
+                        atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
                     pc.System.assign_particles(self, atoms, boxdims)
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
@@ -929,13 +945,16 @@ class System(pc.System):
                         pc.System.assign_triclinic_params(self, rot, rotinv)
                 else:
                     raise FileNotFoundError("input file %s not found"%filename)
-                
+
                 #now remove filenames
                 for file in filenames:
                     os.remove(file)
 
             elif os.path.exists(filename):
-                atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
+                if customread:
+                    atoms, boxdims, box, triclinic, customvals = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                else:
+                    atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
                 pc.System.assign_particles(self, atoms, boxdims)
                 if triclinic:
                     #we have to input rotation matrix and the inverse rotation matrix
@@ -944,6 +963,8 @@ class System(pc.System):
                     pc.System.assign_triclinic_params(self, rot, rotinv)
             else:
                 raise FileNotFoundError("input file %s not found"%filename)
+
+
 
         elif format == 'poscar':
             if os.path.exists(filename):
@@ -957,8 +978,8 @@ class System(pc.System):
 
     def assign_atoms(self, atoms, box):
         """
-        
-        Assign atoms and box vectors to :class:`~System`. 
+
+        Assign atoms and box vectors to :class:`~System`.
 
         Parameters
         ----------
@@ -988,14 +1009,14 @@ class System(pc.System):
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
         """
-        Calculate the radial distribution function. 
+        Calculate the radial distribution function.
 
         Parameters
         ----------
         histobins : int
             number of bins in the histogram
         histomin : float, optional
-            minimum value of the distance histogram. Default 0.0. 
+            minimum value of the distance histogram. Default 0.0.
 
         histomax : float, optional
             maximum value of the distance histogram. Default, the maximum value
@@ -1037,7 +1058,7 @@ class System(pc.System):
 
     def get_atom(self, index):
         """
-        
+
         Get the :class:`~Atom` object at the queried position in the list of all atoms
         in the :class:`~System`.
 
@@ -1058,8 +1079,8 @@ class System(pc.System):
 
     def set_atom(self, atom):
         """
-        
-        Return the atom to its original location after modification. 
+
+        Return the atom to its original location after modification.
 
         Parameters
         ----------
@@ -1073,23 +1094,23 @@ class System(pc.System):
         Notes
         -----
         For example, an :class:`~Atom` at location `i` in the list of all atoms in :class:`System` can be queried by,
-        ``atom = System.get_atom(i)``, then any kind of modification, for example, the 
-        position of the `Atom` can done by, ``atom.set_pos([2.3, 4.5, 4.5])``. After 
+        ``atom = System.get_atom(i)``, then any kind of modification, for example, the
+        position of the `Atom` can done by, ``atom.set_pos([2.3, 4.5, 4.5])``. After
         modification, the `Atom` can be set back to its position in `System` by
         :func:`~System.set_atom`.
-        
+
         .. warning::
-            
+
             If an atom already exists at that index in the list, it will be overwritten and will
             lead to loss of information.
-        
+
         """
         atomc = self.copy_atom_to_catom(atom)
         pc.System.set_atom(self, atomc)
 
     def get_atoms(self):
         """
-        
+
         Get a list of all :class:`~Atom` objects that belong to the system.
 
         Parameters
@@ -1107,7 +1128,7 @@ class System(pc.System):
 
     def get_box(self, box_vectors=False):
         """
-        
+
         Get the dimensions of the simulation box.
 
         Parameters
@@ -1134,7 +1155,7 @@ class System(pc.System):
 
     def set_box(self, box):
         """
-        
+
         Set the dimensions of the simulation box.
 
         Parameters
@@ -1151,16 +1172,16 @@ class System(pc.System):
 
     def get_qvals(self, q, averaged = False):
         """
-        Get the required q values of all atoms. 
+        Get the required q values of all atoms.
 
         Parameters
         ----------
         q : int or list of ints
             required q value from 2-12
-        
+
         averaged : bool, optional
             If True, return the averaged q values,
-            If False, return the non averaged ones 
+            If False, return the non averaged ones
             default False
 
         Returns
@@ -1170,7 +1191,7 @@ class System(pc.System):
 
         Notes
         -----
-        The function returns a list of 
+        The function returns a list of
         q values in the same order as that of the atoms in the system.
 
         """
@@ -1205,24 +1226,24 @@ class System(pc.System):
                 first atom
         atom2 : `Atom` object
                 second atom
-        
+
         Returns
         -------
         distance : double
                 distance between the first and second atom.
-        
+
         """
-        
+
         atom1c = self.copy_atom_to_catom(atom1)
         atom2c = self.copy_atom_to_catom(atom2)
         return pc.System.get_absdistance(self, atom1c, atom2c)
 
 
-    def find_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None, 
+    def find_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None,
                                             voroexp=1, face_cutoff=0.002, padding=1.2, nlimit=6):
         """
-        
-        Find neighbors of all atoms in the :class:`~System`. 
+
+        Find neighbors of all atoms in the :class:`~System`.
 
         Parameters
         ----------
@@ -1236,27 +1257,27 @@ class System(pc.System):
             If the value is specified as `sann`, sann algorithm is used.
 
         threshold : float, optional
-            only used if ``cutoff=adaptive``. A threshold which is used as safe limit for calculation of cutoff. 
+            only used if ``cutoff=adaptive``. A threshold which is used as safe limit for calculation of cutoff.
 
         filter : {'None', 'type'}, optional
             apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
             `type`, only atoms of the same type would be included in the neighbor calculations. Default None.
 
-        voroexp : int, optional 
-            only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards the q 
-            values. Default 1. 
+        voroexp : int, optional
+            only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards the q
+            values. Default 1.
 
         face_cutoff : double, optional
             only used if ``method=voronoi``. The minimum fraction of total voronoi face area a single phase should have in order to
             include it in the analysis of voronoi polyhedra to find `(n_3, n_4, n_5, n_6)` vector. Default 0.002
 
         padding : double, optional
-            only used if ``cutoff=adaptive``. A safe padding value used after an adaptive cutoff is found. Default 1.2. 
+            only used if ``cutoff=adaptive``. A safe padding value used after an adaptive cutoff is found. Default 1.2.
 
         nlimit : int, optional
             only used if ``cutoff=adaptive``. The number of particles to be considered for the calculation of adaptive cutoff.
             Default 6.
-        
+
         Returns
         -------
         None
@@ -1269,14 +1290,14 @@ class System(pc.System):
 
         RuntimeError
             raised when neighbor search was unsuccessful. This is due to a low `threshold` value.
-        
+
         Notes
         -----
         This function calculates the neighbors of each particle. There are several ways to do this. A complete description of
         the methods can be `found here <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html>`_.
 
-        Method cutoff and specifying a cutoff radius uses the traditional approach being the one in which the neighbors of an atom 
-        are the ones that lie in the cutoff distance around it. 
+        Method cutoff and specifying a cutoff radius uses the traditional approach being the one in which the neighbors of an atom
+        are the ones that lie in the cutoff distance around it.
 
         In order to reduce time during sorting of distances during the adaptive methods, pyscal guesses an initial large cutoff radius.
         This is calculated as,
@@ -1295,7 +1316,7 @@ class System(pc.System):
 
         In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]_. There are no parameters to customise sann behaviour.
 
-        The second approach is using Voronoi polyhedra. All the atoms that share a Voronoi polyhedra face with the host atoms are considered 
+        The second approach is using Voronoi polyhedra. All the atoms that share a Voronoi polyhedra face with the host atoms are considered
         its neighbors. A corresponding neighborweight is also assigned to each neighbor in the ratio of the face area between the two atoms.
         This weight can later be used to weight steinhardt parameters. Higher powers of this weight can also be used [3]_. The keyword `voroexp`
         can be used to set this weight. If `voroexp` is set to 0, the neighbors would be calculated using Voronoi method, but Steinhardts
@@ -1343,7 +1364,7 @@ class System(pc.System):
                             finallydone = True
                             warnings.warn("found neighbors with higher threshold than default/user input")
                             break
-                    
+
                     if not finallydone:
                         raise RuntimeError("sann cutoff could not be converged. This is most likely, \
                         due to a low threshold value. Try increasing it.")
@@ -1354,7 +1375,7 @@ class System(pc.System):
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")
             else:
-                #warnings.warn("THIS RAN")    
+                #warnings.warn("THIS RAN")
                 pc.System.set_neighbordistance(self, cutoff)
                 pc.System.get_all_neighbors_normal(self)
 
@@ -1365,17 +1386,17 @@ class System(pc.System):
 
         self.neighbors_found = True
 
-            
+
 
     def reset_neighbors(self):
         """
-        
-        Reset the neighbors of all atoms in the system. 
+
+        Reset the neighbors of all atoms in the system.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
@@ -1389,13 +1410,13 @@ class System(pc.System):
 
     def calculate_q(self, q, averaged = False):
         """
-        Find the bond order parameter q for all atoms. 
+        Find the bond order parameter q for all atoms.
 
         Parameters
         ----------
         qs : int or list of ints
-            A list of all q params to be found from 2-12. 
-        
+            A list of all q params to be found from 2-12.
+
         averaged : bool, optional
             If True, return the averaged q values,
             If False, return the non averaged ones
@@ -1425,7 +1446,7 @@ class System(pc.System):
         for ql in qq:
             if not ql in range(2,13):
                 raise ValueError("value of q should be between 2 and 13")
-        
+
         pc.System.calculate_q(self, qq)
 
         if averaged:
@@ -1433,15 +1454,15 @@ class System(pc.System):
 
     def get_largestcluster(self):
         """
-        Get id of the the largest cluster. 
-        
+        Get id of the the largest cluster.
+
         Parameters
         ----------
         None
 
         Returns
         -------
-        clusterid : int 
+        clusterid : int
             id of the largest cluster
 
         Notes
@@ -1461,20 +1482,20 @@ class System(pc.System):
         bonds : int, optional
             Minimum number of solid bonds for an atom to be identified as
             a solid. Default 7.
-        
+
         threshold : double, optional
             The cutoff value of connection between two atoms for them to be def
             ined as having a bond. Default 0.5.
-        
+
         avgthreshold : double, optional
-            Averaged value of connection between an atom and its neighbors for 
+            Averaged value of connection between an atom and its neighbors for
             an atom to be solid. This threshold is known to improve the solid-liquid
-            distinction in interfaces between solid and liquid. Default 0.6. 
+            distinction in interfaces between solid and liquid. Default 0.6.
 
         cluster : bool, optional
             If True, cluster the solid atoms and return the number of atoms in the largest
             cluster.
-        
+
         Returns
         -------
         lc : int
@@ -1482,21 +1503,21 @@ class System(pc.System):
 
         Notes
         -----
-        The number of solid atoms in liquid using method found in [1]_ and example 
+        The number of solid atoms in liquid using method found in [1]_ and example
         usage (not with this module) can be found in [2]_. The neighbors should be calculated
         before running this function. Check :func:`~System.find_neighbors` method.
 
         `bonds` define the number of solid bond required for an atom to be considered solid.
-        Two particles are said to be 'bonded' if,  
+        Two particles are said to be 'bonded' if,
 
         .. math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
 
         where `threshold` values is also an optional parameter.
 
         `avgthreshold` is an additional parameter to improve solid-liquid distinction.
-        In addition to having a the specified number of `bonds`, 
+        In addition to having a the specified number of `bonds`,
 
-        .. math::  \langle s_{ij} \\rangle > avgthreshold  
+        .. math::  \langle s_{ij} \\rangle > avgthreshold
 
         also needs to be satisfied.
 
@@ -1510,7 +1531,7 @@ class System(pc.System):
         #check if neighbors are found
         if not self.neighbors_found:
             raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
-        
+
         if not isinstance(bonds, int):
             raise TypeError("bonds should be interger value")
 
@@ -1543,7 +1564,7 @@ class System(pc.System):
             lc = self.cluster_atoms(ccondition, largest=True)
             return lc
 
-    
+
     def cluster_atoms(self, condition, largest = True):
         """
         Cluster atoms based on a property
@@ -1560,20 +1581,20 @@ class System(pc.System):
         -------
         lc : int
             Size of the largest cluster. Returned only if `largest` is True.
-        
+
 
         Notes
         -----
         This function helps to cluster atoms based on a defined property. This property
-        is defined by the user through the function `condition` which is passed as a parameter. 
-        For each atom in the system, the `condition` should give a True/False values. 
+        is defined by the user through the function `condition` which is passed as a parameter.
+        For each atom in the system, the `condition` should give a True/False values.
 
         When clustering happens, the code loops over each atom and its neighbors. If the
         host atom and the neighbor both have True value for `condition`, they are put
-        in the same cluster. For example, if the atoms need to be clustered over if they 
+        in the same cluster. For example, if the atoms need to be clustered over if they
         are solid or not, corresponding condition would be,
 
-        .. code:: python  
+        .. code:: python
 
             def condition(atom):
                 #if both atom is solid
@@ -1616,7 +1637,7 @@ class System(pc.System):
 
     def calculate_nucsize(self, frenkelnums, threshold, avgthreshold):
         """
-        Calculate the size of the largest cluster in the given system. 
+        Calculate the size of the largest cluster in the given system.
 
         Parameters
         ----------
@@ -1641,19 +1662,19 @@ class System(pc.System):
         #print("this raaan")
         warnings.simplefilter('always', DeprecationWarning)
         warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
-        
+
         pc.System.calculate_q(self, [6])
         pc.System.set_nucsize_parameters(self, frenkelnums, threshold, avgthreshold)
         return pc.System.calculate_nucsize(self)
 
     def calculate_solidneighbors(self):
         """
-        Find Solid neighbors of all atoms in the system. 
+        Find Solid neighbors of all atoms in the system.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         None
@@ -1662,13 +1683,13 @@ class System(pc.System):
         -----
         A solid bond is considered between two atoms if the connection
         betweem them is greater than 0.6.
-        
+
         """
         pc.System.calculate_frenkelnumbers(self)
 
     def find_clusters(self, recursive = True, largest = True):
         """
-        Find the clusters of all atoms in the system. 
+        Find the clusters of all atoms in the system.
 
         Parameters
         ----------
@@ -1678,21 +1699,21 @@ class System(pc.System):
 
         largest : Bool, optional
             If True, return the number of particles in the largest cluster. Default True.
-        
+
         Returns
         -------
         cluster : int
             The size of the largest cluster in the system. Only returned if `largest` is set to True.
-        
+
         Notes
         -----
-        Go through all the atoms in the system and cluster them together based on the `issolid` parameter of the atom. 
-        To cluster based on any user defined criteria, you can use `set_solid` method of `Atom` to explicitely 
-        set the `issolid` value. 
+        Go through all the atoms in the system and cluster them together based on the `issolid` parameter of the atom.
+        To cluster based on any user defined criteria, you can use `set_solid` method of `Atom` to explicitely
+        set the `issolid` value.
 
         .. warning::
 
-            This function is deprecated and will be removed in a future release. Please use 
+            This function is deprecated and will be removed in a future release. Please use
             :func:`~System.cluster_atoms` instead.
 
         """
@@ -1701,21 +1722,21 @@ class System(pc.System):
 
         if recursive:
             pc.System.find_clusters_recursive(self)
-        else:    
+        else:
             pc.System.find_clusters(self)
 
         if largest:
             cluster = pc.System.find_largest_cluster(self)
-            return cluster            
+            return cluster
 
     def find_largestcluster(self):
         """
-        Find the largest solid cluster of atoms in the system from all the clusters. 
+        Find the largest solid cluster of atoms in the system from all the clusters.
 
         Parameters
         ----------
         None
-        
+
         Returns
         -------
         cluster : int
@@ -1731,12 +1752,12 @@ class System(pc.System):
     def copy_catom_to_atom(self, atomc):
         """
         Used to copy a C++ `Atom` object to python `Atom` object.
-        
+
         Parameters
         ----------
         atomc : C++ `Atom` object
             the input atom
-        
+
         Returns
         -------
         atom : python `Atom` object
@@ -1778,7 +1799,7 @@ class System(pc.System):
     def copy_atom_to_catom(self, atom):
         """
         Used to copy a python `Atom` object to C++ `Atom` object.
-        
+
         Parameters
         ----------
         atom : python `Atom` object
@@ -1791,7 +1812,7 @@ class System(pc.System):
 
         Notes
         -----
-        A python object is converted to a C++ object which is then 
+        A python object is converted to a C++ object which is then
         passed on the system for calculation.
 
         """
@@ -1889,16 +1910,16 @@ class System(pc.System):
         including the atoms and their properties. This can be useful to
         restart the calculation. The function uses `numpy.save` method
         to save the information. Hence pickling between different versions
-        of python could lead to issues. 
+        of python could lead to issues.
 
         .. warning::
 
-            Pickling between different versions of numpy or python could be incompatible. 
+            Pickling between different versions of numpy or python could be incompatible.
 
         """
         psys = self.prepare_pickle()
         np.save(file, psys)
-        
+
 
     def from_file(self, file):
         """
@@ -1945,44 +1966,3 @@ class System(pc.System):
 
         #assign atoms and box
         pc.System.reassign_particles(self, catoms, boxdims)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
