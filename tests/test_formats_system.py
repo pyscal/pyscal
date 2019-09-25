@@ -11,7 +11,7 @@ def test_lammps_dump():
     assert len(atoms) == 500
 
     #check box
-    assert sys.get_box() == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
+    assert sys.box == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
 
     #check few atoms
     filtered_atoms = [ atom for atom in atoms if atom.id == 204]
@@ -24,7 +24,7 @@ def test_lammps_dump():
     assert len(atoms) == 500
 
     #check box
-    assert sys.get_box() == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
+    assert sys.box == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
 
     #check few atoms
     filtered_atoms = [ atom for atom in atoms if atom.id == 204]
@@ -45,7 +45,7 @@ def test_poscar():
     assert type3 == 2
 
     #now test the coorfinates of the atom
-    assert sys.get_box() == [[0.0, 18.768662916], [0.0, 8.9728430088], [0.0, 2.83746]]
+    assert sys.box == [[0.0, 18.768662916], [0.0, 8.9728430088], [0.0, 2.83746]]
 
     #now check coordinates of first atom
     assert atoms[0].pos == [0.020389021322710754, 8.8981229427339, 0.0005978263145216028]

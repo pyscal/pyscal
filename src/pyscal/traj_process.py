@@ -349,7 +349,7 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
     None
 
     """
-    boxdims = sys.get_box()
+    boxdims = sys.box
     atoms = sys.get_allatoms()
 
     #open files for writing

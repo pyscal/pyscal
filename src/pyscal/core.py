@@ -666,50 +666,6 @@ class System(pc.System):
         atoms = [self.copy_catom_to_atom(xx) for xx in atomcs]
         return atoms
 
-    def get_box(self, box_vectors=False):
-        """
-
-        Get the dimensions of the simulation box.
-
-        Parameters
-        ----------
-        box_vectors : bool, optional
-            If True, return the whole box dimesions, default False
-
-        Returns
-        -------
-        boxdims : list of box dimensions
-            If `box_vectors` is false:
-            the return value consists of the vector of values in the form-
-            `[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]`
-            If `box_vectors` is true:
-            return the box vectors of the form
-            `[[x1, x2, x3], [y1, y2, y3], [z1, z2, z3]]`
-        """
-        if not box_vectors:
-            box6dim = pc.System.get_box(self)
-            pbox = [[box6dim[0], box6dim[1]], [box6dim[2], box6dim[3]], [box6dim[4], box6dim[5]]]
-        else:
-            pbox = pc.System.get_boxvecs(self)
-        return pbox
-
-    def set_box(self, box):
-        """
-
-        Set the dimensions of the simulation box.
-
-        Parameters
-        ----------
-        boxdims : list of box dimensions of length 6
-            the return value consists of the vector of values in the form-
-            `[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]`
-
-        Returns
-        -------
-        None
-        """
-        pc.System.set_box(self, box)
-
     def get_qvals(self, q, averaged = False):
         """
         Get the required q values of all atoms.
