@@ -147,7 +147,7 @@ class Atom(object):
             cutoff for edge length. Default 0.05.
 
 
-        area_cutoff : float, optional
+        area_cutoff : float, optional        self.initialized = 23
             cutoff for face area. Default 0.01.
 
         edge_length : bool, optional
@@ -356,11 +356,46 @@ class System(pc.System):
         self.initialized = True
         #self.solid_params_set = False
         self.neighbors_found = False
+        self.customkeys = None
+        self.customvals = None
+        self.atoms = None
         #this method can be done more
         #we can remove checks on the cpp side
         pc.System.__init__(self)
-        self.customkeys = None
-        self.customvals = None
+
+    #try a get attribute
+    def __getattr__(self, name):
+        #now check if the first letter is q
+
+        if name == 'box':
+            #then extract the next two parts
+            box6dim = pc.System.get_box(self)
+            pbox = [[box6dim[0], box6dim[1]], [box6dim[2], box6dim[3]], [box6dim[4], box6dim[5]]]
+            return pbox
+
+        elif name == 'box_vectors':
+            pbox = pc.System.get_boxvecs(self)
+            return pbox
+        else:
+            raise AttributeError(name)
+
+    #overload the setattr function to overload
+    def __setattr__(self, variable, value):
+        if variable == 'box':
+            #check for length
+            if not len(value) == 3:
+                raise TypeError('box should be of the form [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]')
+
+            if not all(all(isinstance(x, (int, float)) for x in xx) for xx in value):
+                raise TypeError("all values must be float")
+
+            pc.System.set_box(self, value)
+
+        elif variable == 'box_vectors':
+            raise AttributeError("box_vectors are calculated from box. If using triclinic, read in a file instead.")
+        #finally assign the variables
+        super(System, self).__setattr__(variable, value)
+
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
         """
@@ -418,6 +453,8 @@ class System(pc.System):
         --------
         assign_atoms
         """
+        self.customkeys = customkeys
+
         if format == 'lammps-dump':
             #check customkeys and assign a variable
             customread = (len(customkeys) > 0)
@@ -436,6 +473,7 @@ class System(pc.System):
                 if os.path.exists(filename):
                     if customread:
                         atoms, boxdims, box, triclinic, customvals = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                        self.customvals = customvals
                     else:
                         atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
                     pc.System.assign_particles(self, atoms, boxdims)
@@ -454,6 +492,7 @@ class System(pc.System):
             elif os.path.exists(filename):
                 if customread:
                     atoms, boxdims, box, triclinic, customvals = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                    self.customvals = customvals
                 else:
                     atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
                 pc.System.assign_particles(self, atoms, boxdims)
@@ -1380,7 +1419,7 @@ class System(pc.System):
         indicators = pc.System.get_indicators(self)
 
         #get box dims and triclinic params if triclinic
-        boxdims = self.get_box()
+        boxdims = self.box
         if indicators[6] == 1:
             rot = pc.System.get_triclinic_params(self)
         else:
