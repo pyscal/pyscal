@@ -17,7 +17,7 @@ import warnings
 Definitions of class Atom.
 
 """
-class Atom():
+class Atom(object):
     """
     Class to store atom details.
 
@@ -102,7 +102,7 @@ class Atom():
             if not (isinstance(value, bool) or (value in [0, 1])):
                 raise TypeError("%s value should be of type bool"%variable)
         #finally assign the variables
-        super().__setattr__(variable, value)
+        super(Atom, self).__setattr__(variable, value)
 
     #property for coordination - dynamic values
     @property
