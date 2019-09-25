@@ -99,31 +99,31 @@ class Atom(pc.Atom):
                 raise TypeError("all values of pos should float")
             if len(value) is not 3:
                 raise ValueError("pos should be of length 3")
-            pc.Atom.set_x(self, pos)
+            pc.Atom.set_x(self, value)
 
         elif variable in ['solid', 'surface', 'largest_cluster']:
             if not (isinstance(value, bool) or (value in [0, 1])):
                 raise TypeError("%s value should be of type bool"%variable)
 
             if variable == 'solid':
-                cinfo = pc.Atom.get_cluster()
+                cinfo = pc.Atom.get_cluster(self)
                 cinfo[0] = value
                 pc.Atom.set_cluster(self, cinfo)
 
             if variable == 'surface':
-                cinfo = pc.Atom.get_cluster()
+                cinfo = pc.Atom.get_cluster(self)
                 cinfo[1] = value
                 pc.Atom.set_cluster(self, cinfo)
 
             if variable == 'largest_cluster':
-                cinfo = pc.Atom.get_cluster()
+                cinfo = pc.Atom.get_cluster(self)
                 cinfo[2] = value
                 pc.Atom.set_cluster(self, cinfo)
 
         elif variable == 'cluster':
             if not isinstance(value, int):
                 raise TypeError("value of cluster should be int")
-            cinfo = pc.Atom.get_cluster()
+            cinfo = pc.Atom.get_cluster(self)
             cinfo[3] = value
             pc.Atom.set_cluster(self, cinfo)
 
@@ -203,7 +203,7 @@ class Atom(pc.Atom):
             pc.Atom.set_condition(self, value)
 
         elif variable == 'avg_connection':
-            if not isinstance(value, float):
+            if not isinstance(value, (int, float)):
                 raise TypeError("value of connection should be int")
             pc.Atom.set_avgconnection(self, value)
 
@@ -219,10 +219,75 @@ class Atom(pc.Atom):
     #try a get attribute
     def __getattr__(self, name):
         #now check if the first letter is q
+        if name == 'pos':
+            return pc.System.get_x(self)
 
+        elif name == 'solid':
+            cinfo = pc.Atom.get_cluster(self)
+            return cinfo[0]
 
+        elif name == 'surface':
+            cinfo = pc.Atom.get_cluster(self)
+            return cinfo[1]
 
+        elif name == 'largest_cluster':
+            cinfo = pc.Atom.get_cluster(self)
+            return cinfo[2]
 
+        elif name == 'cluster':
+            cinfo = pc.Atom.get_cluster(self)
+            return cinfo[3]
+
+        elif name == 'structure':
+            return pc.Atom.get_structure(self)
+
+        elif name == 'neighbors':
+            return pc.Atom.get_neighbors(self)
+
+        elif name == 'neighbor_weights':
+            return pc.Atom.get_neighborweights(self)
+
+        elif name == 'allq':
+            return pc.Atom.get_allq(self)
+
+        elif name == 'allaq':
+            return pc.Atom.get_allaq(self)
+
+        elif name == 'id':
+            return pc.Atom.get_id(self)
+
+        elif name == 'loc':
+            return pc.Atom.get_loc(self)
+
+        elif name == 'type':
+            return pc.Atom.get_type(self)
+
+        elif name == 'volume':
+            return pc.Atom.get_volume(self)
+
+        elif name == 'avg_volume':
+            return pc.Atom.get_avgvolume(self)
+
+        elif name == 'face_vertices':
+            return pc.Atom.get_facevertices(self)
+
+        elif name == 'face_perimeters':
+            return pc.Atom.get_faceperimeters(self)
+
+        elif name == 'vertex_numbers':
+            return pc.Atom.get_vertexnumbers(self)
+
+        elif name == 'vertex_vectors':
+            return pc.Atom.get_vertexvectors(self)
+
+        elif name == 'condition':
+            return pc.Atom.get_condition(self)
+
+        elif name == 'avg_connection':
+            return pc.Atom.get_avgconnection(self)
+
+        elif name == 'bonds':
+            return pc.Atom.get_bonds(self)
 
         elif name[0] == 'q':
             #then extract the next two parts
@@ -233,10 +298,9 @@ class Atom(pc.Atom):
             #then extract the next two parts
             reqd_q = int(name[2:]) - 2
             return self.allaq[reqd_q]
+
         else:
             raise AttributeError(name)
-
-
 
     #add a getstate and setstate functions
     #will be called during pickling
@@ -475,7 +539,7 @@ class System(pc.System):
         self.initialized = True
         #self.solid_params_set = False
         self.neighbors_found = False
-        self._atoms = []
+        self.atoms = []
         self.nop = 0
         #this method can be done more
         #we can remove checks on the cpp side
@@ -495,10 +559,6 @@ class System(pc.System):
             pbox = pc.System.get_boxvecs(self)
             return pbox
 
-        elif name == 'atoms':
-            #update local atoms with c ones
-            return [self.copy_catom_to_atom(pc.System.get_atom(self, index)) for index in range(self.nop))]
-
         else:
             raise AttributeError(name)
 
@@ -517,27 +577,8 @@ class System(pc.System):
         elif variable == 'box_vectors':
             raise AttributeError("box_vectors are calculated from box. If using triclinic, read in a file instead.")
 
-        elif variable == 'atoms':
-
-
         #finally assign the variables
         super(System, self).__setattr__(variable, value)
-
-    @property
-    def atoms(self):
-        return [self.copy_catom_to_atom(pc.System.get_atom(self, index)) for index in range(len(self._atoms))]
-
-    @atoms.setter
-    def atoms(self, value):
-        #check for loc of the modified atom
-        if not isinstance(value, Atom):
-            raise TypeError("value needs to be an Atom")
-
-        #now put it back
-        pc.System.set_atom(self, value)
-        #raise ValueError("coordination values cannot be set")
-
-
 
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
@@ -617,13 +658,11 @@ class System(pc.System):
                     tatoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
                     #self.tatoms = tatoms
                     #convert these atoms to normal atoms and save them
-                    patoms = [self.copy_atom(tatom) for tatom in tatoms]
-                    self._atoms = patoms
+                    self.atoms = [self.copy_atom(tatom) for tatom in tatoms]
                     #now get catoms
-                    catoms = [self.copy_atom_to_catom(atom) for atom in patoms]
+                    catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
                     pc.System.assign_particles(self, catoms, boxdims)
                     self.nop = len(catoms)
-                    self.counts = range(len(catoms))
 
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
@@ -640,12 +679,12 @@ class System(pc.System):
             elif os.path.exists(filename):
                 tatoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
                 #convert these atoms to normal atoms and save them
-                self._atoms = [self.copy_atom(tatom) for tatom in tatoms]
+                self.atoms = [self.copy_atom(tatom) for tatom in tatoms]
                 #now get catoms
-                catoms = [self.copy_atom_to_catom(atom) for atom in self._atoms]
+                catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
+
                 pc.System.assign_particles(self, catoms, boxdims)
                 self.nop = len(catoms)
-                self.counts = range(len(catoms))
 
                 if triclinic:
                     #we have to input rotation matrix and the inverse rotation matrix
@@ -656,18 +695,16 @@ class System(pc.System):
                 raise FileNotFoundError("input file %s not found"%filename)
 
 
-
         elif format == 'poscar':
             if os.path.exists(filename):
                 tatoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
                 #convert these atoms to normal atoms and save them
-                self._atoms = [self.copy_atom(tatom) for tatom in tatoms]
+                self.atoms = [self.copy_atom(tatom) for tatom in tatoms]
                 #now get catoms
-                catoms = [self.copy_atom_to_catom(atom) for atom in self._atoms]
+                catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
 
                 pc.System.assign_particles(self, catoms, boxdims)
                 self.nop = len(catoms)
-                self.counts = range(len(catoms))
 
             else:
                 raise FileNotFoundError("input file %s not found"%filename)
