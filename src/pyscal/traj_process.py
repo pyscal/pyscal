@@ -4,9 +4,22 @@ reading of input files formats, writing of output files etc are provided in
 this module.
 
 """
-import pyscal.ccore as pc
 import numpy as np
 import gzip
+
+class TempAtom(object):
+    """
+    Class to store atom details until transferred to core module
+    """
+    def __init__(self, pos = [0,0,0], id = 0, type = 1):
+        """
+        Defaults args
+        """
+        self.custom = {}
+        self.pos = pos
+        self.id = id
+        self.loc = 0
+        self.type = type
 
 #functions that are not wrapped from C++
 def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False, customkeys=[]):
@@ -49,14 +62,11 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
     triclinic : bool
         True if the box is triclinic. Only returned if `check_triclinic` is set to True
 
-    customvals : list of list
-        list of extra values read in from the file if `customkeys` are provided.
-
     .. note::
 
-        Values are always returned in the order `atoms, boxdims, box, triclinic, customvals` if all
+        Values are always returned in the order `atoms, boxdims, box, triclinic` if all
         return keywords are selected. For example, ff `check_triclinic` is not selected, the return
-        values would still preserve the order and fall back to  `atoms, boxdims, box, customvals`.
+        values would still preserve the order and fall back to  `atoms, boxdims, box`.
 
     Notes
     -----
@@ -124,8 +134,6 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
                 if customread:
                     if not np.prod([(x in headerdict) for x in customkeys]):
                         raise KeyError("some values in custokeys was not found in the file")
-                #set up arrays for custom val reading
-                customvals = [[] for x in range(customlength)]
 
 
         elif count > 8:
@@ -135,18 +143,19 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
             x = float(raw[headerdict["x"]])
             y = float(raw[headerdict["y"]])
             z = float(raw[headerdict["z"]])
-            atom = pc.Atom()
-            atom.set_x([x, y, z])
-            atom.set_id(idd)
-            atom.set_type(typ)
-            atoms.append(atom)
+
+            atom = TempAtom()
+            atom.pos = [x, y, z]
+            atom.id = idd
+            atom.type = typ
+            atom.loc = count-8
 
             #if customkeys need to be read, do it
             if customread:
                 for cc, kk in enumerate(customkeys):
-                    customvals[cc].append(raw[headerdict[kk]])
-            #reads custom values
+                    atom.custom[kk] = raw[headerdict[kk]]
 
+            atoms.append(atom)
 
     #close files
     f.close()
@@ -175,8 +184,8 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
         for atom in atoms:
             #correct zero of the atomic positions (shift box to origin)
-            dist = np.array(atom.get_x()) - ortho_origin
-            atom.set_x(dist)
+            dist = np.array(atom.x) - ortho_origin
+            atom.x = dist
 
         #finally change boxdims - to triclinic box size
         box = np.array([a, b, c])
@@ -306,10 +315,10 @@ def read_poscar(infile, compressed = False):
 
             count+=1
             idd = count
-            atom = pc.Atom()
-            atom.set_x([x, y, z])
-            atom.set_id(idd)
-            atom.set_type(typ)
+            atom = TempAtom()
+            atom.x = [x, y, z]
+            atom.id = idd
+            atom.type = typ
             #atom = pc.Atom(pos=, id=idd, type=typ)
             atoms.append(atom)
             i+=1

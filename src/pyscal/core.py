@@ -17,7 +17,7 @@ import warnings
 Definitions of class Atom.
 
 """
-class Atom(object):
+class Atom(pc.Atom):
     """
     Class to store atom details.
 
@@ -75,8 +75,8 @@ class Atom(object):
         self.neighbor_weights = []
 
         #qvals : they need better treatment
-        self.allq = None
-        self.allaq = None
+        self.allq = [-1 for x in range(12)]
+        self.allaq = [-1 for x in range(12)]
 
         self.id = id
         self.loc = 0
@@ -87,35 +87,144 @@ class Atom(object):
         self.face_perimeters = []
         self.vertex_numbers = []
         self.vertex_vectors = []
-        self.condition = None
+        self.condition = 0
         self.avg_connection = 0
         self.bonds = 0
 
     #overload the setattr function to overload
     def __setattr__(self, variable, value):
+
         if variable == 'pos':
             if not all(isinstance(x, (int, float)) for x in value):
                 raise TypeError("all values of pos should float")
             if len(value) is not 3:
                 raise ValueError("pos should be of length 3")
+            pc.Atom.set_x(self, pos)
+
         elif variable in ['solid', 'surface', 'largest_cluster']:
             if not (isinstance(value, bool) or (value in [0, 1])):
                 raise TypeError("%s value should be of type bool"%variable)
+
+            if variable == 'solid':
+                cinfo = pc.Atom.get_cluster()
+                cinfo[0] = value
+                pc.Atom.set_cluster(self, cinfo)
+
+            if variable == 'surface':
+                cinfo = pc.Atom.get_cluster()
+                cinfo[1] = value
+                pc.Atom.set_cluster(self, cinfo)
+
+            if variable == 'largest_cluster':
+                cinfo = pc.Atom.get_cluster()
+                cinfo[2] = value
+                pc.Atom.set_cluster(self, cinfo)
+
+        elif variable == 'cluster':
+            if not isinstance(value, int):
+                raise TypeError("value of cluster should be int")
+            cinfo = pc.Atom.get_cluster()
+            cinfo[3] = value
+            pc.Atom.set_cluster(self, cinfo)
+
+        elif variable == 'structure':
+            if not isinstance(value, int):
+                raise TypeError("value of structure should be int")
+            pc.Atom.set_structure(self, value)
+
+        elif variable == 'neighbors':
+            if not all(isinstance(x, int) for x in value):
+                raise TypeError("all values should be int")
+            pc.Atom.set_neighbors(self, value)
+
+        elif variable == 'neighbor_weights':
+            if not all(isinstance(x, (int, float)) for x in value):
+                raise TypeError("all values should be int/float")
+            pc.Atom.set_neighborweights(self, value)
+
+        elif variable == 'allq':
+            if not all(isinstance(x, (int, float)) for x in value):
+                raise TypeError("all values should be int/float")
+            pc.Atom.set_allq(self, value)
+
+        elif variable == 'allaq':
+            if not all(isinstance(x, (int, float)) for x in value):
+                raise TypeError("all values should be int/float")
+            pc.Atom.set_allaq(self, value)
+
+        elif variable == 'id':
+            if not isinstance(value, int):
+                raise TypeError("value of id should be int")
+            pc.Atom.set_id(self, value)
+
+        elif variable == 'loc':
+            if not isinstance(value, int):
+                raise TypeError("value of loc should be int")
+            pc.Atom.set_loc(self, value)
+
+        elif variable == 'type':
+            if not isinstance(value, int):
+                raise TypeError("value of type should be int")
+            pc.Atom.set_type(self, value)
+
+        elif variable == 'volume':
+            if not isinstance(value, (int, float)):
+                raise TypeError("value of volume should be int")
+            pc.Atom.set_volume(self, value)
+
+        elif variable == 'avg_volume':
+            if not isinstance(value, (int, float)):
+                raise TypeError("value of avg volume should be int")
+            pc.Atom.set_avgvolume(self, value)
+
+        elif variable == 'face_vertices':
+            if not all(isinstance(x, (int, float)) for x in value):
+                raise TypeError("all values should be int/float")
+            pc.Atom.set_facevertices(self, value)
+
+        elif variable == 'face_perimeters':
+            if not all(isinstance(x, (int, float)) for x in value):
+                raise TypeError("all values should be int/float")
+            pc.Atom.set_faceperimeters(self, value)
+
+        elif variable == 'vertex_numbers':
+            if not all(isinstance(x, int) for x in value):
+                raise TypeError("all values should be int")
+            pc.Atom.set_vertexnumbers(self, value)
+
+        elif variable == 'vertex_vectors':
+            if not all(isinstance(x, (int, float)) for x in value):
+                raise TypeError("all values should be int/float")
+            pc.Atom.set_vertexvectors(self, value)
+
+        elif variable == 'condition':
+            if not isinstance(value, int):
+                raise TypeError("value of condition should be int")
+            pc.Atom.set_condition(self, value)
+
+        elif variable == 'avg_connection':
+            if not isinstance(value, float):
+                raise TypeError("value of connection should be int")
+            pc.Atom.set_avgconnection(self, value)
+
+        elif variable == 'bonds':
+            if not isinstance(value, int):
+                raise TypeError("value of bonds should be int")
+            pc.Atom.set_bonds(self, value)
+
         #finally assign the variables
         super(Atom, self).__setattr__(variable, value)
 
-    #add a getstate and setstate functions
-    #will be called during pickling
-    def __getstate__(self):
-        return self.__dict__
-
-    def __setstate__(self, value):
-        return self.__dict__.update(value)
 
     #try a get attribute
     def __getattr__(self, name):
         #now check if the first letter is q
-        if name[0] == 'q':
+
+
+
+
+
+        elif name[0] == 'q':
             #then extract the next two parts
             reqd_q = int(name[1:]) - 2
             return self.allq[reqd_q]
@@ -126,6 +235,16 @@ class Atom(object):
             return self.allaq[reqd_q]
         else:
             raise AttributeError(name)
+
+
+
+    #add a getstate and setstate functions
+    #will be called during pickling
+    def __getstate__(self):
+        return self.__dict__
+
+    def __setstate__(self, value):
+        return self.__dict__.update(value)
 
     #property for coordination - dynamic values
     @property
@@ -356,9 +475,8 @@ class System(pc.System):
         self.initialized = True
         #self.solid_params_set = False
         self.neighbors_found = False
-        self.customkeys = None
-        self.customvals = None
-        self.atoms = None
+        self._atoms = []
+        self.nop = 0
         #this method can be done more
         #we can remove checks on the cpp side
         pc.System.__init__(self)
@@ -376,6 +494,11 @@ class System(pc.System):
         elif name == 'box_vectors':
             pbox = pc.System.get_boxvecs(self)
             return pbox
+
+        elif name == 'atoms':
+            #update local atoms with c ones
+            return [self.copy_catom_to_atom(pc.System.get_atom(self, index)) for index in range(self.nop))]
+
         else:
             raise AttributeError(name)
 
@@ -393,8 +516,28 @@ class System(pc.System):
 
         elif variable == 'box_vectors':
             raise AttributeError("box_vectors are calculated from box. If using triclinic, read in a file instead.")
+
+        elif variable == 'atoms':
+
+
         #finally assign the variables
         super(System, self).__setattr__(variable, value)
+
+    @property
+    def atoms(self):
+        return [self.copy_catom_to_atom(pc.System.get_atom(self, index)) for index in range(len(self._atoms))]
+
+    @atoms.setter
+    def atoms(self, value):
+        #check for loc of the modified atom
+        if not isinstance(value, Atom):
+            raise TypeError("value needs to be an Atom")
+
+        #now put it back
+        pc.System.set_atom(self, value)
+        #raise ValueError("coordination values cannot be set")
+
+
 
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
@@ -471,12 +614,17 @@ class System(pc.System):
 
                 #now if file exists
                 if os.path.exists(filename):
-                    if customread:
-                        atoms, boxdims, box, triclinic, customvals = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
-                        self.customvals = customvals
-                    else:
-                        atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
-                    pc.System.assign_particles(self, atoms, boxdims)
+                    tatoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                    #self.tatoms = tatoms
+                    #convert these atoms to normal atoms and save them
+                    patoms = [self.copy_atom(tatom) for tatom in tatoms]
+                    self._atoms = patoms
+                    #now get catoms
+                    catoms = [self.copy_atom_to_catom(atom) for atom in patoms]
+                    pc.System.assign_particles(self, catoms, boxdims)
+                    self.nop = len(catoms)
+                    self.counts = range(len(catoms))
+
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
                         rot = box.T
@@ -490,12 +638,15 @@ class System(pc.System):
                     os.remove(file)
 
             elif os.path.exists(filename):
-                if customread:
-                    atoms, boxdims, box, triclinic, customvals = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
-                    self.customvals = customvals
-                else:
-                    atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True)
-                pc.System.assign_particles(self, atoms, boxdims)
+                tatoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                #convert these atoms to normal atoms and save them
+                self._atoms = [self.copy_atom(tatom) for tatom in tatoms]
+                #now get catoms
+                catoms = [self.copy_atom_to_catom(atom) for atom in self._atoms]
+                pc.System.assign_particles(self, catoms, boxdims)
+                self.nop = len(catoms)
+                self.counts = range(len(catoms))
+
                 if triclinic:
                     #we have to input rotation matrix and the inverse rotation matrix
                     rot = box.T
@@ -508,13 +659,46 @@ class System(pc.System):
 
         elif format == 'poscar':
             if os.path.exists(filename):
-                atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
-                pc.System.assign_particles(self, atoms, boxdims)
+                tatoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
+                #convert these atoms to normal atoms and save them
+                self._atoms = [self.copy_atom(tatom) for tatom in tatoms]
+                #now get catoms
+                catoms = [self.copy_atom_to_catom(atom) for atom in self._atoms]
+
+                pc.System.assign_particles(self, catoms, boxdims)
+                self.nop = len(catoms)
+                self.counts = range(len(catoms))
+
             else:
                 raise FileNotFoundError("input file %s not found"%filename)
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 
+    def copy_atom(self, atom1):
+        """
+        Copies the essential infomation from one atom to another
+
+        Parameters
+        ----------
+        atom1 : atom object
+            source atom
+
+        Returns
+        -------
+        atom2 : copied atom
+
+        Notes
+        -----
+        This method only copies the essential information. Positions, type and id
+        and customvals
+        """
+        atom2 = Atom()
+        atom2.pos = atom1.pos
+        atom2.loc = atom1.loc
+        atom2.id = atom1.id
+        atom2.type = atom1.type
+        atom2.custom = atom1.custom
+        return atom2
 
     def assign_atoms(self, atoms, box):
         """
@@ -596,57 +780,7 @@ class System(pc.System):
 
 
 
-    def get_atom(self, index):
-        """
 
-        Get the :class:`~Atom` object at the queried position in the list of all atoms
-        in the :class:`~System`.
-
-        Parameters
-        ----------
-        index : int
-            index of required atom in the list of all atoms.
-
-        Returns
-        -------
-        atom : Atom object
-            atom object at the queried position.
-
-        """
-        atomc = pc.System.get_atom(self, index)
-        atom = self.copy_catom_to_atom(atomc)
-        return atom
-
-    def set_atom(self, atom):
-        """
-
-        Return the atom to its original location after modification.
-
-        Parameters
-        ----------
-        atom : Atom
-                atom to be replaced
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        For example, an :class:`~Atom` at location `i` in the list of all atoms in :class:`System` can be queried by,
-        ``atom = System.get_atom(i)``, then any kind of modification, for example, the
-        position of the `Atom` can done by, ``atom.set_pos([2.3, 4.5, 4.5])``. After
-        modification, the `Atom` can be set back to its position in `System` by
-        :func:`~System.set_atom`.
-
-        .. warning::
-
-            If an atom already exists at that index in the list, it will be overwritten and will
-            lead to loss of information.
-
-        """
-        atomc = self.copy_atom_to_catom(atom)
-        pc.System.set_atom(self, atomc)
 
     def get_atoms(self):
         """
@@ -1245,7 +1379,7 @@ class System(pc.System):
         """
         return pc.System.find_largest_cluster(self)
 
-    def copy_catom_to_atom(self, atomc):
+    def copy_catom_to_atom(self, atomc, destination=None):
         """
         Used to copy a C++ `Atom` object to python `Atom` object.
 
@@ -1267,7 +1401,11 @@ class System(pc.System):
 
 
         """
-        atom = Atom()
+        if destination is None:
+            atom = Atom()
+        else:
+            atom = destination
+
         atom.pos = atomc.get_x()
         atom.solid = bool(atomc.get_solid())
         atom.structure = atomc.get_structure()
