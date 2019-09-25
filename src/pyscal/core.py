@@ -104,6 +104,29 @@ class Atom(object):
         #finally assign the variables
         super(Atom, self).__setattr__(variable, value)
 
+    #add a getstate and setstate functions
+    #will be called during pickling
+    def __getstate__(self):
+        return self.__dict__
+
+    def __setstate__(self, value):
+        return self.__dict__.update(value)
+
+    #try a get attribute
+    def __getattr__(self, name):
+        #now check if the first letter is q
+        if name[0] == 'q':
+            #then extract the next two parts
+            reqd_q = int(name[1:]) - 2
+            return self.allq[reqd_q]
+
+        elif name[:2] == 'aq':
+            #then extract the next two parts
+            reqd_q = int(name[2:]) - 2
+            return self.allaq[reqd_q]
+        else:
+            raise AttributeError(name)
+
     #property for coordination - dynamic values
     @property
     def coordination(self):
@@ -204,6 +227,106 @@ class Atom(object):
             return vorovector, edge_lengths
         else:
             return vorovector
+
+
+    def get_q(self, q, averaged = False):
+        """
+        get q value of the atom.
+        Parameters
+        ----------
+        q : int or list of int
+            number of the required q - from 2-12
+        averaged : bool, optional
+            If True, return the averaged q values,
+            If False, return the non averaged ones
+            default False
+        Returns
+        -------
+        q : float or list of floats
+            The queried q value
+        Notes
+        -----
+        The q value can be either normal or can be averaged [1]_
+        The averaged version can be obtained by using keyword
+        `averaged = True`.
+        References
+        ----------
+        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
+        Examples
+        --------
+        >>> q2 = atom.get_q(2, averaged = True)
+        >>> q24 = atom.get_q([2, 4])
+        """
+        if isinstance(q, int):
+            if not q in range(2, 13):
+                raise ValueError("q values should be in range 2-12")
+            if averaged:
+                return self.allaq[q-2]
+            else:
+                return self.allq[q-2]
+
+        else:
+
+            if not all(qq in range(2,13) for qq in q):
+                raise ValueError("q values should be in range 2-12")
+            if averaged:
+                return [ self.allaq[qq-2] for qq in q ]
+            else:
+                return [ self.allq[qq-2] for qq in q ]
+
+
+    def set_q(self, q, d, averaged = False):
+        """
+        set the q value of the atom.
+        Parameters
+        ----------
+        q : int or list of ints
+            number of the required q - from 2-12
+        d : float or list of floats
+            the q value to set
+        averaged : bool, optional
+            If True, return the averaged q values,
+            If False, return the non averaged ones
+            default False
+        Returns
+        -------
+        None
+        Notes
+        -----
+        The q value can be either normal or can be averaged [1]_
+        The averaged version can be obtained by using keyword
+        `averaged = True`.
+        References
+        ----------
+        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
+        Examples
+        --------
+        >>> atom.set_q(2, 0.24, averaged = True)
+        >>> atom.set_q([2,4], [0.24, 0.05])
+        """
+        if isinstance(q, int):
+            if isinstance(d, (int, float)):
+                if not q in range(2, 13):
+                    raise ValueError("q values should be in range 2-12")
+                if averaged:
+                    self.allaq[q-2] = d
+                else:
+                    self.allq[q-2] = d
+            else:
+                raise TypeError("The q value to be set should be float")
+        else:
+            if not all(qq in range(2,13) for qq in q):
+                    raise ValueError("q values should be in range 2-12")
+
+            if not all(isinstance(dd, (int, float))  for dd in d):
+                    raise ValueError("The q value to be set should be float")
+
+            if averaged:
+                for count, qq in enumerate(q):
+                    self.allaq[qq-2] = d[count]
+            else:
+                for count, qq in enumerate(q):
+                    self.allq[qq-2] = d[count]
 
 
 
@@ -1305,7 +1428,7 @@ class System(pc.System):
 
         """
         psys = self.prepare_pickle()
-        np.save(file, psys)
+        np.save(file, psys, allow_pickle=True)
 
 
     def from_file(self, file):
