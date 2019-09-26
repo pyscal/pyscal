@@ -15,68 +15,61 @@ be elaborate and ideally follow pep-8 conventions.
 namespace py = pybind11;
 using namespace std;
 
+class PyAtom : public Atom {
+public:
+  using Atom::Atom;
+};
+
+vector<double> vv{0,0,0};
 
 PYBIND11_MODULE(ccore, m) {
+    //py::options options;
+    //options.disable_function_signatures();
+
 //bindings for Atom class
 //------------------------------------------------------------------
-    py::class_<Atom>(m,"Atom")
-        .def(py::init< >())
-        .def("get_x",&Atom::gx)
-        .def("set_x",&Atom::sx)
-        .def("get_cluster",&Atom::gcluster)
-        .def("set_cluster",&Atom::scluster)
-        .def("get_neighbors",&Atom::gneighbors)
+    py::class_<Atom, PyAtom>(m,"Atom")
+        .def(py::init < vector<double>, int , int >(), py::arg("pos")=vv, py::arg("id")=0, py::arg("type")=0)
+        .def_property("pos", &Atom::gx, &Atom::sx)
+        .def_property("cluster",&Atom::gcluster, &Atom::scluster)
+        .def_property("neighbors",&Atom::gneighbors, &Atom::sneighbors)
         .def("get_coordination",&Atom::gnneighbors)
-        .def("set_neighbors",&Atom::sneighbors)
-        .def("get_neighborweights",&Atom::gneighborweights)
-        .def("set_neighborweights",&Atom::sneighborweights)
-        .def("set_custom",&Atom::scustom)
-        .def("get_custom",&Atom::gcustom)
-        .def("get_bonds",&Atom::gfrenkelnumber)
-        .def("set_bonds",&Atom::sfrenkelnumber)
-        .def("get_q",&Atom::gq)
-        .def("get_id",&Atom::gid)
-        .def("set_id",&Atom::sid)
-        .def("set_condition",&Atom::scondition)
-        .def("get_condition",&Atom::gcondition)
-        .def("get_solid",&Atom::gsolid)
-        .def("set_solid",&Atom::ssolid)
-        .def("get_structure",&Atom::gstructure)
-        .def("set_structure",&Atom::sstructure)
-        .def("get_loc",&Atom::gloc)
-        .def("set_loc",&Atom::sloc)
-        .def("get_allq",&Atom::gallq)
-        .def("get_allaq",&Atom::gallaq)
-        .def("set_allq",&Atom::sallq)
-        .def("set_allaq",&Atom::sallaq)
-        .def("get_type",&Atom::gtype)
-        .def("set_type",&Atom::stype)
+        .def_property("neighborweights",&Atom::gneighborweights, &Atom::sneighborweights)
+        .def_property("bonds",&Atom::gfrenkelnumber, &Atom::sfrenkelnumber)
+        .def_property("id",&Atom::gid,&Atom::sid)
+        .def_property("condition",&Atom::gcondition, &Atom::scondition)
+        .def_property("solid",&Atom::gsolid,&Atom::ssolid)
+        .def_property("structure",&Atom::gstructure,&Atom::sstructure)
+        .def_property("loc",&Atom::gloc,&Atom::sloc)
+        .def_property("allq",&Atom::gallq,&Atom::sallq)
+        .def_property("allaq",&Atom::gallaq,&Atom::sallaq)
+        .def_property("type",&Atom::gtype,&Atom::stype)
+        .def("get_q",&Atom::gq, R"mydelimiter(
+            Test documentation
+
+            Parameters
+            ----------
+            None
+        )mydelimiter")
         .def("set_q",&Atom::sq)
         .def("get_aq",&Atom::gaq)
         .def("set_aq",&Atom::saq)
         .def("get_qlm",&Atom::gqlm)
         .def("get_aqlm",&Atom::gaqlm)
-        .def("get_volume",&Atom::gvolume)
-        .def("set_volume",&Atom::svolume)
-        .def("get_avgvolume",&Atom::gavgvolume)
-        .def("set_avgvolume",&Atom::savgvolume)
-        .def("get_facevertices", &Atom::gfacevertices)
-        .def("set_facevertices", &Atom::sfacevertices)
-        .def("get_faceperimeters", &Atom::gfaceperimeters)
-        .def("set_faceperimeters", &Atom::sfaceperimeters)
-        .def("get_vertexnumbers", &Atom::gvertex_numbers)
-        .def("set_vertexnumbers", &Atom::svertex_numbers)
-        .def("get_vertexvectors", &Atom::gvertex_vectors)
-        .def("set_vertexvectors", &Atom::svertex_vectors)
-        .def("get_avgconnection", &Atom::gasij)
-        .def("set_avgconnection", &Atom::sasij)
-        ; 
+        .def_property("volume",&Atom::gvolume,&Atom::svolume)
+        .def_property("avg_volume",&Atom::gavgvolume,&Atom::savgvolume)
+        .def_property("face_vertices", &Atom::gfacevertices, &Atom::sfacevertices)
+        .def_property("face_perimeters", &Atom::gfaceperimeters, &Atom::sfaceperimeters)
+        .def_property("vertex_numbers", &Atom::gvertex_numbers, &Atom::svertex_numbers)
+        .def_property("vertex_vectors", &Atom::gvertex_vectors, &Atom::svertex_vectors)
+        .def_property("avg_connection", &Atom::gasij, &Atom::sasij)
+        ;
 
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")
         .def(py::init< >())
-        .def("read_inputfile",&System::read_particle_file)        
-        .def("get_largestcluster",&System::glargestclusterid)             
+        .def("read_inputfile",&System::read_particle_file)
+        .def("get_largestcluster",&System::glargestclusterid)
         .def("set_nucsize_parameters",&System::set_nucsize_parameters)
         .def("assign_particles", &System::assign_particles)
         .def("reassign_particles", &System::reassign_particles)
@@ -103,7 +96,7 @@ PYBIND11_MODULE(ccore, m) {
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
         .def("find_clusters",&System::find_clusters)
         .def("find_clusters_recursive",&System::find_clusters_recursive)
-        .def("find_largest_cluster",&System::largest_cluster) 
+        .def("find_largest_cluster",&System::largest_cluster)
         .def("get_largest_cluster_atoms",&System::get_largest_cluster_atoms)
         .def("set_filter",&System::sfilter)
         .def("assign_triclinic_params",&System::assign_triclinic_params)
