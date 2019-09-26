@@ -9,7 +9,10 @@
 #include <sstream>
 #include <time.h>
 #include <vector>
-
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
+#include <pybind11/stl.h>
+namespace py = pybind11;
 
 using namespace std;
 
@@ -21,7 +24,7 @@ const int NILVALUE = 33333333;
 class Atom{
     /*
     Class to hold the details of an atom. This is a list of all
-    members of the class. 
+    members of the class.
 
     Attributes
     ----------
@@ -36,7 +39,7 @@ class Atom{
     id : int
         id of the atom
     loc : int
-        location of the atom in the array of all atoms in 
+        location of the atom in the array of all atoms in
         the system.
 
     Neighbor related properties
@@ -55,12 +58,12 @@ class Atom{
         structure of the atom.
     belongsto : int
         id of the cluster to which atom belongs to.
-    
-     */    
+
+     */
     public:
-        Atom();
+        Atom(vector<double>, int, int);
         virtual ~Atom();
-        
+
         //basic atom properties
         double posx,posy,posz;
         int id;
@@ -92,7 +95,7 @@ class Atom{
 
 
         double realQ6[13],imgQ6[13];
-    
+
         int frenkelnumber;
         double avq6q6;
         //volume calculated by voronoi tesselation
@@ -112,8 +115,8 @@ class Atom{
         int structure;
         int type;
         int condition;
-        
-        
+
+
         //indicator which is 1 if neighbors are already provided
         int isneighborset;
 
@@ -127,7 +130,7 @@ class Atom{
         //in that case will have to return a vector
         //its probably expensive
         //but that doesnt matter because we wont use it regularl
-      
+
         //function to set neighbors
         void sneighbors(vector<int> nns);
         vector<int> gneighbors();
@@ -141,7 +144,7 @@ class Atom{
         vector<double> gneighborweights();
         //vector<double> gx();
         vector<int> gcluster();
-        void scluster(vector<int>); 
+        void scluster(vector<int>);
 
         //variables for storing q2-12
         //invidual variables or arrays - individual ones are easier!
@@ -194,9 +197,9 @@ class Atom{
 
 
 class System{
-  
+
     public:
-        
+
         double dfactorial(int ,int );
         void convert_to_spherical_coordinates(double , double , double , double &, double &, double &);
         double PLM(int, int, double);
@@ -225,7 +228,7 @@ class System{
 
         //Atom* atoms;
         vector<Atom> atoms;
-    
+
         void read_particle_file(string);
         //void read_particle_instance(int,int);
         int calculate_nucsize();	//variant of function above
@@ -276,7 +279,7 @@ class System{
         //face cutoff
         double face_cutoff;
         void set_face_cutoff(double);
-        
+
         double neighbordistance;
 
         double threshold;
@@ -305,7 +308,7 @@ class System{
         vector<vector<double>> gboxvecs();
         void sbox(vector<vector<double>>);
         vector<double> gboxdims();
-        
+
         //system flags
         int neighborsfound;
         int qsfound;
