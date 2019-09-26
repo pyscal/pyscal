@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include "string.h"
 #include <chrono>
+#include <pybind11/stl.h>
 
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------
@@ -115,7 +116,14 @@ void Atom::scluster(vector<int> c1){
 }
 
 
+py::dict Atom::gcustom(){
 
+    return custom;
+}
+
+void Atom::scustom(py::dict cc){
+    custom = cc;
+}
 
 vector<vector <double>> Atom::gqlm(int qq) {
 
@@ -142,20 +150,78 @@ vector<vector <double>> Atom::gqlm(int qq) {
 double Atom::gq(int qq){ return q[qq-2]; }
 void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
 
-//vector<double> Atom::gqvec(vector<int> qq){
+double Atom::gaq(int qq){ return aq[qq-2]; }
+void Atom::saq(int qq, double qval){ aq[qq-2] = qval; }
 
-//  return q[qq-2];
-//}
-//void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
+double Atom::gq_big( bool averaged, int qval){
 
-//takes vector<int> and returns vector<double>
-//vector<double> Atom::gaq(int qq){ return aq[qq-2]; }
-//void Atom::saq(int qq, double qval){ aq[qq-2] = qval; }
+    if ((qval < 2) || (qval > 12)){
+        throw invalid_argument("q value should be between 2-12");
+    }
+    if(averaged == true) { return gaq(qval);}
+    else {return gq(qval);}
+}
+
+void Atom::sq_big( bool averaged, int qval, double val){
+
+    if ((qval < 2) || (qval > 12)){
+        throw invalid_argument("q value should be between 2-12");
+    }
+    if(averaged == true) { saq(qval, val);}
+    else { sq(qval, val);}
+}
+
+//overloaded version which takes a vector
+vector<double> Atom::gq_big(bool averaged, vector<int> qval ){
+    int d;
+    if(averaged == true) {
+        vector<double> retvals;
+        for(int i=0; i<qval.size(); i++){
+            if ((qval[i] < 2) || (qval[i] > 12)){
+                throw invalid_argument("q value should be between 2-12");
+            }
+            retvals.push_back(gaq(qval[i]));
+        }
+        return retvals;
+    }
+    else {
+        vector<double> retvals;
+        for(int i=0; i<qval.size(); i++){
+            if ((qval[i] < 2) || (qval[i] > 12)){
+                throw invalid_argument("q value should be between 2-12");
+            }
+            retvals.push_back(gq(qval[i]));
+        }
+        return retvals;
+    }
+}
+
+//overloaded version which takes a vector
+void Atom::sq_big(bool averaged, vector<int> qval, vector<double> setvals){
+
+    if(averaged == true) {
+
+        for(int i=0; i<qval.size(); i++){
+            if ((qval[i] < 2) || (qval[i] > 12)){
+                throw invalid_argument("q value should be between 2-12");
+            }
+
+            saq(qval[i], setvals[i]);
+        }
+    }
+    else {
+
+        for(int i=0; i<qval.size(); i++){
+            if ((qval[i] < 2) || (qval[i] > 12)){
+                throw invalid_argument("q value should be between 2-12");
+            }
+            sq(qval[i], setvals[i]);
+        }
+    }
+}
 
 
 //takes int and returns double - one value
-double Atom::gaq(int qq){ return aq[qq-2]; }
-void Atom::saq(int qq, double qval){ aq[qq-2] = qval; }
 
 vector<vector <double>> Atom::gaqlm(int qq) {
 
@@ -178,21 +244,6 @@ vector<vector <double>> Atom::gaqlm(int qq) {
 
 }
 
-void Atom::scustom(vector<double> cvals) {
-    for(int i=0; i<cvals.size(); i++){
-        custom.emplace_back(cvals[i]);
-    }
-    //custom = cvals;
-}
-
-vector<double> Atom::gcustom() {
-    vector <double> rqlms;
-    for(int i=0; i<custom.size(); i++){
-        rqlms.emplace_back(custom[i]);
-    }
-    //rqlms = custom;
-    return rqlms;
-}
 
 //functions to set the neighbors for each atoms
 void Atom::sneighbors(vector<int> nns){

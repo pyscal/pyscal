@@ -8,7 +8,9 @@
 #include <sstream>
 #include <time.h>
 #include <vector>
+#include <pybind11/stl.h>
 
+namespace py = pybind11;
 using namespace std;
 
 
@@ -62,6 +64,10 @@ class Atom{
         double posx,posy,posz;
         int id;
         int loc;
+
+        py::dict custom;
+        py::dict gcustom();
+        void scustom(py::dict);
 
         //neighbor related properties
         int neighbors[MAXNUMBEROFNEIGHBORS];
@@ -156,6 +162,12 @@ class Atom{
 
         double gq(int);
         void sq(int, double);
+
+        double gq_big(bool, int);
+        void sq_big( bool, int, double);
+        vector<double> gq_big(bool, vector<int>);
+        void sq_big(bool, vector<int>, vector<double>);
+
         vector <vector<double>> gqlm(int);
 
         double gaq(int);
@@ -173,10 +185,6 @@ class Atom{
         int gstructure();
         void sstructure(int);
 
-        //for custom values
-        vector <double> custom;
-        void scustom(vector <double>);
-        vector<double> gcustom();
 
         void scondition(int);
         int gcondition();

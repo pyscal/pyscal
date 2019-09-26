@@ -44,6 +44,7 @@ PYBIND11_MODULE(catom, m) {
         .def_property("allq",&Atom::gallq,&Atom::sallq)
         .def_property("allaq",&Atom::gallaq,&Atom::sallaq)
         .def_property("type",&Atom::gtype,&Atom::stype)
+        .def_property("custom",&Atom::gcustom,&Atom::scustom)
         .def("get_q",&Atom::gq, R"mydelimiter(
             Test documentation
 
@@ -63,6 +64,11 @@ PYBIND11_MODULE(catom, m) {
         .def_property("vertex_numbers", &Atom::gvertex_numbers, &Atom::svertex_numbers)
         .def_property("vertex_vectors", &Atom::gvertex_vectors, &Atom::svertex_vectors)
         .def_property("avg_connection", &Atom::gasij, &Atom::sasij)
+        .def("get_q", (double (Atom::*) (bool, int))  &Atom::gq_big, py::arg("averaged"), py::arg("q"))
+        .def("get_q", (vector<double> (Atom::*) (bool, vector<int>))  &Atom::gq_big, py::arg("averaged"), py::arg("q"))
+        .def("set_q", (void (Atom::*) (bool, int, double))  &Atom::sq_big, py::arg("averaged"), py::arg("q"), py::arg("vals"))
+        .def("set_q", (void (Atom::*) (bool, vector<int>, vector<double>))  &Atom::sq_big, py::arg("averaged"), py::arg("q"), py::arg("vals"))
+
         ;
 
 
