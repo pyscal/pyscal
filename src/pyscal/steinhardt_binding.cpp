@@ -23,8 +23,8 @@ public:
 vector<double> vv{0,0,0};
 
 PYBIND11_MODULE(ccore, m) {
-    //py::options options;
-    //options.disable_function_signatures();
+    py::options options;
+    options.disable_function_signatures();
 
 //bindings for Atom class
 //------------------------------------------------------------------

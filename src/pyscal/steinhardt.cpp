@@ -1524,7 +1524,7 @@ int Atom::gnneighbors(){
     return n_neighbors;
 }
 
-double Atom::gq(int qq){ return q[qq-2]; }
+
 int Atom::gid(){ return id; }
 int Atom::gfrenkelnumber(){ return frenkelnumber; }
 void Atom::sfrenkelnumber(int nn){ frenkelnumber=nn; }
@@ -1606,7 +1606,7 @@ void Atom::scluster(vector<int> c1){
 }
 
 
-void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
+
 
 vector<vector <double>> Atom::gqlm(int qq) {
 
@@ -1629,6 +1629,22 @@ vector<vector <double>> Atom::gqlm(int qq) {
 
 }
 
+//for q vals
+double Atom::gq(int qq){ return q[qq-2]; }
+void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
+
+vector<double> Atom::gqvec(vector<int> qq){
+  
+  return q[qq-2];
+}
+void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
+
+//takes vector<int> and returns vector<double>
+vector<double> Atom::gaq(int qq){ return aq[qq-2]; }
+void Atom::saq(int qq, double qval){ aq[qq-2] = qval; }
+
+
+//takes int and returns double - one value
 double Atom::gaq(int qq){ return aq[qq-2]; }
 void Atom::saq(int qq, double qval){ aq[qq-2] = qval; }
 
