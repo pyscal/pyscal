@@ -86,8 +86,8 @@ setup(
     # tell setuptools that all packages will be under the 'src' directory
     # and nowhere else
     package_dir={'':'src'},
-    # add an extension module named 'python_cpp_example' to the package 
-    ext_modules=[CMakeExtension('pyscal/ccore')],
+    # add an extension module named 'python_cpp_example' to the package
+    ext_modules=[CMakeExtension('pyscal/catom'), CMakeExtension('pyscal/csystem')],
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
