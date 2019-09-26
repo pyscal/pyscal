@@ -33,10 +33,10 @@ pyscal.pickle module
    :undoc-members:
    :show-inheritance:
 
-pyscal.ccore module
+pyscal.catom module
 --------------------
 
-   .. automodule:: pyscal.ccore
+   .. automodule:: pyscal.catom
       :members:
       :undoc-members:
       :show-inheritance:

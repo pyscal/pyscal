@@ -6,512 +6,13 @@ by combining various methods, validation etc.
 
 """
 
-import pyscal.ccore as pc
+import pyscal.catom as pca
+import pyscal.csystem as pcs
 import pyscal.traj_process as ptp
 import pyscal.pickle as pp
 import os
 import numpy as np
 import warnings
-
-"""
-Definitions of class Atom.
-
-"""
-class Atom(pc.Atom):
-    """
-    Class to store atom details.
-
-    Parameters
-    ----------
-    pos : list of floats of length 3
-        position of the `Atom`, default [0,0,0]
-
-    id : int
-        id of the `Atom`, default 0
-
-    type : int
-        type of the `Atom`, default 1
-
-    Notes
-    -----
-    A c++ class for holding the properties of a single atom. Various properties of the atom
-    can be accessed through member functions which are described below in detail. Atoms can
-    be created individually or directly by reading in a file. Check the examples for more
-    details on how atoms are created. For creating atoms directly from an input file check
-    the documentation of :class:`~System` class.
-
-    Although an `Atom` object can be created independently, `Atom` should be thought of
-    inherently as members of the :class:`~System` class. All the properties that define an atom are
-    relative to the parent class. :class:`~System` has a list of all atoms using which the neighbors
-    of an `Atom`, if its solid and so on can be calculated. All the calculated properties of an
-    atom which depend on any other atom, hence should be calculated through :class:`~System`. Please
-    check the examples section of the documentation for more details.
-
-
-    Examples
-    --------
-    >>> #method 1 - individually
-    >>> atom = Atom()
-    >>> #now set positions of the atoms
-    >>> atom.set_x([23.0, 45.2, 34.2])
-    >>> #now set id
-    >>> atom.set_id(23)
-
-    """
-    def __init__(self, pos = [0,0,0], id = 0, type = 1):
-        """
-        Defaults args
-        """
-        a=1
-        self.custom = {}
-
-        self.pos = pos
-        self.solid = False
-        self.structure = 0
-        self.surface = False
-        self.cluster = -1
-        self.largest_cluster = False
-        self.neighbors = []
-        self.neighbor_weights = []
-
-        #qvals : they need better treatment
-        self.allq = [-1 for x in range(12)]
-        self.allaq = [-1 for x in range(12)]
-
-        self.id = id
-        self.loc = 0
-        self.type = type
-        self.volume = 0
-        self.avg_volume = 0
-        self.face_vertices = []
-        self.face_perimeters = []
-        self.vertex_numbers = []
-        self.vertex_vectors = []
-        self.condition = 0
-        self.avg_connection = 0
-        self.bonds = 0
-
-    #overload the setattr function to overload
-    def __setattr__(self, variable, value):
-
-        if variable == 'pos':
-            if not all(isinstance(x, (int, float)) for x in value):
-                raise TypeError("all values of pos should float")
-            if len(value) is not 3:
-                raise ValueError("pos should be of length 3")
-            pc.Atom.set_x(self, value)
-
-        elif variable in ['solid', 'surface', 'largest_cluster']:
-            if not (isinstance(value, bool) or (value in [0, 1])):
-                raise TypeError("%s value should be of type bool"%variable)
-
-            if variable == 'solid':
-                cinfo = pc.Atom.get_cluster(self)
-                cinfo[0] = value
-                pc.Atom.set_cluster(self, cinfo)
-
-            if variable == 'surface':
-                cinfo = pc.Atom.get_cluster(self)
-                cinfo[1] = value
-                pc.Atom.set_cluster(self, cinfo)
-
-            if variable == 'largest_cluster':
-                cinfo = pc.Atom.get_cluster(self)
-                cinfo[2] = value
-                pc.Atom.set_cluster(self, cinfo)
-
-        elif variable == 'cluster':
-            if not isinstance(value, int):
-                raise TypeError("value of cluster should be int")
-            cinfo = pc.Atom.get_cluster(self)
-            cinfo[3] = value
-            pc.Atom.set_cluster(self, cinfo)
-
-        elif variable == 'structure':
-            if not isinstance(value, int):
-                raise TypeError("value of structure should be int")
-            pc.Atom.set_structure(self, value)
-
-        elif variable == 'neighbors':
-            if not all(isinstance(x, int) for x in value):
-                raise TypeError("all values should be int")
-            pc.Atom.set_neighbors(self, value)
-
-        elif variable == 'neighbor_weights':
-            if not all(isinstance(x, (int, float)) for x in value):
-                raise TypeError("all values should be int/float")
-            pc.Atom.set_neighborweights(self, value)
-
-        elif variable == 'allq':
-            if not all(isinstance(x, (int, float)) for x in value):
-                raise TypeError("all values should be int/float")
-            pc.Atom.set_allq(self, value)
-
-        elif variable == 'allaq':
-            if not all(isinstance(x, (int, float)) for x in value):
-                raise TypeError("all values should be int/float")
-            pc.Atom.set_allaq(self, value)
-
-        elif variable == 'id':
-            if not isinstance(value, int):
-                raise TypeError("value of id should be int")
-            pc.Atom.set_id(self, value)
-
-        elif variable == 'loc':
-            if not isinstance(value, int):
-                raise TypeError("value of loc should be int")
-            pc.Atom.set_loc(self, value)
-
-        elif variable == 'type':
-            if not isinstance(value, int):
-                raise TypeError("value of type should be int")
-            pc.Atom.set_type(self, value)
-
-        elif variable == 'volume':
-            if not isinstance(value, (int, float)):
-                raise TypeError("value of volume should be int")
-            pc.Atom.set_volume(self, value)
-
-        elif variable == 'avg_volume':
-            if not isinstance(value, (int, float)):
-                raise TypeError("value of avg volume should be int")
-            pc.Atom.set_avgvolume(self, value)
-
-        elif variable == 'face_vertices':
-            if not all(isinstance(x, (int, float)) for x in value):
-                raise TypeError("all values should be int/float")
-            pc.Atom.set_facevertices(self, value)
-
-        elif variable == 'face_perimeters':
-            if not all(isinstance(x, (int, float)) for x in value):
-                raise TypeError("all values should be int/float")
-            pc.Atom.set_faceperimeters(self, value)
-
-        elif variable == 'vertex_numbers':
-            if not all(isinstance(x, int) for x in value):
-                raise TypeError("all values should be int")
-            pc.Atom.set_vertexnumbers(self, value)
-
-        elif variable == 'vertex_vectors':
-            if not all(isinstance(x, (int, float)) for x in value):
-                raise TypeError("all values should be int/float")
-            pc.Atom.set_vertexvectors(self, value)
-
-        elif variable == 'condition':
-            if not isinstance(value, int):
-                raise TypeError("value of condition should be int")
-            pc.Atom.set_condition(self, value)
-
-        elif variable == 'avg_connection':
-            if not isinstance(value, (int, float)):
-                raise TypeError("value of connection should be int")
-            pc.Atom.set_avgconnection(self, value)
-
-        elif variable == 'bonds':
-            if not isinstance(value, int):
-                raise TypeError("value of bonds should be int")
-            pc.Atom.set_bonds(self, value)
-
-        #finally assign the variables
-        super(Atom, self).__setattr__(variable, value)
-
-
-    #try a get attribute
-    def __getattr__(self, name):
-        #now check if the first letter is q
-        if name == 'pos':
-            return pc.System.get_x(self)
-
-        elif name == 'solid':
-            cinfo = pc.Atom.get_cluster(self)
-            return cinfo[0]
-
-        elif name == 'surface':
-            cinfo = pc.Atom.get_cluster(self)
-            return cinfo[1]
-
-        elif name == 'largest_cluster':
-            cinfo = pc.Atom.get_cluster(self)
-            return cinfo[2]
-
-        elif name == 'cluster':
-            cinfo = pc.Atom.get_cluster(self)
-            return cinfo[3]
-
-        elif name == 'structure':
-            return pc.Atom.get_structure(self)
-
-        elif name == 'neighbors':
-            return pc.Atom.get_neighbors(self)
-
-        elif name == 'neighbor_weights':
-            return pc.Atom.get_neighborweights(self)
-
-        elif name == 'allq':
-            return pc.Atom.get_allq(self)
-
-        elif name == 'allaq':
-            return pc.Atom.get_allaq(self)
-
-        elif name == 'id':
-            return pc.Atom.get_id(self)
-
-        elif name == 'loc':
-            return pc.Atom.get_loc(self)
-
-        elif name == 'type':
-            return pc.Atom.get_type(self)
-
-        elif name == 'volume':
-            return pc.Atom.get_volume(self)
-
-        elif name == 'avg_volume':
-            return pc.Atom.get_avgvolume(self)
-
-        elif name == 'face_vertices':
-            return pc.Atom.get_facevertices(self)
-
-        elif name == 'face_perimeters':
-            return pc.Atom.get_faceperimeters(self)
-
-        elif name == 'vertex_numbers':
-            return pc.Atom.get_vertexnumbers(self)
-
-        elif name == 'vertex_vectors':
-            return pc.Atom.get_vertexvectors(self)
-
-        elif name == 'condition':
-            return pc.Atom.get_condition(self)
-
-        elif name == 'avg_connection':
-            return pc.Atom.get_avgconnection(self)
-
-        elif name == 'bonds':
-            return pc.Atom.get_bonds(self)
-
-        elif name[0] == 'q':
-            #then extract the next two parts
-            reqd_q = int(name[1:]) - 2
-            return self.allq[reqd_q]
-
-        elif name[:2] == 'aq':
-            #then extract the next two parts
-            reqd_q = int(name[2:]) - 2
-            return self.allaq[reqd_q]
-
-        else:
-            raise AttributeError(name)
-
-    #add a getstate and setstate functions
-    #will be called during pickling
-    def __getstate__(self):
-        return self.__dict__
-
-    def __setstate__(self, value):
-        return self.__dict__.update(value)
-
-    #property for coordination - dynamic values
-    @property
-    def coordination(self):
-        return (len(self.neighbors))
-
-    @coordination.setter
-    def coordination(self, value):
-        raise ValueError("coordination values cannot be set")
-
-
-    def get_vorovector(self, edge_cutoff=0.05, area_cutoff=0.01, edge_length=False):
-        """
-        get the voronoi structure identification vector.
-
-        Parameters
-        ----------
-        edge_cutoff : float, optional
-            cutoff for edge length. Default 0.05.
-
-
-        area_cutoff : float, optional        self.initialized = 23
-            cutoff for face area. Default 0.01.
-
-        edge_length : bool, optional
-            if True, a list of unrefined edge lengths are returned. Default false.
-
-        Returns
-        -------
-        vorovector : array like, int
-            array of the form (n3, n4, n5, n6)
-
-        Notes
-        -----
-        Returns a vector of the form `(n3, n4, n5, n6)`, where `n3` is the number
-        of faces with 3 vertices, `n4` is the number of faces with 4
-        vertices and so on. This can be used to identify structures [1]_ [2]_.
-
-        The keywords `edge_cutoff` and `area_cutoff` can be used to tune the values to minimise
-        the effect of thermal distortions. Edges are only considered in the analysis if the
-        `edge_length/sum(edge_lengths)` is at least `edge_cutoff`. Similarly, faces are only
-        considered in the analysis if the  `face_area/sum(face_areas)` is at least `face_cutoff`.
-
-        References
-        ----------
-        .. [1] Finney, JL, Proc. Royal Soc. Lond. A 319, 1970
-        .. [2] Tanemura, M, Hiwatari, Y, Matsuda, H,Ogawa, T, Ogita, N, Ueda, A. Prog. Theor. Phys. 58, 1977
-
-        """
-        #start looping over and eliminating short edges
-        st = 1
-        refined_edges = []
-        edge_lengths = []
-
-        for vno in self.face_vertices:
-
-            vphase = self.vertex_numbers[st:st+vno]
-            edgecount = 0
-            dummy_edge_lengths = []
-
-            #now calculate the length f each edge
-            for i in range(-1, len(vphase)-1):
-                #get pairs of indices
-                #verts are i, i+1
-                ipos = self.vertex_vectors[vphase[i]*3:vphase[i]*3+3]
-                jpos = self.vertex_vectors[vphase[i+1]*3:vphase[i+1]*3+3]
-
-                #now calculate edge length
-                edgeln = np.sqrt((ipos[0]-jpos[0])**2 + (ipos[1]-jpos[1])**2 + (ipos[2]-jpos[2])**2)
-                dummy_edge_lengths.append(edgeln)
-
-            edge_lengths.append(dummy_edge_lengths)
-            st += (vno+1)
-
-        #now all the edge lengths are saved
-        for c, ed in enumerate(edge_lengths):
-            #normalise the edge lengths
-            norm = (ed/np.sum(ed))
-            #apply face area cutoff
-            if (self.neighbor_weights[c] > area_cutoff):
-                #check for edge length cutoff
-                edgecount = len([cc for cc,x in enumerate(norm) if x > edge_cutoff])
-                refined_edges.append(edgecount)
-
-        #now loop over refined edges and collect n3, n4, n5, n6
-        vorovector = [0, 0, 0, 0]
-
-        for ed in refined_edges:
-            if ed == 3:
-                vorovector[0] += 1
-            elif ed == 4:
-                vorovector[1] += 1
-            elif ed == 5:
-                vorovector[2] += 1
-            elif ed == 6:
-                vorovector[3] += 1
-
-        if edge_length:
-            return vorovector, edge_lengths
-        else:
-            return vorovector
-
-
-    def get_q(self, q, averaged = False):
-        """
-        get q value of the atom.
-        Parameters
-        ----------
-        q : int or list of int
-            number of the required q - from 2-12
-        averaged : bool, optional
-            If True, return the averaged q values,
-            If False, return the non averaged ones
-            default False
-        Returns
-        -------
-        q : float or list of floats
-            The queried q value
-        Notes
-        -----
-        The q value can be either normal or can be averaged [1]_
-        The averaged version can be obtained by using keyword
-        `averaged = True`.
-        References
-        ----------
-        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
-        Examples
-        --------
-        >>> q2 = atom.get_q(2, averaged = True)
-        >>> q24 = atom.get_q([2, 4])
-        """
-        if isinstance(q, int):
-            if not q in range(2, 13):
-                raise ValueError("q values should be in range 2-12")
-            if averaged:
-                return self.allaq[q-2]
-            else:
-                return self.allq[q-2]
-
-        else:
-
-            if not all(qq in range(2,13) for qq in q):
-                raise ValueError("q values should be in range 2-12")
-            if averaged:
-                return [ self.allaq[qq-2] for qq in q ]
-            else:
-                return [ self.allq[qq-2] for qq in q ]
-
-
-    def set_q(self, q, d, averaged = False):
-        """
-        set the q value of the atom.
-        Parameters
-        ----------
-        q : int or list of ints
-            number of the required q - from 2-12
-        d : float or list of floats
-            the q value to set
-        averaged : bool, optional
-            If True, return the averaged q values,
-            If False, return the non averaged ones
-            default False
-        Returns
-        -------
-        None
-        Notes
-        -----
-        The q value can be either normal or can be averaged [1]_
-        The averaged version can be obtained by using keyword
-        `averaged = True`.
-        References
-        ----------
-        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
-        Examples
-        --------
-        >>> atom.set_q(2, 0.24, averaged = True)
-        >>> atom.set_q([2,4], [0.24, 0.05])
-        """
-        if isinstance(q, int):
-            if isinstance(d, (int, float)):
-                if not q in range(2, 13):
-                    raise ValueError("q values should be in range 2-12")
-                if averaged:
-                    self.allaq[q-2] = d
-                else:
-                    self.allq[q-2] = d
-            else:
-                raise TypeError("The q value to be set should be float")
-        else:
-            if not all(qq in range(2,13) for qq in q):
-                    raise ValueError("q values should be in range 2-12")
-
-            if not all(isinstance(dd, (int, float))  for dd in d):
-                    raise ValueError("The q value to be set should be float")
-
-            if averaged:
-                for count, qq in enumerate(q):
-                    self.allaq[qq-2] = d[count]
-            else:
-                for count, qq in enumerate(q):
-                    self.allq[qq-2] = d[count]
-
-
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -520,7 +21,7 @@ System class definitions
 #------------------------------------------------------------------------------------------------------------
 
 
-class System(pc.System):
+class System(pcs.System):
     """
     A c++ class for holding the properties of a system.
 
@@ -543,7 +44,7 @@ class System(pc.System):
         self.nop = 0
         #this method can be done more
         #we can remove checks on the cpp side
-        pc.System.__init__(self)
+        pcs.System.__init__(self)
 
     #try a get attribute
     def __getattr__(self, name):
@@ -551,12 +52,12 @@ class System(pc.System):
 
         if name == 'box':
             #then extract the next two parts
-            box6dim = pc.System.get_box(self)
+            box6dim = pcs.System.get_box(self)
             pbox = [[box6dim[0], box6dim[1]], [box6dim[2], box6dim[3]], [box6dim[4], box6dim[5]]]
             return pbox
 
         elif name == 'box_vectors':
-            pbox = pc.System.get_boxvecs(self)
+            pbox = pcs.System.get_boxvecs(self)
             return pbox
 
         else:
@@ -572,7 +73,7 @@ class System(pc.System):
             if not all(all(isinstance(x, (int, float)) for x in xx) for xx in value):
                 raise TypeError("all values must be float")
 
-            pc.System.set_box(self, value)
+            pcs.System.set_box(self, value)
 
         elif variable == 'box_vectors':
             raise AttributeError("box_vectors are calculated from box. If using triclinic, read in a file instead.")
@@ -661,14 +162,14 @@ class System(pc.System):
                     self.atoms = [self.copy_atom(tatom) for tatom in tatoms]
                     #now get catoms
                     catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
-                    pc.System.assign_particles(self, catoms, boxdims)
+                    pcs.System.assign_particles(self, catoms, boxdims)
                     self.nop = len(catoms)
 
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
                         rot = box.T
                         rotinv = np.linalg.inv(rot)
-                        pc.System.assign_triclinic_params(self, rot, rotinv)
+                        pcs.System.assign_triclinic_params(self, rot, rotinv)
                 else:
                     raise FileNotFoundError("input file %s not found"%filename)
 
@@ -683,14 +184,14 @@ class System(pc.System):
                 #now get catoms
                 catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
 
-                pc.System.assign_particles(self, catoms, boxdims)
+                pcs.System.assign_particles(self, catoms, boxdims)
                 self.nop = len(catoms)
 
                 if triclinic:
                     #we have to input rotation matrix and the inverse rotation matrix
                     rot = box.T
                     rotinv = np.linalg.inv(rot)
-                    pc.System.assign_triclinic_params(self, rot, rotinv)
+                    pcs.System.assign_triclinic_params(self, rot, rotinv)
             else:
                 raise FileNotFoundError("input file %s not found"%filename)
 
@@ -703,7 +204,7 @@ class System(pc.System):
                 #now get catoms
                 catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
 
-                pc.System.assign_particles(self, catoms, boxdims)
+                pcs.System.assign_particles(self, catoms, boxdims)
                 self.nop = len(catoms)
 
             else:
@@ -766,7 +267,7 @@ class System(pc.System):
         read_inputfile
         """
         #self.no_of_atoms = len(atoms)
-        pc.System.assign_particles(self, atoms, box)
+        pcs.System.assign_particles(self, atoms, box)
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
         """
@@ -791,7 +292,7 @@ class System(pc.System):
             radius in distance units
 
         """
-        distances = pc.System.get_pairdistances(self)
+        distances = pcs.System.get_pairdistances(self)
 
         if histomax == None:
             histomax = max(distances)
@@ -802,9 +303,9 @@ class System(pc.System):
         r = bin_edges[:-1]
 
         #get box density
-        boxvecs = pc.System.get_boxvecs(self)
+        boxvecs = pcs.System.get_boxvecs(self)
         vol = np.dot(np.cross(boxvecs[0], boxvecs[1]), boxvecs[2])
-        natoms = pc.System.get_nop(self)
+        natoms = pcs.System.get_nop(self)
         rho = natoms/vol
 
         shell_vols = (4./3.)*np.pi*((r+edgewidth)**3 - r**3)
@@ -833,7 +334,7 @@ class System(pc.System):
         allatoms : list of `Atom` objects
             all atoms in the system
         """
-        atomcs = pc.System.get_allatoms(self)
+        atomcs = pcs.System.get_allatoms(self)
         atoms = [self.copy_catom_to_atom(xx) for xx in atomcs]
         return atoms
 
@@ -865,9 +366,9 @@ class System(pc.System):
         if isinstance(q, int):
             if q in range(2, 13):
                 if averaged:
-                    rq = pc.System.get_aqvals(self, q)
+                    rq = pcs.System.get_aqvals(self, q)
                 else:
-                    rq = pc.System.get_qvals(self, q)
+                    rq = pcs.System.get_qvals(self, q)
                 return rq
             else:
                 raise ValueError("the value of q should be between 2 and 12")
@@ -877,9 +378,9 @@ class System(pc.System):
                 if not qq in range(2, 13):
                     raise ValueError("the value of q should be between 2 and 12")
             if averaged:
-                rq = [ pc.System.get_aqvals(self, qq) for qq in q ]
+                rq = [ pcs.System.get_aqvals(self, qq) for qq in q ]
             else:
-                rq = [ pc.System.get_qvals(self, qq) for qq in q ]
+                rq = [ pcs.System.get_qvals(self, qq) for qq in q ]
             return rq
 
 
@@ -903,7 +404,7 @@ class System(pc.System):
 
         atom1c = self.copy_atom_to_catom(atom1)
         atom2c = self.copy_atom_to_catom(atom2)
-        return pc.System.get_absdistance(self, atom1c, atom2c)
+        return pcs.System.get_absdistance(self, atom1c, atom2c)
 
 
     def find_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None,
@@ -1006,18 +507,18 @@ class System(pc.System):
 
         """
         #first reset all neighbors
-        pc.System.reset_allneighbors(self)
-        pc.System.set_filter(self, 0)
+        pcs.System.reset_allneighbors(self)
+        pcs.System.set_filter(self, 0)
 
         if filter == 'type':
             # type corresponds to 1
-            pc.System.set_filter(self, 1)
+            pcs.System.set_filter(self, 1)
 
         if method == 'cutoff':
             if cutoff=='sann':
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
-                finished = pc.System.get_all_neighbors_sann(self, threshold)
+                finished = pcs.System.get_all_neighbors_sann(self, threshold)
                 #if it finished without finding neighbors
                 if not finished:
                     finallydone = False
@@ -1025,8 +526,8 @@ class System(pc.System):
                         #threshold value is probably too low
                         #try increasing threshold
                         warnings.warn("Could not find sann cutoff. trying with a higher threshold", RuntimeWarning)
-                        pc.System.reset_allneighbors(self)
-                        newfinished = pc.System.get_all_neighbors_sann(self, threshold*i)
+                        pcs.System.reset_allneighbors(self)
+                        newfinished = pcs.System.get_all_neighbors_sann(self, threshold*i)
                         if newfinished:
                             finallydone = True
                             warnings.warn("found neighbors with higher threshold than default/user input")
@@ -1038,18 +539,18 @@ class System(pc.System):
             elif cutoff=='adaptive' or cutoff==0:
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
-                finished = pc.System.get_all_neighbors_adaptive(self, threshold, nlimit, padding)
+                finished = pcs.System.get_all_neighbors_adaptive(self, threshold, nlimit, padding)
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")
             else:
                 #warnings.warn("THIS RAN")
-                pc.System.set_neighbordistance(self, cutoff)
-                pc.System.get_all_neighbors_normal(self)
+                pcs.System.set_neighbordistance(self, cutoff)
+                pcs.System.get_all_neighbors_normal(self)
 
         elif method == 'voronoi':
-            pc.System.set_face_cutoff(self, face_cutoff)
-            pc.System.set_alpha(self, int(voroexp))
-            pc.System.get_all_neighbors_voronoi(self)
+            pcs.System.set_face_cutoff(self, face_cutoff)
+            pcs.System.set_alpha(self, int(voroexp))
+            pcs.System.get_all_neighbors_voronoi(self)
 
         self.neighbors_found = True
 
@@ -1073,7 +574,100 @@ class System(pc.System):
         It is used automatically when neighbors are recalculated.
 
         """
-        pc.System.reset_allneighbors(self)
+        pcs.System.reset_allneighbors(self)
+
+    def calculate_vorovector(self, edge_cutoff=0.05, area_cutoff=0.01, edge_length=False):
+        """
+        get the voronoi structure identification vector.
+
+        Parameters
+        ----------
+        edge_cutoff : float, optional
+            cutoff for edge length. Default 0.05.
+
+
+        area_cutoff : float, optional        self.initialized = 23
+            cutoff for face area. Default 0.01.
+
+        edge_length : bool, optional
+            if True, a list of unrefined edge lengths are returned. Default false.
+
+        Returns
+        -------
+        vorovector : array like, int
+            array of the form (n3, n4, n5, n6)
+
+        Notes
+        -----
+        Returns a vector of the form `(n3, n4, n5, n6)`, where `n3` is the number
+        of faces with 3 vertices, `n4` is the number of faces with 4
+        vertices and so on. This can be used to identify structures [1]_ [2]_.
+
+        The keywords `edge_cutoff` and `area_cutoff` can be used to tune the values to minimise
+        the effect of thermal distortions. Edges are only considered in the analysis if the
+        `edge_length/sum(edge_lengths)` is at least `edge_cutoff`. Similarly, faces are only
+        considered in the analysis if the  `face_area/sum(face_areas)` is at least `face_cutoff`.
+
+        References
+        ----------
+        .. [1] Finney, JL, Proc. Royal Soc. Lond. A 319, 1970
+        .. [2] Tanemura, M, Hiwatari, Y, Matsuda, H,Ogawa, T, Ogita, N, Ueda, A. Prog. Theor. Phys. 58, 1977
+
+        """
+        atoms = pcs.System.get_allatoms(self)
+
+        for atom in atoms:
+            #start looping over and eliminating short edges
+            st = 1
+            refined_edges = []
+            edge_lengths = []
+
+            for vno in atom.face_vertices:
+
+                vphase = atom.vertex_numbers[st:st+vno]
+                edgecount = 0
+                dummy_edge_lengths = []
+
+                #now calculate the length f each edge
+                for i in range(-1, len(vphase)-1):
+                    #get pairs of indices
+                    #verts are i, i+1
+                    ipos = atom.vertex_vectors[vphase[i]*3:vphase[i]*3+3]
+                    jpos = atom.vertex_vectors[vphase[i+1]*3:vphase[i+1]*3+3]
+
+                    #now calculate edge length
+                    edgeln = np.sqrt((ipos[0]-jpos[0])**2 + (ipos[1]-jpos[1])**2 + (ipos[2]-jpos[2])**2)
+                    dummy_edge_lengths.append(edgeln)
+
+                edge_lengths.append(dummy_edge_lengths)
+                st += (vno+1)
+
+            #now all the edge lengths are saved
+            for c, ed in enumerate(edge_lengths):
+                #normalise the edge lengths
+                norm = (ed/np.sum(ed))
+                #apply face area cutoff
+                if (atom.neighbor_weights[c] > area_cutoff):
+                    #check for edge length cutoff
+                    edgecount = len([cc for cc,x in enumerate(norm) if x > edge_cutoff])
+                    refined_edges.append(edgecount)
+
+            #now loop over refined edges and collect n3, n4, n5, n6
+            vorovector = [0, 0, 0, 0]
+
+            for ed in refined_edges:
+                if ed == 3:
+                    vorovector[0] += 1
+                elif ed == 4:
+                    vorovector[1] += 1
+                elif ed == 5:
+                    vorovector[2] += 1
+                elif ed == 6:
+                    vorovector[3] += 1
+
+            atom.edge_lengths = edge_lengths
+            atom.vorovector = vorovector
+
 
     def calculate_q(self, q, averaged = False):
         """
@@ -1114,10 +708,10 @@ class System(pc.System):
             if not ql in range(2,13):
                 raise ValueError("value of q should be between 2 and 13")
 
-        pc.System.calculate_q(self, qq)
+        pcs.System.calculate_q(self, qq)
 
         if averaged:
-            pc.System.calculate_aq(self, qq)
+            pcs.System.calculate_aq(self, qq)
 
     def get_largestcluster(self):
         """
@@ -1138,7 +732,7 @@ class System(pc.System):
         been found using the :func:`~System.find_solids` with keyword `cluster=True`. Otherwise it returns the default values.
 
         """
-        return pc.System.get_largestcluster(self)
+        return pcs.System.get_largestcluster(self)
 
     def find_solids(self, bonds=7, threshold=0.5, avgthreshold=0.6, cluster=True):
         """
@@ -1216,13 +810,13 @@ class System(pc.System):
 
         #start identification routine
         #first calculate q
-        pc.System.calculate_q(self, [6])
+        pcs.System.calculate_q(self, [6])
         #self.calculate_q(6)
         #calculate solid neighs
-        pc.System.set_nucsize_parameters(self, bonds, threshold, avgthreshold)
-        pc.System.calculate_frenkelnumbers(self)
+        pcs.System.set_nucsize_parameters(self, bonds, threshold, avgthreshold)
+        pcs.System.calculate_frenkelnumbers(self)
         #now find solids
-        pc.System.find_solid_atoms(self)
+        pcs.System.find_solid_atoms(self)
 
         if cluster:
             def ccondition(atom):
@@ -1281,7 +875,7 @@ class System(pc.System):
             raise RuntimeError("condition did not work")
 
         #now loop
-        nop = pc.System.get_nop(self)
+        nop = pcs.System.get_nop(self)
         for i in range(nop):
             atom = self.get_atom(i)
             cval = condition(atom)
@@ -1290,11 +884,11 @@ class System(pc.System):
 
         #atom conditions are set
         #now can clustering function
-        pc.System.find_clusters_recursive(self)
+        pcs.System.find_clusters_recursive(self)
 
         #done!
-        lc = pc.System.find_largest_cluster(self)
-        #pc.System.get_largest_cluster_atoms(self)
+        lc = pcs.System.find_largest_cluster(self)
+        #pcs.System.get_largest_cluster_atoms(self)
 
         if largest:
             return lc
@@ -1330,9 +924,9 @@ class System(pc.System):
         warnings.simplefilter('always', DeprecationWarning)
         warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
 
-        pc.System.calculate_q(self, [6])
-        pc.System.set_nucsize_parameters(self, frenkelnums, threshold, avgthreshold)
-        return pc.System.calculate_nucsize(self)
+        pcs.System.calculate_q(self, [6])
+        pcs.System.set_nucsize_parameters(self, frenkelnums, threshold, avgthreshold)
+        return pcs.System.calculate_nucsize(self)
 
     def calculate_solidneighbors(self):
         """
@@ -1352,7 +946,7 @@ class System(pc.System):
         betweem them is greater than 0.6.
 
         """
-        pc.System.calculate_frenkelnumbers(self)
+        pcs.System.calculate_frenkelnumbers(self)
 
     def find_clusters(self, recursive = True, largest = True):
         """
@@ -1388,12 +982,12 @@ class System(pc.System):
         warnings.warn("This function is deprecated - use cluster_atoms instead", DeprecationWarning)
 
         if recursive:
-            pc.System.find_clusters_recursive(self)
+            pcs.System.find_clusters_recursive(self)
         else:
-            pc.System.find_clusters(self)
+            pcs.System.find_clusters(self)
 
         if largest:
-            cluster = pc.System.find_largest_cluster(self)
+            cluster = pcs.System.find_largest_cluster(self)
             return cluster
 
     def find_largestcluster(self):
@@ -1414,7 +1008,7 @@ class System(pc.System):
         :func:`System.find_clusters` has to be used before using this function.
 
         """
-        return pc.System.find_largest_cluster(self)
+        return pcs.System.find_largest_cluster(self)
 
     def copy_catom_to_atom(self, atomc, destination=None):
         """
@@ -1493,7 +1087,7 @@ class System(pc.System):
         passed on the system for calculation.
 
         """
-        atomc = pc.Atom()
+        atomc = pca.Atom()
         atomc.set_x(atom.pos)
         atomc.set_solid(atom.solid)
         atomc.set_structure(atom.structure)
@@ -1547,17 +1141,17 @@ class System(pc.System):
         """
 
         #get the basic system indicators
-        indicators = pc.System.get_indicators(self)
+        indicators = pcs.System.get_indicators(self)
 
         #get box dims and triclinic params if triclinic
         boxdims = self.box
         if indicators[6] == 1:
-            rot = pc.System.get_triclinic_params(self)
+            rot = pcs.System.get_triclinic_params(self)
         else:
             rot = 0
 
         #now finally get atoms
-        atoms = pc.System.get_allatoms(self)
+        atoms = pcs.System.get_allatoms(self)
         #convert them to picklabale atoms
         patoms = [self.copy_catom_to_atom(atom) for atom in atoms]
 
@@ -1631,7 +1225,7 @@ class System(pc.System):
         else:
             raise FileNotFoundError("file does not exist")
         #set up indicators
-        pc.System.set_indicators(self, psys.indicators)
+        pcs.System.set_indicators(self, psys.indicators)
         #unpickle atoms
         catoms = [self.copy_atom_to_catom(atom) for atom in psys.atoms]
         boxdims = psys.boxdims
@@ -1641,7 +1235,7 @@ class System(pc.System):
         if psys.indicators[6] == 1:
             rot = psys.rot
             rotinv = np.linalg.inv(rot)
-            pc.System.assign_triclinic_params(self, rot, rotinv)
+            pcs.System.assign_triclinic_params(self, rot, rotinv)
 
         #assign atoms and box
-        pc.System.reassign_particles(self, catoms, boxdims)
+        pcs.System.reassign_particles(self, catoms, boxdims)

@@ -7,7 +7,7 @@ the data.
 Update : Atom objects are now pure - hence no pickling module is needed.
 """
 
-import pyscal.ccore as pc
+#import pyscal.ccore as pc
 #import pyscal.core as pcc
 import pyscal.traj_process as ptp
 import os

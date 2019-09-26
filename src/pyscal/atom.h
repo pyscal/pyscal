@@ -76,13 +76,18 @@ class Atom{
         int facevertices[MAXNUMBEROFNEIGHBORS];
         int faceverticenumbers[MAXNUMBEROFNEIGHBORS];
         double faceperimeters[MAXNUMBEROFNEIGHBORS];
+        double edgelengths[MAXNUMBEROFNEIGHBORS];
         double n_diffx[MAXNUMBEROFNEIGHBORS];
         double n_diffy[MAXNUMBEROFNEIGHBORS];
         double n_diffz[MAXNUMBEROFNEIGHBORS];
         double n_r[MAXNUMBEROFNEIGHBORS];
         double n_phi[MAXNUMBEROFNEIGHBORS];
         double n_theta[MAXNUMBEROFNEIGHBORS];
+        int n3, n4, n5, n6;
         int n_neighbors;
+
+
+
 
         //vertex vectors
         vector<double> vertex_vectors;
@@ -109,8 +114,17 @@ class Atom{
         void sasij(double);
 
         int belongsto;
+        void scluster(int);
+        int gcluster();
+
         int lcluster;
+        void slcluster(int);
+        int glcluster();
+
         int issurface;
+        void ssurface(int);
+        int gsurface();
+
         int issolid;
         int structure;
         int type;
@@ -138,14 +152,15 @@ class Atom{
         void sfacevertices(vector<int>);
         vector<double> gfaceperimeters();
         void sfaceperimeters(vector<double>);
+        vector<double> gedgelengths();
+        void sedgelengths(vector<double>);
+        vector<int> gvorovector();
+        void svorovector(vector<int>);
 
         int gnneighbors();
         void sneighborweights(vector<double> nns);
         vector<double> gneighborweights();
         //vector<double> gx();
-        vector<int> gcluster();
-        void scluster(vector<int>);
-
         //variables for storing q2-12
         //invidual variables or arrays - individual ones are easier!
         double q[11];

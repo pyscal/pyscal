@@ -99,21 +99,14 @@ void Atom::sx(vector<double> rls){
     posz = rls[2];
 }
 
-vector<int> Atom::gcluster(){
-    vector<int> cl;
-    cl.emplace_back(issolid);
-    cl.emplace_back(issurface);
-    cl.emplace_back(lcluster);
-    cl.emplace_back(belongsto);
-    return cl;
-}
 
-void Atom::scluster(vector<int> c1){
-    issolid = c1[0];
-    issurface = c1[1];
-    lcluster = c1[2];
-    belongsto = c1[3];
-}
+//structure properties
+int Atom::gsurface() {return issurface; }
+int Atom::gcluster() {return belongsto; }
+void Atom::ssurface( int val) {issurface = val; }
+void Atom::scluster( int val) {belongsto = val; }
+int Atom::glcluster() {return lcluster; }
+void Atom::slcluster( int val) {lcluster = val; }
 
 
 py::dict Atom::gcustom(){
@@ -322,4 +315,35 @@ vector<double> Atom::gfaceperimeters(){
         rqlms.emplace_back(faceperimeters[i]);
     }
     return rqlms;
+}
+
+void Atom::sedgelengths(vector<double> nss){
+    for(int i=0; i<nss.size(); i++){
+        edgelengths[i] = nss[i];
+    }
+}
+
+vector<double> Atom::gedgelengths(){
+    vector <double> rqlms;
+    for(int i=0; i<n_neighbors; i++){
+        rqlms.emplace_back(edgelengths[i]);
+    }
+    return rqlms;
+}
+
+vector<int> Atom::gvorovector(){
+    vector<int> voro;
+    voro.emplace_back(n3);
+    voro.emplace_back(n4);
+    voro.emplace_back(n5);
+    voro.emplace_back(n6);
+    return voro;
+}
+
+void Atom::svorovector(vector<int> voro){
+
+    n3 = voro[0];
+    n4 = voro[1];
+    n5 = voro[2];
+    n6 = voro[3];
 }
