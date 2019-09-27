@@ -6,7 +6,7 @@ this module.
 """
 import numpy as np
 import gzip
-import pyscal.catom as pca
+import pyscal.ccore as pca
 
 
 #functions that are not wrapped from C++

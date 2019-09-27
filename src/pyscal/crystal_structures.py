@@ -2,7 +2,7 @@
 pyscal module for creating crystal structures.
 """
 
-import pyscal.catom as pc
+import pyscal.ccore as pc
 import numpy as np
 
 def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca_ratio = 1.633):

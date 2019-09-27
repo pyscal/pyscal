@@ -6,13 +6,13 @@ by combining various methods, validation etc.
 
 """
 
-import pyscal.csystem as pcs
+import pyscal.ccore as pc
 import pyscal.traj_process as ptp
 import pyscal.pickle as pp
 import os
 import numpy as np
 import warnings
-from pyscal.catom import Atom
+from pyscal.ccore import Atom
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -21,7 +21,7 @@ System class definitions
 #------------------------------------------------------------------------------------------------------------
 
 
-class System(pcs.System):
+class System(pc.System):
     """
     A c++ class for holding the properties of a system.
 
@@ -40,7 +40,7 @@ class System(pcs.System):
 
         self.initialized = True
         self.neighbors_found = False
-
+        pc.System.__init__(self)
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
         """

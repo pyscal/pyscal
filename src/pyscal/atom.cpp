@@ -10,7 +10,7 @@
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------
 Atom::Atom( vector<double> pos, int idd, int typ){
-
+    /*
     posx = pos[0];
     posy = pos[1];
     posz = pos[2];
@@ -40,6 +40,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
             aimgq[tn][tnn] = -1;
         }
     }
+    */
 
 }
 
