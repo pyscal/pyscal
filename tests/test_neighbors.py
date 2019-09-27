@@ -8,16 +8,17 @@ def test_neighbors_system():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [6, 6, 6])
     sys = pc.System()
-    sys.assign_atoms(atoms, boxdims)
+    sys.atoms = atoms
+    sys.box = boxdims
 
     #test that atoms are set properly
-    assert len(sys.get_atoms()) == 432
+    assert len(sys.atoms) == 432
 
     #then lets find neighbors
     #cutoff method - first shell only
     sys.find_neighbors(method = 'cutoff', cutoff=0.867)
     #any atom should have 8 neighbors
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert atoms[0].coordination == 8
 
     sys.reset_neighbors()
@@ -25,20 +26,20 @@ def test_neighbors_system():
     #cutoff method - second shell
     sys.find_neighbors(method = 'cutoff', cutoff=1.1)
     #any atom should have 8 neighbors
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert atoms[0].coordination == 14
 
     #cutoff method - third shell
     sys.find_neighbors(method = 'cutoff', cutoff=1.5)
     #any atom should have 8 neighbors
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert atoms[0].coordination == 26
 
     sys.reset_neighbors()
     #voronoi method - first shell only
     sys.find_neighbors(method = 'voronoi')
     #any atom should have 8 neighbors
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert atoms[0].coordination == 14
 
     assert np.round(sys.get_distance(atoms[0], atoms[1]), decimals=2) == 0.87
@@ -48,12 +49,13 @@ def test_neighbors_system_filter():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2])
     sys = pc.System()
-    sys.assign_atoms(atoms, boxdims)
+    sys.atoms = atoms
+    sys.box = boxdims
 
 
     sys.find_neighbors(method = 'cutoff', cutoff=0.867)
     #any atom should have 8 neighbors
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert atoms[0].coordination == 8
 
     #now we take all the neighbors of atom0 and replace half of
@@ -72,5 +74,5 @@ def test_neighbors_system_filter():
     #recalculate neighbors with filter
     sys.find_neighbors(method = 'cutoff', cutoff=0.867, filter='type')
     #any atom should have 8 neighbors
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert atoms[0].coordination == 6

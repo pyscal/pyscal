@@ -8,11 +8,10 @@ def test_neighbors_sann():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [6, 6, 6])
     sys = pc.System()
-    #sys.atoms = atoms
-    sys.set_atoms(atoms)
+    sys.atoms = atoms
     sys.box = boxdims
 
-"""
+
     #then lets find neighbors
     #SANN algo test
     sys.find_neighbors(method = 'cutoff', cutoff='sann')
@@ -48,4 +47,3 @@ def test_neighbors_adaptive():
     #any atom should have 8 neighbors
     atoms = sys.atoms
     assert atoms[0].coordination == 14
-"""

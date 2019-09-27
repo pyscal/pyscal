@@ -6,13 +6,14 @@ by combining various methods, validation etc.
 
 """
 
-import pyscal.ccore as pc
+
 import pyscal.traj_process as ptp
 import pyscal.pickle as pp
 import os
 import numpy as np
 import warnings
-from pyscal.ccore import Atom
+import pyscal.csystem as pc
+from pyscal.catom import Atom
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -230,9 +231,9 @@ class System(pc.System):
         if isinstance(q, int):
             if q in range(2, 13):
                 if averaged:
-                    rq = self.get_aqvals(q)
+                    rq = self.cget_aqvals(q)
                 else:
-                    rq = self.get_qvals(q)
+                    rq = self.cget_qvals(q)
                 return rq
             else:
                 raise ValueError("the value of q should be between 2 and 12")
@@ -242,9 +243,9 @@ class System(pc.System):
                 if not qq in range(2, 13):
                     raise ValueError("the value of q should be between 2 and 12")
             if averaged:
-                rq = [ self.get_aqvals(qq) for qq in q ]
+                rq = [ self.cget_aqvals(qq) for qq in q ]
             else:
-                rq = [ self.get_qvals(qq) for qq in q ]
+                rq = [ self.cget_qvals(qq) for qq in q ]
             return rq
 
 
@@ -265,7 +266,7 @@ class System(pc.System):
                 distance between the first and second atom.
 
         """
-        return self.get_absdistance(atom1c, atom2c)
+        return self.get_absdistance(atom1, atom2)
 
 
     def find_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None,
@@ -569,10 +570,10 @@ class System(pc.System):
             if not ql in range(2,13):
                 raise ValueError("value of q should be between 2 and 13")
 
-        self.calculate_q(qq)
+        self.ccalculate_q(qq)
 
         if averaged:
-            self.calculate_aq(qq)
+            self.ccalculate_aq(qq)
 
 
     def find_solids(self, bonds=7, threshold=0.5, avgthreshold=0.6, cluster=True):
@@ -651,7 +652,7 @@ class System(pc.System):
 
         #start identification routine
         #first calculate q
-        self.calculate_q([6])
+        self.ccalculate_q([6])
         #self.calculate_q(6)
         #calculate solid neighs
         self.set_nucsize_parameters(bonds, threshold, avgthreshold)
@@ -722,7 +723,7 @@ class System(pc.System):
             atom.condition = cval
         self.atoms = atoms
 
-        self.find_clusters_recursive()
+        self.cfind_clusters_recursive()
 
         #done!
         lc = self.find_largest_cluster()
@@ -762,7 +763,7 @@ class System(pc.System):
         warnings.simplefilter('always', DeprecationWarning)
         warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
 
-        self.calculate_q([6])
+        self.ccalculate_q([6])
         self.set_nucsize_parameters(frenkelnums, threshold, avgthreshold)
         return self.calculate_nucsize()
 
@@ -820,9 +821,9 @@ class System(pc.System):
         warnings.warn("This function is deprecated - use cluster_atoms instead", DeprecationWarning)
 
         if recursive:
-            self.find_clusters_recursive()
+            self.cfind_clusters_recursive()
         else:
-            self.find_clusters()
+            self.cfind_clusters()
 
         if largest:
             cluster = self.find_largest_cluster()

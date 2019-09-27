@@ -6,7 +6,7 @@ this module.
 """
 import numpy as np
 import gzip
-import pyscal.ccore as pca
+import pyscal.catom as pca
 
 
 #functions that are not wrapped from C++
@@ -174,8 +174,8 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
         for atom in atoms:
             #correct zero of the atomic positions (shift box to origin)
-            dist = np.array(atom.x) - ortho_origin
-            atom.x = dist
+            dist = np.array(atom.pos) - ortho_origin
+            atom.pos = dist
 
         #finally change boxdims - to triclinic box size
         box = np.array([a, b, c])
@@ -294,7 +294,7 @@ def read_poscar(infile, compressed = False):
             count+=1
             idd = count
             atom = pca.Atom()
-            atom.x = [x, y, z]
+            atom.pos = [x, y, z]
             atom.id = idd
             atom.type = typ
             atom.loc = i-atom_start

@@ -18,7 +18,7 @@ def test_basic_system():
 def test_system_read():
     sys = pc.System()
     sys.read_inputfile('tests/conf.dump')
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert len(atoms) == 500
 
     #check box
@@ -31,7 +31,7 @@ def test_system_read():
     #now check the same for zipped file
     sys = pc.System()
     sys.read_inputfile('tests/conf.dump.gz')
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
     assert len(atoms) == 500
 
     #check box
@@ -46,12 +46,20 @@ def test_system_atom_access():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc')
     sys = pc.System()
-    sys.assign_atoms(atoms, boxdims)
-    atom = sys.get_atom(0)
-    assert atom.pos == [0, 0, 0]
+    sys.box = boxdims
+    sys.atoms = atoms
 
-    atom.pos = [0.1, 0.1, 0.1]
-    sys.set_atom(atom)
+    #fetch an atom
+    xoxo = sys.get_atom(0)
+    assert xoxo.pos == [0, 0, 0]
+
+    #change pos pf ayom
+    xoxo.pos = [1.1, 2.1, 3.1]
+    sys.set_atom(xoxo)
+
     atom = sys.get_atom(0)
-    assert atom.pos == [0.1, 0.1, 0.1]
+    assert atom.pos == [1.1, 2.1, 3.1]
+    #sys.atoms = atoms
+    #atom = sys.get_atom(0)
+    #assert atom.pos == [0.1, 0.1, 0.1]
     #del sys

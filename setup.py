@@ -87,7 +87,7 @@ setup(
     # and nowhere else
     package_dir={'':'src'},
     # add an extension module named 'python_cpp_example' to the package
-    ext_modules=[CMakeExtension('pyscal/ccore')],
+    ext_modules=[CMakeExtension('pyscal/catom'), CMakeExtension('pyscal/csystem')],
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,

@@ -8,10 +8,11 @@ def test_system_nucsize():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2])
     sys = pc.System()
-    sys.assign_atoms(atoms, boxdims)
+    sys.atoms = atoms
+    sys.box = boxdims
 
     #test that atoms are set properly
-    assert len(sys.get_atoms()) == 16
+    assert len(sys.atoms) == 16
 
     #now calculate nucsize
     sys.find_neighbors(method='cutoff', cutoff=3.63)

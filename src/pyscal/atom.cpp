@@ -10,7 +10,7 @@
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------
 Atom::Atom( vector<double> pos, int idd, int typ){
-    /*
+
     posx = pos[0];
     posy = pos[1];
     posz = pos[2];
@@ -24,9 +24,15 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     isneighborset = 0;
     n_neighbors = 0;
 
-    for (int tn = 0; tn<100; tn++){
-        neighbors[tn] = 333333;
+    for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){
+        neighbors[tn] = -1;
         neighbordist[tn] = -1.0;
+        neighborweight[tn] = -1.0;
+        facevertices[tn] = -1;
+        faceverticenumbers[tn] = -1;
+        faceperimeters[tn] = -1.0;
+        edgelengths[tn] = -1.0;
+
     }
 
     for (int tn = 0; tn<11; tn++){
@@ -40,7 +46,6 @@ Atom::Atom( vector<double> pos, int idd, int typ){
             aimgq[tn][tnn] = -1;
         }
     }
-    */
 
 }
 
@@ -59,7 +64,9 @@ vector<int> Atom::gneighbors(){
 int Atom::gnneighbors(){
     return n_neighbors;
 }
+void Atom::snneighbors(int dd){
 
+}
 
 int Atom::gid(){ return id; }
 int Atom::gfrenkelnumber(){ return frenkelnumber; }
@@ -76,7 +83,12 @@ void Atom::sasij(double vv){ avq6q6 = vv; }
 double Atom::gavgvolume(){ return avgvolume; }
 void Atom::savgvolume(double vv){ avgvolume = vv; }
 int Atom::gsolid(){ return issolid; }
-void Atom::ssolid(int idd){ issolid=idd; }
+void Atom::ssolid(int idd){
+  if (!((idd == 0) || (idd == 1))){
+    throw invalid_argument("surface should be 1 or 0");
+  }
+  issolid=idd; }
+
 int Atom::gstructure(){ return structure; }
 void Atom::sstructure(int idd){ structure=idd; }
 void Atom::scondition(int idd){ condition=idd; }
@@ -129,10 +141,22 @@ void Atom::sx(vector<double> rls){
 //structure properties
 int Atom::gsurface() {return issurface; }
 int Atom::gcluster() {return belongsto; }
-void Atom::ssurface( int val) {issurface = val; }
-void Atom::scluster( int val) {belongsto = val; }
+void Atom::ssurface( int val) {
+  if (!((val == 0) || (val == 1))){
+    throw invalid_argument("surface should be 1 or 0");
+  }
+  issurface = val; }
+
+void Atom::scluster( int val) {
+  belongsto = val; }
+
 int Atom::glcluster() {return lcluster; }
-void Atom::slcluster( int val) {lcluster = val; }
+void Atom::slcluster( int val) {
+  if (!((val == 0) || (val == 1))){
+    throw invalid_argument("largest_cluster should be 1 or 0");
+  }
+
+  lcluster = val; }
 
 
 py::dict Atom::gcustom(){

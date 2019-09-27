@@ -20,162 +20,20 @@ public:
   using System::System;
 };
 
-vector<double> vv{0,0,0};
 
-PYBIND11_MODULE(ccore, m) {
+
+PYBIND11_MODULE(csystem, m) {
     py::options options;
     options.disable_function_signatures();
 
-    py::class_<Atom>(m,"Atom")
-        .def(py::init < vector<double>, int , int >(), py::arg("pos")=vv, py::arg("id")=0, py::arg("type")=0)
-        .def_property("pos", &Atom::gx, &Atom::sx, R"mydelimiter(
-            List of floats of the type [x, y, z], default [0, 0, 0]
-            Position of the atom.
-        )mydelimiter")
 
-        .def_property("cluster",&Atom::gcluster, &Atom::scluster, R"mydelimiter(
-            int
-            Id number of the cluster that the atom belongs to.
-        )mydelimiter")
-
-        .def_property("neighbors",&Atom::gneighbors, &Atom::sneighbors, R"mydelimiter(
-            List of ints
-            List of neighbors of the atom. The list contains indices of neighbor
-            atoms which indicate their position in the list of all atoms.
-        )mydelimiter")
-
-        .def("get_coordination",&Atom::gnneighbors, R"mydelimiter(
-            Get the coordination number of the atom
-
-            Parameters
-            ----------
-            None
-
-            Returns
-            -------
-            coordination : int
-                coordination number of the atom.
-
-        )mydelimiter")
-
-        .def_property("neighborweights",&Atom::gneighborweights, &Atom::sneighborweights, R"mydelimiter(
-            List of floats
-            Used to weight the contribution of each neighbor atom towards the value of
-            Steinhardt's parameters. By default, each atom has a weight of 1 each. However,
-            if :func:`~pyscal.core.System.find_neighbors` is used with `method='voronoi'`,
-            each neighbor gets a weight proportional to the area shared between the neighboring
-            atom and host atom.
-        )mydelimiter")
-
-        .def_property("bonds",&Atom::gfrenkelnumber, &Atom::sfrenkelnumber, R"mydelimiter(
-            Int
-            The number of solid connections of an atom.
-        )mydelimiter")
-        .def_property("id",&Atom::gid,&Atom::sid, R"mydelimiter(
-
-        )mydelimiter")
-
-        .def_property("condition",&Atom::gcondition, &Atom::scondition, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("solid",&Atom::gsolid,&Atom::ssolid, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("surface",&Atom::gsurface,&Atom::ssurface, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("largest_cluster",&Atom::glcluster,&Atom::slcluster, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("structure",&Atom::gstructure,&Atom::sstructure, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("loc",&Atom::gloc,&Atom::sloc, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("allq",&Atom::gallq,&Atom::sallq, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("allaq",&Atom::gallaq,&Atom::sallaq, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("type",&Atom::gtype,&Atom::stype, R"mydelimiter(
-
-        )mydelimiter")
-        //.def_property("custom",&Atom::gcustom,&Atom::scustom, R"mydelimiter(
-
-        //)mydelimiter")
-        .def("get_q",&Atom::gq, R"mydelimiter(
-            Test documentationposx
-
-            Parameters
-            ----------
-            None
-        )mydelimiter")
-        .def("set_q",&Atom::sq, R"mydelimiter(
-
-        )mydelimiter")
-        .def("get_aq",&Atom::gaq, R"mydelimiter(
-
-        )mydelimiter")
-        .def("set_aq",&Atom::saq, R"mydelimiter(
-
-        )mydelimiter")
-        .def("get_qlm",&Atom::gqlm, R"mydelimiter(
-
-        )mydelimiter")
-        .def("get_aqlm",&Atom::gaqlm, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("volume",&Atom::gvolume,&Atom::svolume, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("avg_volume",&Atom::gavgvolume,&Atom::savgvolume, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("face_vertices", &Atom::gfacevertices, &Atom::sfacevertices, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("face_perimeters", &Atom::gfaceperimeters, &Atom::sfaceperimeters, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("vertex_numbers", &Atom::gvertex_numbers, &Atom::svertex_numbers, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("vertex_vectors", &Atom::gvertex_vectors, &Atom::svertex_vectors, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("edge_lengths", &Atom::gedgelengths, &Atom::sedgelengths, R"mydelimiter(
-
-        )mydelimiter")
-        .def_property("vorovector", &Atom::gvorovector, &Atom::svorovector, R"mydelimiter(
-
-        )mydelimiter")
-
-        .def_property("avg_connection", &Atom::gasij, &Atom::sasij, R"mydelimiter(
-
-        )mydelimiter")
-        .def("get_q", (double (Atom::*) (bool, int))  &Atom::gq_big, py::arg("averaged"), py::arg("q"), R"mydelimiter(
-
-        )mydelimiter")
-        .def("get_q", (vector<double> (Atom::*) (bool, vector<int>))  &Atom::gq_big, py::arg("averaged"), py::arg("q"), R"mydelimiter(
-
-        )mydelimiter")
-        .def("set_q", (void (Atom::*) (bool, int, double))  &Atom::sq_big, py::arg("averaged"), py::arg("q"), py::arg("vals"), R"mydelimiter(
-
-        )mydelimiter")
-        .def("set_q", (void (Atom::*) (bool, vector<int>, vector<double>))  &Atom::sq_big, py::arg("averaged"), py::arg("q"), py::arg("vals"), R"mydelimiter(
-
-        )mydelimiter")
-
-        ;
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")
         .def(py::init< >())
         //.def("assign_particles", &System::assign_particles, py::keep_alive<1, 2>())
         .def_property("largest_clusterid", &System::glargestclusterid, &System::slargestclusterid)
         .def("set_nucsize_parameters",&System::set_nucsize_parameters)
-        .def_property("box", &System::gboxdims, &System::sbox )
+        .def_property("box", &System::gbox, &System::sbox )
         .def_property("atoms", &System::get_atoms, &System::set_atoms)
         //.def("get_atoms", &System::get_atoms)
         //.def("set_atoms", &System::set_atoms)
@@ -184,8 +42,8 @@ PYBIND11_MODULE(ccore, m) {
         .def("set_atom", &System::satom)
         .def_property("voroexp", &System::galpha, &System::salpha)
         .def_property("nop",&System::gnop,&System::snop)
-        .def("get_qvals",&System::gqvals)
-        .def("get_aqvals",&System::gaqvals)
+        .def("cget_qvals",&System::gqvals)
+        .def("cget_aqvals",&System::gaqvals)
         .def("get_absdistance", (double (System::*) (Atom, Atom))  &System::get_abs_distance)
         .def("get_all_neighbors_normal",&System::get_all_neighbors_normal)
         .def("get_all_neighbors_sann",&System::get_all_neighbors_sann)
@@ -193,12 +51,12 @@ PYBIND11_MODULE(ccore, m) {
         .def("get_all_neighbors_voronoi",&System::get_all_neighbors_voronoi)
         .def("set_neighbordistance", &System::set_neighbordistance)
         .def("reset_allneighbors", &System::reset_all_neighbors)
-        .def("calculate_q",&System::calculate_q)
-        .def("calculate_aq",&System::calculate_aq)
+        .def("ccalculate_q",&System::calculate_q)
+        .def("ccalculate_aq",&System::calculate_aq)
         .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond)
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
-        .def("find_clusters",&System::find_clusters)
-        .def("find_clusters_recursive",&System::find_clusters_recursive)
+        .def("cfind_clusters",&System::find_clusters)
+        .def("cfind_clusters_recursive",&System::find_clusters_recursive)
         .def("find_largest_cluster",&System::largest_cluster)
         .def("get_largest_cluster_atoms",&System::get_largest_cluster_atoms)
         .def_property("filter",&System::gfilter,&System::sfilter)
