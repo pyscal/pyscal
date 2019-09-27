@@ -6,13 +6,13 @@ by combining various methods, validation etc.
 
 """
 
-import pyscal.catom as pca
 import pyscal.csystem as pcs
 import pyscal.traj_process as ptp
 import pyscal.pickle as pp
 import os
 import numpy as np
 import warnings
+from pyscal.catom import Atom
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -37,49 +37,9 @@ class System(pcs.System):
     >>> sys.read_inputfile()
     """
     def __init__(self):
+
         self.initialized = True
-        #self.solid_params_set = False
         self.neighbors_found = False
-        self.atoms = []
-        self.nop = 0
-        #this method can be done more
-        #we can remove checks on the cpp side
-        pcs.System.__init__(self)
-
-    #try a get attribute
-    def __getattr__(self, name):
-        #now check if the first letter is q
-
-        if name == 'box':
-            #then extract the next two parts
-            box6dim = pcs.System.get_box(self)
-            pbox = [[box6dim[0], box6dim[1]], [box6dim[2], box6dim[3]], [box6dim[4], box6dim[5]]]
-            return pbox
-
-        elif name == 'box_vectors':
-            pbox = pcs.System.get_boxvecs(self)
-            return pbox
-
-        else:
-            raise AttributeError(name)
-
-    #overload the setattr function to overload
-    def __setattr__(self, variable, value):
-        if variable == 'box':
-            #check for length
-            if not len(value) == 3:
-                raise TypeError('box should be of the form [[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]')
-
-            if not all(all(isinstance(x, (int, float)) for x in xx) for xx in value):
-                raise TypeError("all values must be float")
-
-            pcs.System.set_box(self, value)
-
-        elif variable == 'box_vectors':
-            raise AttributeError("box_vectors are calculated from box. If using triclinic, read in a file instead.")
-
-        #finally assign the variables
-        super(System, self).__setattr__(variable, value)
 
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
@@ -138,7 +98,6 @@ class System(pcs.System):
         --------
         assign_atoms
         """
-        self.customkeys = customkeys
 
         if format == 'lammps-dump':
             #check customkeys and assign a variable
@@ -156,20 +115,15 @@ class System(pcs.System):
 
                 #now if file exists
                 if os.path.exists(filename):
-                    tatoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
-                    #self.tatoms = tatoms
-                    #convert these atoms to normal atoms and save them
-                    self.atoms = [self.copy_atom(tatom) for tatom in tatoms]
-                    #now get catoms
-                    catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
-                    pcs.System.assign_particles(self, catoms, boxdims)
-                    self.nop = len(catoms)
+                    atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                    self.atoms = atoms
+                    self.box = boxdims
 
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
                         rot = box.T
                         rotinv = np.linalg.inv(rot)
-                        pcs.System.assign_triclinic_params(self, rot, rotinv)
+                        self.assign_triclinic_params(rot, rotinv)
                 else:
                     raise FileNotFoundError("input file %s not found"%filename)
 
@@ -178,96 +132,28 @@ class System(pcs.System):
                     os.remove(file)
 
             elif os.path.exists(filename):
-                tatoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
-                #convert these atoms to normal atoms and save them
-                self.atoms = [self.copy_atom(tatom) for tatom in tatoms]
-                #now get catoms
-                catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
-
-                pcs.System.assign_particles(self, catoms, boxdims)
-                self.nop = len(catoms)
+                atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                self.atoms = atoms
+                self.box = boxdims
 
                 if triclinic:
-                    #we have to input rotation matrix and the inverse rotation matrix
                     rot = box.T
                     rotinv = np.linalg.inv(rot)
-                    pcs.System.assign_triclinic_params(self, rot, rotinv)
+                    self.assign_triclinic_params(rot, rotinv)
             else:
                 raise FileNotFoundError("input file %s not found"%filename)
 
 
         elif format == 'poscar':
             if os.path.exists(filename):
-                tatoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
-                #convert these atoms to normal atoms and save them
-                self.atoms = [self.copy_atom(tatom) for tatom in tatoms]
-                #now get catoms
-                catoms = [self.copy_atom_to_catom(atom) for atom in self.atoms]
-
-                pcs.System.assign_particles(self, catoms, boxdims)
-                self.nop = len(catoms)
-
+                atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
+                self.atoms = atoms
+                self.box = boxdims
             else:
                 raise FileNotFoundError("input file %s not found"%filename)
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 
-    def copy_atom(self, atom1):
-        """
-        Copies the essential infomation from one atom to another
-
-        Parameters
-        ----------
-        atom1 : atom object
-            source atom
-
-        Returns
-        -------
-        atom2 : copied atom
-
-        Notes
-        -----
-        This method only copies the essential information. Positions, type and id
-        and customvals
-        """
-        atom2 = Atom()
-        atom2.pos = atom1.pos
-        atom2.loc = atom1.loc
-        atom2.id = atom1.id
-        atom2.type = atom1.type
-        atom2.custom = atom1.custom
-        return atom2
-
-    def assign_atoms(self, atoms, box):
-        """
-
-        Assign atoms and box vectors to :class:`~System`.
-
-        Parameters
-        ----------
-        atoms : list of `Atom` objects
-            list consisting of all atoms
-        box   : list of list of floats
-            list which consists of the box dimensions in the format-
-            `[[box_x_low, box_x_high], [box_y_low, box_y_high], [box_z_low, box_z_high]]`
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        Receive a vector of atom objects which is stored instead
-        of reading in the input file. If this method is used, there is no need of using the
-        :func:`~System.read_inputfile` method. Also using this function allows for reading of multiple
-        file formats which are not supported by the inbuilt :func:`~System.read_inputfile` method.
-
-        See Also
-        --------
-        read_inputfile
-        """
-        #self.no_of_atoms = len(atoms)
-        pcs.System.assign_particles(self, atoms, box)
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
         """
@@ -292,7 +178,7 @@ class System(pcs.System):
             radius in distance units
 
         """
-        distances = pcs.System.get_pairdistances(self)
+        distances = self.get_pairdistances()
 
         if histomax == None:
             histomax = max(distances)
@@ -303,9 +189,9 @@ class System(pcs.System):
         r = bin_edges[:-1]
 
         #get box density
-        boxvecs = pcs.System.get_boxvecs(self)
+        boxvecs = self.get_boxvecs()
         vol = np.dot(np.cross(boxvecs[0], boxvecs[1]), boxvecs[2])
-        natoms = pcs.System.get_nop(self)
+        natoms = self.nop
         rho = natoms/vol
 
         shell_vols = (4./3.)*np.pi*((r+edgewidth)**3 - r**3)
@@ -315,28 +201,6 @@ class System(pcs.System):
 
         return rdf, r
 
-
-
-
-
-
-    def get_atoms(self):
-        """
-
-        Get a list of all :class:`~Atom` objects that belong to the system.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        allatoms : list of `Atom` objects
-            all atoms in the system
-        """
-        atomcs = pcs.System.get_allatoms(self)
-        atoms = [self.copy_catom_to_atom(xx) for xx in atomcs]
-        return atoms
 
     def get_qvals(self, q, averaged = False):
         """
@@ -366,9 +230,9 @@ class System(pcs.System):
         if isinstance(q, int):
             if q in range(2, 13):
                 if averaged:
-                    rq = pcs.System.get_aqvals(self, q)
+                    rq = self.get_aqvals(q)
                 else:
-                    rq = pcs.System.get_qvals(self, q)
+                    rq = self.get_qvals(q)
                 return rq
             else:
                 raise ValueError("the value of q should be between 2 and 12")
@@ -378,9 +242,9 @@ class System(pcs.System):
                 if not qq in range(2, 13):
                     raise ValueError("the value of q should be between 2 and 12")
             if averaged:
-                rq = [ pcs.System.get_aqvals(self, qq) for qq in q ]
+                rq = [ self.get_aqvals(qq) for qq in q ]
             else:
-                rq = [ pcs.System.get_qvals(self, qq) for qq in q ]
+                rq = [ self.get_qvals(qq) for qq in q ]
             return rq
 
 
@@ -401,10 +265,7 @@ class System(pcs.System):
                 distance between the first and second atom.
 
         """
-
-        atom1c = self.copy_atom_to_catom(atom1)
-        atom2c = self.copy_atom_to_catom(atom2)
-        return pcs.System.get_absdistance(self, atom1c, atom2c)
+        return self.get_absdistance(atom1c, atom2c)
 
 
     def find_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None,
@@ -507,18 +368,19 @@ class System(pcs.System):
 
         """
         #first reset all neighbors
-        pcs.System.reset_allneighbors(self)
-        pcs.System.set_filter(self, 0)
+        self.reset_allneighbors()
+        self.filter = 0
 
         if filter == 'type':
             # type corresponds to 1
-            pcs.System.set_filter(self, 1)
+            self.filter = 1
 
         if method == 'cutoff':
             if cutoff=='sann':
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
-                finished = pcs.System.get_all_neighbors_sann(self, threshold)
+
+                finished = self.get_all_neighbors_sann(threshold)
                 #if it finished without finding neighbors
                 if not finished:
                     finallydone = False
@@ -526,8 +388,8 @@ class System(pcs.System):
                         #threshold value is probably too low
                         #try increasing threshold
                         warnings.warn("Could not find sann cutoff. trying with a higher threshold", RuntimeWarning)
-                        pcs.System.reset_allneighbors(self)
-                        newfinished = pcs.System.get_all_neighbors_sann(self, threshold*i)
+                        self.reset_allneighbors()
+                        newfinished = self.get_all_neighbors_sann(threshold*i)
                         if newfinished:
                             finallydone = True
                             warnings.warn("found neighbors with higher threshold than default/user input")
@@ -539,18 +401,17 @@ class System(pcs.System):
             elif cutoff=='adaptive' or cutoff==0:
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
-                finished = pcs.System.get_all_neighbors_adaptive(self, threshold, nlimit, padding)
+                finished = self.get_all_neighbors_adaptive(threshold, nlimit, padding)
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")
             else:
                 #warnings.warn("THIS RAN")
-                pcs.System.set_neighbordistance(self, cutoff)
-                pcs.System.get_all_neighbors_normal(self)
+                self.set_neighbordistance(cutoff)
+                self.get_all_neighbors_normal()
 
         elif method == 'voronoi':
-            pcs.System.set_face_cutoff(self, face_cutoff)
-            pcs.System.set_alpha(self, int(voroexp))
-            pcs.System.get_all_neighbors_voronoi(self)
+            self.voroexp = int(voroexp)
+            self.get_all_neighbors_voronoi()
 
         self.neighbors_found = True
 
@@ -574,7 +435,7 @@ class System(pcs.System):
         It is used automatically when neighbors are recalculated.
 
         """
-        pcs.System.reset_allneighbors(self)
+        self.reset_allneighbors()
 
     def calculate_vorovector(self, edge_cutoff=0.05, area_cutoff=0.01, edge_length=False):
         """
@@ -614,8 +475,7 @@ class System(pcs.System):
         .. [2] Tanemura, M, Hiwatari, Y, Matsuda, H,Ogawa, T, Ogita, N, Ueda, A. Prog. Theor. Phys. 58, 1977
 
         """
-        atoms = pcs.System.get_allatoms(self)
-
+        atoms = self.atoms
         for atom in atoms:
             #start looping over and eliminating short edges
             st = 1
@@ -667,6 +527,7 @@ class System(pcs.System):
 
             atom.edge_lengths = edge_lengths
             atom.vorovector = vorovector
+        self.atoms = atoms
 
 
     def calculate_q(self, q, averaged = False):
@@ -708,31 +569,11 @@ class System(pcs.System):
             if not ql in range(2,13):
                 raise ValueError("value of q should be between 2 and 13")
 
-        pcs.System.calculate_q(self, qq)
+        self.calculate_q(qq)
 
         if averaged:
-            pcs.System.calculate_aq(self, qq)
+            self.calculate_aq(qq)
 
-    def get_largestcluster(self):
-        """
-        Get id of the the largest cluster.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        clusterid : int
-            id of the largest cluster
-
-        Notes
-        -----
-        id is only available if the largest cluster has already
-        been found using the :func:`~System.find_solids` with keyword `cluster=True`. Otherwise it returns the default values.
-
-        """
-        return pcs.System.get_largestcluster(self)
 
     def find_solids(self, bonds=7, threshold=0.5, avgthreshold=0.6, cluster=True):
         """
@@ -810,13 +651,13 @@ class System(pcs.System):
 
         #start identification routine
         #first calculate q
-        pcs.System.calculate_q(self, [6])
+        self.calculate_q([6])
         #self.calculate_q(6)
         #calculate solid neighs
-        pcs.System.set_nucsize_parameters(self, bonds, threshold, avgthreshold)
-        pcs.System.calculate_frenkelnumbers(self)
+        self.set_nucsize_parameters(bonds, threshold, avgthreshold)
+        self.calculate_frenkelnumbers()
         #now find solids
-        pcs.System.find_solid_atoms(self)
+        self.find_solid_atoms()
 
         if cluster:
             def ccondition(atom):
@@ -864,7 +705,7 @@ class System(pcs.System):
         Check examples for more details.
 
         """
-        testatom = self.get_atom(0)
+        testatom = self.atoms[0]
 
         #test the condition
         try:
@@ -875,19 +716,16 @@ class System(pcs.System):
             raise RuntimeError("condition did not work")
 
         #now loop
-        nop = pcs.System.get_nop(self)
-        for i in range(nop):
-            atom = self.get_atom(i)
+        atoms = self.atoms
+        for atom in atoms:
             cval = condition(atom)
             atom.condition = cval
-            self.set_atom(atom)
+        self.atoms = atoms
 
-        #atom conditions are set
-        #now can clustering function
-        pcs.System.find_clusters_recursive(self)
+        self.find_clusters_recursive()
 
         #done!
-        lc = pcs.System.find_largest_cluster(self)
+        lc = self.find_largest_cluster()
         #pcs.System.get_largest_cluster_atoms(self)
 
         if largest:
@@ -924,9 +762,9 @@ class System(pcs.System):
         warnings.simplefilter('always', DeprecationWarning)
         warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
 
-        pcs.System.calculate_q(self, [6])
-        pcs.System.set_nucsize_parameters(self, frenkelnums, threshold, avgthreshold)
-        return pcs.System.calculate_nucsize(self)
+        self.calculate_q([6])
+        self.set_nucsize_parameters(frenkelnums, threshold, avgthreshold)
+        return self.calculate_nucsize()
 
     def calculate_solidneighbors(self):
         """
@@ -946,7 +784,7 @@ class System(pcs.System):
         betweem them is greater than 0.6.
 
         """
-        pcs.System.calculate_frenkelnumbers(self)
+        self.calculate_frenkelnumbers()
 
     def find_clusters(self, recursive = True, largest = True):
         """
@@ -982,12 +820,12 @@ class System(pcs.System):
         warnings.warn("This function is deprecated - use cluster_atoms instead", DeprecationWarning)
 
         if recursive:
-            pcs.System.find_clusters_recursive(self)
+            self.find_clusters_recursive()
         else:
-            pcs.System.find_clusters(self)
+            self.find_clusters()
 
         if largest:
-            cluster = pcs.System.find_largest_cluster(self)
+            cluster = self.find_largest_cluster()
             return cluster
 
     def find_largestcluster(self):
@@ -1008,115 +846,10 @@ class System(pcs.System):
         :func:`System.find_clusters` has to be used before using this function.
 
         """
-        return pcs.System.find_largest_cluster(self)
-
-    def copy_catom_to_atom(self, atomc, destination=None):
-        """
-        Used to copy a C++ `Atom` object to python `Atom` object.
-
-        Parameters
-        ----------
-        atomc : C++ `Atom` object
-            the input atom
-
-        Returns
-        -------
-        atom : python `Atom` object
-            output atom
-
-        Notes
-        -----
-        This function is used to make sure that the user gets a python
-        object rather than a C++ one.
+        return self.find_largest_cluster()
 
 
-
-        """
-        if destination is None:
-            atom = Atom()
-        else:
-            atom = destination
-
-        atom.pos = atomc.get_x()
-        atom.solid = bool(atomc.get_solid())
-        atom.structure = atomc.get_structure()
-
-        cinfo = atomc.get_cluster()
-        atom.surface = bool(cinfo[1])
-        atom.largest_cluster = bool(cinfo[2])
-        atom.cluster = cinfo[3]
-
-        atom.neighbors = atomc.get_neighbors()
-        atom.neighbor_weights = atomc.get_neighborweights()
-        atom.allq = atomc.get_allq()
-        atom.allaq = atomc.get_allaq()
-        atom.id = atomc.get_id()
-        atom.loc = atomc.get_loc()
-        atom.type = atomc.get_type()
-
-        #atom.set_vorovector(atomc.get_vorovector())
-        atom.volume = atomc.get_volume()
-        atom.avg_volume = atomc.get_avgvolume()
-        atom.face_vertices = atomc.get_facevertices()
-        atom.face_perimeters = atomc.get_faceperimeters()
-        atom.vertex_numbers = atomc.get_vertexnumbers()
-        atom.vertex_vectors = atomc.get_vertexvectors()
-        atom.condition = atomc.get_condition()
-        atom.avg_connection = atomc.get_avgconnection()
-        atom.bonds = atomc.get_bonds()
-        #atom.set_allqcomps(atomc.get_allqcomps())
-        return atom
-
-    def copy_atom_to_catom(self, atom):
-        """
-        Used to copy a python `Atom` object to C++ `Atom` object.
-
-        Parameters
-        ----------
-        atom : python `Atom` object
-            output atom
-
-        Returns
-        -------
-        atomc : C++ `Atom` object
-            the input atom
-
-        Notes
-        -----
-        A python object is converted to a C++ object which is then
-        passed on the system for calculation.
-
-        """
-        atomc = pca.Atom()
-        atomc.set_x(atom.pos)
-        atomc.set_solid(atom.solid)
-        atomc.set_structure(atom.structure)
-
-        #prep cluster values
-        cinfo = [int(atom.solid), int(atom.surface), int(atom.largest_cluster), atom.cluster]
-        atomc.set_cluster(cinfo)
-        atomc.set_neighbors(atom.neighbors)
-        atomc.set_neighborweights(atom.neighbor_weights)
-        atomc.set_allq(atom.allq)
-        atomc.set_allaq(atom.allaq)
-        atomc.set_id(atom.id)
-        atomc.set_loc(atom.loc)
-        atomc.set_type(atom.type)
-        #atomc.set_vorovector(atom.get_vorovector())
-        atomc.set_volume(atom.volume)
-        atomc.set_avgvolume(atom.avg_volume)
-        atomc.set_facevertices(atom.face_vertices)
-        atomc.set_faceperimeters(atom.face_perimeters)
-        atomc.set_vertexnumbers(atom.vertex_numbers)
-        atomc.set_vertexvectors(atom.vertex_vectors)
-        atomc.set_condition(atom.condition)
-        atomc.set_avgconnection(atom.avg_connection)
-        atomc.set_bonds(atom.bonds)
-        #atomc.set_allqcomps(atom.get_allqcomps())
-        return atomc
-
-
-    def prepare_pickle(self):
+    #def prepare_pickle(self):
         """
         Prepare the system for pickling and create a picklable system
 
@@ -1141,30 +874,30 @@ class System(pcs.System):
         """
 
         #get the basic system indicators
-        indicators = pcs.System.get_indicators(self)
+    #    indicators = pcs.System.get_indicators(self)
 
         #get box dims and triclinic params if triclinic
-        boxdims = self.box
-        if indicators[6] == 1:
-            rot = pcs.System.get_triclinic_params(self)
-        else:
-            rot = 0
+    #    boxdims = self.box
+    #    if indicators[6] == 1:
+    #        rot = pcs.System.get_triclinic_params(self)
+    #    else:
+    #        rot = 0
 
         #now finally get atoms
-        atoms = pcs.System.get_allatoms(self)
+    #    atoms = pcs.System.get_allatoms(self)
         #convert them to picklabale atoms
-        patoms = [self.copy_catom_to_atom(atom) for atom in atoms]
+    #    patoms = [self.copy_catom_to_atom(atom) for atom in atoms]
 
         #create System instance and assign things
-        psys = pp.System()
-        psys.indicators = indicators
-        psys.atoms = patoms
-        psys.boxdims = boxdims
-        psys.rot = rot
+    #    psys = pp.System()
+    #    psys.indicators = indicators
+    #    psys.atoms = patoms
+    #    psys.boxdims = boxdims
+    #    psys.rot = rot
 
-        return psys
+    #    return psys
 
-    def to_file(self, file):
+    #def to_file(self, file):
         """
         Save a system to file
 
@@ -1191,11 +924,11 @@ class System(pcs.System):
             Pickling between different versions of numpy or python could be incompatible.
 
         """
-        psys = self.prepare_pickle()
-        np.save(file, psys, allow_pickle=True)
+    #    psys = self.prepare_pickle()
+    #    np.save(file, psys, allow_pickle=True)
 
 
-    def from_file(self, file):
+    #def from_file(self, file):
         """
         Populate the empty system from file
 
@@ -1220,22 +953,22 @@ class System(pcs.System):
         >>> sys.from_file(filename)
 
         """
-        if os.path.exists(file):
-            psys = np.load(file, allow_pickle=True).flatten()[0]
-        else:
-            raise FileNotFoundError("file does not exist")
+    #    if os.path.exists(file):
+    #        psys = np.load(file, allow_pickle=True).flatten()[0]
+    #    else:
+    #        raise FileNotFoundError("file does not exist")
         #set up indicators
-        pcs.System.set_indicators(self, psys.indicators)
+    #    pcs.System.set_indicators(self, psys.indicators)
         #unpickle atoms
-        catoms = [self.copy_atom_to_catom(atom) for atom in psys.atoms]
-        boxdims = psys.boxdims
+    #    catoms = [self.copy_atom_to_catom(atom) for atom in psys.atoms]
+    #    boxdims = psys.boxdims
 
 
         #if triclinic, get those
-        if psys.indicators[6] == 1:
-            rot = psys.rot
-            rotinv = np.linalg.inv(rot)
-            pcs.System.assign_triclinic_params(self, rot, rotinv)
+    #    if psys.indicators[6] == 1:
+    #        rot = psys.rot
+    #        rotinv = np.linalg.inv(rot)
+    #        pcs.System.assign_triclinic_params(self, rot, rotinv)
 
         #assign atoms and box
-        pcs.System.reassign_particles(self, catoms, boxdims)
+    #    pcs.System.reassign_particles(self, catoms, boxdims)

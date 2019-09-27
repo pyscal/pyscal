@@ -158,100 +158,41 @@ void System::salpha(int a){
     alpha = a;
 }
 
+int System::galpha(){
+
+    return alpha ;
+}
+
 //this function allows for handling custom formats of atoms and so on
-void System::assign_particles( vector<Atom> atomitos, vector<vector<double>> boxd ){
+void System::set_atoms( vector<Atom> atomitos){
     //atomitos are just a list of Atom objects
     //boxd is a vector of 6 values - [xlow, xhigh, ylow, yhigh, zlow, zhigh]
-    nop = atomitos.size();
+    //nop = atomitos.size();
+    //atoms.clear();
+    //atoms.reserve(nop);
     //atoms = new Atom[nop];
-    atoms.reserve(nop);
-    vector<double> dpos;
-    dpos.push_back(0);
-    dpos.push_back(0);
-    dpos.push_back(0);
-
-    Atom atom(dpos, 0, 0);
-    //triclinic = 0;
-
-    boxdims[0][0] = boxd[0][0];
-    boxdims[0][1] = boxd[0][1];
-    boxdims[1][0] = boxd[1][0];
-    boxdims[1][1] = boxd[1][1];
-    boxdims[2][0] = boxd[2][0];
-    boxdims[2][1] = boxd[2][1];
-
-    boxx = boxd[0][1] - boxd[0][0];
-    boxy = boxd[1][1] - boxd[1][0];
-    boxz = boxd[2][1] - boxd[2][0];
-
-    for(int ti=0; ti<nop; ti++){
-
-        atom.posx = atomitos[ti].posx;
-        atom.posy = atomitos[ti].posy;
-        atom.posz = atomitos[ti].posz;
-        atom.id = atomitos[ti].id;
-        atom.type = atomitos[ti].type;
-        atom.belongsto = -1;
-        atom.issolid = 0;
-        atom.loc = ti;
-        atom.isneighborset = 0;
-        atom.custom = atomitos[ti].custom;
-        atom.n_neighbors=0;
-        atom.isneighborset = 0;
-
-        for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){
-            atom.neighbors[tn] = NILVALUE;
-            atom.neighbordist[tn] = -1.0;
-        }
-
-        for (int tn = 0; tn<11; tn++){
-            atom.q[tn] = -1;
-            atom.aq[tn] = -1;
-            for (int tnn =0; tnn<25; tnn++){
-                atom.realq[tn][tnn] = -1;
-                atom.imgq[tn][tnn] = -1;
-                atom.arealq[tn][tnn] = -1;
-                atom.aimgq[tn][tnn] = -1;
-            }
-        }
-
-        atoms.emplace_back(atom);
-
+    cout<<"runnning"<<endl;
+    cout<<atomitos.size()<<endl;
+    for(int i=0; i<atomitos.size(); i++){
+        cout<<"im trying"<<endl;
+        atoms.emplace_back(atomitos[i]);
     }
-
-    //atomitos.shrink_to_fit();
-
+    //atoms = atomitos;
     fileread = 1;
-}
 
+}
 
 //this function allows for handling custom formats of atoms and so on
-void System::reassign_particles( vector<Atom> atomitos, vector<vector<double>> boxd ){
+vector<Atom> System::get_atoms( ){
     //atomitos are just a list of Atom objects
     //boxd is a vector of 6 values - [xlow, xhigh, ylow, yhigh, zlow, zhigh]
-    nop = atomitos.size();
-    //atoms = new Atom[nop];
-    atoms.clear();
-    atoms = atomitos;
+    vector<Atom> atomitos;
+    for(int i=0; i<atoms.size(); i++){
+      atomitos.emplace_back(atoms[i]);
+    }
+    return atomitos;
 
-    //triclinic = 0;
-
-    boxdims[0][0] = boxd[0][0];
-    boxdims[0][1] = boxd[0][1];
-    boxdims[1][0] = boxd[1][0];
-    boxdims[1][1] = boxd[1][1];
-    boxdims[2][0] = boxd[2][0];
-    boxdims[2][1] = boxd[2][1];
-
-    boxx = boxd[0][1] - boxd[0][0];
-    boxy = boxd[1][1] - boxd[1][0];
-    boxz = boxd[2][1] - boxd[2][0];
-
-
-    //atomitos.shrink_to_fit();
-    fileread = 1;
 }
-
 
 //needs two version of the function; one for fast inbuilt calculation.
 //the other for being accessed to the python interface
@@ -395,6 +336,9 @@ void System::reset_all_neighbors(){
 void System::sfilter(int fno){
 
     filter = fno;
+}
+int System::gfilter(){
+  return filter;
 }
 
 vector<double> System::get_pairdistances(){
@@ -1414,19 +1358,13 @@ void System::satom(Atom atom1) {
 
 //add function to return nop
 int System::gnop() { return nop; }
+void System::snop( int n) {  }
 //int System::gnop() { return nop; }
 //add function to pack and return the whole set of atoms
-vector<Atom> System::gallatoms(){
-    vector<Atom> allatoms;
-    allatoms.reserve(nop);
-    for(int i=0;i<nop;i++){
-        allatoms.emplace_back(atoms[i]);
-    }
 
-    return allatoms;
-}
 
 int System::glargestclusterid() { return maxclusterid; }
+void System::slargestclusterid(int idd) { }
 
 vector<double> System::gqvals(int qq){
     vector<double> qres;

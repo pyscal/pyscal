@@ -61,8 +61,8 @@ class System{
         void set_nucsize_parameters(int,double,double);
         //void set_inputfile(string);
         void set_neighbordistance(double);
-        void assign_particles( vector<Atom>, vector<vector<double>>);
-        void reassign_particles( vector<Atom>, vector<vector<double>>);
+        void set_atoms( vector<Atom>);
+        vector<Atom> get_atoms();
         void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
         vector<vector<double>> get_triclinic_params();
         void get_largest_cluster_atoms();
@@ -91,6 +91,7 @@ class System{
         //power of face area weighting
         int alpha;
         void salpha(int);
+        int galpha();
         //indicator function - 1 if voronoi method is used
         //will be reset if any other method is used
         int voronoiused;
@@ -111,14 +112,17 @@ class System{
         //variables for a filter
         int filter;
         void sfilter(int);
+        int gfilter();
         //int apply_filter(int, int);
 
         //some access functions for system
         Atom gatom(int);
         void satom(Atom);
         int glargestclusterid();
+        void slargestclusterid(int);
         int gnop();
-        vector<Atom> gallatoms();
+        void snop(int);
+
         vector<double> gqvals(int qq);
         vector<double> gaqvals(int qq);
         vector<int> rq_backup;

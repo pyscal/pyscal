@@ -16,6 +16,31 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     posz = pos[2];
     id = idd;
     type = typ;
+
+    //assign other values - the default ones
+    belongsto = -1;
+    issolid = 0;
+    loc = 0;
+    isneighborset = 0;
+    n_neighbors = 0;
+
+    for (int tn = 0; tn<100; tn++){
+        neighbors[tn] = 333333;
+        neighbordist[tn] = -1.0;
+    }
+
+    for (int tn = 0; tn<11; tn++){
+        q[tn] = -1;
+        aq[tn] = -1;
+
+        for (int tnn =0; tnn<25; tnn++){
+            realq[tn][tnn] = -1;
+            imgq[tn][tnn] = -1;
+            arealq[tn][tnn] = -1;
+            aimgq[tn][tnn] = -1;
+        }
+    }
+
 }
 
 Atom::~Atom(){ }

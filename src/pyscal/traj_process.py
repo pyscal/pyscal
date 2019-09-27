@@ -6,20 +6,8 @@ this module.
 """
 import numpy as np
 import gzip
+import pyscal.catom as pca
 
-class TempAtom(object):
-    """
-    Class to store atom details until transferred to core module
-    """
-    def __init__(self, pos = [0,0,0], id = 0, type = 1):
-        """
-        Defaults args
-        """
-        self.custom = {}
-        self.pos = pos
-        self.id = id
-        self.loc = 0
-        self.type = type
 
 #functions that are not wrapped from C++
 def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False, customkeys=[]):
@@ -144,17 +132,19 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
             y = float(raw[headerdict["y"]])
             z = float(raw[headerdict["z"]])
 
-            atom = TempAtom()
+            atom = pca.Atom()
             atom.pos = [x, y, z]
             atom.id = idd
             atom.type = typ
             atom.loc = count-8
 
+            customdict = {}
             #if customkeys need to be read, do it
             if customread:
                 for cc, kk in enumerate(customkeys):
-                    atom.custom[kk] = raw[headerdict[kk]]
+                    customdict[kk] = raw[headerdict[kk]]
 
+            atom.custom = customdict
             atoms.append(atom)
 
     #close files
@@ -195,27 +185,15 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
         boxdims = np.array([[boxx[0], boxx[1]],[boxy[0], boxy[1]],[boxz[0], boxz[1]]])
 
     if box_vectors and check_triclinic:
-        if customread:
-            return atoms, boxdims, box, triclinic, customvals
-        else:
-            return atoms, boxdims, box, triclinic
+        return atoms, boxdims, box, triclinic
 
     elif box_vectors:
-        if customread:
-            return atoms, boxdims, box, customvals
-        else:
-            return atoms, boxdims, box
+        return atoms, boxdims, box
 
     elif check_triclinic:
-        if customread:
-            return atoms, boxdims, triclinic, customvals
-        else:
-            return atoms, boxdims, triclinic
+        return atoms, boxdims, triclinic
     else:
-        if customread:
-            return atoms, boxdims, customvals
-        else:
-            return atoms, boxdims
+        return atoms, boxdims
 
 def read_poscar(infile, compressed = False):
     """
@@ -315,10 +293,11 @@ def read_poscar(infile, compressed = False):
 
             count+=1
             idd = count
-            atom = TempAtom()
+            atom = pca.Atom()
             atom.x = [x, y, z]
             atom.id = idd
             atom.type = typ
+            atom.loc = i-atom_start
             #atom = pc.Atom(pos=, id=idd, type=typ)
             atoms.append(atom)
             i+=1
@@ -359,7 +338,7 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
 
     """
     boxdims = sys.box
-    atoms = sys.get_allatoms()
+    atoms = sys.atoms
 
     #open files for writing
     if compressed:
@@ -417,13 +396,13 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
     dump.write(title_str)
 
     for cc, atom in enumerate(atoms):
-        pos = atom.get_x()
+        pos = atom.pos
 
         if writecustom:
             cvals = " ".join(np.array(customvals)[:, cc].astype(str))
-            atomline = ("%d %d %f %f %f %s\n")%(atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2], cvals)
+            atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cvals)
         else:
-            atomline = ("%d %d %f %f %f\n")%(atom.get_id(), atom.get_type(), pos[0], pos[1], pos[2])
+            atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
 
         dump.write(atomline)
 
@@ -500,7 +479,7 @@ def split_traj_lammps_dump(infile, compressed = False):
                 break
     f.close()
 
-    #now restart f
+    #now restart f()
     if raw[-1] == 'gz' or  compressed:
         f = gzip.open(infile,'rt')
     else:
