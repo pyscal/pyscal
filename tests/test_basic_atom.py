@@ -40,5 +40,5 @@ def test_neighbors():
     atom.neighbors = [1,2]
     assert atom.neighbors == [1,2]
     assert atom.coordination == 2
-    atom.neighborweights = [0.6, 0.4]
-    assert atom.neighborweights == [0.6, 0.4]
+    atom.neighbor_weights = [0.6, 0.4]
+    assert atom.neighbor_weights == [0.6, 0.4]

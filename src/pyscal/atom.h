@@ -74,7 +74,7 @@ class Atom{
         int facevertices[MAXNUMBEROFNEIGHBORS];
         int faceverticenumbers[MAXNUMBEROFNEIGHBORS];
         double faceperimeters[MAXNUMBEROFNEIGHBORS];
-        double edgelengths[MAXNUMBEROFNEIGHBORS];
+        //double edgelengths[MAXNUMBEROFNEIGHBORS];
         double n_diffx[MAXNUMBEROFNEIGHBORS];
         double n_diffy[MAXNUMBEROFNEIGHBORS];
         double n_diffz[MAXNUMBEROFNEIGHBORS];
@@ -88,6 +88,7 @@ class Atom{
 
 
         //vertex vectors
+        vector<vector<double>> edgelengths;
         vector<double> vertex_vectors;
         vector<int> vertex_numbers;
         vector<double> gvertex_vectors();
@@ -150,8 +151,8 @@ class Atom{
         void sfacevertices(vector<int>);
         vector<double> gfaceperimeters();
         void sfaceperimeters(vector<double>);
-        vector<double> gedgelengths();
-        void sedgelengths(vector<double>);
+        vector<vector<double>> gedgelengths();
+        void sedgelengths(vector<vector<double>>);
         vector<int> gvorovector();
         void svorovector(vector<int>);
 

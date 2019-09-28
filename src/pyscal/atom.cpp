@@ -20,9 +20,12 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     //assign other values - the default ones
     belongsto = -1;
     issolid = 0;
+    issurface = 0;
     loc = 0;
     isneighborset = 0;
     n_neighbors = 0;
+    lcluster = 0;
+
 
     for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){
         neighbors[tn] = -1;
@@ -31,7 +34,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
         facevertices[tn] = -1;
         faceverticenumbers[tn] = -1;
         faceperimeters[tn] = -1.0;
-        edgelengths[tn] = -1.0;
+        //edgelengths[tn] = -1.0;
 
     }
 
@@ -367,18 +370,13 @@ vector<double> Atom::gfaceperimeters(){
     return rqlms;
 }
 
-void Atom::sedgelengths(vector<double> nss){
-    for(int i=0; i<nss.size(); i++){
-        edgelengths[i] = nss[i];
-    }
+void Atom::sedgelengths(vector<vector<double>> nss){
+    edgelengths.clear();
+    edgelengths = nss;
 }
 
-vector<double> Atom::gedgelengths(){
-    vector <double> rqlms;
-    for(int i=0; i<n_neighbors; i++){
-        rqlms.emplace_back(edgelengths[i]);
-    }
-    return rqlms;
+vector<vector<double>> Atom::gedgelengths(){
+    return edgelengths;
 }
 
 vector<int> Atom::gvorovector(){

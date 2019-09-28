@@ -8,21 +8,23 @@ import pyscal.pickle as pp
 
 
 def test_pickle_system():
+
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [1, 1, 1])
     sys = pc.System()
-    sys.assign_atoms(atoms, boxdims)
+    sys.atoms = atoms
+    sys.box = boxdims
     sys.find_neighbors(method = 'voronoi')
 
     #test write and read system
-    sys.to_file('tests/sy.npy')
+    sys.to_pickle('tests/sy.npy')
 
     #now read the pickled system
     psys = pc.System()
-    psys.from_file('tests/sy.npy')
+    psys.from_pickle('tests/sy.npy')
 
     #now get atoms and a random number of atom
-    satoms = sys.get_atoms()
-    patoms = psys.get_atoms()
+    satoms = sys.atoms
+    patoms = psys.atoms
 
     rn = np.random.randint(0, len(satoms)-1)
     assert satoms[rn].neighbors == patoms[rn].neighbors

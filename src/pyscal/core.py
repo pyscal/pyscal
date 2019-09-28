@@ -850,7 +850,7 @@ class System(pc.System):
         return self.find_largest_cluster()
 
 
-    #def prepare_pickle(self):
+    def prepare_pickle(self):
         """
         Prepare the system for pickling and create a picklable system
 
@@ -875,30 +875,29 @@ class System(pc.System):
         """
 
         #get the basic system indicators
-    #    indicators = pcs.System.get_indicators(self)
-
+        indicators = self.get_indicators()
         #get box dims and triclinic params if triclinic
-    #    boxdims = self.box
-    #    if indicators[6] == 1:
-    #        rot = pcs.System.get_triclinic_params(self)
-    #    else:
-    #        rot = 0
+        box = self.box
+        if indicators[6] == 1:
+            rot = self.get_triclinic_params()
+        else:
+            rot = 0
 
         #now finally get atoms
-    #    atoms = pcs.System.get_allatoms(self)
+        atoms = self.atoms
         #convert them to picklabale atoms
-    #    patoms = [self.copy_catom_to_atom(atom) for atom in atoms]
+        patoms = [pp.pickle_atom(atom) for atom in atoms]
 
         #create System instance and assign things
-    #    psys = pp.System()
-    #    psys.indicators = indicators
-    #    psys.atoms = patoms
-    #    psys.boxdims = boxdims
-    #    psys.rot = rot
+        psys = pp.pickleSystem()
+        psys.indicators = indicators
+        psys.atoms = patoms
+        psys.box = box
+        psys.rot = rot
 
-    #    return psys
+        return psys
 
-    #def to_file(self, file):
+    def to_pickle(self, file):
         """
         Save a system to file
 
@@ -925,11 +924,11 @@ class System(pc.System):
             Pickling between different versions of numpy or python could be incompatible.
 
         """
-    #    psys = self.prepare_pickle()
-    #    np.save(file, psys, allow_pickle=True)
+        psys = self.prepare_pickle()
+        np.save(file, psys, allow_pickle=True)
 
 
-    #def from_file(self, file):
+    def from_pickle(self, file):
         """
         Populate the empty system from file
 
@@ -954,22 +953,93 @@ class System(pc.System):
         >>> sys.from_file(filename)
 
         """
-    #    if os.path.exists(file):
-    #        psys = np.load(file, allow_pickle=True).flatten()[0]
-    #    else:
-    #        raise FileNotFoundError("file does not exist")
+        if os.path.exists(file):
+            psys = np.load(file, allow_pickle=True).flatten()[0]
+        else:
+            raise FileNotFoundError("file does not exist")
         #set up indicators
-    #    pcs.System.set_indicators(self, psys.indicators)
+        self.set_indicators(psys.indicators)
         #unpickle atoms
-    #    catoms = [self.copy_atom_to_catom(atom) for atom in psys.atoms]
-    #    boxdims = psys.boxdims
+        self.atoms = [pp.unpickle_atom(atom) for atom in psys.atoms]
+        self.box = psys.box
 
 
         #if triclinic, get those
-    #    if psys.indicators[6] == 1:
-    #        rot = psys.rot
-    #        rotinv = np.linalg.inv(rot)
-    #        pcs.System.assign_triclinic_params(self, rot, rotinv)
+        if psys.indicators[6] == 1:
+            rot = psys.rot
+            rotinv = np.linalg.inv(rot)
+            self.assign_triclinic_params(rot, rotinv)
 
-        #assign atoms and box
-    #    pcs.System.reassign_particles(self, catoms, boxdims)
+    def to_file(self, outfile, format='lammps-dump', custom=True, compressed=False):
+        """
+        Save the system instance to a trajectory file.
+
+        Parameters
+        ----------
+        outfile : string
+            name of the output file
+
+        format : string, optional
+            format of the output file, default lammps-dump
+            Currently only lammps-dump format is supported.
+
+        custom : bool, optional
+            If true, any custom values that the atom has is also
+            saved to the file. default False.
+
+        compressed : bool, optional
+            If true, the output is written as a compressed file.
+
+        Returns
+        -------
+        None
+
+        """
+        boxdims = sys.box
+        atoms = sys.atoms
+
+        if custom:
+            #check if there is custom vals
+            if len(atoms[0].custom.keys()) > 0:
+                customkeys = atoms[0].custom.keys()
+            else:
+                custom = False
+
+        #open files for writing
+        if compressed:
+            gz = gzip.open(outfile,'w')
+            dump = io.BufferedReader(gz)
+        else:
+            gz = open(outfile,'w')
+            dump = gz
+
+        #now write
+        dump.write("ITEM: TIMESTEP\n")
+        dump.write("0\n")
+        dump.write("ITEM: NUMBER OF ATOMS\n")
+        dump.write("%d\n" % len(atoms))
+        dump.write("ITEM: BOX BOUNDS\n")
+        dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
+        dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
+        dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
+
+        #now write header
+        if custom:
+            ckey = " ".join(customkeys)
+            title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
+        else:
+            title_str = "ITEM: ATOMS id type x y z\n"
+
+        dump.write(title_str)
+
+        for cc, atom in enumerate(atoms):
+            pos = atom.pos
+            if custom:
+                cvals = " ".join(list(atom.custom.values()))
+                atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cvals)
+            else:
+                atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
+
+            dump.write(atomline)
+
+        dump.close()

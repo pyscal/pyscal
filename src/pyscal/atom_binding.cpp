@@ -56,7 +56,7 @@ py::class_<Atom>(m,"Atom")
 
     )mydelimiter")
 
-    .def_property("neighborweights",&Atom::gneighborweights, &Atom::sneighborweights, R"mydelimiter(
+    .def_property("neighbor_weights",&Atom::gneighborweights, &Atom::sneighborweights, R"mydelimiter(
         List of floats
         Used to weight the contribution of each neighbor atom towards the value of
         Steinhardt's parameters. By default, each atom has a weight of 1 each. However,
@@ -103,22 +103,7 @@ py::class_<Atom>(m,"Atom")
     .def_property("custom",&Atom::gcustom,&Atom::scustom, R"mydelimiter(
 
     )mydelimiter")
-    .def("get_q",&Atom::gq, R"mydelimiter(
-        Test documentationposx
 
-        Parameters
-        ----------
-        None
-    )mydelimiter")
-    .def("set_q",&Atom::sq, R"mydelimiter(
-
-    )mydelimiter")
-    .def("get_aq",&Atom::gaq, R"mydelimiter(
-
-    )mydelimiter")
-    .def("set_aq",&Atom::saq, R"mydelimiter(
-
-    )mydelimiter")
     .def("get_qlm",&Atom::gqlm, R"mydelimiter(
 
     )mydelimiter")
@@ -153,16 +138,16 @@ py::class_<Atom>(m,"Atom")
     .def_property("avg_connection", &Atom::gasij, &Atom::sasij, R"mydelimiter(
 
     )mydelimiter")
-    .def("get_q", (double (Atom::*) (int q, bool))  &Atom::gq_big,  py::arg(), py::arg("averaged"), R"mydelimiter(
+    .def("get_q", (double (Atom::*) (int q, bool))  &Atom::gq_big,  py::arg(), py::arg("averaged")=false, R"mydelimiter(
 
     )mydelimiter")
-    .def("get_q", (vector<double> (Atom::*) (vector<int>, bool))  &Atom::gq_big, py::arg(), py::arg("averaged"), R"mydelimiter(
+    .def("get_q", (vector<double> (Atom::*) (vector<int>, bool))  &Atom::gq_big, py::arg(), py::arg("averaged")=false, R"mydelimiter(
 
     )mydelimiter")
-    .def("set_q", (void (Atom::*) (int, double, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged"), R"mydelimiter(
+    .def("set_q", (void (Atom::*) (int, double, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false, R"mydelimiter(
 
     )mydelimiter")
-    .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged"), R"mydelimiter(
+    .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false, R"mydelimiter(
 
     )mydelimiter")
 
