@@ -208,27 +208,25 @@ class System(pc.System):
 
     def get_qvals(self, q, averaged = False):
         """
-        Get the required q values of all atoms.
+        Get the required q_l (Steinhardt parameter) values of all atoms.
 
         Parameters
         ----------
-        q : int or list of ints
-            required q value from 2-12
+        q_l : int or list of ints
+            required q_l value with l from 2-12
 
         averaged : bool, optional
-            If True, return the averaged q values,
-            If False, return the non averaged ones
-            default False
+            If True, return the averaged q values, default False
 
         Returns
         -------
         qvals : list of floats
-            list of qvalue of all atoms.
+            list of q_l of all atoms.
 
         Notes
         -----
         The function returns a list of
-        q values in the same order as that of the atoms in the system.
+        q_l values in the same order as the list of the atoms in the system.
 
         """
         if isinstance(q, int):
@@ -268,21 +266,24 @@ class System(pc.System):
         distance : double
                 distance between the first and second atom.
 
+        Notes
+        -----
+        Periodic boundary conditions are assumed by default.
         """
         return self.get_absdistance(atom1, atom2)
 
 
-    def find_neighbors(self, method="cutoff", cutoff=None, threshold=2, filter=None,
+    def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
                                             voroexp=1, face_cutoff=0.002, padding=1.2, nlimit=6):
         """
 
-        Find neighbors of all atoms in the :class:`~System`.
+        Find neighbors of all atoms in the :class:`~pyscal.core.System`.
 
         Parameters
         ----------
         method : {'cutoff', 'voronoi'}
-            `cutoff` method finds atoms within a specified or adaptive cutoff distance of the host atom
-            `voronoi` method finds atoms that share a Voronoi polyhedra face with the host atom. Default, `cutoff`
+            `cutoff` method finds neighbors of an atom within a specified or adaptive cutoff distance from the atom.
+            `voronoi` method finds atoms that share a Voronoi polyhedra face with the atom. Default, `cutoff`
 
         cutoff : { float, 'sann', 'adaptive'}
             the cutoff distance to be used for the `cutoff` based neighbor calculation method described above.
@@ -297,8 +298,8 @@ class System(pc.System):
             `type`, only atoms of the same type would be included in the neighbor calculations. Default None.
 
         voroexp : int, optional
-            only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards the q
-            values. Default 1.
+            only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards
+            Steinhardt parameter values. Default 1.
 
         face_cutoff : double, optional
             only used if ``method=voronoi``. The minimum fraction of total voronoi face area a single phase should have in order to
@@ -318,8 +319,8 @@ class System(pc.System):
         Raises
         ------
         RuntimeWarning
-            raised when `threshold` value is too less. A low threshold value will lead to 'sann' algorithm not converging
-            in finding a neighbor. The function will try to automatically increase `threshold` and check again.
+            raised when `threshold` value is too low. A low threshold value will lead to 'sann' algorithm not converging
+            when finding a neighbor. This function will try to automatically increase `threshold` and check again.
 
         RuntimeError
             raised when neighbor search was unsuccessful. This is due to a low `threshold` value.
@@ -332,36 +333,31 @@ class System(pc.System):
         Method cutoff and specifying a cutoff radius uses the traditional approach being the one in which the neighbors of an atom
         are the ones that lie in the cutoff distance around it.
 
-        In order to reduce time during sorting of distances during the adaptive methods, pyscal guesses an initial large cutoff radius.
+        In order to reduce time during the distance sorting during the adaptive methods, pyscal sets an initial guess for a cutoff distance.
         This is calculated as,
 
         .. math:: r_{initial} = threshold * (simulation~box~volume/ number~of~particles)^{(1/3)}
 
         threshold is a safe multiplier used for the guess value and can be set using the `threshold` keyword.
 
-        In Method cutoff, if ``cutoff='adaptive'``, an adaptive cutoff is decided during runtime for each atom to find its neighbors [1]_.
-        Setting the cutoff radius to 0 also triggers this algorithm. The cutoff for an atom i is found using,
+        In Method cutoff, if ``cutoff='adaptive'``, an adaptive cutoff is found during runtime for each atom [1]_.
+        Setting the cutoff radius to 0 also uses this algorithm. The cutoff for an atom i is found using,
 
         .. math:: r_c(i) = padding * ((1/nlimit) * \sum_{j=1}^{nlimit}(r_{ij}))
 
         padding is a safe multiplier to the cutoff distance that can be set through the keyword `padding`. `nlimit` keyword sets the
         limit for the top nlimit atoms to be taken into account to calculate the cutoff radius.
 
-        In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]_. There are no parameters to customise sann behaviour.
+        In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]_. There are no parameters to tune sann algorithm.
 
-        The second approach is using Voronoi polyhedra. All the atoms that share a Voronoi polyhedra face with the host atoms are considered
-        its neighbors. A corresponding neighborweight is also assigned to each neighbor in the ratio of the face area between the two atoms.
-        This weight can later be used to weight steinhardt parameters. Higher powers of this weight can also be used [3]_. The keyword `voroexp`
-        can be used to set this weight. If `voroexp` is set to 0, the neighbors would be calculated using Voronoi method, but Steinhardts
-        parameters could be calculated normally.
-
-        Keyword `filter` can be used to filter the neighbors based on a condition. Choosing ``filter='type'`` only considers an atom as
-        a neighbor if both the neighbor atom and host atom are of the same type.
+        The second approach is using Voronoi polyhedra which also assigns a weight to each neighbor in the ratio of the face area between the two atoms.
+        Higher powers of this weight can also be used [3]_. The keyword `voroexp`
+        can be used to set this weight.
 
         .. warning::
 
             Adaptive cutoff uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
-            of a warning that ``threshold`` is inadequate, it should be further increased. High/low value
+            of a warning that ``threshold`` is inadequate, this parameter should be further increased. High/low value
             of this parameter will correspond to the time taken for finding neighbors.
 
         References
@@ -451,7 +447,7 @@ class System(pc.System):
             cutoff for edge length. Default 0.05.
 
 
-        area_cutoff : float, optional        self.initialized = 23
+        area_cutoff : float, optional
             cutoff for face area. Default 0.01.
 
         edge_length : bool, optional
@@ -536,17 +532,15 @@ class System(pc.System):
 
     def calculate_q(self, q, averaged = False):
         """
-        Find the bond order parameter q for all atoms.
+        Find the Steinhardt parameter q_l for all atoms.
 
         Parameters
         ----------
-        qs : int or list of ints
-            A list of all q params to be found from 2-12.
+        q_l : int or list of ints
+            A list of all Steinhardt parameters to be found from 2-12.
 
         averaged : bool, optional
-            If True, return the averaged q values,
-            If False, return the non averaged ones
-            default False
+            If True, return the averaged q values, default False
 
         Returns
         -------
@@ -554,14 +548,15 @@ class System(pc.System):
 
         Notes
         -----
-        Enables calculation of the Steinhardt parameters q from 2-12. The type of
+        Enables calculation of the Steinhardt parameters [1]_ q from 2-12. The type of
         q values depend on the method used to calculate neighbors. See the description
-        :func:`~System.find_neighbors` for more details. If the keyword `average` is set to True,
-        the averaged versions of the bond order parameter [1]_ is returned.
+        :func:`~pyscal.core.System.find_neighbors` for more details. If the keyword `average` is set to True,
+        the averaged versions of the bond order parameter [2]_ is returned.
 
         References
         ----------
-        .. [1] Lechner, W, Dellago, C, J Chem Phys, 2013
+        .. [1] Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983
+        .. [2] Lechner, W, Dellago, C, J Chem Phys, 2013
 
         """
         if isinstance(q, int):
@@ -590,13 +585,11 @@ class System(pc.System):
             a solid. Default 7.
 
         threshold : double, optional
-            The cutoff value of connection between two atoms for them to be def
-            ined as having a bond. Default 0.5.
+            Solid bond cutoff value. Default 0.5.
 
         avgthreshold : double, optional
-            Averaged value of connection between an atom and its neighbors for
-            an atom to be solid. This threshold is known to improve the solid-liquid
-            distinction in interfaces between solid and liquid. Default 0.6.
+            Value required for Averaged solid bond cutoff for an atom to be identified
+            as solid. Default 0.6.
 
         cluster : bool, optional
             If True, cluster the solid atoms and return the number of atoms in the largest
@@ -604,23 +597,22 @@ class System(pc.System):
 
         Returns
         -------
-        lc : int
-            Size of the largest cluster of solid atoms. Returned only if `cluster=True`.
+        solid : int
+            Size of the largest solid cluster. Returned only if `cluster=True`.
 
         Notes
         -----
-        The number of solid atoms in liquid using method found in [1]_ and example
-        usage (not with this module) can be found in [2]_. The neighbors should be calculated
-        before running this function. Check :func:`~System.find_neighbors` method.
+        The neighbors should be calculated before running this function.
+        Check :func:`~pyscal.core.System.find_neighbors` method.
 
-        `bonds` define the number of solid bond required for an atom to be considered solid.
-        Two particles are said to be 'bonded' if,
+        `bonds` define the number of solid bonds of an atom to be identified as solid.
+        Two particles are said to be 'bonded' if [1]_,
 
         .. math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
 
         where `threshold` values is also an optional parameter.
 
-        `avgthreshold` is an additional parameter to improve solid-liquid distinction.
+        An additional parameter `avgthreshold` is an additional parameter to improve solid-liquid distinction.
         In addition to having a the specified number of `bonds`,
 
         .. math::  \langle s_{ij} \\rangle > avgthreshold
@@ -631,7 +623,6 @@ class System(pc.System):
         References
         ----------
         .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
-        .. [2] Diaz Leines, G, Drautz, R, Rogal, J, J Chem Phys 146, 2017
 
         """
         #check if neighbors are found
@@ -695,10 +686,9 @@ class System(pc.System):
         is defined by the user through the function `condition` which is passed as a parameter.
         For each atom in the system, the `condition` should give a True/False values.
 
-        When clustering happens, the code loops over each atom and its neighbors. If the
-        host atom and the neighbor both have True value for `condition`, they are put
-        in the same cluster. For example, if the atoms need to be clustered over if they
-        are solid or not, corresponding condition would be,
+        When clustering, the code loops over each atom and its neighbors. If the
+        `condition` is true for both host atom and the neighbor, they are assigned to
+        the same cluster. For example, a condition to cluster solid atoms would be,
 
         .. code:: python
 
@@ -847,7 +837,7 @@ class System(pc.System):
 
         Notes
         -----
-        :func:`System.find_clusters` has to be used before using this function.
+        :func:`pyscal.core.System.find_clusters` has to be used before using this function.
 
         """
         return self.find_largest_cluster()
@@ -868,7 +858,7 @@ class System(pc.System):
         Notes
         -----
         This function prepares the system object for pickling. From
-        a user perspective, the :func:`~System.to_file` method should be used
+        a user perspective, the :func:`~pyscal.core.System.to_pickle` method should be used
         directly.
 
         See also
@@ -915,7 +905,7 @@ class System(pc.System):
 
         Notes
         -----
-        This function can be used to save a :class:`~System` object directly to
+        This function can be used to save a :class:`~pyscal.core.System` object directly to
         file. This retains all the calculated quantities of the system,
         including the atoms and their properties. This can be useful to
         restart the calculation. The function uses `numpy.save` method
@@ -933,12 +923,13 @@ class System(pc.System):
 
     def from_pickle(self, file):
         """
-        Populate the empty system from file
+        Read the contents of :class:`~pyscal.core.System` object from a
+        pickle file.
 
         Parameters
         ----------
         file : string
-            name of output file
+            name of input file
 
         Returns
         -------
@@ -947,13 +938,13 @@ class System(pc.System):
         Notes
         -----
         This function can be used to set up a system
-        from a file. A system needs to be created first.
+        from a file. A system object needs to be created first.
 
         Examples
         --------
 
         >>> sys = System()
-        >>> sys.from_file(filename)
+        >>> sys.from_pickle(filename)
 
         """
         if os.path.exists(file):
@@ -983,8 +974,8 @@ class System(pc.System):
             name of the output file
 
         format : string, optional
-            format of the output file, default lammps-dump
-            Currently only lammps-dump format is supported.
+            format of the output file, default `lammps-dump`
+            Currently only `lammps-dump` format is supported.
 
         custom : bool, optional
             If true, any custom values that the atom has is also
