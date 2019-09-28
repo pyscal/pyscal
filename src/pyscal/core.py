@@ -26,6 +26,21 @@ class System(pc.System):
     """
     A c++ class for holding the properties of a system.
 
+    Attributes
+    ----------
+    box : list of list of floats
+        A list containing the dimensions of the simulation box in the format
+        `[[x_low, x_high], [y_low, y_high], [z_low, z_high]]`
+
+    atoms : list of :class:`~pyscal.core.Atom` objects
+
+        .. note::
+
+            atoms can be accessed or set as `System.atoms`. However, due to
+            technical reasons individual atoms should be accessed using the
+            :func:`~pyscal.core.System.get_atom` method. An atom can be assigned
+            to the atom using the :func:`~pyscal.core.System.set_atom` method.
+
     Notes
     -----
     A `System` consists of two
@@ -78,11 +93,8 @@ class System(pc.System):
         Notes
         -----
         `format` keyword specifies the format of the input file. Currently only
-        a `lammps-dump` and `poscar` files are supported. However, this restriction can easily
-        be overcome using the :func:`~System.assign_atoms` method from system where a list of atoms
-        and box vectors are directly provided to the system. This function itself uses the
-        :func:`~pyscal.traj_process` module to process a file which is then assigned to system
-        using :func:`~System.assign_atoms`.
+        a `lammps-dump` and `poscar` files are supported.  This function uses the
+        :func:`~pyscal.traj_process` module to process a file which is then assigned to system.
 
         `compressed` keyword is not required if a file ends with `.gz` extension, it is
         automatically treated as a compressed file.
@@ -98,9 +110,7 @@ class System(pc.System):
         available. This information is not passed to the C++ instance of atom, and is stored
         as a dictionary. It can be accessed directly as `atom.custom['customval']`
 
-        See Also
-        --------
-        assign_atoms
+
         """
 
         if format == 'lammps-dump':
@@ -157,6 +167,55 @@ class System(pc.System):
                 raise IOError("input file %s not found"%filename)
         else:
             raise TypeError("format recieved an unknown option %s"%format)
+
+    def get_atom(self, index):
+        """
+
+        Get the :class:`~pyscal.core.Atom` object at the queried position in the list of all atoms
+        in the :class:`~pyscal.core.System`.
+
+        Parameters
+        ----------
+        index : int
+            index of required atom in the list of all atoms.
+
+        Returns
+        -------
+        atom : Atom object
+            atom object at the queried position.
+        """
+        atom = self.cget_atom(index)
+        return atom
+
+    def set_atom(self, atom):
+        """
+        Return the atom to its original location after modification.
+
+        Parameters
+        ----------
+        atom : Atom
+                atom to be replaced
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        For example, an :class:`~pyscal.core.Atom` at location `i` in the list of all atoms in
+        :class:`~pyscal.core.System` can be queried by,
+        ``atom = System.get_atom(i)``, then any kind of modification, for example, the
+        position of the `Atom` can done by, ``atom.set_pos([2.3, 4.5, 4.5])``. After
+        modification, the `Atom` can be set back to its position in `System` by
+        :func:`~pyscal.core.System.set_atom`.
+
+        Although the complete list of atoms can be accessed or set using ``atoms = sys.atoms``,
+        `get_atom` and `set_atom` functions should be used for accessing individual atoms.
+        If an atom already exists at that index in the list, it will be overwritten and will
+        lead to loss of information.
+
+        """
+        self.set_atom(atom)
 
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
