@@ -43,7 +43,7 @@ def test_system_read():
     #del sys
 
     sys = pc.System()
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(IOError):
         sys.read_inputfile('tests/ahdkklc.dump')
 
 #@profile

@@ -112,7 +112,7 @@ class System(pc.System):
                 try:
                     filename = filenames[frame]
                 except:
-                    raise FileNotFoundError("frame %d is not found in the trajectory"%frame)
+                    raise IOError("frame %d is not found in the trajectory"%frame)
 
                 #now if file exists
                 if os.path.exists(filename):
@@ -126,7 +126,7 @@ class System(pc.System):
                         rotinv = np.linalg.inv(rot)
                         self.assign_triclinic_params(rot, rotinv)
                 else:
-                    raise FileNotFoundError("input file %s not found"%filename)
+                    raise IOError("input file %s not found"%filename)
 
                 #now remove filenames
                 for file in filenames:
@@ -142,7 +142,7 @@ class System(pc.System):
                     rotinv = np.linalg.inv(rot)
                     self.assign_triclinic_params(rot, rotinv)
             else:
-                raise FileNotFoundError("input file %s not found"%filename)
+                raise IOError("input file %s not found"%filename)
 
 
         elif format == 'poscar':
@@ -151,7 +151,7 @@ class System(pc.System):
                 self.atoms = atoms
                 self.box = boxdims
             else:
-                raise FileNotFoundError("input file %s not found"%filename)
+                raise IOError("input file %s not found"%filename)
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 
@@ -956,7 +956,7 @@ class System(pc.System):
         if os.path.exists(file):
             psys = np.load(file, allow_pickle=True).flatten()[0]
         else:
-            raise FileNotFoundError("file does not exist")
+            raise IOError("file does not exist")
         #set up indicators
         self.set_indicators(psys.indicators)
         #unpickle atoms
