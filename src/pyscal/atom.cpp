@@ -196,7 +196,7 @@ void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
 double Atom::gaq(int qq){ return aq[qq-2]; }
 void Atom::saq(int qq, double qval){ aq[qq-2] = qval; }
 
-double Atom::gq_big( bool averaged, int qval){
+double Atom::gq_big(int qval, bool averaged){
 
     if ((qval < 2) || (qval > 12)){
         throw invalid_argument("q value should be between 2-12");
@@ -205,7 +205,7 @@ double Atom::gq_big( bool averaged, int qval){
     else {return gq(qval);}
 }
 
-void Atom::sq_big( bool averaged, int qval, double val){
+void Atom::sq_big(int qval, double val,  bool averaged){
 
     if ((qval < 2) || (qval > 12)){
         throw invalid_argument("q value should be between 2-12");
@@ -215,7 +215,7 @@ void Atom::sq_big( bool averaged, int qval, double val){
 }
 
 //overloaded version which takes a vector
-vector<double> Atom::gq_big(bool averaged, vector<int> qval ){
+vector<double> Atom::gq_big(vector<int> qval, bool averaged ){
     int d;
     if(averaged == true) {
         vector<double> retvals;
@@ -240,7 +240,7 @@ vector<double> Atom::gq_big(bool averaged, vector<int> qval ){
 }
 
 //overloaded version which takes a vector
-void Atom::sq_big(bool averaged, vector<int> qval, vector<double> setvals){
+void Atom::sq_big(vector<int> qval, vector<double> setvals, bool averaged){
 
     if(averaged == true) {
 

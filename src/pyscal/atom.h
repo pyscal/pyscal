@@ -177,10 +177,10 @@ class Atom{
         double gq(int);
         void sq(int, double);
 
-        double gq_big(bool, int);
-        void sq_big( bool, int, double);
-        vector<double> gq_big(bool, vector<int>);
-        void sq_big(bool, vector<int>, vector<double>);
+        double gq_big(int, bool);
+        void sq_big( int, double, bool);
+        vector<double> gq_big(vector<int>, bool);
+        void sq_big(vector<int>, vector<double>, bool);
 
         vector <vector<double>> gqlm(int);
 

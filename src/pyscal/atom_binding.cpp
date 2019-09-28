@@ -153,16 +153,16 @@ py::class_<Atom>(m,"Atom")
     .def_property("avg_connection", &Atom::gasij, &Atom::sasij, R"mydelimiter(
 
     )mydelimiter")
-    .def("get_q", (double (Atom::*) (bool, int))  &Atom::gq_big, py::arg("averaged"), py::arg("q"), R"mydelimiter(
+    .def("get_q", (double (Atom::*) (int q, bool))  &Atom::gq_big,  py::arg(), py::arg("averaged"), R"mydelimiter(
 
     )mydelimiter")
-    .def("get_q", (vector<double> (Atom::*) (bool, vector<int>))  &Atom::gq_big, py::arg("averaged"), py::arg("q"), R"mydelimiter(
+    .def("get_q", (vector<double> (Atom::*) (vector<int>, bool))  &Atom::gq_big, py::arg(), py::arg("averaged"), R"mydelimiter(
 
     )mydelimiter")
-    .def("set_q", (void (Atom::*) (bool, int, double))  &Atom::sq_big, py::arg("averaged"), py::arg("q"), py::arg("vals"), R"mydelimiter(
+    .def("set_q", (void (Atom::*) (int, double, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged"), R"mydelimiter(
 
     )mydelimiter")
-    .def("set_q", (void (Atom::*) (bool, vector<int>, vector<double>))  &Atom::sq_big, py::arg("averaged"), py::arg("q"), py::arg("vals"), R"mydelimiter(
+    .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged"), R"mydelimiter(
 
     )mydelimiter")
 
