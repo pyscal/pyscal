@@ -30,12 +30,12 @@ class System(pc.System):
     -----
     A `System` consists of two
     major components - the simulation box and the atoms. All the associated variables
-    are then calculated over these.
+    are then calculated using this class.
 
     Examples
     --------
     >>> sys = System()
-    >>> sys.read_inputfile()
+    >>> sys.read_inputfile('atoms.dat')
     """
     def __init__(self):
 
@@ -46,12 +46,12 @@ class System(pc.System):
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
         """
 
-        Read input file containing the information of a time slice.
+        Read input file that contains the information of system configuration.
 
         Parameters
         ----------
         filename : string
-            name of the input file to be read in
+            name of the input file.
 
         format : {'lammps-dump', 'poscar'}
             format of the input file
@@ -60,9 +60,12 @@ class System(pc.System):
             If True, force to read a `gz` compressed format, default False.
 
         frame : int
-            If the trajectory contains more than one time slice, the slice can be specified
+            If the trajectory contains more than one time step, the slice can be specified
             using the `frame` option.
-            Alert: works only with `lammps-dump` format.
+
+            .. note::
+
+                works only with `lammps-dump` format.
 
         customkeys : list
             A list containing names of headers of extra data that needs to be read in from the
