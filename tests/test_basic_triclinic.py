@@ -12,7 +12,20 @@ def test_triclinic():
     neighs = atoms[0].neighbors
     assert len(neighs) == 14
 
+    indicators = sys.get_indicators()
+    assert indicators[6] == 1
+
     sys.find_neighbors(method = 'cutoff', cutoff=0.9)
     atoms = sys.atoms
+    neighs = atoms[0].neighbors
+    assert len(neighs) == 8
+
+def test_triclinic_frames():
+
+    os.system("cat tests/conf.primitive.bcc.supercell.dump tests/conf.primitive.bcc.supercell.dump > tests/bcc.prim.dat")
+    sys3 = pc.System()
+    sys3.read_inputfile("tests/bcc.prim.dat", frame=1)
+    sys3.find_neighbors(method = 'cutoff', cutoff=0.9)
+    atoms = sys3.atoms
     neighs = atoms[0].neighbors
     assert len(neighs) == 8

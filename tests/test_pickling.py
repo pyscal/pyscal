@@ -40,3 +40,37 @@ def test_pickle_system():
 
     #if os.path.exists('tests/sys.npy'):
     #    os.remove('tests/sys.npy')
+
+
+def test_file_system():
+
+    atoms, boxdims = pcs.make_crystal('bcc', repetitions = [1, 1, 1])
+    sys = pc.System()
+    sys.atoms = atoms
+    sys.box = boxdims
+    sys.find_neighbors(method = 'voronoi')
+
+    sys.to_file('tests/tjkf.dat')
+
+    #now try to read in the file
+    sys2 = pc.System()
+    sys2.read_inputfile('tests/tjkf.dat')
+    assert len(sys2.atoms) == 2
+
+    #now add some custom values
+    atoms[0].custom = {"velocity":12}
+    atoms[1].custom = {"velocity":24}
+
+    #now try to read in the file
+    sys3 = pc.System()
+    sys3.atoms = atoms
+    sys3.box = boxdims
+    sys3.to_file('tests/tjkf.dat')
+
+    #now read it again
+    sys4 = pc.System()
+    sys4.read_inputfile('tests/tjkf.dat', customkeys=['velocity'])
+    #now get atoms and check them
+    atoms = sys4.atoms
+    assert int(atoms[0].custom['velocity']) == 12
+    assert int(atoms[1].custom['velocity']) == 24

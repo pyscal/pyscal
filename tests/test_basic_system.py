@@ -41,6 +41,11 @@ def test_system_read():
     filtered_atoms = [ atom for atom in atoms if atom.id == 204]
     assert filtered_atoms[0].pos == [-0.10301, -6.35752, -6.44787]
     #del sys
+
+    sys = pc.System()
+    with pytest.raises(FileNotFoundError):
+        sys.read_inputfile('tests/ahdkklc.dump')
+
 #@profile
 def test_system_atom_access():
     #create some atoms

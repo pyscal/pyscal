@@ -995,8 +995,8 @@ class System(pc.System):
         None
 
         """
-        boxdims = sys.box
-        atoms = sys.atoms
+        boxdims = self.box
+        atoms = self.atoms
 
         if custom:
             #check if there is custom vals
@@ -1035,7 +1035,7 @@ class System(pc.System):
         for cc, atom in enumerate(atoms):
             pos = atom.pos
             if custom:
-                cvals = " ".join(list(atom.custom.values()))
+                cvals = " ".join(np.array(list(atom.custom.values())).astype(str))
                 atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cvals)
             else:
                 atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
