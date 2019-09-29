@@ -215,7 +215,7 @@ class System(pc.System):
         lead to loss of information.
 
         """
-        self.set_atom(atom)
+        self.cset_atom(atom)
 
 
     def calculate_rdf(self, histobins=100, histomin=0.0, histomax=None):
