@@ -1023,7 +1023,7 @@ class System(pc.System):
             rotinv = np.linalg.inv(rot)
             self.assign_triclinic_params(rot, rotinv)
 
-    def to_file(self, outfile, format='lammps-dump', custom=True, compressed=False):
+    def to_file(self, outfile, format='lammps-dump', custom=[], compressed=False):
         """
         Save the system instance to a trajectory file.
 
@@ -1036,9 +1036,8 @@ class System(pc.System):
             format of the output file, default `lammps-dump`
             Currently only `lammps-dump` format is supported.
 
-        custom : bool, optional
-            If true, any custom values that the atom has is also
-            saved to the file. default False.
+        custom : list of strings, optional
+            a list of extra atom wise values to be written in the output file.
 
         compressed : bool, optional
             If true, the output is written as a compressed file.
@@ -1047,16 +1046,49 @@ class System(pc.System):
         -------
         None
 
+        Notes
+        -----
+
         """
+
+        def get_custom(atom, customkeys):
+            #first option - maybe it appears
+            vals = []
+            for ckey in customkeys:
+                #if the key is there - ignore it
+                if not ckey in atom.custom.keys():
+                    #try to get from attribute
+                    try:
+                        val = getattr(atom, ckey)
+                        vals.append(val)
+
+                    except AttributeError:
+                        #since attr failed, check if they are q or aq values
+                        if ckey[0] == 'q':
+                            qkey = ckey[1:]
+                            #try to acess this value
+                            val = atom.get_q(int(qkey))
+                            #add this pair to dict - as string vals
+                            vals.append(val)
+
+                        elif ckey[:2] == 'aq':
+                            qkey = ckey[2:]
+                            val = atom.get_q(int(qkey), averaged=True)
+                            vals.append(val)
+
+                        else:
+                            raise AttributeError("custom key was not found")
+                else:
+                    val = atom.custom[ckey]
+                    vals.append(val)
+            return vals
+
+
         boxdims = self.box
         atoms = self.atoms
 
-        if custom:
-            #check if there is custom vals
-            if len(atoms[0].custom.keys()) > 0:
-                customkeys = atoms[0].custom.keys()
-            else:
-                custom = False
+        if len(custom) > 0:
+            cvals = [get_custom(atom, custom) for atom in atoms]
 
         #open files for writing
         if compressed:
@@ -1077,8 +1109,8 @@ class System(pc.System):
         dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
 
         #now write header
-        if custom:
-            ckey = " ".join(customkeys)
+        if len(custom) > 0:
+            ckey = " ".join(custom)
             title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
         else:
             title_str = "ITEM: ATOMS id type x y z\n"
@@ -1087,9 +1119,9 @@ class System(pc.System):
 
         for cc, atom in enumerate(atoms):
             pos = atom.pos
-            if custom:
-                cvals = " ".join(np.array(list(atom.custom.values())).astype(str))
-                atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cvals)
+            if len(custom) > 0:
+                cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
+                atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
             else:
                 atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
 
