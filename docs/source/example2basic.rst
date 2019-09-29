@@ -1,10 +1,10 @@
-
 Calculating coordination numbers
 --------------------------------
 
-| In this example, we will read in a snapshot from an MD simulation and
-  then calculate the coordination number distribution.
-| This example assumes that you read the basic example.
+| In this example, we will read in a configuration from an MD simulation
+  and then calculate the coordination number distribution.
+| This example assumes that you read the `basic
+  example <https://pyscal.readthedocs.io/en/latest/examples.html#basic-examples>`__.
 
 .. code:: python
 
@@ -16,7 +16,7 @@ Read in a file
 ~~~~~~~~~~~~~~
 
 The first step is setting up a system. We can create atoms and
-simulation box using the ``pyscal.crystal_structures`` module. Let's
+simulation box using the ``pyscal.crystal_structures`` module. Let us
 start by importing the module.
 
 .. code:: python
@@ -35,14 +35,17 @@ to it.
 .. code:: python
 
     sys = pc.System()
-    sys.assign_atoms(atoms, box)
+    sys.atoms = atoms
+    sys.box = box
 
 Calculating neighbors
 ~~~~~~~~~~~~~~~~~~~~~
 
 We start by calculating the neighbors of each atom in the system. There
-are two ways to do this, either using a `cutoff <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#fixed-cutoff-method>`_ or using a
-`voronoi <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#voronoi-tessellation>`_ polyhedra method. First the cutoff method is illustrated - which has two sub-options. 
+are two ways to do this, using a ``cutoff`` method and using a
+``voronoi`` polyhedra method. We will try with both of them. First we
+try with cutoff system - which has three sub options. We will check each
+of them in detail.
 
 Cutoff method
 ^^^^^^^^^^^^^
@@ -58,15 +61,13 @@ Now lets get all the atoms.
 
 .. code:: python
 
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
 
-    
-
-lets try accessing the coordination number of an atom
+let us try accessing the coordination number of an atom
 
 .. code:: python
 
-    atoms[0].get_coordination()
+    atoms[0].coordination
 
 
 
@@ -78,20 +79,23 @@ lets try accessing the coordination number of an atom
 
 
 As we would expect for a bcc type lattice, we see that the atom has 14
-neighbors (8 in the first shell and 6 in the second). It is important to note that you could tune the cutoff radius to select only the first shell. Now a more interesting example where a distribution of coordination numbers exist is shown. A file with a bcc system with thermal vibrations is used as input.
+neighbors (8 in the first shell and 6 in the second). Lets try a more
+interesting example by reading in a bcc system with thermal vibrations.
+Thermal vibrations lead to distortion in atomic positions, and hence
+there will be a distribution of coordination numbers.
 
 .. code:: python
 
     sys = pc.System()
     sys.read_inputfile('conf.dump')
     sys.find_neighbors(method='cutoff', cutoff=3.6)
-    atoms = sys.get_atoms()
+    atoms = sys.atoms
 
 We can loop over all atoms and create a histogram of the results
 
 .. code:: python
 
-    coord = [atom.get_coordination() for atom in atoms]
+    coord = [atom.coordination for atom in atoms]
 
 Now lets plot and see the results
 
@@ -104,30 +108,29 @@ Now lets plot and see the results
     plt.title("Cutoff method")
 
 
-
-    
-.. image:: output_23_1.png
+.. image:: coord_1.png
 
 
 Adaptive cutoff methods
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-``pyscal`` also has `adaptive cutoff methods implemented <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#adaptive-cutoff-methods>`_. These methods
-remove the restriction on having a global cutoff. Separate cutoffs are
+``pyscal`` also has adaptive cutoff methods implemented. These methods
+remove the restriction on having the same cutoff. A distinct cutoff is
 selected for each atom during runtime. ``pyscal`` uses two distinct
-algorithms to do this - `sann <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#solid-angle-based-nearest-neighbor-algorithm-sann>`_ and `adaptive <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#adaptive-cutoff-method>`_. Please check the
-documentation for a explanation of these algorithms. For the purpose of
-this example, we will use the adaptive algorithm.
+algorithms to do this - ``sann`` and ``adaptive``. Please check the
+`documentation <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html>`__
+for a explanation of these algorithms. For the purpose of this example,
+we will use the ``adaptive`` algorithm.
 
-adaptive algorithm
+``adaptive algorithm``
 
 .. code:: python
 
     sys.find_neighbors(method='cutoff', cutoff='adaptive', padding=1.5)
-    atoms = sys.get_atoms()
-    coord = [atom.get_coordination() for atom in atoms]
+    atoms = sys.atoms
+    coord = [atom.coordination for atom in atoms]
 
-Now lets plot
+Now let us plot
 
 .. code:: python
 
@@ -138,9 +141,7 @@ Now lets plot
     plt.title("Cutoff adaptive method")
 
 
-
-    
-.. image:: output_29_1.png
+.. image:: coord_2.png
 
 
 The adaptive method also gives similar results!
@@ -148,22 +149,22 @@ The adaptive method also gives similar results!
 Voronoi method
 ~~~~~~~~~~~~~~
 
-`Voronoi method <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#voronoi-tessellation>`_ calculates the voronoi polyhedra of all atoms. Any atom
+Voronoi method calculates the voronoi polyhedra of all atoms. Any atom
 that shares a voronoi face area with the host atom are considered
-neighbors. Voronoi polyhedra is calculated using the Voro++ code.
-However, you dont need to install this specifically as it is linked to
-pyscal.
+neighbors. Voronoi polyhedra is calculated using the
+`Voro++ <http://math.lbl.gov/voro++/>`__ code. However, you dont need to
+install this specifically as it is linked to pyscal.
 
 .. code:: python
 
     sys.find_neighbors(method='voronoi')
 
-Once again, lets get all atoms and find their coordination
+Once again, let us get all atoms and find their coordination
 
 .. code:: python
 
-    atoms = sys.get_allatoms()
-    coord = [atom.get_coordination() for atom in atoms]
+    atoms = sys.atoms
+    coord = [atom.coordination for atom in atoms]
 
 And visualise the results
 
@@ -176,12 +177,13 @@ And visualise the results
     plt.title("Voronoi method")
 
 
-    
-.. image:: output_37_1.png
+.. image:: coord_3.png
 
 
 Finally..
 ~~~~~~~~~
 
 All methods find the coordination number, and the results are
-comparable. The choice of a method depends on the problem at hand. Cutoff method is robust and fast, while Voronoi method gives a truly parameter free approach.
+comparable. Cutoff method is very sensitive to the choice of cutoff
+radius, but voronoi method can slightly overestimate the neighbors due
+to thermal vibrations.
