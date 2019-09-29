@@ -471,7 +471,7 @@ void System::get_all_neighbors_voronoi(){
             //only loop over neighbors
             weightsum = 0.0;
             for (int i=0; i<facearea.size(); i++){
-            	weightsum += facearea[i];
+            	weightsum += pow(facearea[i], alpha);
             }
 
 
