@@ -8,10 +8,13 @@ import pyscal.crystal_structures as pcs
 def test_voro_props():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2])
     sys = pc.System()
-    sys.assign_atoms(atoms, boxdims)
+    sys.atoms = atoms
+    sys.box = boxdims
+
 
     sys.find_neighbors(method = 'voronoi')
-    atoms = sys.get_atoms()
+    sys.calculate_vorovector()
+    atoms = sys.atoms
     atom = atoms[0]
-    v = atom.get_vorovector()
+    v = atom.vorovector
     assert v == [0,6,0,8]

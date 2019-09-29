@@ -2,23 +2,23 @@ Classification of atoms as solid or liquid
 ------------------------------------------
 
 pyscal can also be used to distinguish solid and liquid atoms. The
-classification is based on Steinhardt's parameters, specifically the
-:math:`q_6` value. The method defines two neighboring atoms :math:`i`
-and :math:`j` as having solid bonds if a parameter [1]_,
+classification is based on `Steinhardt's parameters <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html>`_,
+specifically
+:math:`q_6`. The method defines two neighboring atoms :math:`i`
+and :math:`j` as having solid bonds if a parameter :math:`s_{ij}` [1]_,
 
-.. math::  s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(j) \geq \mathrm{threshold} 
+.. math::  s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(j) \geq \mathrm{threshold}
 
 Additionally, a second order parameter is used to improve the
 distinction in solid-liquid boundaries [2]_. This is defined by the criteria,
 
-.. math::  \langle s_{ij} \rangle > \mathrm{avgthreshold} 
+.. math::  \langle s_{ij} \rangle > \mathrm{avgthreshold}
 
 If a particle has :math:`n` number of bonds with
 :math:`s_{ij} \geq \mathrm{threshold}` and the above condition is also
 satisfied, it is considered as a solid. The solid atoms can be clustered
-to find the largest solid cluster of atoms. Clustering based on a
-different criteria, any criteria is straightforward. Please check the
-examples on how to do this.
+to find the largest solid cluster of atoms. Please check the
+`examples <https://pyscal.readthedocs.io/en/latest/examples.html>`_ on how to do this.
 
 Finding solid atoms in liquid start with reading in a file and
 calculation of neighbors.

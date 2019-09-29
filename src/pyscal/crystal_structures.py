@@ -1,8 +1,8 @@
 """
-pyscal module for creating crystal structures. 
+pyscal module for creating crystal structures.
 """
 
-import pyscal.ccore as pc
+import pyscal.catom as pc
 import numpy as np
 
 def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca_ratio = 1.633):
@@ -14,7 +14,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
     ----------
     structure : {'bcc', 'fcc', 'hcp'}
         type of the crystal structure
-    
+
     lattice_constant : float, optional
         lattice constant of the crystal structure, default 1
 
@@ -22,14 +22,14 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
         of type `[nx, ny, nz]`, repetions of the unit cell in x, y and z directions.
         default `[1, 1, 1]`.
 
-    ca_ratio : float, optional 
+    ca_ratio : float, optional
         ratio of c/a for hcp structures, default 1.633
 
     Returns
     -------
     atoms : list of `Atom` objects
         list of all atoms as created by user input
-    
+
     box : list of list of floats
         list of the type `[[xlow, xhigh], [ylow, yhigh], [zlow, zhigh]]` where each of them are the lower
         and upper limits of the simulation box in x, y and z directions respectively.
@@ -39,14 +39,14 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
     >>> atoms, box = make_crystal('bcc', lattice_constant=3.48, repetitions=[2,2,2])
     >>> sys = System()
     >>> sys.assign_atoms(atoms, box)
-    
+
     """
     nx = repetitions[0]
     ny = repetitions[1]
     nz = repetitions[2]
 
     if structure == 'bcc':
-        
+
         coord_no = 2
         natoms = coord_no*nx*ny*nz
 
@@ -118,14 +118,11 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
                     posy = (unitcelly[l-1]+(lattice_constant*yfact*(float(j)-1)))
                     posz = (unitcellz[l-1]+(lattice_constant*zfact*(float(k)-1)))
                     atom = pc.Atom()
-                    atom.set_x([posx, posy, posz])
-                    atom.set_id(co)
-                    atom.set_type(1)
+                    atom.pos = [posx, posy, posz]
+                    atom.id = co
+                    atom.type = 1
+                    atom.loc = co-1
                     atoms.append(atom)
                     co += 1
 
     return atoms, boxdims
-
-
-
-

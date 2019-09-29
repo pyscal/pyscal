@@ -12,33 +12,33 @@ def test_this_file():
 
 def test_get_x():
     atom = pc.Atom(pos=[0,0,0], id=1)
-    assert atom.get_x() == [0,0,0]
-    atom.set_id(5)
-    assert atom.get_id() == 5
+    assert atom.pos == [0,0,0]
+    atom.id = 5
+    assert atom.id == 5
 
 def test_set_x():
     atom = pc.Atom(pos=[0,0,0], id=1)
     newx = [0,0,2]
-    atom.set_x(newx)
-    assert atom.get_x() == newx
+    atom.pos = newx
+    assert atom.pos == newx
 
 def test_set_type():
     atom = pc.Atom(pos=[0,0,0], id=1, type=1)
-    assert atom.get_type() == 1
-    atom.set_type(2)
-    assert atom.get_type() == 2
+    assert atom.type == 1
+    atom.type = 2
+    assert atom.type == 2
 
 def test_set_solid():
     atom = pc.Atom(pos=[0,0,0], id=1, type=1)
-    atom.set_solid(1)
-    assert atom.get_solid() == 1
+    atom.solid = 1
+    assert atom.solid == 1
     with pytest.raises(ValueError):
-        atom.set_solid(2)
+        atom.solid = 2
 
 def test_neighbors():
     atom = pc.Atom(pos=[0,0,0], id=1)
-    atom.set_neighbors([1,2])
-    assert atom.get_neighbors() == [1,2]
-    assert atom.get_coordination() == 2
-    atom.set_neighborweights([0.6, 0.4])
-    assert atom.get_neighborweights() == [0.6, 0.4]
+    atom.neighbors = [1,2]
+    assert atom.neighbors == [1,2]
+    assert atom.coordination == 2
+    atom.neighbor_weights = [0.6, 0.4]
+    assert atom.neighbor_weights == [0.6, 0.4]

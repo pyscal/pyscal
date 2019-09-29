@@ -6,49 +6,28 @@ import pyscal.crystal_structures as pcs
 import pyscal.pickle as pp
 
 
-def test_pickle_atoms():
-
-    sys = pc.System()
-    sys.read_inputfile('tests/conf.dump')
-    atoms = sys.get_atoms()
-
-    #pickle and unpickel atom
-    rn = np.random.randint(0, len(atoms)-1)
-    patom = pp.pickle_atom(atoms[rn])
-    assert patom.pos == atoms[rn].get_x()
-    uatom = pp.unpickle_atom(patom)
-    #assert uatom.get_x() == atoms[0].get_x()
-
-    #pickle array of atoms
-    pp.write_atoms('tests/pk.npy', atoms)
-    ratoms = pp.read_atoms('tests/pk.npy')
-
-    assert len(ratoms) == len(atoms)
-    assert ratoms[rn].get_x() == atoms[rn].get_x()
-
-    if os.path.exists('tests/pk.npy'):
-        os.remove('tests/pk.npy')
-
 
 def test_pickle_system():
+
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [1, 1, 1])
     sys = pc.System()
-    sys.assign_atoms(atoms, boxdims)
+    sys.atoms = atoms
+    sys.box = boxdims
     sys.find_neighbors(method = 'voronoi')
 
     #test write and read system
-    sys.to_file('tests/sy.npy')
+    sys.to_pickle('tests/sy.npy')
 
     #now read the pickled system
     psys = pc.System()
-    psys.from_file('tests/sy.npy')
+    psys.from_pickle('tests/sy.npy')
 
     #now get atoms and a random number of atom
-    satoms = sys.get_atoms()
-    patoms = psys.get_atoms()
+    satoms = sys.atoms
+    patoms = psys.atoms
 
     rn = np.random.randint(0, len(satoms)-1)
-    assert satoms[rn].get_neighbors() == patoms[rn].get_neighbors()
+    assert satoms[rn].neighbors == patoms[rn].neighbors
 
     if os.path.exists('tests/sy.npy'):
         os.remove('tests/sy.npy')
@@ -63,4 +42,35 @@ def test_pickle_system():
     #    os.remove('tests/sys.npy')
 
 
+def test_file_system():
 
+    atoms, boxdims = pcs.make_crystal('bcc', repetitions = [1, 1, 1])
+    sys = pc.System()
+    sys.atoms = atoms
+    sys.box = boxdims
+    sys.find_neighbors(method = 'voronoi')
+
+    sys.to_file('tests/tjkf.dat')
+
+    #now try to read in the file
+    sys2 = pc.System()
+    sys2.read_inputfile('tests/tjkf.dat')
+    assert len(sys2.atoms) == 2
+
+    #now add some custom values
+    atoms[0].custom = {"velocity":12}
+    atoms[1].custom = {"velocity":24}
+
+    #now try to read in the file
+    sys3 = pc.System()
+    sys3.atoms = atoms
+    sys3.box = boxdims
+    sys3.to_file('tests/tjkf.dat', custom=['velocity'])
+
+    #now read it again
+    sys4 = pc.System()
+    sys4.read_inputfile('tests/tjkf.dat', customkeys=['velocity'])
+    #now get atoms and check them
+    atoms = sys4.atoms
+    assert int(atoms[0].custom['velocity']) == 12
+    assert int(atoms[1].custom['velocity']) == 24

@@ -1,10 +1,14 @@
+Calculating bond orientational order parameters
+-----------------------------------------------
 
-Calculating bond order parameters
----------------------------------
-
-This example illustrates the calculation of bond order parameters. `Bond
-order parameters <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html#steinhardt-s-parameters>`_, represented by :math:`q_l` and their `averaged versions <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html#averaged-steinhardt-s-parameters>`_, :math:`\bar{q}_l` have been used for identifying atoms belong to different crystal structures. In this example, we will consider one MD snapshot each for bcc, fcc, hcp and liquid, and calculate the :math:`q_4` and :math:`q_6` parameters and their averaged versions which
-are widely used in literature.
+This example illustrates the calculation of bond orientational order
+parameters. Bond order parameters, :math:`q_l` and their averaged
+versions, :math:`\bar{q}_l` are widely used to identify atoms belong to
+different crystal structures. In this example, we will consider MD
+snapshots for bcc, fcc, hcp and liquid, and calculate the :math:`q_4`
+and :math:`q_6` parameters and their averaged versions which are widely
+used in literature. More details can be found
+`here <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html>`__.
 
 .. code:: python
 
@@ -12,8 +16,8 @@ are widely used in literature.
     import numpy as np
     import matplotlib.pyplot as plt
 
-We will consider two sets of MD snapshots, first a set of perfect bcc,
-fcc and hcp configurations and another set with thermal vibrations.
+In this example, we analyse MD configurations, first a set of perfect
+bcc, fcc and hcp structures and another set with thermal vibrations.
 
 Perfect structures
 ~~~~~~~~~~~~~~~~~~
@@ -33,9 +37,9 @@ configurations and the input files are read in.
     hcp = pc.System()
     hcp.read_inputfile('conf0.hcp', format='lammps-dump')
 
-The next major step is calculation of neighbors. There are `two ways to
-calculate neighbors <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html>`_, by using a cutoff distance or by using the voronoi
-cells. We will try both approaches, but start with the cutoff method.
+Next step is calculation of nearest neighbors. There are two ways to
+calculate neighbors, by using a cutoff distance or by using the voronoi
+cells.
 
 :math:`q_4-q_6` cutoff neighbor method
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -47,7 +51,9 @@ cells. We will try both approaches, but start with the cutoff method.
     hcp.find_neighbors(method='cutoff', cutoff=3.50)
 
 We have used a cutoff of 3 here, but this is a parameter that has to be
-tuned. Now we can calculate the :math:`q_4` and :math:`q_6` distributions
+tuned. Using a different cutoff for each structure is possible, but it
+would complicate the method if the system has a mix of structures. Now
+we can calculate the :math:`q_4` and :math:`q_6` distributions
 
 .. code:: python
 
@@ -73,36 +79,34 @@ Thats it! Now lets gather the results and plot them.
     plt.legend(loc=4, fontsize=15)
 
 
+.. image:: qplot_1.png
 
 
-
-.. image:: output_15_1.png
-
-
-Firstly, we can see that all the distribution fall on one specific point which
-is due to the absence of thermal vibrations. Next, all the points are
-well separated and show good distinction. However, in most cases the
-atomic positions are affected by thermal vibrations and hence show a
-spread in the distribution. We will take a look at this in the next
-case..
+Firstly, we can see that Steinhardt parameter values of all the atoms
+fall on one specific point which is due to the absence of thermal
+vibrations. Next, all the points are well separated and show good
+distinction. However, at finite temperatures, the atomic positions are
+affected by thermal vibrations and hence show a spread in the
+distribution. We will show the effect of thermal vibrations in the next
+example.
 
 Structures with thermal vibrations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Lets start with reading in the MD configurations
+First we read the MD configurations
 
 .. code:: python
 
     bcc = pc.System()
-    bcc.read_inputfile('conf.bcc', format='lammps-dump')
+    bcc.read_inputfile('conf.bcc.dump', format='lammps-dump')
     fcc = pc.System()
-    fcc.read_inputfile('conf.fcc', format='lammps-dump')
+    fcc.read_inputfile('conf.fcc.dump', format='lammps-dump')
     hcp = pc.System()
-    hcp.read_inputfile('conf.hcp', format='lammps-dump')
+    hcp.read_inputfile('conf.hcp.dump', format='lammps-dump')
     lqd = pc.System()
     lqd.read_inputfile('conf.lqd', format='lammps-dump')
 
-Similar to the last example, we use the cutoff method
+Similar to the previous example, we use the cutoff method
 
 cutoff method
 ^^^^^^^^^^^^^
@@ -114,7 +118,7 @@ cutoff method
     hcp.find_neighbors(method='cutoff', cutoff=3.50)
     lqd.find_neighbors(method='cutoff', cutoff=3.50)
 
-And now, calculate q parameters
+And now, calculate :math:`q_4`, :math:`q_6` parameters
 
 .. code:: python
 
@@ -143,12 +147,12 @@ Gather the q vales and plot them
     plt.legend(loc=4, fontsize=15)
 
 
+.. image:: qplot_2.png
 
-.. image:: output_27_1.png
 
-
-The influence of thermal vibrations is clear here, we can see that it causes the distributions to spread a lot and overlap with each
-other. `Lechner and Dellago <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_ proposed using the `averaged distributions <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html#averaged-steinhardt-s-parameters>`_,
+This is not so great as the first case, we can see that the thermal
+vibrations cause the distributions to spread a lot and overlap with each
+other. Lechner and Dellago proposed using the averaged distributions,
 :math:`\bar{q}_4-\bar{q}-6` to better distinguish the distributions.
 Lets try that.
 
@@ -178,69 +182,12 @@ Lets see if these distributions are better..
     plt.ylabel("$q_6$", fontsize=20)
     plt.legend(loc=4, fontsize=15)
 
-    
 
-
-.. image:: output_32_1.png
+.. image:: qplot_3.png
 
 
 This looks much better! We can see that the resolution is much better
 than the non averaged versions.
 
-Voronoi method for neighbors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Finally, we will try the Voronoi method to identify neighbors. This
-method has the advantage that it is parameter-free. Lets see how it
-does. We can use the existing systems we created, but recalculate the
-neighbors.
-
-.. code:: python
-
-    bcc.find_neighbors(method='voronoi')
-    fcc.find_neighbors(method='voronoi')
-    hcp.find_neighbors(method='voronoi')
-    lqd.find_neighbors(method='voronoi')
-
-We calculate q params and plot the values
-
-.. code:: python
-
-    bcc.calculate_q([4,6], averaged=True)
-    fcc.calculate_q([4,6], averaged=True)
-    hcp.calculate_q([4,6], averaged=True)
-    lqd.calculate_q([4,6], averaged=True)
-
-.. code:: python
-
-    bccaq = bcc.get_qvals([4, 6], averaged=True)
-    fccaq = fcc.get_qvals([4, 6], averaged=True)
-    hcpaq = hcp.get_qvals([4, 6], averaged=True)
-    lqdaq = lqd.get_qvals([4, 6], averaged=True)
-
-.. code:: python
-
-    plt.scatter(fccaq[0], fccaq[1], s=10, label='fcc', color='#FFB300')
-    plt.scatter(hcpaq[0], hcpaq[1], s=10, label='hcp', color='#388E3C')
-    plt.scatter(lqdaq[0], lqdaq[1], s=10, label='liquid', color='#1976D2')
-    plt.scatter(bccaq[0], bccaq[1], s=10, label='bcc', color='#C62828')
-    plt.xlabel("$q_4$", fontsize=20)
-    plt.ylabel("$q_6$", fontsize=20)
-    plt.legend(loc=4, fontsize=15)
-
-
-
-
-.. parsed-literal::
-
-    <matplotlib.legend.Legend at 0x7f68f07d5390>
-
-
-
-
-.. image:: output_40_1.png
-
-
-This method also distinguishes the structures well, except for some
-overlap between fcc and bcc regions. However, there is the distinct
-advantage that its parameter free.
+There is also the possibility to calculate structures using Voronoi
+based neighbor identification too.
