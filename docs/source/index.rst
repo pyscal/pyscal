@@ -53,6 +53,12 @@ Getting started
 
     gettingstarted
 
+Download
+--------
+
+.. toctree::
+
+    download
 
 Examples
 --------
@@ -61,12 +67,6 @@ Examples
 
     examples
 
-Download
---------
-
-.. toctree::
-
-    download
 
 Methods
 -------
