@@ -77,7 +77,7 @@ particles <https://ovito.org/manual/particles.modifiers.delete_selected_particle
 can be applied to delete all the non solid particles. The system after
 removing all the liquid atoms is shown below.
 
-.. figure:: ../docs/source/system2.png
+.. figure:: system2.png
    :alt: system with only solid
 
    alt text
@@ -133,7 +133,7 @@ this information to a file and visualise it in Ovito.
 The system visualised in Ovito following similar steps as above is shown
 below.
 
-.. figure:: ../docs/source/system3.png
+.. figure:: system3.png
    :alt: system with only largest solid cluster
 
    alt text
@@ -211,7 +211,7 @@ to a file and visualise in ovito.
 
     sys.to_file('sys.dist.dat', custom = ['solid', 'largest_cluster'])
 
-.. figure:: ../docs/source/system4.png
+.. figure:: system4.png
    :alt: custom clustering
 
    alt text
