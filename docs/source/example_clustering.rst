@@ -9,10 +9,8 @@ here.
 The first step is, of course, importing all the necessary module. For
 visualisation, we will use `Ovito <https://www.ovito.org/>`__.
 
-.. figure:: ../docs/source/system1.png
+.. figure:: system1.png
    :alt: original system
-
-   alt text
 
 The above image shows a visualisation of the system using Ovito.
 Importing modules,
@@ -80,7 +78,6 @@ removing all the liquid atoms is shown below.
 .. figure:: system2.png
    :alt: system with only solid
 
-   alt text
 
 Clustering algorithm
 ~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +133,6 @@ below.
 .. figure:: system3.png
    :alt: system with only largest solid cluster
 
-   alt text
 
 It is clear from the image that the largest cluster of solid atoms was
 successfully identified. Clustering can be done over any property. The
@@ -214,7 +210,6 @@ to a file and visualise in ovito.
 .. figure:: system4.png
    :alt: custom clustering
 
-   alt text
 
 This example illustrates that any property can be used to cluster the
 atoms!
