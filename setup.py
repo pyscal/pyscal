@@ -76,7 +76,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pyscal',
-    version='1.0.1',
+    version='1.0.4',
     author='Sarath Menon',
     author_email='sarath.menon@rub.de',
     description='A hybrid C++/python module for calculation of Steinhardt Parameters',
@@ -91,7 +91,7 @@ setup(
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    download_url = 'https://github.com/dask/dask/archive/1.1.1.tar.gz',
+    download_url = 'https://github.com/srmnitc/pyscal/archive/1.0.4.tar.gz',
     url = 'https://github.com/srmnitc/pyscal',
     install_requires=['numpy'],
     classifiers=[
