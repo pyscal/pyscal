@@ -76,7 +76,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='pyscal',
-    version='1.0.4',
+    version='2.0.0',
     author='Sarath Menon',
     author_email='sarath.menon@rub.de',
     description='A hybrid C++/python module for calculation of Steinhardt Parameters',
