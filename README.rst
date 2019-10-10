@@ -18,6 +18,10 @@
    :target: https://www.gnu.org/licenses/gpl-3.0
    :width: 13 %
 
+.. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg   
+   :target: https://conda.anaconda.org/pyscal
+   :width: 13 %
+	
 
 pyscal - python Structural Environment Calculator 
 =================================================

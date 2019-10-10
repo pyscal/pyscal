@@ -25,6 +25,11 @@ test:
 
 about:
   home: https://github.com/srmnitc/pyscal
-  license: GNU
-  summary:
+  license_file: LICENSE
+  summary: "Python library written in C++ for calculation of local atomic structural environment"
+  doc_url: https://pyscal.readthedocs.io/en/latest/
+
+extra:
+  recipe-maintainers:
+     - srmnitc
 
