@@ -1,14 +1,16 @@
 package:
   name: pyscal
-  version: "2.0.0"
+  version: {{ environ['VERSION'] }}
 
 source:
-  git_rev: "2.0.0"
   git_url: https://github.com/srmnitc/pyscal.git
   path: ../src/
 
 requirements:
   build:
+    script_env:
+	- VERSION
+        - CONDA_BLD_PATH
     - python
     - setuptools
     - numpy
