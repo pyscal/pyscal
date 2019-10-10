@@ -812,12 +812,12 @@ class System(pc.System):
 
         """
         #print("this raaan")
-        warnings.simplefilter('always', DeprecationWarning)
-        warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
+        #warnings.simplefilter('always', DeprecationWarning)
+        #warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
 
         self.ccalculate_q([6])
         self.set_nucsize_parameters(frenkelnums, threshold, avgthreshold)
-        return self.calculate_nucsize()
+        return self.ccalculate_nucsize()
 
     def calculate_solidneighbors(self):
         """

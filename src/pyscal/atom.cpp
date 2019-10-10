@@ -345,6 +345,8 @@ void Atom::svertex_numbers(vector<int> nss){
 }
 
 vector<int> Atom::gvertex_numbers(){
+
+    //loop over face vertices
     return vertex_numbers;
 }
 
