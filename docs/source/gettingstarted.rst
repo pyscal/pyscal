@@ -3,12 +3,23 @@ Getting started
 
 Trying pyscal
 ----------------
-You can try some of the examples provided with pyscal without installing the package using binder. Please use `this link <https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples%2F>`_ to try the package. 
+You can try some of the examples provided with pyscal without installing the package using binder. Please use `this link <https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples%2F>`_ to try the package.
 
-Quick Installation
-------------------
+Installation using `conda <https://anaconda.org>`_
+--------------------------------------------------
 
-Quick installation can be useful when you have administrator privileges, for example, on your personal computer, laptop etc. It is recommended to directly clone the repository and set up an environment as discussed in the `Installation from the repository section <https://pyscal.readthedocs.io/en/latest/gettingstarted.html#installation-from-the-repository>`_
+pyscal can be installed directly using conda by the following statement-
+
+`conda install -c pyscal pyscal`
+
+This is the recommended way to install if you have an anaconda distribution.
+
+Quick Installation from repository
+----------------------------------
+
+Quick installation can be useful when you have administrator privileges, for example, on your personal computer, laptop etc.
+It is recommended to install using conda as described above. If building from repository is preferred,
+directly clone the repository and set up an environment as discussed in the `Installation from the repository section <https://pyscal.readthedocs.io/en/latest/gettingstarted.html#installation-from-the-repository>`_
 
 * Download an archive of the pyscal library from `here <https://pyscal.readthedocs.io/en/latest/download.html>`_.
 
@@ -18,40 +29,40 @@ Quick installation can be useful when you have administrator privileges, for exa
 Installation from the repository
 --------------------------------
 
-Dependencies for the C++ part  
+Dependencies for the C++ part
 
-* `cmake <https://cmake.org/>`_  
-* c++ 11  
+* `cmake <https://cmake.org/>`_
+* c++ 11
 
 Dependencies for the python part
 
-* `numpy <https://numpy.org/>`_  
+* `numpy <https://numpy.org/>`_
 
 We recommend using a conda environment to install the program. A good guide on managing conda environments is available `here <https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html>`_.
 
-pyscal works with both python3 and python2. A python3 conda environment can be created by,  
+pyscal works with both python3 and python2. A python3 conda environment can be created by,
 
 .. code:: console
-    
+
     conda create -n myenv python=3
 
-Once created, the environment can be activated using,  
+Once created, the environment can be activated using,
 
 .. code:: console
-    
+
     conda activate myenv
 
-In case there is no cmake and c++11, these can be installed using,  
+In case there is no cmake and c++11, these can be installed using,
 
 .. code:: console
-    
+
     (myenv) conda install -c anaconda gcc
     (myenv) conda install -c anaconda cmake
 
 Now the pyscal repository can be cloned and the module can be installed. Python dependencies are installed automatically.
 
 .. code:: console
-    
+
     (myenv) git clone https://github.com/srmnitc/pyscal.git
     (myenv) cd pyscal
     (myenv) python setup.py install
