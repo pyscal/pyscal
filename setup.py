@@ -77,9 +77,9 @@ class CMakeBuild(build_ext):
 setup(
     name='pyscal',
     version='2.0.0',
-    author='Sarath Menon',
+    author='Sarath Menon, Jutta Rogal, Grisell Diaz Leines',
     author_email='sarath.menon@rub.de',
-    description='A hybrid C++/python module for calculation of Steinhardt Parameters',
+    description='Python library written in C++ for calculation of local atomic structural environment',
     long_description='',
     # tell setuptools to look for any packages under 'src'
     packages=find_packages('src'),
@@ -91,7 +91,7 @@ setup(
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    download_url = 'https://github.com/srmnitc/pyscal/archive/1.0.4.tar.gz',
+    download_url = 'https://github.com/srmnitc/pyscal/archive/2.0.0.tar.gz',
     url = 'https://github.com/srmnitc/pyscal',
     install_requires=['numpy'],
     classifiers=[
