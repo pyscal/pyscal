@@ -1,5 +1,5 @@
 ---
-title: 'pyscal : python Structural Environment Calculator'
+title: 'pyscal : A python module for structural analysis of atomic environments'
 tags:
   - Python
   - materials science
