@@ -26,24 +26,24 @@ pyscal- A python module for structural analysis of atomic environments
    :target: https://conda.anaconda.org/pyscal
    :width: 13 %
 
-**pyscal** is a python module for the calculation of local atomic structural environment including Steinhardt's bond orientational order parameters [1]_ during post-processing
+**pyscal** is a python module for the calculation of local atomic structural environments including Steinhardt's bond orientational order parameters [1]_ during post-processing
 of atomistic simulation data. The core functionality of pyscal is written in C++ with python wrappers using
-`pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_  which allows for fast calculations, and
-easy extension in python.
+`pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_  which allows for fast calculations and
+easy extensions in python.
 
-Steinhardt's order parameters are widely used for identification of crystal structures [3]_. They are also used to identify
-if an atom is solid or liquid [4]_. pyscal is inspired by
+Steinhardt's order parameters are widely used for the identification of crystal structures [3]_. They are also used to distinguish 
+if an atom is in a solid or liquid environment [4]_. pyscal is inspired by the
 `BondOrderAnalysis <https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html>`_ code,
-but has since incorporated many additions and modifications. pyscal module includes the following functionality-
+but has since incorporated many additional features and modifications. The pyscal module includes the following functionalities:
 
 Highlights
 ----------
 
 * calculation of Steinhardt's order parameters and their averaged version [2]_.
-* links with `Voro++ <http://math.lbl.gov/voro++/>`_ code, for calculation of Steinhardt parameters weighted using face area of Voronoi polyhedra [3]_.
+* links with the `Voro++ <http://math.lbl.gov/voro++/>`_ code, for the calculation of Steinhardt parameters weighted using the face areas of Voronoi polyhedra [3]_.
 * classification of atoms as solid or liquid [4]_.
 * clustering of particles based on a user defined property.
-* methods for calculating radial distribution function, voronoi volume of particles, number of vertices and face area of voronoi polyhedra and coordination number.
+* methods for calculating radial distribution functions, Voronoi volumes of particles, number of vertices and face area of Voronoi polyhedra, and coordination numbers.
 
 .. [1]  `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.
 .. [2]  `Lechner, W, Dellago, C, J Chem Phys, 2013 <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_.
