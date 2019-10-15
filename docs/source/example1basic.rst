@@ -9,26 +9,27 @@ setting up a system and the atoms.
     import pyscal.core as pc
     import numpy as np
 
-The ``System`` class
+The :class:`~pyscal.core.System` class
 ~~~~~~~~~~~~~~~~~~~~
 
-``System`` is the basic class of pyscal and is required to be setup in
+ :class:`~pyscal.core.System` is the basic class of pyscal and is required to be setup in
 order to perform any calculations. It can be set up as-
 
 .. code:: python
 
     sys = pc.System()
 
-``sys`` is a ``System`` object. But at this point, it is completely
-empty. We have to provide the system with the following information- \*
-the simulation box dimensions \* the positions of individual atoms.
+``sys`` is a :class:`~pyscal.core.System` object. But at this point, it is completely
+empty. We have to provide the system with the following information-
 
-| Let us try to set up a small system, which is the bcc unitcell of
-  lattice constant 1. The simulation box dimensions of such a unit cell
-  would be [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]] where the first set
-  correspond to the x axis, second to y axis and so on.
-| The unitcell has 2 atoms and their positions are [0,0,0] and [0.5,
-  0.5, 0.5].
+* the simulation box dimensions
+* the positions of individual atoms.
+
+Let us try to set up a small system, which is the bcc unitcell of
+lattice constant 1. The simulation box dimensions of such a unit cell
+would be [[0.0, 1.0], [0.0, 1.0], [0.0, 1.0]] where the first set
+correspond to the x axis, second to y axis and so on.
+The unitcell has 2 atoms and their positions are [0,0,0] and [0.5, 0.5, 0.5].
 
 .. code:: python
 
@@ -49,14 +50,14 @@ We can easily check if everything worked by getting the box dimensions
 
 
 
-The ``Atom`` class
+The :class:`~pyscal.catom.Atom` class
 ~~~~~~~~~~~~~~~~~~
 
-| The next part is assigning the atoms. This can be done using the
-  ``Atom`` class. Here, we will only look at the basic properties of
-  ``Atom`` class. For a more detailed description, check the
-  `examples <https://pyscal.readthedocs.io/en/latest/examples.html>`__.
-| Now let us create two atoms.
+The next part is assigning the atoms. This can be done using the
+:class:`~pyscal.catom.Atom` class. Here, we will only look at the basic properties of
+:class:`~pyscal.catom.Atom` class. For a more detailed description, check the
+`documentation <https://pyscal.readthedocs.io/en/latest/pyscal.html#module-pyscal.catom>`__.
+Now let us create two atoms.
 
 .. code:: python
 
@@ -66,7 +67,7 @@ The ``Atom`` class
 Now two empty atom objects are created. The basic poperties of an atom
 are its positions and id. There are various other properties which can
 be set here. A detailed description can be found
-`here <https://pyscal.readthedocs.io/en/latest/pyscal.html>`__.
+`here <https://pyscal.readthedocs.io/en/latest/pyscal.html#module-pyscal.catom>`__.
 
 .. code:: python
 
@@ -97,7 +98,7 @@ We can check the details of the atom by querying it
 
 
 
-Combining ``System`` and ``Atom``
+Combining :class:`~pyscal.core.System` and :class:`~pyscal.catom.Atom`
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now that we have created the atoms, we can assign them to the system. We
@@ -166,20 +167,26 @@ Now we can push the atom back to the system with the new type
 
     sys.set_atom(atom)
 
+.. warning::
+
+      Due to Atom being a completely C++ class, it is necessary to use :func:`~pyscal.core.System.get_atom`
+      and :func:`~pyscal.core.System.set_atom` to access individual atoms and set them back into the system
+      object after modification. A list of all atoms however can be accessed directly by :attr:`~pyscal.core.System.atoms`
+
 Reading in an input file
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-| We are all set! The ``System`` is ready for calculations. However, in
-  most realistic simulation situations, we have many atoms and it can be
-  difficult to set each of them
-| individually. In this situation we can read in input file directly. An
-  example input file containing 500 atoms in a simulation box can be
-  read in automatically. The file we use for this example is a file of
-  the `lammps-dump <https://lammps.sandia.gov/doc/dump.html>`__ format.
-  ``pyscal`` can also read in POSCAR files. In principle, ``pyscal``
-  only needs the atom positions and simulation box size, so you can
-  write a python function to process the input file, extract the details
-  and pass to ``pyscal``.
+We are all set! The :class:`~pyscal.core.System` is ready for calculations. However, in
+most realistic simulation situations, we have many atoms and it can be
+difficult to set each of them
+individually. In this situation we can read in input file directly. An
+example input file containing 500 atoms in a simulation box can be
+read in automatically. The file we use for this example is a file of
+the `lammps-dump <https://lammps.sandia.gov/doc/dump.html>`__ format.
+pyscal can also read in POSCAR files. In principle, pyscal
+only needs the atom positions and simulation box size, so you can
+write a python function to process the input file, extract the details
+and pass to pyscal.
 
 .. code:: python
 
@@ -216,9 +223,9 @@ Now we can get all atoms that belong to this system
 
 
 
-| We can see that all the atoms are read in correctly and there are 500
-  atoms in total. Once again, individual atom properties can be
-| accessed as before.
+We can see that all the atoms are read in correctly and there are 500
+atoms in total. Once again, individual atom properties can be
+accessed as before.
 
 .. code:: python
 
