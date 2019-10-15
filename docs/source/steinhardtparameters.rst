@@ -28,8 +28,8 @@ parameters have found specific uses, such as :math:`q_2` and :math:`q_6`
 for identification of crystallinity, :math:`q_6` for identification of
 solidity, and :math:`q_4` and :math:`q_6` for distinction of crystal
 structures [2]_. Commonly this method uses a cutoff radius to identify the neighbors of an atom. The cutoff can be chosen
-based on different methods available. Once the cutoff is chosen and
-neighbors are calculated, the calculation of Steinhardt parameters is
+based on `different methods available <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html>`_. Once the cutoff is chosen and
+neighbors are calculated, the calculation of Steinhardt's parameters is
 straightforward.
 
 .. code:: python
@@ -76,9 +76,9 @@ the neighbor and host atom. The weighted parameters are given by,
 
 where :math:`A_{ij}` is the area of the Voronoi facet between atoms
 :math:`i` and :math:`j` and :math:`A` is the sum of the face areas of
-atom :math:`i`. In ``pyscal``, the area weights are already assigned
+atom :math:`i`. In pyscal, the area weights are already assigned
 during the neighbor calculation phase when the Voronoi method is used to
-calculate neighbors (see `documentation <https://pyscal.readthedocs.io/en/latest/pyscal.html#pyscal.core.System.find_neighbors>`_).
+calculate neighbors in the :func:`~pyscal.core.System.find_neighbors`.
 The Voronoi weighted Steinhardt's parameters can be
 calculated as follows,
 
@@ -100,7 +100,7 @@ purpose.
 
 It was also proposed that higher powers of the weight [4]_
 :math:`\frac{A_{ij}^{\alpha}}{A(\alpha)}` where :math:`\alpha = 2, 3` can also
-be used. The value of this can be set using the keyword ``voroexp``
+be used, where :math:`A(\alpha) = \sum_{j=1}^{N(i)} A_{ij}^{\alpha}` The value of this can be set using the keyword ``voroexp``
 during the neighbor calculation phase.
 
 .. code:: python

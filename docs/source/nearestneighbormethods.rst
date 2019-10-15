@@ -133,7 +133,7 @@ weighted Steinhardt's parameters. Optionally, it is possible to choose
 the exponent for this weight. Option ``voroexp`` is used to set this
 option. For example if ``voroexp=2``, the weight would be calculated as,
 
-  .. math::  W_{ij} = \frac{A_{ij}^2}{\sum_{j=1}^N A_{ij}}
+  .. math::  W_{ij} = \frac{A_{ij}^2}{\sum_{j=1}^N A_{ij}^2}
 
 
 .. [1] `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.

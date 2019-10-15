@@ -48,8 +48,8 @@ also possible to check if each atom is solid or not.
 
 .. code:: python
 
-    atoms = sys.get_atoms()
-    solids = [atom.get_solid() for atom in atoms]
+    atoms = sys.atom
+    solids = [atom.solid for atom in atoms]
 
 .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
 .. [2] Bokeloh, J, Rozas, RE, Horbach, J, Wilde, G, Phys. Rev. Lett. 107, 2011
