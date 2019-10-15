@@ -4,19 +4,18 @@ pyscal Reference
 pyscal.core module
 ------------------
 
-pyscal.core module consists of the two classes of pyscal - System and Atom. Atom is
-written completely in C++ and is imported from the pyscal.catom module.
+Main module of pyscal. This module contains definitions of the two major
+classes in pyscal - the :class:`~pyscal.core.System` and :class:`~pyscal.catom.Atom`.
+Atom is a pure pybind11 class whereas System is a hybrid class with additional
+python definitions. For the ease of use, Atom class should be imported from the :mod:`~pyscal.core`
+module. The original pybind11 definitions of Atom and System can be found in :mod:`~pyscal.catom`
+and :mod:`~pyscal.csystem` respectively.
 
-System
-------
 
 .. automodule:: pyscal.core
    :members:
    :undoc-members:
    :show-inheritance:
-
-Atom
-----
 
 .. automodule:: pyscal.catom
    :members:

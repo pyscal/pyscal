@@ -40,16 +40,16 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
         Notes
         -----
-        A c++ class for holding the properties of a single atom. Various properties of the atom
+        A pybind11 class for holding the properties of a single atom. Various properties of the atom
         can be accessed through  the attributes and member functions which are described below in detail. Atoms can
         be created individually or directly by reading a file. Check the examples for more
         details on how atoms are created. For creating atoms directly from an input file check
         the documentation of :class:`~pyscal.core.System` class.
 
         Although an `Atom` object can be created independently, `Atom` should be thought of
-        inherently as members of the :class:`~System` class. All the properties that define an atom are
-        relative to the parent class. :class:`~System` has a list of all atoms. All the properties of an
-        atom, hence should be calculated through :class:`~System`.
+        inherently as members of the :class:`~pyscal.core.System` class. All the properties that define an atom are
+        relative to the parent class. :class:`~pyscal.core.System` has a list of all atoms. All the properties of an
+        atom, hence should be calculated through :class:`~pyscal.core.System`.
 
         Examples
         --------
@@ -79,7 +79,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def_property("cluster",&Atom::gcluster, &Atom::scluster, R"mydelimiter(
         *int*.
-        Id number of the cluster that the atom belongs to.
+        identification number of the cluster that the atom belongs to.
     )mydelimiter")
 
     .def_property("neighbors",&Atom::gneighbors, &Atom::sneighbors, R"mydelimiter(
@@ -105,7 +105,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def_property("bonds",&Atom::gfrenkelnumber, &Atom::sfrenkelnumber, R"mydelimiter(
         *Int*.
-        The number of solid connections of an atom.
+        The number of solid bonds of an atom.
     )mydelimiter")
 
     .def_property("id",&Atom::gid,&Atom::sid, R"mydelimiter(
@@ -115,8 +115,8 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def_property("condition",&Atom::gcondition, &Atom::scondition, R"mydelimiter(
         *int*.
-        condition specifies if an atom is included in the clustering algorithm or not.
-        Only atoms with the value of condition=1 will be used for clustering in the
+        condition that specifies if an atom is included in the clustering algorithm or not.
+        Only atoms with the value of condition=1 will be used for clustering in
         :func:`~pyscal.core.System.cluster_atoms`.
     )mydelimiter")
 
@@ -128,7 +128,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def_property("surface",&Atom::gsurface,&Atom::ssurface, R"mydelimiter(
         *bool*.
-        True is the atom has at least one liquid neighbor, False otherwise. Surface atoms are only identified
+        True if the atom has at least one liquid neighbor, False otherwise. Surface atoms are only identified
         after using the :func:`~pyscal.core.System.find_solids` function.
 
     )mydelimiter")
@@ -197,26 +197,26 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     )mydelimiter")
 
     .def_property("vertex_numbers", &Atom::gvertex_numbers, &Atom::svertex_numbers, R"mydelimiter(
-          *list of list of floats*. For each Voronoi face of the atom, this values includes a List
+          *list of floats*. For each Voronoi face of the atom, this values includes a List
           of vertices that constitute the face.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
 
     .def_property("vertex_vectors", &Atom::gvertex_vectors, &Atom::svertex_vectors, R"mydelimiter(
-          *list of list of floats*. A list of positions of each vertex of the Voronoi polyhedra of
+          *list of floats*. A list of positions of each vertex of the Voronoi polyhedra of
           the atom.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
 
     .def_property("edge_lengths", &Atom::gedgelengths, &Atom::sedgelengths, R"mydelimiter(
-          *list of list of floats*. For each face, this vector contains the lengths of edges
+          *list of floats*. For each face, this vector contains the lengths of edges
           that make up the Voronoi polyhedra of the atom.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
 
     .def_property("vorovector", &Atom::gvorovector, &Atom::svorovector, R"mydelimiter(
           *list of ints*. A vector of the form `(n3, n4, n5, n6)` where n3 is the number of faces with 3 vertices,
-          n4 is the number of faces with 4 vertices and so on. This can be used to identify structures [1]_ [2]_.
+          n4 is the number of faces with 4 vertices and so on. This can be used to identify structures [1][2].
           Vorovector is calculated if the :func:`~pyscal.core.System.calculate_vorovector` method is used.
 
           References
@@ -238,7 +238,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
           Parameters
           ----------
-          q : int
+          q : int or list of ints
               number of the required q_l - from 2-12
 
           averaged : bool, optional
@@ -248,8 +248,8 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
           Returns
           -------
-          q_l : float
-              the value of the queried Steinhardt parameter.
+          q_l : float or list of floats
+              the value(s) of the queried Steinhardt parameter(s).
 
           Notes
           -----
@@ -259,32 +259,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
           Meaningful values are only returned if :func:`~pyscal.core.System.calculate_q` is used.
     )mydelimiter")
 
-    .def("get_q", (vector<double> (Atom::*) (vector<int>, bool))  &Atom::gq_big, py::arg(), py::arg("averaged")=false, R"mydelimiter(
-          Calculate the steinhardt parameter q_l value.
-
-          Parameters
-          ----------
-          q : list of ints
-              list of the required q_l - from 2-12
-
-          averaged : bool, optional
-              If True, return the averaged q values,
-              If False, return the non averaged ones
-              default False
-
-          Returns
-          -------
-          q_l : list of floats
-              list of the values of the queried Steinhardt parameter.
-
-          Notes
-          -----
-          Please check this `link <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html>`_
-          for more details about Steinhardts parameters and the averaged versions.
-
-          Meaningful values are only returned if :func:`~pyscal.core.System.calculate_q` is used.
-
-    )mydelimiter")
+    .def("get_q", (vector<double> (Atom::*) (vector<int>, bool))  &Atom::gq_big, py::arg(), py::arg("averaged")=false )
 
     .def("set_q", (void (Atom::*) (int, double, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false, R"mydelimiter(
 
@@ -292,11 +267,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
           Parameters
           ----------
-          q : int
+          q : int or list of ints
               number of the required q_l - from 2-12
 
-          val : float
-              value of Steinhardt parameter.
+          val : float or list of floats
+              value(s) of Steinhardt parameter(s).
 
           averaged : bool, optional
               If True, return the averaged q values,
@@ -309,26 +284,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     )mydelimiter")
 
-    .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false, R"mydelimiter(
-          Set the value of steinhardt parameter q_l.
-
-          Parameters
-          ----------
-          q : list of int
-              list of the required q_l - from 2-12
-
-          val : list of float
-              list of the values of Steinhardt parameter.
-
-          averaged : bool, optional
-              If True, return the averaged q values,
-              If False, return the non averaged ones
-              default False
-
-          Returns
-          -------
-          None
-    )mydelimiter")
+    .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false)
 
     ;
 

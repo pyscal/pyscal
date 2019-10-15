@@ -1,8 +1,5 @@
 """
-Main module of pyscal. This module contains definitions of the two major
-classes in pyscal - the :class:`~System` and :class:`~Atom`. Both classes
-inherit the C++ classes of the same name and provide additional functionality
-by combining various methods, validation etc.
+
 
 """
 
@@ -24,7 +21,7 @@ System class definitions
 
 class System(pc.System):
     """
-    A c++ class for holding the properties of a system.
+    A python/pybind11 hybrid class for holding the properties of a system.
 
     Attributes
     ----------
@@ -32,20 +29,20 @@ class System(pc.System):
         A list containing the dimensions of the simulation box in the format
         `[[x_low, x_high], [y_low, y_high], [z_low, z_high]]`
 
-    atoms : list of :class:`~pyscal.core.Atom` objects
-
-        .. note::
-
-            atoms can be accessed or set as `System.atoms`. However, due to
-            technical reasons individual atoms should be accessed using the
-            :func:`~pyscal.core.System.get_atom` method. An atom can be assigned
-            to the atom using the :func:`~pyscal.core.System.set_atom` method.
+    atoms : list of :class:`~pyscal.catom.Atom` objects
 
     Notes
     -----
     A `System` consists of two
     major components - the simulation box and the atoms. All the associated variables
     are then calculated using this class.
+
+    .. note::
+
+        atoms can be accessed or set as :attr:`~pyscal.core.System.atoms`. However, due to
+        technical reasons individual atoms should be accessed using the
+        :func:`~pyscal.core.System.get_atom` method. An atom can be assigned
+        to the atom using the :func:`~pyscal.core.System.set_atom` method.
 
     Examples
     --------
@@ -171,7 +168,7 @@ class System(pc.System):
     def get_atom(self, index):
         """
 
-        Get the :class:`~pyscal.core.Atom` object at the queried position in the list of all atoms
+        Get the :class:`~pyscal.catom.Atom` object at the queried position in the list of all atoms
         in the :class:`~pyscal.core.System`.
 
         Parameters
@@ -202,10 +199,10 @@ class System(pc.System):
 
         Notes
         -----
-        For example, an :class:`~pyscal.core.Atom` at location `i` in the list of all atoms in
+        For example, an :class:`~pyscal.catom.Atom` at location `i` in the list of all atoms in
         :class:`~pyscal.core.System` can be queried by,
         ``atom = System.get_atom(i)``, then any kind of modification, for example, the
-        position of the `Atom` can done by, ``atom.set_pos([2.3, 4.5, 4.5])``. After
+        position of the `Atom` can done by, ``atom.pos = [2.3, 4.5, 4.5]``. After
         modification, the `Atom` can be set back to its position in `System` by
         :func:`~pyscal.core.System.set_atom`.
 
@@ -333,7 +330,7 @@ class System(pc.System):
 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
-                                            voroexp=1, face_cutoff=0.002, padding=1.2, nlimit=6):
+                                            voroexp=1, padding=1.2, nlimit=6):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
@@ -359,10 +356,6 @@ class System(pc.System):
         voroexp : int, optional
             only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards
             Steinhardt parameter values. Default 1.
-
-        face_cutoff : double, optional
-            only used if ``method=voronoi``. The minimum fraction of total voronoi face area a single phase should have in order to
-            include it in the analysis of voronoi polyhedra to find `(n_3, n_4, n_5, n_6)` vector. Default 0.002
 
         padding : double, optional
             only used if ``cutoff=adaptive``. A safe padding value used after an adaptive cutoff is found. Default 1.2.
@@ -399,7 +392,7 @@ class System(pc.System):
 
         threshold is a safe multiplier used for the guess value and can be set using the `threshold` keyword.
 
-        In Method cutoff, if ``cutoff='adaptive'``, an adaptive cutoff is found during runtime for each atom [1]_.
+        In Method cutoff, if ``cutoff='adaptive'``, an adaptive cutoff is found during runtime for each atom [1].
         Setting the cutoff radius to 0 also uses this algorithm. The cutoff for an atom i is found using,
 
         .. math:: r_c(i) = padding * ((1/nlimit) * \sum_{j=1}^{nlimit}(r_{ij}))
@@ -407,10 +400,10 @@ class System(pc.System):
         padding is a safe multiplier to the cutoff distance that can be set through the keyword `padding`. `nlimit` keyword sets the
         limit for the top nlimit atoms to be taken into account to calculate the cutoff radius.
 
-        In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]_. There are no parameters to tune sann algorithm.
+        In Method cutoff, if ``cutoff='sann'``, sann algorithm is used [2]. There are no parameters to tune sann algorithm.
 
         The second approach is using Voronoi polyhedra which also assigns a weight to each neighbor in the ratio of the face area between the two atoms.
-        Higher powers of this weight can also be used [3]_. The keyword `voroexp`
+        Higher powers of this weight can also be used [3]. The keyword `voroexp`
         can be used to set this weight.
 
         .. warning::
@@ -502,6 +495,7 @@ class System(pc.System):
 
         Parameters
         ----------
+
         edge_cutoff : float, optional
             cutoff for edge length. Default 0.05.
 
@@ -521,7 +515,7 @@ class System(pc.System):
         -----
         Returns a vector of the form `(n3, n4, n5, n6)`, where `n3` is the number
         of faces with 3 vertices, `n4` is the number of faces with 4
-        vertices and so on. This can be used to identify structures [1]_ [2]_.
+        vertices and so on. This can be used to identify structures [1] [2].
 
         The keywords `edge_cutoff` and `area_cutoff` can be used to tune the values to minimise
         the effect of thermal distortions. Edges are only considered in the analysis if the
@@ -607,10 +601,10 @@ class System(pc.System):
 
         Notes
         -----
-        Enables calculation of the Steinhardt parameters [1]_ q from 2-12. The type of
+        Enables calculation of the Steinhardt parameters [1] q from 2-12. The type of
         q values depend on the method used to calculate neighbors. See the description
         :func:`~pyscal.core.System.find_neighbors` for more details. If the keyword `average` is set to True,
-        the averaged versions of the bond order parameter [2]_ is returned.
+        the averaged versions of the bond order parameter [2] is returned.
 
         References
         ----------
@@ -665,7 +659,7 @@ class System(pc.System):
         Check :func:`~pyscal.core.System.find_neighbors` method.
 
         `bonds` define the number of solid bonds of an atom to be identified as solid.
-        Two particles are said to be 'bonded' if [1]_,
+        Two particles are said to be 'bonded' if [1],
 
         .. math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
 
@@ -833,8 +827,9 @@ class System(pc.System):
 
         Notes
         -----
-        A solid bond is considered between two atoms if the connection
-        betweem them is greater than 0.6.
+        A solid bond is considered between two atoms if the `connection <https://pyscal.readthedocs.io/en/latest/solidliquid.html>`_
+        between them is greater than 0.6.
+
 
         """
         self.calculate_frenkelnumbers()
@@ -951,7 +946,7 @@ class System(pc.System):
 
     def to_pickle(self, file):
         """
-        Save a system to file
+        Save a system to pickle file
 
         Parameters
         ----------
@@ -974,6 +969,7 @@ class System(pc.System):
         .. warning::
 
             Pickling between different versions of numpy or python could be incompatible.
+            Pickling is not secure. You should only unpickle objects that you trust.
 
         """
         psys = self.prepare_pickle()
@@ -997,7 +993,7 @@ class System(pc.System):
         Notes
         -----
         This function can be used to set up a system
-        from a file. A system object needs to be created first.
+        from a file. A :class:`~pyscal.core.System` object needs to be created first.
 
         Examples
         --------
