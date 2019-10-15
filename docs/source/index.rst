@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-pyscal- python Structural Environment Calculator
+pyscal- A python module for structural analysis of atomic environments
 ================================================
 
 .. image:: https://travis-ci.com/srmnitc/pyscal.svg?branch=master
