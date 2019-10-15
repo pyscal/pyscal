@@ -22,13 +22,13 @@ sys.path.insert(0, os.path.abspath('../../src/pyscal/'))
 # -- Project information -----------------------------------------------------
 
 project = u'pyscal'
-copyright = u'2019, Sarath Menon, Grísell Diaz Leines, Jutta Rogal'
+copyright = u'2019, Sarath Menon, Grisell Díaz Leines, Jutta Rogal'
 author = u'Sarath Menon, Grisell Díaz Leines, Jutta Rogal'
 
 # The short X.Y version
 version = u''
 # The full version, including alpha/beta/rc tags
-release = u'1.0.0'
+release = u'2.0.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -192,7 +192,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'pyscal.tex', u'pyscal Documentation',
-     u'Sarath Menon, Grisell D\'{i}az Leines, Jutta Rogal', 'manual'),
+     u'Sarath Menon, Grisell Díaz Leines, Jutta Rogal', 'manual'),
 ]
 
 
