@@ -22,8 +22,8 @@ sys.path.insert(0, os.path.abspath('../../src/pyscal/'))
 # -- Project information -----------------------------------------------------
 
 project = u'pyscal'
-copyright = u'2019, Sarath Menon, Grisell Diaz Leines, Jutta Rogal'
-author = u'Sarath Menon, Grisell Diaz Leines, Jutta Rogal'
+copyright = u'2019, Sarath Menon, Grísell Diaz Leines, Jutta Rogal'
+author = u'Sarath Menon, Grisell Díaz Leines, Jutta Rogal'
 
 # The short X.Y version
 version = u''
@@ -115,7 +115,7 @@ pygments_style = None
 # documentation.
 #
 #html_theme_options = {
-#    
+#
 #     'textcolor': '#263238',
 #     'headtextcolor': '#37474F',
 #     'cssfiles': ['_static/default.css'],
@@ -192,7 +192,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'pyscal.tex', u'pyscal Documentation',
-     u'Sarath Menon, Grisell Diaz Leines, Jutta Rogal', 'manual'),
+     u'Sarath Menon, Grisell D\'{i}az Leines, Jutta Rogal', 'manual'),
 ]
 
 

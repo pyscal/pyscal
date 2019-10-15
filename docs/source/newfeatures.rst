@@ -14,7 +14,7 @@ with local feature development.
 Setting up local environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-1. The first step is to fork ``pyscal``. A detailed tutorial on forking
+1. The first step is to fork pyscal. A detailed tutorial on forking
    can be found
    `here <https://help.github.com/en/articles/fork-a-repo>`__. After
    forking, clone the repository to your local machine.
@@ -29,19 +29,19 @@ Setting up local environment
 
 4. Now implement the necessary feature.
 
-5. Once done, you can reinstall ``pyscal`` by
+5. Once done, you can reinstall pyscal by
    ``python setup.py install``. After that please make sure that the
    existing tests work by running ``pytest tests/`` from the main module
    folder.
 
 6. If the tests work, you are almost done! If the new feature is not
    covered in existing tests, you can to write a new test in the tests
-   folder. ``pyscal`` uses pytest for tests. `This
+   folder. pyscal uses pytest for tests. `This
    link <http://doc.pytest.org/en/latest/getting-started.html>`__ will
    help you get started.
 
 7. Add the necessary docstrings for the new functions implemented.
-   ``pyscal`` uses the `numpy docstring
+   pyscal uses the `numpy docstring
    format <https://numpydoc.readthedocs.io/en/latest/format.html>`__ for
    documentation.
 
@@ -53,12 +53,10 @@ Setting up local environment
    Once the request is submitted, automated tests would be done. Your
    pull request will fail the tests if - the unit tests fail, or if the
    test coverage falls below 80%. If all tests are successful, your
-   feauture will be incorporated to ``pyscal`` and your contributions
+   feauture will be incorporated to pyscal and your contributions
    will be credited.
 
 If you have trouble with any of the steps, or you need help, please
 `send an email <mailto:sarath.menon@rub.de>`__ and we will be happy to
 help! All of the contributions are greatly appreciated and will be
 credited in Developers/Acknowledgements page.
-
-
