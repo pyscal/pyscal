@@ -1,10 +1,10 @@
 Distinction of solid liquid atoms and clustering
 ------------------------------------------------
 
-In this example, we will take one snapshot from a molecular dynamics
+In this example, we will take one configuration from a molecular dynamics
 simulation which has a solid cluster in liquid. The task is to identify
 solid atoms and cluster them. More details about the method can be found
-here.
+`here <https://pyscal.readthedocs.io/en/latest/solidliquid.html>`_.
 
 The first step is, of course, importing all the necessary module. For
 visualisation, we will use `Ovito <https://www.ovito.org/>`__.
@@ -12,14 +12,14 @@ visualisation, we will use `Ovito <https://www.ovito.org/>`__.
 .. figure:: system1.png
    :alt: original system
 
-The above image shows a visualisation of the system using Ovito.
+The above image shows a visualization of the system using Ovito.
 Importing modules,
 
 .. code:: python
 
     import pyscal.core as pc
 
-Now we will set up a System with this input file, and calculate
+Now we will set up a :class:`~pyscal.core.System` with this input file, and calculate
 neighbors. Here we will use a cutoff method to find neighbors. More
 details about finding neighbors can be found
 `here <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html#>`__.
@@ -39,7 +39,7 @@ This can be done using :func:`~pyscal.core.System.find_solids` method.
 
 The above statement found all the solid atoms. Solid atoms can be
 identified by the value of the :attr:`~pyscal.catom.Atom.solid` attribute. For that we first
-get the atom objects and select those with ``solid`` value as True.
+get the atom objects and select those with :attr:`~pyscal.catom.Atom.solid` value as True.
 
 .. code:: python
 
@@ -59,13 +59,13 @@ get the atom objects and select those with ``solid`` value as True.
 There are 202 solid atoms in the system. In order to visualise in Ovito,
 we need to first write it out to a trajectory file. This can be done
 with the help of :func:`~pyscal.core.System.to_file` method of System. This method can help to
-save any attribute of the atom or ant Steinhardt parameter value.
+save any attribute of the atom or any Steinhardt parameter value.
 
 .. code:: python
 
     sys.to_file('sys.solid.dat', custom = ['solid'])
 
-We can now visualise this file in Ovito. After opening the file in
+We can now visualize this file in Ovito. After opening the file in
 Ovito, the modifier `compute
 property <https://ovito.org/manual/particles.modifiers.compute_property.html>`__
 can be selected. The ``Output property`` should be ``selection`` and in
@@ -83,7 +83,7 @@ Clustering algorithm
 ~~~~~~~~~~~~~~~~~~~~
 
 You can see that there is a cluster of atom. The clustering functions
-that pyscal offers helps in this regard. If you used :func:`~pyscal.core.System.find_clusters`
+that pyscal offers helps to select atoms that belong to this cluster. If you used :func:`~pyscal.core.System.find_clusters`
 with ``cluster=True``, the clustering is carried out. Since we did used
 ``cluster=False`` above, we will rerun the function
 
@@ -121,13 +121,13 @@ attribute of the atom.
 
 
 The value matches that given by the function. Once again we will save
-this information to a file and visualise it in Ovito.
+this information to a file and visualize it in Ovito.
 
 .. code:: python
 
     sys.to_file('sys.cluster.dat', custom = ['solid', 'largest_cluster'])
 
-The system visualised in Ovito following similar steps as above is shown
+The system visualized in Ovito following similar steps as above is shown
 below.
 
 .. figure:: system3.png
@@ -186,7 +186,7 @@ Now cluster
 
 
 There are 242 atoms in the cluster! Once again we can check this, save
-to a file and visualise in ovito.
+to a file and visualize in ovito.
 
 .. code:: python
 

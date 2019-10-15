@@ -13,7 +13,7 @@ neighbors, q values, solidity, voronoi volume etc are all saved. Saving
 this information is beneficial in systems with a large number of atoms
 as it saves time which would otherwise be spent recalculating
 information. The :mod:`~pyscal.pickle`
-module provides the base functions for pickling support.
+module provides the base functions for pickling support as is used internally in :class:`~pyscal.core.System`.
 
 .. code:: python
 
@@ -49,7 +49,7 @@ directly, similar to how pandas `DataFrames <https://pandas.pydata.org/pandas-do
 
     sys.to_pickle('test_system.npy')
 
-Thats it! The information is saved in the while. Once again,
+Thats it! The information is saved in the file. Once again,
 :func:`~pyscal.pickle.read_systems` can be used to read the System instance.
 Alternatively, a new System can be created and the information can be
 read in from a file.
@@ -68,3 +68,9 @@ further calculations
 
 Here :math:`\bar{q}_8` and :math:`\bar{q}_{10}` were calculated without
 having to find neighbors again.
+
+.. warning::
+
+    pickling can be incompatible with different python versions. As python documentation also
+    points out - pickling objects is not secure. You should only unpickle objects that you
+    trust.

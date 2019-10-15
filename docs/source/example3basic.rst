@@ -25,7 +25,7 @@ Perfect structures
 Read in the input files
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-First ``System`` objects are created for each of the different
+First :class:`~pyscal.core.System` objects are created for each of the different
 configurations and the input files are read in.
 
 .. code:: python
@@ -38,7 +38,7 @@ configurations and the input files are read in.
     hcp.read_inputfile('conf0.hcp', format='lammps-dump')
 
 Next step is calculation of nearest neighbors. There are two ways to
-calculate neighbors, by using a cutoff distance or by using the voronoi
+calculate neighbors, by using a cutoff distance (or adaptive cutoff distance) or by using the Voronoi
 cells.
 
 :math:`q_4-q_6` cutoff neighbor method
@@ -82,7 +82,7 @@ Thats it! Now lets gather the results and plot them.
 .. image:: qplot_1.png
 
 
-Firstly, we can see that Steinhardt parameter values of all the atoms
+Firstly, we can see that Steinhardt's parameter values of all the atoms
 fall on one specific point which is due to the absence of thermal
 vibrations. Next, all the points are well separated and show good
 distinction. However, at finite temperatures, the atomic positions are
@@ -150,9 +150,9 @@ Gather the q vales and plot them
 .. image:: qplot_2.png
 
 
-This is not so great as the first case, we can see that the thermal
+This is not so well separated as the first case, we can see that the thermal
 vibrations cause the distributions to spread a lot and overlap with each
-other. Lechner and Dellago proposed using the averaged distributions,
+other. Lechner and Dellago proposed using the `averaged distributions <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html#averaged-steinhardt-s-parameters>`_,
 :math:`\bar{q}_4-\bar{q}-6` to better distinguish the distributions.
 Lets try that.
 

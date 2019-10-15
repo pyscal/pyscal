@@ -1,10 +1,10 @@
 Calculating coordination numbers
 --------------------------------
 
-| In this example, we will read in a configuration from an MD simulation
-  and then calculate the coordination number distribution.
-| This example assumes that you read the `basic
-  example <https://pyscal.readthedocs.io/en/latest/examples.html#basic-examples>`__.
+In this example, we will read in a configuration from an MD simulation
+and then calculate the coordination number distribution.
+This example assumes that you read the `basic
+example <https://pyscal.readthedocs.io/en/latest/examples.html#basic-examples>`__.
 
 .. code:: python
 
@@ -16,7 +16,7 @@ Read in a file
 ~~~~~~~~~~~~~~
 
 The first step is setting up a system. We can create atoms and
-simulation box using the ``pyscal.crystal_structures`` module. Let us
+simulation box using the :mod:`~pyscal.crystal_structures module`. Let us
 start by importing the module.
 
 .. code:: python
@@ -29,7 +29,7 @@ start by importing the module.
 
 The above function creates an bcc crystal of 6x6x6 unit cells with a
 lattice constant of 4.00 along with a simulation box that encloses the
-particles. We can then create a ``System`` and assign the atoms and box
+particles. We can then create a :class:`~pyscal.core.System` and assign the atoms and box
 to it.
 
 .. code:: python
@@ -114,15 +114,15 @@ Now lets plot and see the results
 Adaptive cutoff methods
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-``pyscal`` also has adaptive cutoff methods implemented. These methods
-remove the restriction on having the same cutoff. A distinct cutoff is
-selected for each atom during runtime. ``pyscal`` uses two distinct
+pyscal also has adaptive cutoff methods implemented. These methods
+remove the restriction on having a global cutoff. A distinct cutoff is
+selected for each atom during runtime. pyscal uses two distinct
 algorithms to do this - ``sann`` and ``adaptive``. Please check the
 `documentation <https://pyscal.readthedocs.io/en/latest/nearestneighbormethods.html>`__
 for a explanation of these algorithms. For the purpose of this example,
 we will use the ``adaptive`` algorithm.
 
-``adaptive algorithm``
+**adaptive algorithm**
 
 .. code:: python
 
@@ -152,7 +152,7 @@ Voronoi method
 Voronoi method calculates the voronoi polyhedra of all atoms. Any atom
 that shares a voronoi face area with the host atom are considered
 neighbors. Voronoi polyhedra is calculated using the
-`Voro++ <http://math.lbl.gov/voro++/>`__ code. However, you dont need to
+`Voro++ <http://math.lbl.gov/voro++/>`__ code. However, you do not need to
 install this specifically as it is linked to pyscal.
 
 .. code:: python
@@ -185,5 +185,5 @@ Finally..
 
 All methods find the coordination number, and the results are
 comparable. Cutoff method is very sensitive to the choice of cutoff
-radius, but voronoi method can slightly overestimate the neighbors due
+radius, but Voronoi method can slightly overestimate the neighbors due
 to thermal vibrations.
