@@ -22,11 +22,11 @@ pyscal- python Structural Environment Calculator
    :target: https://www.gnu.org/licenses/gpl-3.0
    :width: 13 %
 
-.. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg   
+.. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg
    :target: https://conda.anaconda.org/pyscal
    :width: 13 %
 
-**pyscal** is a python module for the calculation of Steinhardt's bond orientational order parameters [1]_ during post-processing
+**pyscal** is a python module for the calculation of local atomic structural environment including Steinhardt's bond orientational order parameters [1]_ during post-processing
 of atomistic simulation data. The core functionality of pyscal is written in C++ with python wrappers using
 `pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_  which allows for fast calculations, and
 easy extension in python.
