@@ -72,7 +72,8 @@ class CMakeBuild(build_ext):
         print()  # Add an empty line for cleaner output
 
 
-
+with open('README.rst') as readme_file:
+    readme = readme_file.read()
 
 setup(
     name='pyscal',
@@ -80,7 +81,7 @@ setup(
     author='Sarath Menon, Jutta Rogal, Grisell Diaz Leines',
     author_email='sarath.menon@rub.de',
     description='Python library written in C++ for calculation of local atomic structural environment',
-    long_description='',
+    long_description=readme,
     # tell setuptools to look for any packages under 'src'
     packages=find_packages('src'),
     # tell setuptools that all packages will be under the 'src' directory

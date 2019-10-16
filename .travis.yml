@@ -15,16 +15,33 @@ matrix:
       - os: linux
         python: 3.7
         env: TOXENV=py37
+    include:
+        - name: "Python 3.7  - Linux"
+          os: linux
+          env: CONDA=3.7
+        - name: "Python 3.6  - Linux"
+          os: linux
+          env: CONDA=3.6
+        - name: "Python 3.5  - Linux"
+          os: linux
+          env: CONDA=3.5
+        - name: "Python 2.7  - Linux"
+          os: linux
+          env: CONDA=2.7
+        - name: "Python 3.6 - OSX"
+          os: osx
+          env: CONDA=3.6
+        - name: "Python 2.7 - OSX"
+          os: osx
+          env: CONDA=2.7
 install:
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
-    else
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then OS=Linux-x86_64; else OS=MacOSX-x86_64; fi
+  - wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda${CONDA:0:1}-latest-$OS.sh
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
   - conda config --set always_yes yes --set changeps1 no
+  - conda config --add channels conda-forge
+  - conda install -c conda-forge libiconv
   - conda install -c anaconda setuptools
   - conda update --yes conda
   - pip install -r requirements_dev.txt
@@ -38,4 +55,3 @@ env:
 after_success:
   - codecov
   - test $TRAVIS_BRANCH = "master" && conda install conda-build && conda install anaconda-client && bash conda-recipe/conda_upload.sh
-
