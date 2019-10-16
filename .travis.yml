@@ -1,39 +1,27 @@
 
 
-language: python
+language: generic
+
 matrix:
   include:
-      - os: linux
-        python: 2.7
-        env: TOXENV=py27
-      - os: linux
-        python: 3.5
-        env: TOXENV=py35
-      - os: linux
-        python: 3.6
-        env: TOXENV=py36
-      - os: linux
-        python: 3.7
-        env: TOXENV=py37
-    include:
-        - name: "Python 3.7  - Linux"
-          os: linux
-          env: CONDA=3.7
-        - name: "Python 3.6  - Linux"
-          os: linux
-          env: CONDA=3.6
-        - name: "Python 3.5  - Linux"
-          os: linux
-          env: CONDA=3.5
-        - name: "Python 2.7  - Linux"
-          os: linux
-          env: CONDA=2.7
-        - name: "Python 3.6 - OSX"
-          os: osx
-          env: CONDA=3.6
-        - name: "Python 2.7 - OSX"
-          os: osx
-          env: CONDA=2.7
+      - name: "Python 3.7  - Linux"
+        os: linux
+        env: CONDA=3.7
+      - name: "Python 3.6  - Linux"
+        os: linux
+        env: CONDA=3.6
+      - name: "Python 3.5  - Linux"
+        os: linux
+        env: CONDA=3.5
+      - name: "Python 2.7  - Linux"
+        os: linux
+        env: CONDA=2.7
+      - name: "Python 3.6 - OSX"
+        os: osx
+        env: CONDA=3.6
+      - name: "Python 2.7 - OSX"
+        os: osx
+        env: CONDA=2.7
 install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then OS=Linux-x86_64; else OS=MacOSX-x86_64; fi
   - wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda${CONDA:0:1}-latest-$OS.sh
