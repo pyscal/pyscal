@@ -24,6 +24,14 @@ set(SYSSOURCES "${SOURCE_DIR}/system.cpp")
 #--------------------------------------------------------
 add_subdirectory(lib/pybind11)
 
+IF( APPLE )
+   SET_TARGET_PROPERTIES( example
+     PROPERTIES
+       LINK_FLAGS "-undefined dynamic_lookup"
+       SUFFIX     ".so"
+   )
+ENDIF()
+
 #Finally create the package
 #--------------------------------------------------------
 pybind11_add_module(catom ${ATOMSOURCES} "${SOURCE_DIR}/atom_binding.cpp")
