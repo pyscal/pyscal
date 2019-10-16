@@ -26,12 +26,12 @@ def test_neighbors_sann():
 
     sys.calculate_q(8, averaged=True)
     q = sys.get_qvals(8, averaged=True)
-    assert np.round(np.mean(np.array(q)), decimals=2) == 0.45
+    assert np.round(np.mean(np.array(q), dtype=np.float64), decimals=2) == 0.45
 
 
     sys.calculate_q(7, averaged=True)
     q = sys.get_qvals(7, averaged=True)
-    assert np.round(np.mean(np.array(q).astype(float)), decimals=2) == 0.05
+    assert np.round(np.mean(np.array(q), dtype=np.float64), decimals=2) == 0.05
 
 
 def test_neighbors_adaptive():
