@@ -31,7 +31,15 @@ def test_neighbors_sann():
 
     sys.calculate_q(7, averaged=True)
     q = sys.get_qvals(7, averaged=True)
-    assert np.round(np.mean(np.array(q), dtype=np.float64), decimals=2) == 0.05
+    summ = 0
+    counts = len(q)
+    for qq in q:
+        summ += qq
+    avgg = summ/float(counts)
+
+
+    assert avgg == 0.05
+
 
 
 def test_neighbors_adaptive():
