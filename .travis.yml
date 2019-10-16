@@ -22,7 +22,7 @@ matrix:
       - name: "Python 2.7 - OSX"
         os: osx
         env: CONDA=2.7
-install:
+before_install:
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then OS=Linux-x86_64; else OS=MacOSX-x86_64; fi
   - wget -O miniconda.sh https://repo.continuum.io/miniconda/Miniconda${CONDA:0:1}-latest-$OS.sh
   - bash miniconda.sh -b -p $HOME/miniconda
@@ -32,8 +32,14 @@ install:
   - conda install -c conda-forge libiconv
   - conda install -c anaconda setuptools
   - conda update --yes conda
-  - pip install -r requirements_dev.txt
+  - conda install -q conda-build
+  - conda create -q -n test-environment python=$CONDA pip
+  - source activate test-environment
+
+install:
+  - conda install -c conda-forge --file requirements_dev.txt
   - pip install -e .
+
 script:
   - pytest --cov-report term-missing --cov=pyscal tests/
 
