@@ -608,7 +608,7 @@ int System::get_all_neighbors_sann(double prefactor){
     //create a structure for sorting
     struct datom{
         double dist;
-        size_t  index;
+        int  index;
     };
 
     //create another for the sorting algorithm
@@ -748,7 +748,7 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
     //create a structure for sorting
     struct datom{
         double dist;
-        size_t  index;
+        int  index;
     };
 
     //create another for the sorting algorithm

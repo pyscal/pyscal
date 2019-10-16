@@ -10,9 +10,6 @@ matrix:
       - name: "Python 3.6  - Linux"
         os: linux
         env: CONDA=3.6
-      - name: "Python 3.5  - Linux"
-        os: linux
-        env: CONDA=3.5
       - name: "Python 2.7  - Linux"
         os: linux
         env: CONDA=2.7
