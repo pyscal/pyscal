@@ -18,6 +18,27 @@ System class definitions
 """
 #------------------------------------------------------------------------------------------------------------
 
+def test():
+    """
+    A simple function to test if the module works
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    works : bool
+        True if the module works and could create a System and Atom object
+        False otherwise.
+
+    """
+    try:
+        s = System()
+        a = Atom()
+        return True
+    except:
+        return False
 
 class System(pc.System):
     """
