@@ -941,8 +941,11 @@ class System(pc.System):
         -----
         Calculates the angular criteria for each atom as defined in [1]_. Angular criteria is
         useful for identification of diamond cubic structures. Angular criteria is defined by,
+
         .. math::
+
             A = \sum_{i=1}^6 (\cos(\\theta_i) + \\frac{1}{3})^2
+
         where cos(theta) is the angle size suspended by each pair of neighbors of the central
         atom. A will have a value close to 0 for structures if the angles are close to 109 degrees.
         The calculated A parameter for each atom is stored in :attr:`~pyscal.catom.Atom.angular`.
