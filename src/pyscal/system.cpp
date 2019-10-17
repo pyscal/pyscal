@@ -318,6 +318,71 @@ double System::get_abs_distance(Atom atom1 , Atom atom2 ){
     return abs;
 }
 
+//function for binding
+vector<double> System::get_distance_vector(Atom atom1 , Atom atom2 ){
+
+    double ax, ay, az;
+    double diffx = atom1.posx - atom2.posx;
+    double diffy = atom1.posy - atom2.posy;
+    double diffz = atom1.posz - atom2.posz;
+
+    if (triclinic == 1){
+
+        //convert to the triclinic system
+        ax = rotinv[0][0]*diffx + rotinv[0][1]*diffy + rotinv[0][2]*diffz;
+        ay = rotinv[1][0]*diffx + rotinv[1][1]*diffy + rotinv[1][2]*diffz;
+        az = rotinv[2][0]*diffx + rotinv[2][1]*diffy + rotinv[2][2]*diffz;
+
+        //scale to match the triclinic box size
+        diffx = ax*boxx;
+        diffy = ay*boxy;
+        diffz = az*boxz;
+
+        //now check pbc
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+
+        //now divide by box vals - scale down the size
+        diffx = diffx/boxx;
+        diffy = diffy/boxy;
+        diffz = diffz/boxz;
+
+        //now transform back to normal system
+        ax = rot[0][0]*diffx + rot[0][1]*diffy + rot[0][2]*diffz;
+        ay = rot[1][0]*diffx + rot[1][1]*diffy + rot[1][2]*diffz;
+        az = rot[2][0]*diffx + rot[2][1]*diffy + rot[2][2]*diffz;
+
+        //now assign to diffs and calculate distnace
+        diffx = ax;
+        diffy = ay;
+        diffz = az;
+
+    }
+    else{
+
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+
+    }
+
+    vector<double> abs;
+    abs.emplace_back(diffx);
+    abs.emplace_back(diffy);
+    abs.emplace_back(diffz);
+
+    return abs;
+}
+
 
 void System::reset_all_neighbors(){
     for (int ti = 0;ti<nop;ti++){

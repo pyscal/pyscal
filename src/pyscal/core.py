@@ -11,6 +11,7 @@ import numpy as np
 import warnings
 import pyscal.csystem as pc
 from pyscal.catom import Atom
+import itertools
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -327,7 +328,7 @@ class System(pc.System):
             return rq
 
 
-    def get_distance(self, atom1, atom2):
+    def get_distance(self, atom1, atom2, vector=False):
         """
         Get the distance between two atoms.
 
@@ -337,6 +338,9 @@ class System(pc.System):
                 first atom
         atom2 : `Atom` object
                 second atom
+        vector : bool, optional
+            If True, the displacement vector connecting the atoms
+            is also returned. default false.
 
         Returns
         -------
@@ -347,7 +351,11 @@ class System(pc.System):
         -----
         Periodic boundary conditions are assumed by default.
         """
-        return self.get_absdistance(atom1, atom2)
+        if vector:
+            displacement_vector = self.get_absdistance_vector(atom1, atom2)
+            return self.get_absdistance(atom1, atom2), displacement_vector
+        else:
+            return self.get_absdistance(atom1, atom2)
 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
