@@ -12,7 +12,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
 
     Parameters
     ----------
-    structure : {'bcc', 'fcc', 'hcp'}
+    structure : {'bcc', 'fcc', 'hcp', 'diamond'}
         type of the crystal structure
 
     lattice_constant : float, optional
@@ -99,6 +99,40 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
         unitcellz[2] = 0.5*lattice_constant*zfact
         unitcelly[3] = 2.0*lattice_constant*(1.0/yfact)
         unitcellz[3] = 0.5*lattice_constant*zfact
+
+    elif structure == 'diamond':
+
+        coord_no = 8
+        natoms = coord_no*nx*ny*nz
+
+        xfact = 1.
+        yfact = 1.
+        zfact = 1.
+
+        unitcellx = np.zeros(coord_no)
+        unitcelly = np.zeros(coord_no)
+        unitcellz = np.zeros(coord_no)
+    	unitcellx[1]=0.25*lattice_constant;
+    	unitcelly[1]=0.25*lattice_constant;
+    	unitcellz[1]=0.25*lattice_constant;
+    	unitcellx[2]=0.50*lattice_constant;
+    	unitcelly[2]=0.50*lattice_constant;
+    	unitcellz[2]=0.00*lattice_constant;
+    	unitcellx[3]=0.75*lattice_constant;
+    	unitcelly[3]=0.75*lattice_constant;
+    	unitcellz[3]=0.25*lattice_constant;
+    	unitcellx[4]=0.50*lattice_constant;
+    	unitcelly[4]=0.00*lattice_constant;
+    	unitcellz[4]=0.50*lattice_constant;
+    	unitcellx[5]=0.00*lattice_constant;
+    	unitcelly[5]=0.50*lattice_constant;
+    	unitcellz[5]=0.50*lattice_constant;
+    	unitcellx[6]=0.75*lattice_constant;
+    	unitcelly[6]=0.25*lattice_constant;
+    	unitcellz[6]=0.75*lattice_constant;
+    	unitcellx[7]=0.25*lattice_constant;
+    	unitcelly[7]=0.75*lattice_constant;
+    	unitcellz[7]=0.75*lattice_constant;
 
     m = 0
     co = 1
