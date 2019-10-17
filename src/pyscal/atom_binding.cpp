@@ -286,6 +286,16 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false)
 
+
+    .def_property("angular",&Atom::gangular, &Atom::sangular, R"mydelimiter(
+        *Float*.
+        The value of angular parameter A of an atom. The angular parameter measures the tetrahedral coordination of an atom.
+    )mydelimiter")
+
+    .def_property("avg_angular",&Atom::gavgangular, &Atom::savgangular, R"mydelimiter(
+        *Float*.
+        The average angular parameter value. Not used currently.
+    )mydelimiter")
     ;
 
 

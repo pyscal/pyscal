@@ -207,6 +207,14 @@ class Atom{
         int gfrenkelnumber();
         void sfrenkelnumber(int);
 
+
+        //costheta stuff
+        double angular;
+        double avg_angular;
+        double gangular();
+        void sangular(double);
+        double gavgangular();
+        void savgangular(double);
         //vector<vector<vector<double>>> gallqcomps();
         //void sallqcomps(vector<vector<vector<double>>>);
 
