@@ -47,7 +47,7 @@ In addition to the calculation of Steinhardt parameters and their averaged versi
  * calculation of further parameters based on Voronoi tesselation such as the number of vertices and face areas.
 
 ``pyscal`` uses a list of particle positions and simulation cell vectors as input, which can also be read in from a file.  Currently supported file formats include the [dump format](https://lammps.sandia.gov/doc/dump.html) of the molecular dynamics code  LAMMPS [@Plimpton:1995] and the [POSCAR](https://cms.mpi.univie.ac.at/vasp/vasp/POSCAR_file.html) format used by the _ab initio_ simulation package  [VASP](https://www.vasp.at/) [@Kresse:1993; @Kresse:1996; @Furth:1996].  Extensions to other file formats are easily implemented.
-The module can handle arbitrary simulation cells (orthogonal and triclinic).
+The module can handle arbitrary simulation cells.
  ``pyscal`` also offers a set of supporting tools including those for reading, writing, and splitting atomic trajectory files and the setup of simulation cells for perfect crystal structures. In general, the ``pyscal`` module acts as a tool for the calculation of quantities based on atomic positions, and can easily be extended using either C++ for computationally intensive operations or python for other tasks that wrap over the existing features. ``pyscal`` includes a documentation and various usage examples, available on the [pyscal website](https://pyscal.readthedocs.io/en/latest/). Further examples, including installation of the package and the calculation of bond orientational order parameters, are also available. Alternatively, ``pyscal`` provides a [binder environment](https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples%2F) to test the example cases before installation.
 
 
