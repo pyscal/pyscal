@@ -397,3 +397,19 @@ void Atom::svorovector(vector<int> voro){
     n5 = voro[2];
     n6 = voro[3];
 }
+
+double Atom::gangular(){
+    return angular;
+}
+
+void Atom::sangular(double dd){
+    angular = dd;
+}
+
+double Atom::gavgangular(){
+    return avg_angular;
+}
+
+void Atom::savgangular(double dd){
+    avg_angular = dd;
+}

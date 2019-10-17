@@ -11,6 +11,7 @@ import numpy as np
 import warnings
 import pyscal.csystem as pc
 from pyscal.catom import Atom
+import itertools
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -327,7 +328,7 @@ class System(pc.System):
             return rq
 
 
-    def get_distance(self, atom1, atom2):
+    def get_distance(self, atom1, atom2, vector=False):
         """
         Get the distance between two atoms.
 
@@ -337,6 +338,9 @@ class System(pc.System):
                 first atom
         atom2 : `Atom` object
                 second atom
+        vector : bool, optional
+            If True, the displacement vector connecting the atoms
+            is also returned. default false.
 
         Returns
         -------
@@ -347,7 +351,11 @@ class System(pc.System):
         -----
         Periodic boundary conditions are assumed by default.
         """
-        return self.get_absdistance(atom1, atom2)
+        if vector:
+            displacement_vector = self.get_absdistance_vector(atom1, atom2)
+            return self.get_absdistance(atom1, atom2), displacement_vector
+        else:
+            return self.get_absdistance(atom1, atom2)
 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
@@ -916,6 +924,65 @@ class System(pc.System):
 
         """
         return self.find_largest_cluster()
+
+
+    def calculate_angularcriteria(self):
+        """
+        Calculate the angular criteria for each atom
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Calculates the angular criteria for each atom as defined in [1]_. Angular criteria is
+        useful for identification of diamond cubic structures. Angular criteria is defined by,
+        .. math::
+            A = \sum_{i=1}^6 (\cos(\\theta_i) + \\frac{1}{3})^2
+        where cos(theta) is the angle size suspended by each pair of neighbors of the central
+        atom. A will have a value close to 0 for structures if the angles are close to 109 degrees.
+        The calculated A parameter for each atom is stored in :attr:`~pyscal.catom.Atom.angular`.
+        References
+        ----------
+        .. [1] Uttormark, MJ, Thompson, MO, Clancy, P, Phys. Rev. B 47, 1993
+        """
+
+        atoms = self.atoms
+
+        for atom in atoms:
+            dists = []
+            distneighs = []
+            distvectors = []
+
+            neighs = atom.neighbors
+
+            for neigh in neighs:
+                dist, vectors = self.get_distance(atom, atoms[neigh], vector=True)
+                dists.append(dist)
+                distneighs.append(neigh)
+                distvectors.append(vectors)
+
+            args = np.argsort(dists)
+            #find top four
+            topfourargs = np.array(args)[:4]
+
+            combos = list(itertools.combinations(topfourargs, 2))
+            costhetasum = 0
+
+            for combo in combos:
+                vec1 = distvectors[combo[0]]
+                vec2 = distvectors[combo[1]]
+                modvec1 = np.sqrt(np.sum([x**2 for x in vec1]))
+                modvec2 = np.sqrt(np.sum([x**2 for x in vec2]))
+                costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
+                costhetasum += (costheta +(1./3.))**2
+            atom.angular = costhetasum
+
+        self.atoms = atoms
 
 
     def prepare_pickle(self):

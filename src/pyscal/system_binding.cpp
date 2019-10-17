@@ -45,6 +45,7 @@ PYBIND11_MODULE(csystem, m) {
         .def("cget_qvals",&System::gqvals)
         .def("cget_aqvals",&System::gaqvals)
         .def("get_absdistance", (double (System::*) (Atom, Atom))  &System::get_abs_distance)
+        .def("get_absdistance_vector", &System::get_distance_vector)
         .def("get_all_neighbors_normal",&System::get_all_neighbors_normal)
         .def("get_all_neighbors_sann",&System::get_all_neighbors_sann)
         .def("get_all_neighbors_adaptive",&System::get_all_neighbors_adaptive)

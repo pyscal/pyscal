@@ -45,6 +45,7 @@ class System{
         void calculate_frenkel_numbers();
         double get_abs_distance(int,int,double&,double&,double&);
         double get_abs_distance(Atom , Atom );
+        vector<double> get_distance_vector(Atom , Atom);
         System();
         ~System();
         vector<int> get_indicators();
