@@ -25,11 +25,14 @@ test:
 
 about:
   home: https://github.com/srmnitc/pyscal
-  license_file: LICENSE
+  license_file: ../LICENSE
   summary: "Python library written in C++ for calculation of local atomic structural environment"
+  description: |
+     pyscal is a python module for the calculation of local atomic structural environments including Steinhardt's bond orientational order parameters
+     during post-processing of atomistic simulation data. The core functionality of pyscal is written in C++ with python wrappers using pybind11 which
+     allows for fast calculations with possibilities for easy expansion in python.
   doc_url: https://pyscal.com
 
 extra:
   recipe-maintainers:
      - srmnitc
-
