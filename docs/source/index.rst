@@ -4,7 +4,7 @@
    contain the root `toctree` directive.
 
 pyscal- A python module for structural analysis of atomic environments
-================================================
+======================================================================
 
 .. image:: https://travis-ci.com/srmnitc/pyscal.svg?branch=master
     :target: https://travis-ci.com/srmnitc/pyscal
@@ -31,7 +31,7 @@ of atomistic simulation data. The core functionality of pyscal is written in C++
 `pybind11 <https://pybind11.readthedocs.io/en/stable/intro.html>`_  which allows for fast calculations and
 easy extensions in python.
 
-Steinhardt's order parameters are widely used for the identification of crystal structures [3]_. They are also used to distinguish 
+Steinhardt's order parameters are widely used for the identification of crystal structures [3]_. They are also used to distinguish
 if an atom is in a solid or liquid environment [4]_. pyscal is inspired by the
 `BondOrderAnalysis <https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html>`_ code,
 but has since incorporated many additional features and modifications. The pyscal module includes the following functionalities:
@@ -45,10 +45,10 @@ Highlights
 * clustering of particles based on a user defined property.
 * methods for calculating radial distribution functions, Voronoi volumes of particles, number of vertices and face area of Voronoi polyhedra, and coordination numbers.
 
-.. [1]  `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.
-.. [2]  `Lechner, W, Dellago, C, J Chem Phys, 2013 <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_.
-.. [3]  `Mickel, W, Kapfer, SC, Schroder-Turk, GE, Mecke, K, J Chem Phys 138, 2013 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.
-.. [4]  `Auer, S, Frenkel, D. Adv Polym Sci 173, 2005 <https://link.springer.com/chapter/10.1007/b99429>`_.
+.. [1]  `Steinhardt, P. J., Nelson, D. R., & Ronchetti, M. (1983). Physical Review B, 28 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.
+.. [2]  `Lechner, W., & Dellago, C. (2008). The Journal of Chemical Physics, 129 <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_.
+.. [3]  `Mickel, W., Kapfer, S. C., Schröder-Turk, G. E., & Mecke, K. (2013). The Journal of Chemical Physics, 138 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.
+.. [4]  `Auer, S., & Frenkel, D. (2005). Advances in Polymer Science, 173 <https://link.springer.com/chapter/10.1007/b99429>`_.
 
 Getting started
 ---------------
