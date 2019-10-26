@@ -127,7 +127,7 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
                         raise KeyError("some values in custokeys was not found in the file")
 
 
-        elif count > 8:
+        else:
             raw = line.strip().split()
             idd = int(raw[headerdict["id"]])
             typ = int(raw[headerdict["type"]])
