@@ -125,6 +125,16 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
                 if customread:
                     if not np.prod([(x in headerdict) for x in customkeys]):
                         raise KeyError("some values in custokeys was not found in the file")
+                #add a new keyword for scaled coordinates
+                if "x" in headerdict.keys():
+                    scaled = False
+                elif "xs" in headerdict.keys():
+                    scaled = True
+                    headerdict["x"] = headerdict.pop("xs")
+                    headerdict["y"] = headerdict.pop("ys")
+                    headerdict["z"] = headerdict.pop("zs")
+                else:
+                    raise ValueError("only x/xs, y/ys andz/zs keys are allowed for traj file")
 
 
         else:
@@ -186,6 +196,13 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
     else:
         box = np.array([[boxx[1]-boxx[0], 0, 0],[0, boxy[1]-boxy[0], 0],[0, 0, boxz[1]-boxz[0]]])
         boxdims = np.array([[boxx[0], boxx[1]],[boxy[0], boxy[1]],[boxz[0], boxz[1]]])
+
+    #adjust for scled coordinates
+    if scaled:
+        for atom in atoms:
+            dist = atom.pos
+            ndist = dist[0]*box[0] + dist[1]*box[1] + dist[2]*box[2]
+            atom.pos = ndist
 
     if box_vectors and check_triclinic:
         return atoms, boxdims, box, triclinic

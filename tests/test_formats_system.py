@@ -30,6 +30,13 @@ def test_lammps_dump():
     filtered_atoms = [ atom for atom in atoms if atom.id == 204]
     assert filtered_atoms[0].pos == [-0.10301, -6.35752, -6.44787]
 
+def test_scaled():
+    sys = pc.System()
+    sys.read_inputfile('tests/conf.bcc.scaled.dump')
+    atoms = sys.atoms
+    assert len(atoms) == 2
+    assert atoms[1].pos[0] == 1.0
+
 def test_poscar():
     sys = pc.System()
     sys.read_inputfile('tests/POSCAR', format='poscar')
