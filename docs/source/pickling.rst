@@ -12,7 +12,7 @@ methods to save the information. Information including calculated
 neighbors, q values, solidity, voronoi volume etc are all saved. Saving
 this information is beneficial in systems with a large number of atoms
 as it saves time which would otherwise be spent recalculating
-information. The :mod:`~pyscal.pickle`
+information. The :mod:`~pyscal.pickle_object`
 module provides the base functions for pickling support as is used internally in :class:`~pyscal.core.System`.
 
 .. code:: python
@@ -42,7 +42,7 @@ save the set of systems to a file.
 Saving individual system
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Single System instances can be saved without :mod:`~pyscal.pickle` module
+Single System instances can be saved without :mod:`~pyscal.pickle_object` module
 directly, similar to how pandas `DataFrames <https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.html>`_ are saved to file.
 
 .. code:: python
@@ -50,7 +50,7 @@ directly, similar to how pandas `DataFrames <https://pandas.pydata.org/pandas-do
     sys.to_pickle('test_system.npy')
 
 Thats it! The information is saved in the file. Once again,
-:func:`~pyscal.pickle.read_systems` can be used to read the System instance.
+:func:`~pyscal.pickle_object.read_systems` can be used to read the System instance.
 Alternatively, a new System can be created and the information can be
 read in from a file.
 

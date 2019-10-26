@@ -7,3 +7,5 @@ build/
 dist/
 *.egg*
 .cache
+docs/html/*
+docs/doctrees/*
