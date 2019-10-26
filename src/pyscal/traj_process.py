@@ -70,8 +70,8 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
     """
     if customkeys == None:
-        customkeys == []
-        
+        customkeys = []
+
     #first depending on if the extension is .gz - use zipped read
     raw = infile.split('.')
     if raw[-1] == 'gz' or  compressed:
