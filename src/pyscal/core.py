@@ -5,7 +5,7 @@
 
 
 import pyscal.traj_process as ptp
-import pyscal.pickle as pp
+import pyscal.pickle_object as pp
 import os
 import numpy as np
 import warnings
@@ -77,7 +77,7 @@ class System(pc.System):
         self.neighbors_found = False
         pc.System.__init__(self)
 
-    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=[]):
+    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None):
         """
 
         Read input file that contains the information of system configuration.
@@ -131,6 +131,8 @@ class System(pc.System):
 
 
         """
+        if customkeys == None:
+            customkeys = []
 
         if format == 'lammps-dump':
             #check customkeys and assign a variable
@@ -1110,7 +1112,7 @@ class System(pc.System):
             rotinv = np.linalg.inv(rot)
             self.assign_triclinic_params(rot, rotinv)
 
-    def to_file(self, outfile, format='lammps-dump', custom=[], compressed=False):
+    def to_file(self, outfile, format='lammps-dump', custom=None, compressed=False):
         """
         Save the system instance to a trajectory file.
 
@@ -1137,6 +1139,8 @@ class System(pc.System):
         -----
 
         """
+        if custom == None:
+            custom = []
 
         def get_custom(atom, customkeys):
             #first option - maybe it appears

@@ -5,7 +5,7 @@ pyscal module for creating crystal structures.
 import pyscal.catom as pc
 import numpy as np
 
-def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca_ratio = 1.633):
+def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.
@@ -41,9 +41,14 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = [1, 1, 1], ca
     >>> sys.assign_atoms(atoms, box)
 
     """
-    nx = repetitions[0]
-    ny = repetitions[1]
-    nz = repetitions[2]
+    if repetitions == None:
+        nx = 1
+        ny = 1
+        nz = 1
+    else:
+        nx = repetitions[0]
+        ny = repetitions[1]
+        nz = repetitions[2]
 
     if structure == 'bcc':
 

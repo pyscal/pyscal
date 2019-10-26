@@ -10,7 +10,7 @@ import pyscal.catom as pca
 
 
 #functions that are not wrapped from C++
-def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False, customkeys=[]):
+def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False, customkeys=None):
     """
     Function to read a lammps dump file format - single time slice.
 
@@ -69,6 +69,9 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
     >>> atoms, box = read_lammps_dump('conf.d', compressed=True)
 
     """
+    if customkeys == None:
+        customkeys == []
+        
     #first depending on if the extension is .gz - use zipped read
     raw = infile.split('.')
     if raw[-1] == 'gz' or  compressed:

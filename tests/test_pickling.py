@@ -1,9 +1,9 @@
 import pytest
-import os,sys,inspect
+import os
 import numpy as np
 import pyscal.core as pc
 import pyscal.crystal_structures as pcs
-import pyscal.pickle as pp
+import pyscal.pickle_object as pp
 
 
 
