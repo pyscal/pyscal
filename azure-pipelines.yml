@@ -27,7 +27,7 @@ jobs:
   steps:
     - bash: |
         echo "##vso[task.prependpath]$CONDA/bin"
-        conda create --yes --quiet --name conenv
+        conda create --yes --quiet python=$(python.version) --name conenv
         source activate conenv
         conda config --set always_yes yes --set changeps1 no
         conda config --add channels conda-forge
@@ -83,7 +83,7 @@ jobs:
       displayName: Take ownership of conda installation
     
     - bash: |
-        conda create --yes --quiet --name conenv
+        conda create --yes --quiet python=$(python.version) --name conenv
         source activate conenv
         conda config --set always_yes yes --set changeps1 no
         conda config --add channels conda-forge
