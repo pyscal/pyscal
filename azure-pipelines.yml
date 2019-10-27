@@ -46,7 +46,7 @@ jobs:
         source activate conenv
         pytest --cov-report term-missing --cov=pyscal tests/
         codecov
-     displayName: Run tests
+      displayName: Run tests
 
     - bash: |
         and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
