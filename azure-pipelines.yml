@@ -26,7 +26,7 @@ jobs:
   steps:
     - bash: echo "##vso[task.prependpath]$CONDA/bin"
       displayName: Add conda to PATH
-    - conda config --set always_yes yes --set changeps1 no
+      conda config --set always_yes yes --set changeps1 no
     - conda config --add channels conda-forge
     - conda install -c conda-forge libiconv
     - conda install -c anaconda setuptools
