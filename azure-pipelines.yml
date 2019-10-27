@@ -44,4 +44,5 @@ jobs:
 
     - bash: |
         pytest --cov-report term-missing --cov=pyscal tests/
+        codecov
       displayName: Run tests   
