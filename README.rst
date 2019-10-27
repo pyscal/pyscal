@@ -1,5 +1,5 @@
-.. image:: https://travis-ci.com/srmnitc/pyscal.svg?branch=master
-    :target: https://travis-ci.com/srmnitc/pyscal
+.. image:: https://dev.azure.com/sarathrmenon/pyscal/_apis/build/status/srmnitc.pyscal?branchName=master
+    :target: https://dev.azure.com/sarathrmenon/pyscal/_build/latest?definitionId=1&branchName=master
     :width: 13%
 
 .. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
@@ -22,7 +22,7 @@
    :target: https://conda.anaconda.org/pyscal
    :width: 13 %
 
-.. image:: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e/status.svg   
+.. image:: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e/status.svg
    :target: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e
    :width: 15 %
 

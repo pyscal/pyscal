@@ -1,0 +1,119 @@
+#add the different platforms to test
+#in case of windows the following line has to be added
+#windows: 'vs2017-win2016'
+
+variables:
+  linux: 'ubuntu-16.04'
+  mac: 'macos-10.13'
+
+#do not include branches as of now
+#trigger:
+#- master
+
+jobs:
+
+- job: 'Linux'
+  pool:
+    vmImage: $(linux)
+
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+    - bash: |
+        echo "##vso[task.prependpath]$CONDA/bin"
+        conda create --yes --quiet python=$(python.version) --name conenv
+        source activate conenv
+        conda config --set always_yes yes --set changeps1 no
+        conda config --add channels conda-forge
+        conda install -c conda-forge libiconv
+        conda install -c anaconda setuptools
+        conda update --yes conda
+        conda install -q conda-build
+      displayName: Setup Anaconda Environment
+
+    - bash: |
+        source activate conenv
+        conda install -c conda-forge --file requirements_dev.txt
+        pip install -e .
+      displayName: Install package
+
+    - bash: |
+        source activate conenv
+        pytest --cov-report term-missing --cov=pyscal tests/
+        codecov
+      displayName: Run tests
+
+    - bash: |
+        source activate conenv
+        conda install conda-build
+        conda install anaconda-client
+        mkdir ~/conda-bld
+        conda config --set anaconda_upload no
+        export CONDA_BLD_PATH=~/conda-bld
+        export VERSION=`date +%Y.%m.%d`
+        conda build .
+        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u pyscal -l main $CONDA_BLD_PATH/linux-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      displayName: Upload to conda
+
+
+- job: 'MacOS'
+  pool:
+    vmImage: $(mac)
+
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+    - bash: echo "##vso[task.prependpath]$CONDA/bin"
+      displayName: Add conda to PATH
+
+    - bash: sudo chown -R $USER $CONDA
+      displayName: Take ownership of conda installation
+
+    - bash: |
+        conda create --yes --quiet python=$(python.version) --name conenv
+        source activate conenv
+        conda config --set always_yes yes --set changeps1 no
+        conda config --add channels conda-forge
+        conda install -c conda-forge libiconv
+        conda install -c anaconda setuptools
+        conda update --yes conda
+        conda install -q conda-build
+      displayName: Setup Anaconda Environment
+
+    - bash: |
+        source activate conenv
+        conda install -c conda-forge --file requirements_dev.txt
+        pip install -e .
+      displayName: Install package
+
+    - bash: |
+        source activate conenv
+        pytest --cov-report term-missing --cov=pyscal tests/
+        codecov
+      displayName: Run tests
+
+    - bash: |
+        source activate conenv
+        conda install conda-build
+        conda install anaconda-client
+        mkdir ~/conda-bld
+        conda config --set anaconda_upload no
+        export CONDA_BLD_PATH=~/conda-bld
+        export VERSION=`date +%Y.%m.%d`
+        conda build .
+        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u pyscal -l main $CONDA_BLD_PATH/osx-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      displayName: Upload to conda
