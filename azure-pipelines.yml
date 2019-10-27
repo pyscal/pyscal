@@ -26,12 +26,5 @@ jobs:
   steps:
     - bash: echo "##vso[task.prependpath]$CONDA/bin"
       displayName: Add conda to PATH
-      conda config --set always_yes yes --set changeps1 no
-      conda config --add channels conda-forge
-      conda install -c conda-forge libiconv
-      conda install -c anaconda setuptools
-      conda update --yes conda
-      conda install -q conda-build
-      conda create -q -n test-environment python=$CONDA pip
-      source activate test-environment
-  
+    - bash: conda create --yes --quiet --name myEnvironment
+      displayName: Create Anaconda environment  
