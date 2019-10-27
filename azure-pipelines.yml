@@ -76,9 +76,13 @@ jobs:
     maxParallel: 4
 
   steps:
+    - bash: echo "##vso[task.prependpath]$CONDA/bin"
+      displayName: Add conda to PATH
+  
+    - bash: sudo chown -R $USER $CONDA
+      displayName: Take ownership of conda installation
+    
     - bash: |
-        echo "##vso[task.prependpath]$CONDA/bin"
-        sudo chown -R $USER $CONDA
         conda create --yes --quiet --name conenv
         source activate conenv
         conda config --set always_yes yes --set changeps1 no
