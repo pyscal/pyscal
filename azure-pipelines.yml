@@ -37,7 +37,11 @@ jobs:
       displayName: Setup Anaconda Environment
 
     - bash: |
-        conda activate conenv
+        source activate conenv
         conda install -c conda-forge --file requirements_dev.txt
         pip install -e .
-      displayName: Install package   
+      displayName: Install package
+
+    - bash: |
+        pytest --cov-report term-missing --cov=pyscal tests/
+      displayName: Run tests   
