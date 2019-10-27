@@ -24,7 +24,17 @@ jobs:
     maxParallel: 4
   
   steps:
-    - bash: echo "##vso[task.prependpath]$CONDA/bin"
-      displayName: Add conda to PATH
-    - bash: conda create --yes --quiet --name myEnvironment
-      displayName: Create Anaconda environment  
+    - bash: |
+        echo "##vso[task.prependpath]$CONDA/bin"
+        displayName: Add conda to PATH
+        conda create --yes --quiet --name conenv
+        displayName: Create Anaconda environment 
+        source activate conenv
+        conda config --set always_yes yes --set changeps1 no
+        conda config --add channels conda-forge
+        conda install -c conda-forge libiconv
+        conda install -c anaconda setuptools
+        conda update --yes conda
+        conda install -q conda-build
+        conda install --yes --quiet --name conenv scipy
+        displayName: Install Anaconda packages 
