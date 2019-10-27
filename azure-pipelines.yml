@@ -76,7 +76,7 @@ jobs:
 
   steps:
     - bash: |
-        echo "##vso[task.prependpath]$CONDA/bin"
+        bash: echo "##vso[task.prependpath]$CONDA/bin"
         sudo chown -R $USER $CONDA
         conda create --yes --quiet --name conenv
         source activate conenv
