@@ -58,5 +58,5 @@ jobs:
         export VERSION=`date +%Y.%m.%d`
         conda build .
         anaconda -t $CONDA_UPLOAD_TOKEN upload -u pyscal -l main $CONDA_BLD_PATH/*/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines'))
       displayName: Upload to conda
