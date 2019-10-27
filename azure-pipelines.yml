@@ -58,8 +58,8 @@ jobs:
         export CONDA_BLD_PATH=~/conda-bld
         export VERSION=`date +%Y.%m.%d`
         conda build .
-        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u srmnitc -l main $CONDA_BLD_PATH/linux-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines'))
+        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u pyscal -l main $CONDA_BLD_PATH/linux-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       displayName: Upload to conda
 
 
@@ -78,10 +78,10 @@ jobs:
   steps:
     - bash: echo "##vso[task.prependpath]$CONDA/bin"
       displayName: Add conda to PATH
-  
+
     - bash: sudo chown -R $USER $CONDA
       displayName: Take ownership of conda installation
-    
+
     - bash: |
         conda create --yes --quiet python=$(python.version) --name conenv
         source activate conenv
@@ -114,6 +114,6 @@ jobs:
         export CONDA_BLD_PATH=~/conda-bld
         export VERSION=`date +%Y.%m.%d`
         conda build .
-        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u srmnitc -l main $CONDA_BLD_PATH/osx-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines'))
+        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u pyscal -l main $CONDA_BLD_PATH/osx-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
       displayName: Upload to conda
