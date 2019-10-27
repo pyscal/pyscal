@@ -57,6 +57,57 @@ jobs:
         export CONDA_BLD_PATH=~/conda-bld
         export VERSION=`date +%Y.%m.%d`
         conda build .
-        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u srmnitc -l main $CONDA_BLD_PATH/linux-64/$PKG_NAME-`date +%Y.%m.%d`-*.tar.bz2 --force
+        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u srmnitc -l main $CONDA_BLD_PATH/linux-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
+      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines'))
+      displayName: Upload to conda
+
+jobs:
+- job: 'MacOS'
+  pool:
+    vmImage: $(mac)
+
+  strategy:
+    matrix:
+      Python27:
+        python.version: '2.7'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+
+  steps:
+    - bash: |
+        echo "##vso[task.prependpath]$CONDA/bin"
+        conda create --yes --quiet --name conenv
+        source activate conenv
+        conda config --set always_yes yes --set changeps1 no
+        conda config --add channels conda-forge
+        conda install -c conda-forge libiconv
+        conda install -c anaconda setuptools
+        conda update --yes conda
+        conda install -q conda-build
+      displayName: Setup Anaconda Environment
+
+    - bash: |
+        source activate conenv
+        conda install -c conda-forge --file requirements_dev.txt
+        pip install -e .
+      displayName: Install package
+
+    - bash: |
+        source activate conenv
+        pytest --cov-report term-missing --cov=pyscal tests/
+        codecov
+      displayName: Run tests
+
+    - bash: |
+        source activate conenv
+        conda install conda-build
+        conda install anaconda-client
+        mkdir ~/conda-bld
+        conda config --set anaconda_upload no
+        export CONDA_BLD_PATH=~/conda-bld
+        export VERSION=`date +%Y.%m.%d`
+        conda build .
+        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u srmnitc -l main $CONDA_BLD_PATH/osx-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
       condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/azure-pipelines'))
       displayName: Upload to conda
