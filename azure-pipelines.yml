@@ -11,6 +11,7 @@ variables:
 #- master
 
 jobs:
+
 - job: 'Linux'
   pool:
     vmImage: $(linux)
@@ -76,7 +77,7 @@ jobs:
 
   steps:
     - bash: |
-        bash: echo "##vso[task.prependpath]$CONDA/bin"
+        echo "##vso[task.prependpath]$CONDA/bin"
         sudo chown -R $USER $CONDA
         conda create --yes --quiet --name conenv
         source activate conenv
