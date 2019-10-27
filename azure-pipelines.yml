@@ -14,7 +14,7 @@ jobs:
 - job: 'Linux'
   pool:
     vmImage: $(linux)
-  
+
   strategy:
     matrix:
       Python27:
@@ -22,11 +22,11 @@ jobs:
       Python37:
         python.version: '3.7'
     maxParallel: 4
-  
+
   steps:
     - bash: |
         echo "##vso[task.prependpath]$CONDA/bin"
-        conda create --yes --quiet --name conenv 
+        conda create --yes --quiet --name conenv
         source activate conenv
         conda config --set always_yes yes --set changeps1 no
         conda config --add channels conda-forge
@@ -43,6 +43,7 @@ jobs:
       displayName: Install package
 
     - bash: |
+        source activate conenv
         pytest --cov-report term-missing --cov=pyscal tests/
         codecov
-      displayName: Run tests   
+      displayName: Run tests
