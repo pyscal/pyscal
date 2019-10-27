@@ -16,7 +16,7 @@ requirements:
   run:
     - python
     - numpy
-    - matplotlib>=3
+    - matplotlib
 
 build:
     script_env:
