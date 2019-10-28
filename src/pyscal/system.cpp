@@ -28,6 +28,8 @@ System::System(){
     triclinic = 0;
     alpha = 1;
     voronoiused = 0;
+    solidq = 6;
+    criteria = 0;
 
 }
 
@@ -1158,12 +1160,12 @@ double System::get_number_from_bond(int ti,int tj){
     realdotproduct = 0.0;
     imgdotproduct = 0.0;
 
-    for (int mi = 0;mi < 13;mi++){
+    for (int mi = 0;mi < 2*solidq+1 ;mi++){
 
-        sumSquareti += atoms[ti].realq[4][mi]*atoms[ti].realq[4][mi] + atoms[ti].imgq[4][mi] *atoms[ti].imgq[4][mi];
-        sumSquaretj += atoms[tj].realq[4][mi]*atoms[tj].realq[4][mi] + atoms[tj].imgq[4][mi] *atoms[tj].imgq[4][mi];
-        realdotproduct += atoms[ti].realq[4][mi]*atoms[tj].realq[4][mi];
-        imgdotproduct  += atoms[ti].imgq[4][mi] *atoms[tj].imgq[4][mi];
+        sumSquareti += atoms[ti].realq[solidq-2][mi]*atoms[ti].realq[solidq-2][mi] + atoms[ti].imgq[solidq-2][mi] *atoms[ti].imgq[solidq-2][mi];
+        sumSquaretj += atoms[tj].realq[solidq-2][mi]*atoms[tj].realq[solidq-2][mi] + atoms[tj].imgq[solidq-2][mi] *atoms[tj].imgq[solidq-2][mi];
+        realdotproduct += atoms[ti].realq[solidq-2][mi]*atoms[tj].realq[solidq-2][mi];
+        imgdotproduct  += atoms[ti].imgq[solidq-2][mi] *atoms[tj].imgq[solidq-2][mi];
     }
 
     connection = (realdotproduct+imgdotproduct)/(sqrt(sumSquaretj)*sqrt(sumSquareti));
@@ -1182,12 +1184,12 @@ double System::get_number_from_bond(Atom atom1,Atom atom2){
     realdotproduct = 0.0;
     imgdotproduct = 0.0;
 
-    for (int mi = 0;mi < 13;mi++){
+    for (int mi = 0;mi < 2*solidq+1 ;mi++){
 
-        sumSquareti += atom1.realQ6[mi]*atom1.realQ6[mi] + atom1.imgQ6[mi] *atom1.imgQ6[mi];
-        sumSquaretj += atom2.realQ6[mi]*atom2.realQ6[mi] + atom2.imgQ6[mi] *atom2.imgQ6[mi];
-        realdotproduct += atom1.realQ6[mi]*atom2.realQ6[mi];
-        imgdotproduct  += atom1.imgQ6[mi] *atom2.imgQ6[mi];
+        sumSquareti += atom1.realq[solidq-2][mi]*atom1.realq[solidq-2][mi] + atom1.imgq[solidq-2][mi] *atom1.imgq[solidq-2][mi];
+        sumSquaretj += atom2.realq[solidq-2][mi]*atom2.realq[solidq-2][mi] + atom2.imgq[solidq-2][mi] *atom2.imgq[solidq-2][mi];
+        realdotproduct += atom1.realq[solidq-2][mi]*atom2.realq[solidq-2][mi];
+        imgdotproduct  += atom1.imgq[solidq-2][mi] *atom2.imgq[solidq-2][mi];
     }
 
     connection = (realdotproduct+imgdotproduct)/(sqrt(sumSquaretj)*sqrt(sumSquareti));
@@ -1237,14 +1239,19 @@ int System::cluster_criteria(int ti, int criterium){
 
 void System::find_solid_atoms(){
 
-    int criteria = 0;
-
-    for (int ti= 0;ti<nop;ti++){
-
-        //atoms[ti].issolid = cluster_criteria(ti,criteria);
-        atoms[ti].issolid = ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > avgthreshold) );
-        //atoms[ti].issolid = 1;
+    int tfrac;
+    if (criteria == 0){
+        for (int ti= 0;ti<nop;ti++){
+          atoms[ti].issolid = ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > avgthreshold) );
+        }
     }
+    else if (criteria == 1){
+        for (int ti= 0;ti<nop;ti++){
+            tfrac = ((atoms[ti].frenkelnumber/double(atoms[ti].n_neighbors)) > minfrenkel);
+            atoms[ti].issolid = (tfrac && (atoms[ti].avq6q6 > avgthreshold));
+        }
+    }
+
 }
 
 
@@ -1412,7 +1419,7 @@ int System::calculate_nucsize()
 //------------------------------------------------------------------------------------------------------------------------
 //void System::set_inputfile(string nn) { inputfile = nn; }
 void System::set_neighbordistance(double nn) { neighbordistance = nn; }
-void System::set_nucsize_parameters(int n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
+void System::set_nucsize_parameters(double n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) {
     int idd = atom1.loc;
@@ -1425,6 +1432,13 @@ void System::snop( int n) {  }
 //int System::gnop() { return nop; }
 //add function to pack and return the whole set of atoms
 
+//a small function which can be used to set the value of solidq
+//incase it needs to be overwritten for the calculation of solid atoms
+int System::gsolidq() { return solidq; }
+void System::ssolidq( int n) { solidq = n; }
+//access function for criteria
+int System::gcriteria() { return criteria; }
+void System::scriteria( int n) { criteria = n; }
 
 int System::glargestclusterid() { return maxclusterid; }
 void System::slargestclusterid(int idd) { }

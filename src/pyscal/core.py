@@ -658,15 +658,17 @@ class System(pc.System):
             self.ccalculate_aq(qq)
 
 
-    def find_solids(self, bonds=7, threshold=0.5, avgthreshold=0.6, cluster=True):
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6):
         """
         Distinguish solid and liquid atoms in the system.
 
         Parameters
         ----------
-        bonds : int, optional
+        bonds : int or float, optional
             Minimum number of solid bonds for an atom to be identified as
-            a solid. Default 7.
+            a solid if the value is an integer. Minimum fraction of neighbors
+            of an atom that should be solid for an atom to be solid if the
+            value is float between 0-1. Default 0.5.
 
         threshold : double, optional
             Solid bond cutoff value. Default 0.5.
@@ -678,6 +680,10 @@ class System(pc.System):
         cluster : bool, optional
             If True, cluster the solid atoms and return the number of atoms in the largest
             cluster.
+
+        q : int, optional
+            The Steinhardt parameter value over which the bonds have to be calculated.
+            Default 6.
 
         Returns
         -------
@@ -696,12 +702,16 @@ class System(pc.System):
 
         where `threshold` values is also an optional parameter.
 
+        If the value of `bonds` is a fraction between 0 and 1, at least that much of an atom's neighbors
+        should be solid for the atom to be solid.
+
         An additional parameter `avgthreshold` is an additional parameter to improve solid-liquid distinction.
         In addition to having a the specified number of `bonds`,
 
         .. math::  \langle s_{ij} \\rangle > avgthreshold
 
-        also needs to be satisfied.
+        also needs to be satisfied. In case another q value has to be used for calculation of S_ij, it can be
+        set used the `q` attribute.
 
 
         References
@@ -713,8 +723,11 @@ class System(pc.System):
         if not self.neighbors_found:
             raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
 
-        if not isinstance(bonds, int):
-            raise TypeError("bonds should be interger value")
+        if not isinstance(q, int):
+            raise TypeError("q should be interger value")
+        else:
+            if not ((q >= 2 ) and (q <= 12 )):
+                raise ValueError("Value of q should be between 2 and 12")
 
         if not isinstance(threshold, float):
             raise TypeError("threshold should be a float value")
@@ -729,9 +742,24 @@ class System(pc.System):
                 raise ValueError("Value of avgthreshold should be between 0 and 1")
 
         #start identification routine
+        #check the value of bonds and set criteria depending on that
+        if isinstance(bonds, int):
+            self.criteria = 0
+        elif isinstance(bonds, float):
+            if ((bonds>=0) and (bonds<=1.0)):
+                self.criteria = 1
+            else:
+                raise TypeError("bonds if float should have value between 0-1")
+        else:
+             raise TypeError("bonds should be interger/float value")
+
+        #Set the vlaue of q
+        self.solidq = q
         #first calculate q
-        self.ccalculate_q([6])
+
+        self.ccalculate_q([q])
         #self.calculate_q(6)
+
         #calculate solid neighs
         self.set_nucsize_parameters(bonds, threshold, avgthreshold)
         self.calculate_frenkelnumbers()
