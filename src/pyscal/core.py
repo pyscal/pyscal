@@ -1069,6 +1069,7 @@ class System(pc.System):
 
             #now add according to classification in paper
             chivector = np.histogram(costhetas, bins=bins)
+            atom.chiparams = chivector
 
 
         self.atoms = atoms
