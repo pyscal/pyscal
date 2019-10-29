@@ -1055,7 +1055,7 @@ class System(pc.System):
                 distvectors.append(vectors)
 
 
-            combos = list(itertools.combinations(len(dists), 2))
+            combos = list(itertools.combinations(range(len(dists)), 2))
             costhetas = []
             for combo in combos:
                 vec1 = distvectors[combo[0]]
