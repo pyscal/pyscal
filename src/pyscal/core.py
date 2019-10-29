@@ -1017,6 +1017,62 @@ class System(pc.System):
 
         self.atoms = atoms
 
+    def calculate_chiparams(self):
+        """
+        Calculate the chi param vector for each atom
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Add note
+
+        References
+        ----------
+        .. [1] Ackland, Jones, Phys. Rev. B 73, 2006
+        """
+
+        bins = [-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]
+        atoms = self.atoms
+
+        for atom in atoms:
+            dists = []
+            distneighs = []
+            distvectors = []
+
+            neighs = atom.neighbors
+
+            for neigh in neighs:
+                dist, vectors = self.get_distance(atom, atoms[neigh], vector=True)
+                dists.append(dist)
+                distneighs.append(neigh)
+                distvectors.append(vectors)
+
+
+            combos = list(itertools.combinations(len(dists), 2))
+            costhetas = []
+            for combo in combos:
+                vec1 = distvectors[combo[0]]
+                vec2 = distvectors[combo[1]]
+                modvec1 = np.sqrt(np.sum([x**2 for x in vec1]))
+                modvec2 = np.sqrt(np.sum([x**2 for x in vec2]))
+                costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
+                #found costheta
+                costhetas.append(costheta)
+
+
+            #now add according to classification in paper
+            chivector = np.histogram(costhetas, bins=bins)
+
+
+        self.atoms = atoms
+
 
     def prepare_pickle(self):
         """

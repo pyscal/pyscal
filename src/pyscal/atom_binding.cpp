@@ -292,6 +292,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         The value of angular parameter A of an atom. The angular parameter measures the tetrahedral coordination of an atom.
     )mydelimiter")
 
+    .def_property("chiparams",&Atom::gchiparams, &Atom::schiparams, R"mydelimiter(
+        *Float*.
+        The value of chiparameter of an atom. The return value is a vector of length 8.
+    )mydelimiter")
+
     .def_property("avg_angular",&Atom::gavgangular, &Atom::savgangular, R"mydelimiter(
         *Float*.
         The average angular parameter value. Not used currently.

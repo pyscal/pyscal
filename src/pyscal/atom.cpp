@@ -413,3 +413,12 @@ double Atom::gavgangular(){
 void Atom::savgangular(double dd){
     avg_angular = dd;
 }
+
+vector<int> Atom::gchiparams(){
+  return chiparams;
+}
+
+void Atom::schiparams(vector<int> nns){
+  chiparams.clear();
+  chiparams = nns;
+}
