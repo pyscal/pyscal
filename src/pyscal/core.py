@@ -1017,7 +1017,7 @@ class System(pc.System):
 
         self.atoms = atoms
 
-    def calculate_chiparams(self, angles=False):
+    def calculate_chiparams(self, angles=False, nlimit=4):
         """
         Calculate the chi param vector for each atom
 
@@ -1025,6 +1025,10 @@ class System(pc.System):
         ----------
         angles : bool, optional
             If True, return the list of cosines of all neighbor pairs
+
+        nlimit : int, optional
+            number of closest neighbors to be considered in the analysis
+            default 4.
 
         Returns
         -------
@@ -1055,8 +1059,10 @@ class System(pc.System):
                 distneighs.append(neigh)
                 distvectors.append(vectors)
 
+            args = np.argsort(dists)
+            topargs = np.array(args)[:nlimit]
 
-            combos = list(itertools.combinations(range(len(dists)), 2))
+            combos = list(itertools.combinations(topargs, 2))
             costhetas = []
             for combo in combos:
                 vec1 = distvectors[combo[0]]
