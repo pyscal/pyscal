@@ -1017,13 +1017,14 @@ class System(pc.System):
 
         self.atoms = atoms
 
-    def calculate_chiparams(self):
+    def calculate_chiparams(self, angles=False):
         """
         Calculate the chi param vector for each atom
 
         Parameters
         ----------
-        None
+        angles : bool, optional
+            If True, return the list of cosines of all neighbor pairs
 
         Returns
         -------
@@ -1070,6 +1071,8 @@ class System(pc.System):
             #now add according to classification in paper
             chivector = np.histogram(costhetas, bins=bins)
             atom.chiparams = chivector[0]
+            if angles:
+                atom.custom['cosines'] = costhetas
 
 
         self.atoms = atoms
