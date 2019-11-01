@@ -1,5 +1,5 @@
 ---
-title: 'pyscal : A python module for structural analysis of atomic environments'
+title: 'pyscal: A python module for structural analysis of atomic environments'
 tags:
   - Python
   - materials science
