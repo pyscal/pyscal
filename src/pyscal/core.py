@@ -729,13 +729,13 @@ class System(pc.System):
             if not ((q >= 2 ) and (q <= 12 )):
                 raise ValueError("Value of q should be between 2 and 12")
 
-        if not isinstance(threshold, float):
+        if not isinstance(threshold, (int, float)):
             raise TypeError("threshold should be a float value")
         else:
             if not ((threshold >= 0 ) and (threshold <= 1 )):
                 raise ValueError("Value of threshold should be between 0 and 1")
 
-        if not isinstance(avgthreshold, float):
+        if not isinstance(avgthreshold, (int, float)):
             raise TypeError("avgthreshold should be a float value")
         else:
             if not ((avgthreshold >= 0 ) and (avgthreshold <= 1 )):
@@ -979,6 +979,7 @@ class System(pc.System):
         where cos(theta) is the angle size suspended by each pair of neighbors of the central
         atom. A will have a value close to 0 for structures if the angles are close to 109 degrees.
         The calculated A parameter for each atom is stored in :attr:`~pyscal.catom.Atom.angular`.
+
         References
         ----------
         .. [1] Uttormark, MJ, Thompson, MO, Clancy, P, Phys. Rev. B 47, 1993
@@ -1017,8 +1018,9 @@ class System(pc.System):
 
         self.atoms = atoms
 
-    def calculate_chiparams(self, angles=False, nlimit=4):
+    def calculate_chiparams(self, angles=False):
         """
+
         Calculate the chi param vector for each atom
 
         Parameters
@@ -1026,21 +1028,28 @@ class System(pc.System):
         angles : bool, optional
             If True, return the list of cosines of all neighbor pairs
 
-        nlimit : int, optional
-            number of closest neighbors to be considered in the analysis
-            default 4.
-
         Returns
         -------
-        None
+        angles : array of floats
+            list of all cosine values, returned only if `angles` is True.
 
         Notes
         -----
-        Add note
+        This method tries to distinguish between crystal structures by finding the cosines of angles
+        formed by an atom with its neighbors. These cosines are then historgrammed with bins
+        `[-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]` to find a vector for
+        each atom that is indicative of its local coordination. Compared to chi parameters from chi_0 to
+        chi_7 in the associated publication, the vector here is from chi_0 to chi_8. This is due to an additional
+        chi parameter which measures the number of neighbors between cosines -0.705 to -0.195.
+
+        Parameter `nlimit` specifies the number of nearest neighbors to be included in the analysis to find the cutoff.
+        If parameter `angles` is true, an array of all cosine values is returned. The publication further provides
+        combinations of chi parameters for structural identification which is not implemented here.
 
         References
         ----------
         .. [1] Ackland, Jones, Phys. Rev. B 73, 2006
+
         """
 
         bins = [-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]
@@ -1060,7 +1069,7 @@ class System(pc.System):
                 distvectors.append(vectors)
 
             args = np.argsort(dists)
-            topargs = np.array(args)[:nlimit]
+            topargs = np.array(args)
 
             combos = list(itertools.combinations(topargs, 2))
             costhetas = []
