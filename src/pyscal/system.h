@@ -65,7 +65,7 @@ class System{
         void harvest_cluster_old(const int, const int);
         void find_clusters_recursive_old();
         int largest_cluster();
-        void set_nucsize_parameters(int,double,double);
+        void set_nucsize_parameters(double,double,double);
         //void set_inputfile(string);
         void set_neighbordistance(double);
         void set_atoms( vector<Atom>);
@@ -89,7 +89,7 @@ class System{
         //old params
         int nop;
         int baseunit;
-        int minfrenkel;
+        double minfrenkel;
         double boxx, boxy, boxz;
         //array for box
         double boxdims[3][2];
@@ -143,5 +143,16 @@ class System{
         int neighborsfound;
         int qsfound;
         int fileread;
+
+        //this is the qvalue over which frenkel numbers are calculated
+        //and its access functions
+        int solidq;
+        int gsolidq();
+        void ssolidq( int);
+        int criteria;
+        int gcriteria();
+        void scriteria( int);
+
+
 
 };

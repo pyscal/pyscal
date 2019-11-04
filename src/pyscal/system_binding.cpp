@@ -35,6 +35,8 @@ PYBIND11_MODULE(csystem, m) {
         .def("set_nucsize_parameters",&System::set_nucsize_parameters)
         .def_property("box", &System::gbox, &System::sbox )
         .def_property("atoms", &System::get_atoms, &System::set_atoms)
+        .def_property("solidq", &System::gsolidq, &System::ssolidq)
+        .def_property("criteria", &System::gcriteria, &System::scriteria)
         //.def("get_atoms", &System::get_atoms)
         //.def("set_atoms", &System::set_atoms)
         .def("ccalculate_nucsize",&System::calculate_nucsize)
