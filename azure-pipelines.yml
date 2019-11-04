@@ -46,7 +46,7 @@ jobs:
     - bash: |
         source activate conenv
         pytest --cov-report term-missing --cov=pyscal tests/
-        codecov
+        curl https://codecov.io/bash -t {CODECOV_TOKEN}
       displayName: Run tests
 
     - bash: |
