@@ -26,9 +26,9 @@
    :target: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e
    :width: 20 %
 
-.. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg
-  :target: https://anaconda.org/conda-forge/pyscal
-  :width: 13 %
+.. image:: https://img.shields.io/conda/dn/conda-forge/pyscal.svg
+   :target: https://conda.anaconda.org/pyscal
+   :width: 13 %
 
 pyscal - python Structural Environment Calculator
 =================================================
