@@ -27,7 +27,7 @@
    :width: 20 %
 
 .. image:: https://img.shields.io/conda/dn/conda-forge/pyscal.svg
-   :target: https://conda.anaconda.org/pyscal
+   :target: https://anaconda.org/conda-forge/pyscal
    :width: 13 %
 
 pyscal - python Structural Environment Calculator
