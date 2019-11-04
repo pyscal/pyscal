@@ -9,7 +9,7 @@ pyscal- A python module for structural analysis of atomic environments
 .. image:: https://dev.azure.com/sarathrmenon/pyscal/_apis/build/status/srmnitc.pyscal?branchName=master
     :target: https://dev.azure.com/sarathrmenon/pyscal/_build/latest?definitionId=1&branchName=master
     :width: 13%
-    
+
 .. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/srmnitc/pyscal
   :width: 15 %
@@ -23,8 +23,12 @@ pyscal- A python module for structural analysis of atomic environments
    :width: 13 %
 
 .. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg
-   :target: https://conda.anaconda.org/pyscal
+   :target: https://anaconda.org/conda-forge/pyscal
    :width: 13 %
+
+.. image:: https://img.shields.io/conda/dn/conda-forge/pyscal.svg
+  :target: https://conda.anaconda.org/pyscal
+  :width: 13 %
 
 **pyscal** is a python module for the calculation of local atomic structural environments including Steinhardt's bond orientational order parameters [1]_ during post-processing
 of atomistic simulation data. The core functionality of pyscal is written in C++ with python wrappers using

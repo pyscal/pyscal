@@ -26,6 +26,9 @@
    :target: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e
    :width: 15 %
 
+.. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg
+  :target: https://anaconda.org/conda-forge/pyscal
+  :width: 13 %
 
 pyscal - python Structural Environment Calculator
 =================================================
@@ -54,4 +57,7 @@ Highlights
 
 Citing the work
 ---------------
-We are currently preparing a publication. Until it is ready, if you want to use the code in your work, it would be great if you let `me <mailto:sarath.menon@rub.de>`_ know about it.
+
+If you use pyscal in your work, the citation of the `following article <https://joss.theoj.org/papers/10.21105/joss.01824>`_ will be greatly appreciated:
+
+Sarath Menon, Grisell Díaz Leines and Jutta Rogal (2019). pyscal: A python module for structural analysis of atomic environments. Journal of Open Source Software, 4(43), 1824, https://doi.org/10.21105/joss.01824

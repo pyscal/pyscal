@@ -21,6 +21,12 @@ pyscal can be installed directly using `Conda <https://docs.conda.io/en/latest/>
 
 This is the recommended way to install if you have an `Anaconda <https://www.anaconda.com/>`_ distribution.
 
+For linux platforms, the latest release version can be installed from the conda-forge channel by-
+
+.. code:: console
+
+    conda install -c conda-forge pyscal
+
 Quick installation
 ------------------
 
