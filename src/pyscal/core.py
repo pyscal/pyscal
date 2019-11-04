@@ -1044,7 +1044,8 @@ class System(pc.System):
 
         Parameter `nlimit` specifies the number of nearest neighbors to be included in the analysis to find the cutoff.
         If parameter `angles` is true, an array of all cosine values is returned. The publication further provides
-        combinations of chi parameters for structural identification which is not implemented here.
+        combinations of chi parameters for structural identification which is not implemented here. The calculated
+        chi params can be accessed using :attr:`~pyscal.catom.chiparams`.
 
         References
         ----------

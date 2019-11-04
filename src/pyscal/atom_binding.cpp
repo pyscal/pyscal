@@ -290,11 +290,13 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     .def_property("angular",&Atom::gangular, &Atom::sangular, R"mydelimiter(
         *Float*.
         The value of angular parameter A of an atom. The angular parameter measures the tetrahedral coordination of an atom.
+        Meaningful values are only returned if the property is calculated using :func:`~pyscal.core.System.calculate_angularcriteria`.
     )mydelimiter")
 
     .def_property("chiparams",&Atom::gchiparams, &Atom::schiparams, R"mydelimiter(
         *Float*.
         The value of chiparameter of an atom. The return value is a vector of length 8.
+        Meaningful values are only returned if chi params are calculated using :func:`~pyscal.core.System.calculate_chiparams`.
     )mydelimiter")
 
     .def_property("avg_angular",&Atom::gavgangular, &Atom::savgangular, R"mydelimiter(
