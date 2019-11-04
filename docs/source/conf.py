@@ -26,7 +26,7 @@ copyright = u'2019, Sarath Menon, Grisell Díaz Leines, Jutta Rogal'
 author = u'Sarath Menon, Grisell Díaz Leines, Jutta Rogal'
 
 # The short X.Y version
-version = u'2.0.1'
+version = u'2.1.1'
 # The full version, including alpha/beta/rc tags
 release = u'2.0.1'
 
