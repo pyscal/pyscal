@@ -658,15 +658,17 @@ class System(pc.System):
             self.ccalculate_aq(qq)
 
 
-    def find_solids(self, bonds=7, threshold=0.5, avgthreshold=0.6, cluster=True):
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6):
         """
         Distinguish solid and liquid atoms in the system.
 
         Parameters
         ----------
-        bonds : int, optional
+        bonds : int or float, optional
             Minimum number of solid bonds for an atom to be identified as
-            a solid. Default 7.
+            a solid if the value is an integer. Minimum fraction of neighbors
+            of an atom that should be solid for an atom to be solid if the
+            value is float between 0-1. Default 0.5.
 
         threshold : double, optional
             Solid bond cutoff value. Default 0.5.
@@ -678,6 +680,10 @@ class System(pc.System):
         cluster : bool, optional
             If True, cluster the solid atoms and return the number of atoms in the largest
             cluster.
+
+        q : int, optional
+            The Steinhardt parameter value over which the bonds have to be calculated.
+            Default 6.
 
         Returns
         -------
@@ -696,12 +702,16 @@ class System(pc.System):
 
         where `threshold` values is also an optional parameter.
 
+        If the value of `bonds` is a fraction between 0 and 1, at least that much of an atom's neighbors
+        should be solid for the atom to be solid.
+
         An additional parameter `avgthreshold` is an additional parameter to improve solid-liquid distinction.
         In addition to having a the specified number of `bonds`,
 
         .. math::  \langle s_{ij} \\rangle > avgthreshold
 
-        also needs to be satisfied.
+        also needs to be satisfied. In case another q value has to be used for calculation of S_ij, it can be
+        set used the `q` attribute.
 
 
         References
@@ -713,25 +723,43 @@ class System(pc.System):
         if not self.neighbors_found:
             raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
 
-        if not isinstance(bonds, int):
-            raise TypeError("bonds should be interger value")
+        if not isinstance(q, int):
+            raise TypeError("q should be interger value")
+        else:
+            if not ((q >= 2 ) and (q <= 12 )):
+                raise ValueError("Value of q should be between 2 and 12")
 
-        if not isinstance(threshold, float):
+        if not isinstance(threshold, (int, float)):
             raise TypeError("threshold should be a float value")
         else:
             if not ((threshold >= 0 ) and (threshold <= 1 )):
                 raise ValueError("Value of threshold should be between 0 and 1")
 
-        if not isinstance(avgthreshold, float):
+        if not isinstance(avgthreshold, (int, float)):
             raise TypeError("avgthreshold should be a float value")
         else:
             if not ((avgthreshold >= 0 ) and (avgthreshold <= 1 )):
                 raise ValueError("Value of avgthreshold should be between 0 and 1")
 
         #start identification routine
+        #check the value of bonds and set criteria depending on that
+        if isinstance(bonds, int):
+            self.criteria = 0
+        elif isinstance(bonds, float):
+            if ((bonds>=0) and (bonds<=1.0)):
+                self.criteria = 1
+            else:
+                raise TypeError("bonds if float should have value between 0-1")
+        else:
+             raise TypeError("bonds should be interger/float value")
+
+        #Set the vlaue of q
+        self.solidq = q
         #first calculate q
-        self.ccalculate_q([6])
+
+        self.ccalculate_q([q])
         #self.calculate_q(6)
+
         #calculate solid neighs
         self.set_nucsize_parameters(bonds, threshold, avgthreshold)
         self.calculate_frenkelnumbers()
@@ -951,6 +979,7 @@ class System(pc.System):
         where cos(theta) is the angle size suspended by each pair of neighbors of the central
         atom. A will have a value close to 0 for structures if the angles are close to 109 degrees.
         The calculated A parameter for each atom is stored in :attr:`~pyscal.catom.Atom.angular`.
+
         References
         ----------
         .. [1] Uttormark, MJ, Thompson, MO, Clancy, P, Phys. Rev. B 47, 1993
@@ -986,6 +1015,81 @@ class System(pc.System):
                 costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
                 costhetasum += (costheta +(1./3.))**2
             atom.angular = costhetasum
+
+        self.atoms = atoms
+
+    def calculate_chiparams(self, angles=False):
+        """
+
+        Calculate the chi param vector for each atom
+
+        Parameters
+        ----------
+        angles : bool, optional
+            If True, return the list of cosines of all neighbor pairs
+
+        Returns
+        -------
+        angles : array of floats
+            list of all cosine values, returned only if `angles` is True.
+
+        Notes
+        -----
+        This method tries to distinguish between crystal structures by finding the cosines of angles
+        formed by an atom with its neighbors. These cosines are then historgrammed with bins
+        `[-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]` to find a vector for
+        each atom that is indicative of its local coordination. Compared to chi parameters from chi_0 to
+        chi_7 in the associated publication, the vector here is from chi_0 to chi_8. This is due to an additional
+        chi parameter which measures the number of neighbors between cosines -0.705 to -0.195.
+
+        Parameter `nlimit` specifies the number of nearest neighbors to be included in the analysis to find the cutoff.
+        If parameter `angles` is true, an array of all cosine values is returned. The publication further provides
+        combinations of chi parameters for structural identification which is not implemented here. The calculated
+        chi params can be accessed using :attr:`~pyscal.catom.chiparams`.
+
+        References
+        ----------
+        .. [1] Ackland, Jones, Phys. Rev. B 73, 2006
+
+        """
+
+        bins = [-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]
+        atoms = self.atoms
+
+        for atom in atoms:
+            dists = []
+            distneighs = []
+            distvectors = []
+
+            neighs = atom.neighbors
+
+            for neigh in neighs:
+                dist, vectors = self.get_distance(atom, atoms[neigh], vector=True)
+                dists.append(dist)
+                distneighs.append(neigh)
+                distvectors.append(vectors)
+
+            args = np.argsort(dists)
+            topargs = np.array(args)
+
+            combos = list(itertools.combinations(topargs, 2))
+            costhetas = []
+            for combo in combos:
+                vec1 = distvectors[combo[0]]
+                vec2 = distvectors[combo[1]]
+                modvec1 = np.sqrt(np.sum([x**2 for x in vec1]))
+                modvec2 = np.sqrt(np.sum([x**2 for x in vec2]))
+                costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
+                #found costheta
+                costhetas.append(costheta)
+
+
+            #now add according to classification in paper
+            chivector = np.histogram(costhetas, bins=bins)
+            atom.chiparams = chivector[0]
+            if angles:
+                atom.custom['cosines'] = costhetas
+
 
         self.atoms = atoms
 

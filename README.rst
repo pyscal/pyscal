@@ -24,7 +24,7 @@
 
 .. image:: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e/status.svg
    :target: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e
-   :width: 15 %
+   :width: 20 %
 
 .. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg
   :target: https://anaconda.org/conda-forge/pyscal

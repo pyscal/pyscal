@@ -217,5 +217,8 @@ class Atom{
         void savgangular(double);
         //vector<vector<vector<double>>> gallqcomps();
         //void sallqcomps(vector<vector<vector<double>>>);
+        vector<int> chiparams;
+        vector<int> gchiparams();
+        void schiparams(vector<int>);
 
 };
