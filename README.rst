@@ -1,4 +1,4 @@
-.. |build| image:: https://dev.azure.com/sarathrmenon/pyscal/_apis/build/status/srmnitc.pyscal?branchName=master
+..  image:: https://dev.azure.com/sarathrmenon/pyscal/_apis/build/status/srmnitc.pyscal?branchName=master
     :target: https://dev.azure.com/sarathrmenon/pyscal/_build/latest?definitionId=1&branchName=master
     :width: 13%
 
@@ -14,12 +14,8 @@
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
    :width: 13 %
 
-.. image:: https://img.shields.io/badge/License-GPLv3-blue.svg
-   :target: https://www.gnu.org/licenses/gpl-3.0
-   :width: 12 %
-
 .. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg
-   :target: https://conda.anaconda.org/pyscal
+   :target: https://anaconda.org/conda-forge/pyscal
    :width: 13 %
 
 .. image:: https://joss.theoj.org/papers/168eca482155601dc517523899527a4e/status.svg
@@ -27,6 +23,10 @@
    :width: 20 %
 
 .. image:: https://img.shields.io/conda/dn/conda-forge/pyscal.svg
+   :target: https://anaconda.org/conda-forge/pyscal
+   :width: 13 %
+
+.. image:: https://img.shields.io/conda/pn/conda-forge/pyscal.svg
    :target: https://anaconda.org/conda-forge/pyscal
    :width: 13 %
 
