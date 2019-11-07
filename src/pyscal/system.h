@@ -153,6 +153,20 @@ class System{
         int gcriteria();
         void scriteria( int);
 
+        //for cell list implementation
+        struct cell{
+          int head = -1;
+        };
+        cell *cells;
+
+        int nx, ny, nz;
+        int total_cells;
+        int cell_index(int, int, int);
+        void set_up_cells();
+        vector<int> cell_periodic(int, int, int);
+        void get_all_neighbors_cells();
+
+        //we add the other functions as we go along
 
 
 };

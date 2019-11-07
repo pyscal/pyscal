@@ -490,7 +490,10 @@ class System(pc.System):
             else:
                 #warnings.warn("THIS RAN")
                 self.set_neighbordistance(cutoff)
-                self.get_all_neighbors_normal()
+                if len(self.atoms) > 2300:
+                    self.get_all_neighbors_cells()
+                else:
+                    self.get_all_neighbors_normal()
 
         elif method == 'voronoi':
             self.voroexp = int(voroexp)
