@@ -423,6 +423,155 @@ vector<double> System::get_pairdistances(){
     return res;
 }
 
+//function to create cell lists
+//snmall function that returns cell index when provided with cx, cy, cz
+int System::cell_index(int cx, int cy, int cz){
+    return cx*ny*nz + cy*nz + cz;
+}
+
+
+//if number of particles are small, use brute force
+//if box is triclinic, use brute force
+void System::set_up_cells(){
+
+      //find of all find the number of cells in each direction
+      nx = boxx/neighbordistance;
+      ny = boxy/neighbordistance;
+      nz = boxz/neighbordistance;
+
+      //now use this to find length of cell in each direction
+      double lx = boxx/nx;
+      double ly = boxy/ny;
+      double lz = boxz/nz;
+
+      //find the total number of cells
+      total_cells = nx*ny*nz;
+
+      //create a vector of cells
+      cells = new cell[total_cells];
+
+      int cx, cy, cz;
+      int ind;
+      //now loop over all atoms and assign cells
+      for(int ti=0; ti<nop; ti++){
+
+          //calculate c indices for the atom
+          cx = atoms[ti].posx/lx;
+          cy = atoms[ti].posx/ly;
+          cz = atoms[ti].posx/lz;
+
+          //now get cell index
+          ind = cell_index(cx, cy, cz);
+          atoms[ti].head = cells[ind].head;
+          cells[ind].head = ti;
+      }
+}
+
+vector<int> System::cell_periodic(int i, int j, int k){
+    vector<int> ci;
+    //apply periodic conditions
+    if (i<0) i = i + nx;
+    else if (i>nx-1) i = i -nx;
+    ci.emplace_back(i);
+    if (j<0) j = j + ny;
+    else if (j>ny-1) j = j -ny;
+    ci.emplace_back(j);
+    if (k<0) k = k + nz;
+    else if (k>nz-1) k = k -nz;
+    ci.emplace_back(k);
+    return ci;
+
+}
+
+//get all neighbor info but using cell lists
+void System::get_all_neighbors_cells(){
+
+    voronoiused = 0;
+
+    double d;
+    double diffx,diffy,diffz;
+    double r,theta,phi;
+
+    //first create cells
+    set_up_cells();
+    int maincell, subcell;
+    int mainatom, subatom;
+    vector<int> cc;
+
+
+
+    //now loop to find distance
+    for(int i=0; i< nx; i++){
+        for(int j=0; j<ny; j++){
+            for(int k=0; k<nz; k++){
+                //get index of the maincell
+                maincell = cell_index(i, j, k);
+                //scan head atom from cell - if its -1, ignore and continue
+                mainatom = cells[maincell].head;
+                while (mainatom != -1){
+                //scan subcells
+                    for(int si=i-1; si<=i+1; si++){
+                        for(int sj=j-1; sj<=j+1; sj++){
+                            for(int sk=k-1; sk<=k+1; sk++){
+                                //apply boundary conditions
+                                cc = cell_periodic(si, sj, sk);
+                                subcell = cell_index(cc[0], cc[1], cc[2]);
+                                //scan atom from sub cell
+                                subatom = cells[subcell]. head;
+                                while (subatom != -1){
+                                    //if everything is okay, find distance between the two atoms
+                                    //but only if mainatom < subatom -> because we add both
+                                    if (mainatom < subatom){
+                                        d = get_abs_distance(mainatom,subatom,diffx,diffy,diffz);
+                                        if (d < neighbordistance){
+                                            if ((filter == 1) && (atoms[mainatom].type != atoms[subatom].type)){
+                                                continue;
+                                            }
+                                            atoms[mainatom].neighbors[atoms[mainatom].n_neighbors] = subatom;
+                                            atoms[mainatom].neighbordist[atoms[mainatom].n_neighbors] = d;
+                                            //weight is set to 1.0, unless manually reset
+                                            atoms[mainatom].neighborweight[atoms[mainatom].n_neighbors] = 1.00;
+                                            atoms[mainatom].n_diffx[atoms[mainatom].n_neighbors] = diffx;
+                                            atoms[mainatom].n_diffy[atoms[mainatom].n_neighbors] = diffy;
+                                            atoms[mainatom].n_diffz[atoms[mainatom].n_neighbors] = diffz;
+                                            convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                                            atoms[mainatom].n_r[atoms[mainatom].n_neighbors] = r;
+                                            atoms[mainatom].n_phi[atoms[mainatom].n_neighbors] = phi;
+                                            atoms[mainatom].n_theta[atoms[mainatom].n_neighbors] = theta;
+                                            atoms[mainatom].n_neighbors += 1;
+
+                                            atoms[subatom].neighbors[atoms[subatom].n_neighbors] = mainatom;
+                                            atoms[subatom].neighbordist[atoms[subatom].n_neighbors] = d;
+                                            //weight is set to 1.0, unless manually reset
+                                            atoms[subatom].neighborweight[atoms[subatom].n_neighbors] = 1.00;
+                                            atoms[subatom].n_diffx[atoms[subatom].n_neighbors] = -diffx;
+                                            atoms[subatom].n_diffy[atoms[subatom].n_neighbors] = -diffy;
+                                            atoms[subatom].n_diffz[atoms[subatom].n_neighbors] = -diffz;
+                                            convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
+                                            atoms[subatom].n_r[atoms[subatom].n_neighbors] = r;
+                                            atoms[subatom].n_phi[atoms[subatom].n_neighbors] = phi;
+                                            atoms[subatom].n_theta[atoms[subatom].n_neighbors] = theta;
+                                            atoms[subatom].n_neighbors +=1;
+                                        }
+
+
+                                    }
+                                    subatom = atoms[subatom].head;
+
+                                }
+
+                            }
+                        }
+                    }
+                    mainatom = atoms[mainatom].head;
+                }
+            }
+        }
+    }
+
+}
+
+
 void System::get_all_neighbors_normal(){
 
 

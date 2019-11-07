@@ -361,7 +361,7 @@ class System(pc.System):
 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
-                                            voroexp=1, padding=1.2, nlimit=6):
+                                            voroexp=1, padding=1.2, nlimit=6, cells=False):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
@@ -490,7 +490,10 @@ class System(pc.System):
             else:
                 #warnings.warn("THIS RAN")
                 self.set_neighbordistance(cutoff)
-                self.get_all_neighbors_normal()
+                if cells:
+                    self.get_all_neighbors_cells()
+                else:
+                    self.get_all_neighbors_normal()
 
         elif method == 'voronoi':
             self.voroexp = int(voroexp)

@@ -25,6 +25,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     isneighborset = 0;
     n_neighbors = 0;
     lcluster = 0;
+    head = -1;
 
 
     for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){

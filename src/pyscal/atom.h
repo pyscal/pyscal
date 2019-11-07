@@ -221,4 +221,7 @@ class Atom{
         vector<int> gchiparams();
         void schiparams(vector<int>);
 
+        //for cell list implementation
+        int head;
+
 };
