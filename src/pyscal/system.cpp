@@ -335,6 +335,7 @@ vector<double> System::get_distance_vector(Atom atom1 , Atom atom2 ){
         ay = rotinv[1][0]*diffx + rotinv[1][1]*diffy + rotinv[1][2]*diffz;
         az = rotinv[2][0]*diffx + rotinv[2][1]*diffy + rotinv[2][2]*diffz;
 
+      double dummy;
         //scale to match the triclinic box size
         diffx = ax*boxx;
         diffy = ay*boxy;
@@ -568,6 +569,7 @@ void System::get_all_neighbors_cells(){
             }
         }
     }
+    neighborsfound = 1;
 
 }
 
