@@ -55,6 +55,37 @@ Highlights
 .. [3]  `Mickel, W., Kapfer, S. C., Schröder-Turk, G. E., & Mecke, K. (2013). The Journal of Chemical Physics, 138 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.
 .. [4]  `Auer, S., & Frenkel, D. (2005). Advances in Polymer Science, 173 <https://link.springer.com/chapter/10.1007/b99429>`_.
 
+Installation
+------------
+
+**For python 3**
+
+pyscal can be installed directly using `Conda <https://docs.conda.io/en/latest/>`_ from the `conda-forge channel <https://conda-forge.org/>`_ by the following statement-
+
+.. code:: console
+
+    conda install -c conda-forge pyscal
+
+**For python 2**
+
+Python 2 version of pyscal can be installed using-
+
+.. code:: console
+
+    conda install -c pyscal pyscal
+
+**From repository**
+
+pyscal can be built from the repository by-
+
+.. code:: console
+
+    git clone https://github.com/srmnitc/pyscal.git
+    cd pyscal
+    python setup.py install --user
+
+complete documentation with examples available `here <https://pyscal.com/>`_.
+
 Citing the work
 ---------------
 
@@ -62,4 +93,4 @@ If you use pyscal in your work, the citation of the `following article <https://
 
 Sarath Menon, Grisell Díaz Leines and Jutta Rogal (2019). pyscal: A python module for structural analysis of atomic environments. Journal of Open Source Software, 4(43), 1824, https://doi.org/10.21105/joss.01824
 
-Citation in bib format can be downloaded `here <https://rubde-my.sharepoint.com/:u:/g/personal/sarath_menon_rub_de/Ecfuz7X8__ZJiz73k-dvvpEBjjMU6VJvg0v-hDtsFd3Kkw?download=1>`_. 
+Citation in bib format can be downloaded `here <https://rubde-my.sharepoint.com/:u:/g/personal/sarath_menon_rub_de/Ecfuz7X8__ZJiz73k-dvvpEBjjMU6VJvg0v-hDtsFd3Kkw?download=1>`_.

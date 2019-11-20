@@ -1096,7 +1096,6 @@ class System(pc.System):
 
         self.atoms = atoms
 
-
     def prepare_pickle(self):
         """
         Prepare the system for pickling and create a picklable system
