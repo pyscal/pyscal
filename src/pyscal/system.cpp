@@ -1408,6 +1408,10 @@ void System::find_solid_atoms(){
 
 void System::find_clusters(){
 
+        for(int ti=0; ti<nop;ti++){
+            atoms[ti].belongsto = -1;
+        }
+        
         for (int ti= 0;ti<nop;ti++){
 
             if (!atoms[ti].condition) continue;
@@ -1444,6 +1448,11 @@ void System::find_clusters_recursive(){
 
     int clusterindex;
     clusterindex = 0;
+
+    //reset belongsto indices
+    for(int ti=0; ti<nop;ti++){
+        atoms[ti].belongsto = -1;
+    }
 
     for (int ti= 0;ti<nop;ti++){
         if (!atoms[ti].condition) continue;
