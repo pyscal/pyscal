@@ -815,7 +815,7 @@ void System::get_temp_neighbors_cells(){
 
     //first create cells
     set_up_cells();
-    
+
     int maincell, subcell;
     int mainatom, subatom;
     double d;
@@ -887,6 +887,7 @@ int System::get_all_neighbors_sann(double prefactor){
     double diffx,diffy,diffz;
     double r,theta,phi;
     int m, maxneighs, finished;
+    finished = 1;
 
     vector<int> nids;
     vector<double> dists, sorted_dists;
@@ -924,82 +925,50 @@ int System::get_all_neighbors_sann(double prefactor){
 
     //now add some safe padding - this is the prefactor which we will read in
     guessdist = prefactor*guessdist;
+    neighbordistance = guessdist;
 
-    //create a structure for sorting
-    struct datom{
-        double dist;
-        int  index;
-    };
-
-    //create another for the sorting algorithm
-    struct by_dist{
-        bool operator()(datom const &datom1, datom const &datom2){
-            return (datom1.dist < datom2.dist);
-        }
-    };
-
-    //a vector of atoms - vectors are needed for fast sorting
-    vector<datom> atomitos;
 
     //if file is not read - read it in at this point
     //we have to work on indicator functions
     if (!fileread) { read_particle_file(inputfile); }
 
+    if (usecells){
+        get_temp_neighbors_cells();
+    }
+    else{
+        get_temp_neighbors_brute();
+    }
 
-    //now starts the main loop
     for (int ti=0; ti<nop; ti++){
-
-        //clear vector
-        atomitos.clear();
-        //start looping over every other particle
-        for (int tj=0; tj<nop; tj++){
-            if(ti==tj) { continue; }
-            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
-
-            if (d <= guessdist){
-                datom x = {d, tj};
-                atomitos.emplace_back(x);
-
-            }
-        }
-
-        //we have all the info now. Pick the top six
-        //first sort distances
-        //check if its zero size
-        if (atomitos.size() == 0){
+        if (atoms[ti].temp_neighbors.size() < 3){
             return 0;
         }
 
-        sort(atomitos.begin(), atomitos.end(), by_dist());
+        sort(atoms[ti].temp_neighbors.begin(), atoms[ti].temp_neighbors.end(), by_dist());
 
         //start with initial routine
         m = 3;
         summ = 0;
         for(int i=0 ; i<m; i++){
-            summ += atomitos[i].dist;
-            int tj = atomitos[i].index;
+            summ += atoms[ti].temp_neighbors[i].dist;
+            int tj = atoms[ti].temp_neighbors[i].index;
             process_neighbor(ti, tj);
         }
 
         //find cutoff
         dcut = summ/float(m-2);
+        maxneighs = atoms[ti].temp_neighbors.size();
 
-        //now start loop
-        maxneighs = atomitos.size();
-
-        while( (m < maxneighs) && (dcut >= atomitos[m].dist)){
+        while( (m < maxneighs) && (dcut >= atoms[ti].temp_neighbors[m].dist)){
             //increase m
             m = m+1;
-            //cout<<m<<endl;
-            //cout<<dcut<<endl;
-            //cout<<atomitos[m].dist<<endl;
 
             //here now we can add this to the list neighbors and process things
-            int tj = atomitos[m].index;
+            int tj = atoms[ti].temp_neighbors[m].index;
             process_neighbor(ti, tj);
 
             //find new dcut
-            summ = summ + atomitos[m].dist;
+            summ = summ + atoms[ti].temp_neighbors[m].dist;
             dcut = summ/float(m-2);
         }
 
@@ -1007,7 +976,8 @@ int System::get_all_neighbors_sann(double prefactor){
         if (m==maxneighs){
             finished = 0;
             break;
-        } else{
+        }
+        else{
             finished = 1;
         }
 

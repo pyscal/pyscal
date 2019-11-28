@@ -462,7 +462,7 @@ class System(pc.System):
             if cutoff=='sann':
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
-
+                self.usecells = (len(self.atoms) > 4000)
                 finished = self.get_all_neighbors_sann(threshold)
                 #if it finished without finding neighbors
                 if not finished:
