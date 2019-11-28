@@ -16,7 +16,7 @@ def test_chiparamsbcc():
 
 
 def test_chiparamsfcc():
-    atoms, box = pcs.make_crystal('fcc', repetitions=[3,3,3], lattice_constant=4)
+    atoms, box = pcs.make_crystal('fcc', repetitions=[11,11,11], lattice_constant=4)
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box

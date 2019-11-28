@@ -462,7 +462,7 @@ class System(pc.System):
             if cutoff=='sann':
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
-
+                self.usecells = (len(self.atoms) > 4000)
                 finished = self.get_all_neighbors_sann(threshold)
                 #if it finished without finding neighbors
                 if not finished:
@@ -484,14 +484,16 @@ class System(pc.System):
             elif cutoff=='adaptive' or cutoff==0:
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
+
+                self.usecells =  (len(self.atoms) > 4000)
                 finished = self.get_all_neighbors_adaptive(threshold, nlimit, padding)
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")
             else:
                 #warnings.warn("THIS RAN")
                 self.set_neighbordistance(cutoff)
-                #if len(self.atoms) > 2300:
-                if cells:
+                if len(self.atoms) > 2300:
+                #if cells:
                     self.get_all_neighbors_cells()
                 else:
                     self.get_all_neighbors_normal()
