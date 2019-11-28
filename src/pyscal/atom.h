@@ -20,6 +20,20 @@ const double PI = 3.141592653589793;
 const int MAXNUMBEROFNEIGHBORS = 100;
 const int NILVALUE = 333333;
 
+//create a structure for sorting
+struct datom{
+    double dist;
+    int  index;
+};
+
+//create another for the sorting algorithm
+struct by_dist{
+    bool operator()(datom const &datom1, datom const &datom2){
+        return (datom1.dist < datom2.dist);
+    }
+};
+
+
 class Atom{
     /*
     Class to hold the details of an atom. This is a list of all
@@ -83,6 +97,7 @@ class Atom{
         double n_theta[MAXNUMBEROFNEIGHBORS];
         int n3, n4, n5, n6;
         int n_neighbors;
+        vector<datom> temp_neighbors;
 
 
 

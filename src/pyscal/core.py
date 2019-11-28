@@ -490,8 +490,8 @@ class System(pc.System):
             else:
                 #warnings.warn("THIS RAN")
                 self.set_neighbordistance(cutoff)
-                #if len(self.atoms) > 2300:
-                if cells:
+                if len(self.atoms) > 2300:
+                #if cells:
                     self.get_all_neighbors_cells()
                 else:
                     self.get_all_neighbors_normal()

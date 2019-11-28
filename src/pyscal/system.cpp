@@ -391,6 +391,8 @@ void System::reset_all_neighbors(){
     for (int ti = 0;ti<nop;ti++){
 
         atoms[ti].n_neighbors=0;
+        atoms[ti].temp_neighbors.clear();
+
         for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
 
             atoms[ti].neighbors[tn] = NILVALUE;
@@ -926,13 +928,8 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
     double r,theta,phi;
     int m, maxneighs, finished;
 
-    //vector<int> nids;
-    //vector<double> dists, sorted_dists;
-
-    //double prefactor = 1.21;
     double summ;
     double boxvol;
-
     //some guesswork here
     //find the box volumes
     if (triclinic==1){
@@ -953,7 +950,6 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
         boxvol = boxx*boxy*boxz;
     }
 
-
     //now find the volume per particle
     double guessvol = boxvol/float(nop);
 
@@ -962,64 +958,88 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
 
     //now add some safe padding - this is the prefactor which we will read in
     guessdist = prefactor*guessdist;
-
-    //create a structure for sorting
-    struct datom{
-        double dist;
-        int  index;
-    };
-
-    //create another for the sorting algorithm
-    struct by_dist{
-        bool operator()(datom const &datom1, datom const &datom2){
-            return (datom1.dist < datom2.dist);
-        }
-    };
-
-    //a vector of atoms - vectors are needed for fast sorting
-    vector<datom> atomitos;
+    neighbordistance = guessdist;
 
     //if file is not read - read it in at this point
     //we have to work on indicator functions
     if (!fileread) { read_particle_file(inputfile); }
 
 
-    //now starts the main loop
-    for (int ti=0; ti<nop; ti++){
+    //introduce cell lists here - instead of looping over all neighbors
+    //use cells
+    //first create cells
+    set_up_cells();
+    int maincell, subcell;
+    int mainatom, subatom;
+    vector<int> cc;
 
-        //clear vector
-        atomitos.clear();
-        //start looping over every other particle
-        for (int tj=0; tj<nop; tj++){
-            if(ti==tj) { continue; }
-            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+    //now loop to find distance
+    for(int i=0; i< nx; i++){
+        for(int j=0; j<ny; j++){
+            for(int k=0; k<nz; k++){
+                //get index of the maincell
+                maincell = cell_index(i, j, k);
+                //scan head atom from cell - if its -1, ignore and continue
+                mainatom = cells[maincell].head;
 
-            if (d <= guessdist){
-                datom x = {d, tj};
-                atomitos.emplace_back(x);
 
+                while (mainatom != -1){
+                //scan subcells
+                    for(int si=i-1; si<=i+1; si++){
+                        for(int sj=j-1; sj<=j+1; sj++){
+                            for(int sk=k-1; sk<=k+1; sk++){
+                                //apply boundary conditions
+                                cc = cell_periodic(si, sj, sk);
+                                subcell = cell_index(cc[0], cc[1], cc[2]);
+                                //scan atom from sub cell
+                                subatom = cells[subcell]. head;
+                                while (subatom != -1){
+                                    //if everything is okay, find distance between the two atoms
+                                    //but only if mainatom < subatom -> because we add both
+                                    if (mainatom < subatom){
+                                        d = get_abs_distance(mainatom,subatom,diffx,diffy,diffz);
+                                        if (d <= neighbordistance){
+                                            datom x = {d, subatom};
+                                            atoms[mainatom].temp_neighbors.emplace_back(x);
+                                            datom y = {d, mainatom};
+                                            atoms[subatom].temp_neighbors.emplace_back(y);
+                                        }
+
+
+                                    }
+                                    subatom = atoms[subatom].head;
+
+                                }
+
+                            }
+                        }
+                    }
+                    mainatom = atoms[mainatom].head;
+                }
             }
         }
-
-        //we have all the info now. Pick the top six
-        //first sort distances
+    }
+    //end of call
+    //subatoms would now be populated
+    //now starts the main loop
+    for (int ti=0; ti<nop; ti++){
         //check if its zero size
-        if (atomitos.size() == 0){
+        if (atoms[ti].temp_neighbors.size() < nlimit){
             return 0;
         }
 
-        sort(atomitos.begin(), atomitos.end(), by_dist());
+        sort(atoms[ti].temp_neighbors.begin(), atoms[ti].temp_neighbors.end(), by_dist());
 
         summ = 0;
         for(int i=0; i<nlimit; i++){
-            summ += atomitos[i].dist;
+            summ += atoms[ti].temp_neighbors[i].dist;
         }
         dcut = padding*(1.0/float(nlimit))*summ;
 
         //now we are ready to loop over again, but over the lists
-        for(int j=0; j<atomitos.size(); j++){
-            int tj = atomitos[j].index;
-            if (atomitos[j].dist < dcut){
+        for(int j=0; j<atoms[ti].temp_neighbors.size(); j++){
+            int tj = atoms[ti].temp_neighbors[j].index;
+            if (atoms[ti].temp_neighbors[j].dist < dcut){
 
                 if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
                     continue;
@@ -1043,7 +1063,6 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
         }
 
     }
-
 
     //mark end of neighbor calc
     neighborsfound = 1;
@@ -1411,7 +1430,7 @@ void System::find_clusters(){
         for(int ti=0; ti<nop;ti++){
             atoms[ti].belongsto = -1;
         }
-        
+
         for (int ti= 0;ti<nop;ti++){
 
             if (!atoms[ti].condition) continue;
