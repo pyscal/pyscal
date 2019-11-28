@@ -4,7 +4,7 @@ import pyscal.core as pc
 import pyscal.crystal_structures as pcs
 
 def test_chiparamsbcc():
-    atoms, box = pcs.make_crystal('bcc', repetitions=[10,10,10], lattice_constant=4)
+    atoms, box = pcs.make_crystal('bcc', repetitions=[3,3,3], lattice_constant=4)
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box
@@ -16,7 +16,7 @@ def test_chiparamsbcc():
 
 
 def test_chiparamsfcc():
-    atoms, box = pcs.make_crystal('fcc', repetitions=[3,3,3], lattice_constant=4)
+    atoms, box = pcs.make_crystal('fcc', repetitions=[11,11,11], lattice_constant=4)
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box

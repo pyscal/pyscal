@@ -484,6 +484,8 @@ class System(pc.System):
             elif cutoff=='adaptive' or cutoff==0:
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
+
+                self.usecells =  (len(self.atoms) > 4000)
                 finished = self.get_all_neighbors_adaptive(threshold, nlimit, padding)
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")

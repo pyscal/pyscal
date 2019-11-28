@@ -30,6 +30,7 @@ System::System(){
     voronoiused = 0;
     solidq = 6;
     criteria = 0;
+    usecells = 0;
 
 }
 
@@ -171,6 +172,15 @@ int System::galpha(){
     return alpha ;
 }
 
+void System::susecells(int a){
+
+    usecells = a;
+}
+
+int System::gusecells(){
+
+    return usecells ;
+}
 //this function allows for handling custom formats of atoms and so on
 void System::set_atoms( vector<Atom> atomitos){
 
@@ -771,6 +781,96 @@ void System::process_neighbor(int ti, int tj){
 
 }
 
+/*
+To increase the speed of the other methods, we need some functions using cells and
+otheriwse which adds atoms to the temp_neighbors list
+*/
+void System::get_temp_neighbors_brute(){
+
+    //reset voronoi flag
+
+    double d;
+    double diffx,diffy,diffz;
+
+    for (int ti=0; ti<nop; ti++){
+        for (int tj=ti; tj<nop; tj++){
+            if(ti==tj) { continue; }
+            d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+            if (d <= neighbordistance){
+                datom x = {d, tj};
+                atoms[ti].temp_neighbors.emplace_back(x);
+                datom y = {d, ti};
+                atoms[tj].temp_neighbors.emplace_back(y);
+            }
+        }
+    }
+
+}
+
+/*
+Cells should only be used when the system has a minimum size - in this case,
+about 2000 atoms.
+*/
+void System::get_temp_neighbors_cells(){
+
+    //first create cells
+    set_up_cells();
+    
+    int maincell, subcell;
+    int mainatom, subatom;
+    double d;
+    double diffx,diffy,diffz;
+
+    vector<int> cc;
+
+    //now loop to find distance
+    for(int i=0; i< nx; i++){
+        for(int j=0; j<ny; j++){
+            for(int k=0; k<nz; k++){
+                //get index of the maincell
+                maincell = cell_index(i, j, k);
+                //scan head atom from cell - if its -1, ignore and continue
+                mainatom = cells[maincell].head;
+
+                while (mainatom != -1){
+                  //scan subcells
+                  for(int si=i-1; si<=i+1; si++){
+                      for(int sj=j-1; sj<=j+1; sj++){
+                          for(int sk=k-1; sk<=k+1; sk++){
+                              //apply boundary conditions
+                              cc = cell_periodic(si, sj, sk);
+                              subcell = cell_index(cc[0], cc[1], cc[2]);
+                              //scan atom from sub cell
+                              subatom = cells[subcell]. head;
+                              while (subatom != -1){
+                                  //if everything is okay, find distance between the two atoms
+                                  //but only if mainatom < subatom -> because we add both
+                                  if (mainatom < subatom){
+                                      d = get_abs_distance(mainatom,subatom,diffx,diffy,diffz);
+                                      if (d <= neighbordistance){
+                                          datom x = {d, subatom};
+                                          atoms[mainatom].temp_neighbors.emplace_back(x);
+                                          datom y = {d, mainatom};
+                                          atoms[subatom].temp_neighbors.emplace_back(y);
+                                      }
+
+
+                                  }
+                                  subatom = atoms[subatom].head;
+
+                              }
+
+                          }
+                      }
+                  }
+                  mainatom = atoms[mainatom].head;
+              }
+          }
+      }
+    }
+
+}
+
 
 int System::get_all_neighbors_sann(double prefactor){
     /*
@@ -921,6 +1021,7 @@ int System::get_all_neighbors_sann(double prefactor){
 }
 
 
+
 int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padding){
 
     double d, dcut;
@@ -967,58 +1068,14 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
 
     //introduce cell lists here - instead of looping over all neighbors
     //use cells
-    //first create cells
-    set_up_cells();
-    int maincell, subcell;
-    int mainatom, subatom;
-    vector<int> cc;
 
-    //now loop to find distance
-    for(int i=0; i< nx; i++){
-        for(int j=0; j<ny; j++){
-            for(int k=0; k<nz; k++){
-                //get index of the maincell
-                maincell = cell_index(i, j, k);
-                //scan head atom from cell - if its -1, ignore and continue
-                mainatom = cells[maincell].head;
-
-
-                while (mainatom != -1){
-                //scan subcells
-                    for(int si=i-1; si<=i+1; si++){
-                        for(int sj=j-1; sj<=j+1; sj++){
-                            for(int sk=k-1; sk<=k+1; sk++){
-                                //apply boundary conditions
-                                cc = cell_periodic(si, sj, sk);
-                                subcell = cell_index(cc[0], cc[1], cc[2]);
-                                //scan atom from sub cell
-                                subatom = cells[subcell]. head;
-                                while (subatom != -1){
-                                    //if everything is okay, find distance between the two atoms
-                                    //but only if mainatom < subatom -> because we add both
-                                    if (mainatom < subatom){
-                                        d = get_abs_distance(mainatom,subatom,diffx,diffy,diffz);
-                                        if (d <= neighbordistance){
-                                            datom x = {d, subatom};
-                                            atoms[mainatom].temp_neighbors.emplace_back(x);
-                                            datom y = {d, mainatom};
-                                            atoms[subatom].temp_neighbors.emplace_back(y);
-                                        }
-
-
-                                    }
-                                    subatom = atoms[subatom].head;
-
-                                }
-
-                            }
-                        }
-                    }
-                    mainatom = atoms[mainatom].head;
-                }
-            }
-        }
+    if (usecells){
+        get_temp_neighbors_cells();
     }
+    else{
+        get_temp_neighbors_brute();
+    }
+
     //end of call
     //subatoms would now be populated
     //now starts the main loop

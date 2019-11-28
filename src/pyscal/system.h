@@ -143,6 +143,9 @@ class System{
         int neighborsfound;
         int qsfound;
         int fileread;
+        int usecells;
+        void susecells(int);
+        int gusecells();
 
         //this is the qvalue over which frenkel numbers are calculated
         //and its access functions
@@ -165,6 +168,8 @@ class System{
         void set_up_cells();
         vector<int> cell_periodic(int, int, int);
         void get_all_neighbors_cells();
+        void get_temp_neighbors_cells();
+        void get_temp_neighbors_brute();
 
         //we add the other functions as we go along
 
