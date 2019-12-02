@@ -447,6 +447,8 @@ int System::cell_index(int cx, int cy, int cz){
 //if box is triclinic, use brute force
 void System::set_up_cells(){
 
+      int si,sj,sk, maincell, subcell;
+      vector<int> cc;
       //find of all find the number of cells in each direction
       nx = boxx/neighbordistance;
       ny = boxy/neighbordistance;
@@ -463,21 +465,48 @@ void System::set_up_cells(){
       //create a vector of cells
       cells = new cell[total_cells];
 
+      //now run over and for each cell create its neighbor cells
+      //all neighbor cells are also added
+      for(int i=0; i<nx; i++){
+         for(int j=0; j<ny; j++){
+           for(int k=0; k<nz; k++){
+              maincell = cell_index(i, j, k);
+              for(int si=i-1; si<=i+1; si++){
+                  for(int sj=j-1; sj<=j+1; sj++){
+                      for(int sk=k-1; sk<=k+1; sk++){
+                         cc = cell_periodic(si, sj, sk);
+                         subcell = cell_index(cc[0], cc[1], cc[2]);
+                         //add this to the list of neighbors
+                         cells[maincell].neighbor_cells.emplace_back(subcell);
+
+                      }
+                  }
+              }
+           }
+         }
+      }
+
       int cx, cy, cz;
       int ind;
+
       //now loop over all atoms and assign cells
       for(int ti=0; ti<nop; ti++){
 
           //calculate c indices for the atom
           cx = atoms[ti].posx/lx;
-          cy = atoms[ti].posx/ly;
-          cz = atoms[ti].posx/lz;
+          cy = atoms[ti].posy/ly;
+          cz = atoms[ti].posz/lz;
 
           //now get cell index
           ind = cell_index(cx, cy, cz);
-          atoms[ti].head = cells[ind].head;
-          cells[ind].head = ti;
+
+          //got cell index
+          //now add the atom to the corresponding cells
+          cells[ind].members.emplace_back(ti);
+
       }
+
+      //end of loop - all cells, the member atoms and neighboring cells are added
 }
 
 vector<int> System::cell_periodic(int i, int j, int k){
@@ -504,86 +533,73 @@ void System::get_all_neighbors_cells(){
     double d;
     double diffx,diffy,diffz;
     double r,theta,phi;
+    int ti, tj;
 
     //first create cells
     set_up_cells();
     int maincell, subcell;
-    int mainatom, subatom;
-    vector<int> cc;
-
-
 
     //now loop to find distance
-    for(int i=0; i< nx; i++){
-        for(int j=0; j<ny; j++){
-            for(int k=0; k<nz; k++){
-                //get index of the maincell
-                maincell = cell_index(i, j, k);
-                //scan head atom from cell - if its -1, ignore and continue
-                mainatom = cells[maincell].head;
-                while (mainatom != -1){
-                //scan subcells
-                    for(int si=i-1; si<=i+1; si++){
-                        for(int sj=j-1; sj<=j+1; sj++){
-                            for(int sk=k-1; sk<=k+1; sk++){
-                                //apply boundary conditions
-                                cc = cell_periodic(si, sj, sk);
-                                subcell = cell_index(cc[0], cc[1], cc[2]);
-                                //scan atom from sub cell
-                                subatom = cells[subcell]. head;
-                                while (subatom != -1){
-                                    //if everything is okay, find distance between the two atoms
-                                    //but only if mainatom < subatom -> because we add both
-                                    if (mainatom < subatom){
-                                        d = get_abs_distance(mainatom,subatom,diffx,diffy,diffz);
-                                        if (d < neighbordistance){
-                                            if ((filter == 1) && (atoms[mainatom].type != atoms[subatom].type)){
-                                                continue;
-                                            }
-                                            atoms[mainatom].neighbors[atoms[mainatom].n_neighbors] = subatom;
-                                            atoms[mainatom].neighbordist[atoms[mainatom].n_neighbors] = d;
-                                            //weight is set to 1.0, unless manually reset
-                                            atoms[mainatom].neighborweight[atoms[mainatom].n_neighbors] = 1.00;
-                                            atoms[mainatom].n_diffx[atoms[mainatom].n_neighbors] = diffx;
-                                            atoms[mainatom].n_diffy[atoms[mainatom].n_neighbors] = diffy;
-                                            atoms[mainatom].n_diffz[atoms[mainatom].n_neighbors] = diffz;
-                                            convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                                            atoms[mainatom].n_r[atoms[mainatom].n_neighbors] = r;
-                                            atoms[mainatom].n_phi[atoms[mainatom].n_neighbors] = phi;
-                                            atoms[mainatom].n_theta[atoms[mainatom].n_neighbors] = theta;
-                                            atoms[mainatom].n_neighbors += 1;
+    for(int i=0; i<total_cells; i++){
+        //now go over the neighbor cells
+        //for each member in cell i
+        for(int mi=0; mi<cells[i].members.size(); mi++){
+            //now go through the neighbors
+            ti = cells[i].members[mi];
+            for(int j=0 ; j<cells[i].neighbor_cells.size(); j++){
+               //loop through members of j
+               subcell = cells[i].neighbor_cells[j];
+               for(int mj=0; mj<cells[subcell].members.size(); mj++){
+                  //now we have mj -> members/compare with
+                  tj = cells[subcell].members[mj];
+                  //compare ti and tj and add
+                  if (ti < tj){
+                      d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+                      if (d < neighbordistance){
 
-                                            atoms[subatom].neighbors[atoms[subatom].n_neighbors] = mainatom;
-                                            atoms[subatom].neighbordist[atoms[subatom].n_neighbors] = d;
-                                            //weight is set to 1.0, unless manually reset
-                                            atoms[subatom].neighborweight[atoms[subatom].n_neighbors] = 1.00;
-                                            atoms[subatom].n_diffx[atoms[subatom].n_neighbors] = -diffx;
-                                            atoms[subatom].n_diffy[atoms[subatom].n_neighbors] = -diffy;
-                                            atoms[subatom].n_diffz[atoms[subatom].n_neighbors] = -diffz;
-                                            convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
-                                            atoms[subatom].n_r[atoms[subatom].n_neighbors] = r;
-                                            atoms[subatom].n_phi[atoms[subatom].n_neighbors] = phi;
-                                            atoms[subatom].n_theta[atoms[subatom].n_neighbors] = theta;
-                                            atoms[subatom].n_neighbors +=1;
-                                        }
-
-
-                                    }
-                                    subatom = atoms[subatom].head;
-
-                                }
-
-                            }
+                        if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                            continue;
                         }
-                    }
-                    mainatom = atoms[mainatom].head;
-                }
+                        //process_neighbor(ti, tj);
+
+                        atoms[ti].neighbors[atoms[ti].n_neighbors] = tj;
+                        atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
+                        //weight is set to 1.0, unless manually reset
+                        atoms[ti].neighborweight[atoms[ti].n_neighbors] = 1.00;
+                        atoms[ti].n_diffx[atoms[ti].n_neighbors] = diffx;
+                        atoms[ti].n_diffy[atoms[ti].n_neighbors] = diffy;
+                        atoms[ti].n_diffz[atoms[ti].n_neighbors] = diffz;
+                        convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                        atoms[ti].n_r[atoms[ti].n_neighbors] = r;
+                        atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
+                        atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
+                        atoms[ti].n_neighbors += 1;
+
+                        atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
+                        atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
+                        //weight is set to 1.0, unless manually reset
+                        atoms[tj].neighborweight[atoms[tj].n_neighbors] = 1.00;
+                        atoms[tj].n_diffx[atoms[tj].n_neighbors] = -diffx;
+                        atoms[tj].n_diffy[atoms[tj].n_neighbors] = -diffy;
+                        atoms[tj].n_diffz[atoms[tj].n_neighbors] = -diffz;
+                        convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
+                        atoms[tj].n_r[atoms[tj].n_neighbors] = r;
+                        atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
+                        atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
+                        atoms[tj].n_neighbors +=1;
+                      }
+                  }
+               }
+
             }
+
         }
     }
+
     neighborsfound = 1;
 
 }
+
 
 
 void System::get_all_neighbors_normal(){
@@ -817,56 +833,38 @@ void System::get_temp_neighbors_cells(){
     set_up_cells();
 
     int maincell, subcell;
-    int mainatom, subatom;
+    int ti, tj;
     double d;
     double diffx,diffy,diffz;
 
-    vector<int> cc;
-
     //now loop to find distance
-    for(int i=0; i< nx; i++){
-        for(int j=0; j<ny; j++){
-            for(int k=0; k<nz; k++){
-                //get index of the maincell
-                maincell = cell_index(i, j, k);
-                //scan head atom from cell - if its -1, ignore and continue
-                mainatom = cells[maincell].head;
-
-                while (mainatom != -1){
-                  //scan subcells
-                  for(int si=i-1; si<=i+1; si++){
-                      for(int sj=j-1; sj<=j+1; sj++){
-                          for(int sk=k-1; sk<=k+1; sk++){
-                              //apply boundary conditions
-                              cc = cell_periodic(si, sj, sk);
-                              subcell = cell_index(cc[0], cc[1], cc[2]);
-                              //scan atom from sub cell
-                              subatom = cells[subcell]. head;
-                              while (subatom != -1){
-                                  //if everything is okay, find distance between the two atoms
-                                  //but only if mainatom < subatom -> because we add both
-                                  if (mainatom < subatom){
-                                      d = get_abs_distance(mainatom,subatom,diffx,diffy,diffz);
-                                      if (d <= neighbordistance){
-                                          datom x = {d, subatom};
-                                          atoms[mainatom].temp_neighbors.emplace_back(x);
-                                          datom y = {d, mainatom};
-                                          atoms[subatom].temp_neighbors.emplace_back(y);
-                                      }
-
-
-                                  }
-                                  subatom = atoms[subatom].head;
-
-                              }
-
-                          }
+    for(int i=0; i<total_cells; i++){
+        //now go over the neighbor cells
+        //for each member in cell i
+        for(int mi=0; mi<cells[i].members.size(); mi++){
+            //now go through the neighbors
+            ti = cells[i].members[mi];
+            for(int j=0 ; j<cells[i].neighbor_cells.size(); j++){
+               //loop through members of j
+               subcell = cells[i].neighbor_cells[j];
+               for(int mj=0; mj<cells[subcell].members.size(); mj++){
+                  //now we have mj -> members/compare with
+                  tj = cells[subcell].members[mj];
+                  //compare ti and tj and add
+                  if (ti < tj){
+                      d = get_abs_distance(ti,tj,diffx,diffy,diffz);
+                      if (d < neighbordistance){
+                        datom x = {d, tj};
+                        atoms[ti].temp_neighbors.emplace_back(x);
+                        datom y = {d, ti};
+                        atoms[tj].temp_neighbors.emplace_back(y);
                       }
                   }
-                  mainatom = atoms[mainatom].head;
-              }
-          }
-      }
+               }
+
+            }
+
+        }
     }
 
 }

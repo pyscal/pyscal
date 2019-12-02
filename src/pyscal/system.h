@@ -18,7 +18,10 @@
 namespace py = pybind11;
 using namespace std;
 
-
+struct cell{
+  vector<int> members;
+  vector<int> neighbor_cells;
+};
 
 class System{
 
@@ -156,10 +159,6 @@ class System{
         int gcriteria();
         void scriteria( int);
 
-        //for cell list implementation
-        struct cell{
-          int head = -1;
-        };
         cell *cells;
 
         int nx, ny, nz;
