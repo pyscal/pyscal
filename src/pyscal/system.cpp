@@ -500,11 +500,11 @@ void System::set_up_cells(){
 
           //now apply boxdims
           if (dx < 0) dx+=boxx;
-          elif (dx > boxx) dx-=boxx;
+          else if (dx > boxx) dx-=boxx;
           if (dy < 0) dy+=boxy;
-          elif (dy > boxy) dy-=boxy;
+          else if (dy > boxy) dy-=boxy;
           if (dz < 0) dz+=boxz;
-          elif (dz > boxz) dz-=boxz;
+          else if (dz > boxz) dz-=boxz;
 
           //now find c vals
           cx = dx/lx;
