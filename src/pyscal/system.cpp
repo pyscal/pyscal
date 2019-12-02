@@ -487,7 +487,7 @@ void System::set_up_cells(){
       }
 
       int cx, cy, cz;
-      double px, py, pz;
+      double dx, dy, dz;
       int ind;
 
       //now loop over all atoms and assign cells
