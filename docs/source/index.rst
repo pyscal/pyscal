@@ -80,13 +80,19 @@ Examples
     examples
 
 
-Methods
--------
+Methods implemented in pyscal
+-----------------------------
 
 .. toctree::
 
     methods
 
+News and updates
+----------------
+
+.. toctree::
+
+    news
 
 pyscal reference
 ----------------
