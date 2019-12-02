@@ -487,15 +487,29 @@ void System::set_up_cells(){
       }
 
       int cx, cy, cz;
+      double px, py, pz;
       int ind;
 
       //now loop over all atoms and assign cells
       for(int ti=0; ti<nop; ti++){
 
           //calculate c indices for the atom
-          cx = atoms[ti].posx/lx;
-          cy = atoms[ti].posy/ly;
-          cz = atoms[ti].posz/lz;
+          dx = atoms[ti].posx;
+          dy = atoms[ti].posy;
+          dz = atoms[ti].posz;
+
+          //now apply boxdims
+          if (dx < 0) dx+=boxx;
+          elif (dx > boxx) dx-=boxx;
+          if (dy < 0) dy+=boxy;
+          elif (dy > boxy) dy-=boxy;
+          if (dz < 0) dz+=boxz;
+          elif (dz > boxz) dz-=boxz;
+
+          //now find c vals
+          cx = dx/lx;
+          cy = dy/ly;
+          cz = dz/lz;
 
           //now get cell index
           ind = cell_index(cx, cy, cz);
