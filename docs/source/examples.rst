@@ -25,3 +25,4 @@ Advanced examples
 	example3basic
 	example_clustering
 	pickling
+  angular_params

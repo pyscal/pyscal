@@ -52,11 +52,13 @@ Highlights
 * classification of atoms as solid or liquid [4]_.
 * clustering of particles based on a user defined property.
 * methods for calculating radial distribution functions, Voronoi volumes of particles, number of vertices and face area of Voronoi polyhedra, and coordination numbers.
+* calculation of angular parameters to identify diamond structure [5]_.
 
 .. [1]  `Steinhardt, P. J., Nelson, D. R., & Ronchetti, M. (1983). Physical Review B, 28 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.
 .. [2]  `Lechner, W., & Dellago, C. (2008). The Journal of Chemical Physics, 129 <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_.
 .. [3]  `Mickel, W., Kapfer, S. C., Schröder-Turk, G. E., & Mecke, K. (2013). The Journal of Chemical Physics, 138 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.
 .. [4]  `Auer, S., & Frenkel, D. (2005). Advances in Polymer Science, 173 <https://link.springer.com/chapter/10.1007/b99429>`_.
+.. [5]  `Uttormark, M. J., Thompson, M. O., Clancy, P. (1993). Physical Review B, 47 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.47.15717>`_.
 
 Getting started
 ---------------
