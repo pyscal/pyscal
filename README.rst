@@ -86,6 +86,9 @@ pyscal can be built from the repository by-
 
 complete documentation with examples available `here <https://pyscal.com/>`_.
 
+News
+----
+
 - November 30, 2019 : pyscal reaches over 1500 downloads on conda-forge channel. Thanks for the support!
 
 - November 21, 2019 : pyscal is selected as the E-CAM module of the month. See the news `here <https://www.e-cam2020.eu/pyscal-a-python-module-for-structural-analysis-of-atomic-environments/>`_.
