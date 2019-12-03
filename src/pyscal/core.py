@@ -1099,7 +1099,7 @@ class System(pc.System):
 
         self.atoms = atoms
 
-    def calculate_disorder(self, averaged=False):
+    def calculate_disorder(self, averaged=False, q=6):
         """
         Calculate the disorder criteria for each atom
 
@@ -1107,6 +1107,10 @@ class System(pc.System):
         ----------
         averaged : bool, optional
             If True, calculate the averaged disorder. Default False.
+
+        q : int, optional
+            The Steinhardt parameter value over which the bonds have to be calculated.
+            Default 6.
 
         Returns
         -------
@@ -1132,6 +1136,17 @@ class System(pc.System):
         .. [1] Kawasaki, T, Onuki, A, J. Chem. Phys. 135, 2011
 
         """
+        #now routine for calculation of disorder
+        if q in range(2,13):
+            self.solidq = q
+        else:
+            raise ValueError("q values should be between 2-12")
+
+        self.ccalculate_disorder()
+
+        if averaged:
+            self.ccalculate_avg_disorder()
+
 
 
     def prepare_pickle(self):
