@@ -1099,6 +1099,41 @@ class System(pc.System):
 
         self.atoms = atoms
 
+    def calculate_disorder(self, averaged=False):
+        """
+        Calculate the disorder criteria for each atom
+
+        Parameters
+        ----------
+        averaged : bool, optional
+            If True, calculate the averaged disorder. Default False.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Calculate the disorder criteria as introduced in [1]. The disorder criteria value for each atom is defined by,
+
+        .. math::
+
+            D_j = \\frac{1}{N_b^j} \sum_{i=1}^{N_b} [ S_{jj} + S_{kk} -2S_{jk}]
+
+        where .. math:: S_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i)
+
+        The keyword `averaged` is True, the disorder value is averaged over the atom and its neighbors. The disorder value
+        can be accessed using :attr:`~pyscal.catom.disorder` and the averaged version can be accessed using
+        :attr:`~pyscal.catom.avg_disorder`. For ordered systems, the value of disorder would be zero which would increase
+        and reach one for disordered systems.
+
+        References
+        ----------
+        .. [1] Kawasaki, T, Onuki, A, J. Chem. Phys. 135, 2011
+
+        """
+
+
     def prepare_pickle(self):
         """
         Prepare the system for pickling and create a picklable system

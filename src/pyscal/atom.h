@@ -239,4 +239,16 @@ class Atom{
         //for cell list implementation
         int head;
 
+        //intermediate values for disorder params
+        //the value of self dot product
+        double sii;
+
+        //disorder params
+        double disorder;
+        double avgdisorder;
+        double gdisorder();
+        void sdisorder(double);
+        double gavgdisorder();
+        void savgdisorder(double);
+
 };

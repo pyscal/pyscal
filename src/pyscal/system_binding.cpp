@@ -73,6 +73,8 @@ PYBIND11_MODULE(csystem, m) {
         .def("get_indicators",&System::get_indicators)
         .def("set_indicators",&System::set_indicators)
         .def("find_solid_atoms",&System::find_solid_atoms)
+        .def("ccalculate_disorder",&System::calculate_disorder)
+        .def("ccalculate_avg_disorder",&System::find_average_disorder)
         ;
 
 

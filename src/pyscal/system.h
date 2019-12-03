@@ -170,7 +170,9 @@ class System{
         void get_temp_neighbors_cells();
         void get_temp_neighbors_brute();
 
-        //we add the other functions as we go along
+        //disorder vars
+        void calculate_disorder();
+        void find_average_disorder();
 
 
 };

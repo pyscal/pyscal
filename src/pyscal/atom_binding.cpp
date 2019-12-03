@@ -303,6 +303,17 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         *Float*.
         The average angular parameter value. Not used currently.
     )mydelimiter")
+
+    .def_property("disorder",&Atom::gdisorder, &Atom::sdisorder, R"mydelimiter(
+        *Float*.
+        The value of disorder parameter.
+    )mydelimiter")
+
+    .def_property("avg_disorder",&Atom::gavgdisorder, &Atom::savgdisorder, R"mydelimiter(
+        *Float*.
+        The value of averaged disorder parameter.
+    )mydelimiter")
+
     ;
 
 
