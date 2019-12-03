@@ -415,6 +415,7 @@ void Atom::savgangular(double dd){
     avg_angular = dd;
 }
 
+
 vector<int> Atom::gchiparams(){
   return chiparams;
 }
@@ -422,4 +423,20 @@ vector<int> Atom::gchiparams(){
 void Atom::schiparams(vector<int> nns){
   chiparams.clear();
   chiparams = nns;
+}
+
+double Atom::gdisorder(){
+    return disorder;
+}
+
+void Atom::sdisorder(double dd){
+    disorder = dd;
+}
+
+double Atom::gavgdisorder(){
+    return avgdisorder;
+}
+
+void Atom::savgdisorder(double dd){
+    avgdisorder = dd;
 }

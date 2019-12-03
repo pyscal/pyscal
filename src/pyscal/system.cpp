@@ -1058,7 +1058,7 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
         get_temp_neighbors_brute();
     }
 
-    //end of call
+    //end of callstructural competition
     //subatoms would now be populated
     //now starts the main loop
     for (int ti=0; ti<nop; ti++){
@@ -1339,6 +1339,71 @@ void System::calculate_aq(vector <int> qs){
 
         }
 
+    }
+}
+
+void System::calculate_disorder(){
+
+    //for disorder we need sjj which is dot product with itself, self dot prouct of neighbors
+    //and cross dot product
+    double sumSquareti,sumSquaretj;
+    double realdotproduct,imgdotproduct;
+    double connection;
+    double dis;
+
+    for(int ti=0; ti<nop; ti++){
+
+        sumSquareti = 0.0;
+        realdotproduct = 0.0;
+        imgdotproduct = 0.0;
+
+        for (int mi = 0;mi < 2*solidq+1 ;mi++){
+            sumSquareti += atoms[ti].realq[solidq-2][mi]*atoms[ti].realq[solidq-2][mi] + atoms[ti].imgq[solidq-2][mi] *atoms[ti].imgq[solidq-2][mi];
+            realdotproduct += atoms[ti].realq[solidq-2][mi]*atoms[ti].realq[solidq-2][mi];
+            imgdotproduct  += atoms[ti].imgq[solidq-2][mi] *atoms[ti].imgq[solidq-2][mi];
+        }
+        connection = (realdotproduct+imgdotproduct)/(sqrt(sumSquareti)*sqrt(sumSquareti));
+        atoms[ti].sii = connection;
+
+    }
+
+    //first round is over
+    //now find cross terms
+    for(int ti=0; ti<nop; ti++){
+
+        sumSquareti = 0.0;
+        sumSquaretj = 0.0;
+        realdotproduct = 0.0;
+        imgdotproduct = 0.0;
+        dis = 0;
+
+        for(int tj=0; tj<atoms[ti].n_neighbors; tj++){
+            for (int mi = 0;mi < 2*solidq+1 ;mi++){
+                sumSquareti += atoms[ti].realq[solidq-2][mi]*atoms[ti].realq[solidq-2][mi] + atoms[ti].imgq[solidq-2][mi] *atoms[ti].imgq[solidq-2][mi];
+                sumSquaretj += atoms[tj].realq[solidq-2][mi]*atoms[tj].realq[solidq-2][mi] + atoms[tj].imgq[solidq-2][mi] *atoms[tj].imgq[solidq-2][mi];
+                realdotproduct += atoms[ti].realq[solidq-2][mi]*atoms[tj].realq[solidq-2][mi];
+                imgdotproduct  += atoms[ti].imgq[solidq-2][mi] *atoms[tj].imgq[solidq-2][mi];
+            }
+            connection = (realdotproduct+imgdotproduct)/(sqrt(sumSquaretj)*sqrt(sumSquareti));
+            dis += (atoms[ti].sii + atoms[tj].sii - 2*connection);
+        }
+        atoms[ti].disorder = dis/float(atoms[ti].n_neighbors);
+
+    }
+}
+
+void System::find_average_disorder(){
+    double vv;
+    int nn;
+
+    for (int ti= 0;ti<nop;ti++){
+        nn = atoms[ti].n_neighbors;
+        vv = atoms[ti].disorder;
+        for (int ci = 0; ci<nn; ci++){
+            vv += atoms[atoms[ti].neighbors[ci]].disorder;
+        }
+        vv = vv/(double(nn+1));
+        atoms[ti].avgdisorder = vv;
     }
 }
 
