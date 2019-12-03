@@ -3,8 +3,8 @@
     :width: 13%
 
 .. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/srmnitc/pyscal
-  :width: 13 %
+    :target: https://codecov.io/gh/srmnitc/pyscal
+    :width: 13 %
 
 .. image:: https://readthedocs.org/projects/pyscal/badge/?version=latest
     :target: https://pyscal.readthedocs.io/en/latest/?badge=latest

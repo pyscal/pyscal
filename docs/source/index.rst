@@ -11,8 +11,8 @@ pyscal- A python module for structural analysis of atomic environments
     :width: 20%
 
 .. image:: https://codecov.io/gh/srmnitc/pyscal/branch/master/graph/badge.svg
-  :target: https://codecov.io/gh/srmnitc/pyscal
-  :width: 15 %
+    :target: https://codecov.io/gh/srmnitc/pyscal
+    :width: 15 %
 
 .. image:: https://mybinder.org/badge_logo.svg
    :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
