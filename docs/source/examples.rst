@@ -14,15 +14,15 @@ Basic examples
 
 .. toctree::
 
-    example1basic
-    example2basic
+   example1basic
+   example2basic
 
 Advanced examples
 -----------------
 
 .. toctree::
 
-	example3basic
-	example_clustering
-	pickling
-  angular_params
+   example3basic
+   example_clustering
+   pickling
+   angular_params
