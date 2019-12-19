@@ -1165,7 +1165,7 @@ class System(pc.System):
         -------
         vec: list of float
             The short range order averaged over the whole system for atom of
-            the reference type. ONly returned if `average` is True.
+            the reference type. Only returned if `average` is True.
 
         Notes
         -----
@@ -1174,7 +1174,7 @@ class System(pc.System):
 
         .. math::
 
-            \alpha_i = 1 - \frac{n_i}{m_A c_i}
+            \\alpha_i = 1 - \\frac{n_i}{m_A c_i}
 
         where n_i is the number of atoms of the non reference type among the c_i atoms
         in the ith shell. m_A is the concentration of the non reference atom. Please
