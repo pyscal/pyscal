@@ -251,4 +251,8 @@ class Atom{
         double gavgdisorder();
         void savgdisorder(double);
 
+        //method for sro
+        vector<double> sro;
+        vector<double> gsro();
+        void ssro(vector<double>);
 };

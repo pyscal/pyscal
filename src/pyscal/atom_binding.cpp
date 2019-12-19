@@ -314,6 +314,10 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         The value of averaged disorder parameter.
     )mydelimiter")
 
+    .def_property("sro",&Atom::gsro, &Atom::ssro, R"mydelimiter(
+        *Float*.
+        The value of short range order parameter.
+    )mydelimiter")
     ;
 
 

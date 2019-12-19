@@ -12,7 +12,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
 
     Parameters
     ----------
-    structure : {'bcc', 'fcc', 'hcp', 'diamond'}
+    structure : {'bcc', 'fcc', 'hcp', 'diamond' or 'l12'}
         type of the crystal structure
 
     lattice_constant : float, optional
@@ -53,6 +53,8 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     if structure == 'bcc':
 
         coord_no = 2
+        atomtype = [1, 1]
+
         natoms = coord_no*nx*ny*nz
 
         xfact = 1.
@@ -66,9 +68,12 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         unitcelly[1] = 0.5*lattice_constant
         unitcellz[1] = 0.5*lattice_constant
 
+
     elif structure == 'fcc':
 
         coord_no = 4
+        atomtype = [1, 1, 1, 1]
+
         natoms = coord_no*nx*ny*nz
 
         xfact = 1.
@@ -88,6 +93,8 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     elif structure == 'hcp':
 
         coord_no = 4
+        atomtype = [1, 1, 1, 1]
+
         natoms = coord_no*nx*ny*nz
 
         xfact = 1.
@@ -108,6 +115,8 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     elif structure == 'diamond':
 
         coord_no = 8
+        atomtype = [1, 1, 1, 1, 1, 1, 1, 1]
+
         natoms = coord_no*nx*ny*nz
 
         xfact = 1.
@@ -139,6 +148,30 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         unitcelly[7]=0.75*lattice_constant
         unitcellz[7]=0.75*lattice_constant
 
+    elif structure == 'l12':
+
+        coord_no = 4
+        atomtype = [1, 2, 2, 2]
+
+        natoms = coord_no*nx*ny*nz
+
+        xfact = 1.
+        yfact = 1.
+        zfact = 1.
+
+        unitcellx = np.zeros(coord_no)
+        unitcelly = np.zeros(coord_no)
+        unitcellz = np.zeros(coord_no)
+        unitcellx[1] = 0.5*lattice_constant
+        unitcellz[1] = 0.5*lattice_constant
+        unitcelly[2] = 0.5*lattice_constant
+        unitcellz[2] = 0.5*lattice_constant
+        unitcellx[3] = 0.5*lattice_constant
+        unitcelly[3] = 0.5*lattice_constant
+
+    else:
+        raise ValueError("Unknown crystal structure")
+
     m = 0
     co = 1
     atoms = []
@@ -159,7 +192,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                     atom = pc.Atom()
                     atom.pos = [posx, posy, posz]
                     atom.id = co
-                    atom.type = 1
+                    atom.type = atomtype[l-1]
                     atom.loc = co-1
                     atoms.append(atom)
                     co += 1

@@ -1148,6 +1148,102 @@ class System(pc.System):
             self.ccalculate_avg_disorder()
 
 
+    def calculate_sro(self, reference_type=1, average=True):
+        """
+        Calculate short range order
+
+        Parameters
+        ----------
+        reference_type: int, optional
+            type of the atom to be used a reference. default 1
+
+        average: bool, optional
+            if True, average over all atoms of the reference type in the system.
+            default True.
+
+        Returns
+        -------
+        vec: list of float
+            The short range order averaged over the whole system for atom of
+            the reference type. ONly returned if `average` is True.
+
+        Notes
+        -----
+        Calculates the short range order for an AB alloy using the approach by
+        Cowley [1]. Short range order is calculated as,
+
+        .. math::
+
+            \alpha_i = 1 - \frac{n_i}{m_A c_i}
+
+        where n_i is the number of atoms of the non reference type among the c_i atoms
+        in the ith shell. m_A is the concentration of the non reference atom. Please
+        note that the value is calculated for shells 1 and 2 by default. In order for
+        this to be possible, neighbors have to be found first using the :func:`~pyscal.core.System.find_neighbors`
+        method. The selected neighbor method should include the second shell as well. For this
+        purpose `method=cutoff` can be chosen with a cutoff long enough to include the second
+        shell. In order to estimate this cutoff, one can use the :func:`~pyscal.core.System.calculate_rdf`
+        method.
+
+        """
+        if not self.neighbors_found:
+            raise RuntimeError("Neighbors not found, please find neighbors using the cutoff method")
+        if not reference_type in [1,2]:
+            raise ValueError("reference atom type should be either 1 or 2")
+
+        atoms = self.atoms
+
+        try:
+            type1 = len([1 for atom in atoms if atom.type == 1])
+            type2 = len([1 for atom in atoms if atom.type == 2])
+            concv = [type1, type2]
+        except:
+            raise RuntimeError("There should be two atom types")
+        if not ((type1>0) and (type2>0)):
+            raise RuntimeError("There should be two atom types")
+
+        mref = concv[reference_type-1]/float(np.sum(concv))
+        motr = 1 - mref
+
+        for atom in atoms:
+            if atom.type == reference_type:
+                neighs = atom.neighbors
+                #get all neighbor distances
+                distances = [self.get_distance(atom, atoms[n]) for n in neighs]
+                avgdistance = np.mean(distances)
+                distsplit = avgdistance/2.00
+                #find two shells of atoms
+                set1 = [neighs[n] for n, dist in enumerate(distances) if dist <= avgdistance]
+                set2 = [neighs[n] for n, dist in enumerate(distances) if dist > avgdistance]
+                #now evaluate types of atoms
+                set1ref = np.sum([1 for n in set1 if atoms[n].type == reference_type])
+                set1otr = len(set1) - set1ref
+                set2ref = np.sum([1 for n in set2 if atoms[n].type == reference_type])
+                set2otr = len(set2) - set2ref
+                #now calculate values
+                shell1 = 1 - (set1otr/(len(set1)*motr))
+                shell2 = 1 - (set2otr/(len(set2)*motr))
+                atom.sro = [shell1, shell2]
+
+        #add atoms
+        self.atoms = atoms
+        #now if avg is reqd, find it
+        if average:
+            vec = np.zeros(2)
+            count = 0
+            for atom in atoms:
+                if atom.type == reference_type:
+                    vec += np.array(atom.sro)
+                    count += 1
+            return vec/float(count)
+
+
+
+
+
+
+
+
 
     def prepare_pickle(self):
         """

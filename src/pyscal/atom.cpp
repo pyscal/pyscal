@@ -440,3 +440,11 @@ double Atom::gavgdisorder(){
 void Atom::savgdisorder(double dd){
     avgdisorder = dd;
 }
+
+vector<double> Atom::gsro(){
+    return sro;
+}
+
+void Atom::ssro(vector<double> dd){
+    sro = dd;
+}
