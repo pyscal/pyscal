@@ -1165,7 +1165,9 @@ class System(pc.System):
         -------
         vec: list of float
             The short range order averaged over the whole system for atom of
-            the reference type. Only returned if `average` is True.
+            the reference type. Only returned if `average` is True. First value is SRO
+            of the first neighbor shell and the second value corresponds to the second
+            nearest neighbor shell.
 
         Notes
         -----
@@ -1184,6 +1186,10 @@ class System(pc.System):
         purpose `method=cutoff` can be chosen with a cutoff long enough to include the second
         shell. In order to estimate this cutoff, one can use the :func:`~pyscal.core.System.calculate_rdf`
         method.
+
+        References
+        ----------
+        .. [1] Cowley J. M., PR 77(5), 1950.
 
         """
         if not self.neighbors_found:

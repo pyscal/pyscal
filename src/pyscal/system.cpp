@@ -705,12 +705,14 @@ void System::get_all_neighbors_voronoi(){
 
     if (!fileread) { read_particle_file(inputfile); }
 
-    pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
+    //pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
+    pre_container pcon(0.00, boxx, 0.00, boxy, 0.0, boxz, true, true, true);
     for(int i=0; i<nop; i++){
-        pcon.put(i, atoms[i].posx, atoms[i].posy, atoms[i].posz);
+        pcon.put(i, atoms[i].posx-boxdims[0][0], atoms[i].posy-boxdims[1][0], atoms[i].posz-boxdims[2][0]);
     }
     pcon.guess_optimal(tnx,tny,tnz);
-    container con(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],tnx,tny,tnz,true,true,true, nop);
+    //container con(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],tnx,tny,tnz,true,true,true, nop);
+    container con(0.00, boxx, 0.00, boxy, 0.0, boxz, tnx, tny, tnz, true, true, true, nop);
     pcon.setup(con);
 
     c_loop_all cl(con);
