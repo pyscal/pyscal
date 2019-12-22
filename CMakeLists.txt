@@ -23,14 +23,15 @@ set(SYSSOURCES "${SOURCE_DIR}/system.cpp")
 #Now add subdir for the modules
 #--------------------------------------------------------
 add_subdirectory(lib/pybind11)
-
+#message(STATUS "include dir: ${CMAKE_BUILD_TYPE}")
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-O2 -DNDEBUG")
 
 #Finally create the package
 #--------------------------------------------------------
