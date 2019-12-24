@@ -4,6 +4,7 @@ pyscal module for creating crystal structures.
 
 import pyscal.catom as pc
 import numpy as np
+import warnings
 
 def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
     """
@@ -53,6 +54,9 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         ny = repetitions[1]
         nz = repetitions[2]
 
+    if noise > 0.1:
+        warnings.warn("Value of noise is rather high. Atom positions might overlap")
+        
     if structure == 'bcc':
 
         coord_no = 2
