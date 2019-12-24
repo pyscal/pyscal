@@ -42,3 +42,11 @@ The value of q can be replaced with whichever is required from 2-12. The calcula
 :attr:`~pyscal.catom.Atom.disorder` and :attr:`~pyscal.catom.Atom.avg_disorder`.
 
 .. [1] Kawasaki .T, Onuki .A, JCP 135, 174109 (2011)
+
+..  note:: Associated methods
+
+    :func:`~pyscal.core.System.calculate_q`
+    :func:`~pyscal.core.System.calculate_disorder`
+    :attr:`~pyscal.catom.Atom.disorder`
+    :attr:`~pyscal.catom.Atom.avg_disorder`
+    

@@ -37,3 +37,10 @@ straightforward.
 
 .. [1] `Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983 <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784>`_.
 .. [2] `Mickel, W, Kapfer, SC, Schroder-Turk, GE, Mecke, K, J Chem Phys 138, 2013 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.
+
+..  note:: Associated methods
+
+    :func:`~pyscal.core.System.find_neighbors`
+    :func:`~pyscal.core.System.calculate_q`
+    :func:`~pyscal.core.System.get_qvals`
+    :func:`~pyscal.catom.Atom.get_q`

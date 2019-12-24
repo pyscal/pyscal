@@ -48,3 +48,10 @@ not be weighted.
 
 .. [1] `Mickel, W, Kapfer, SC, Schroder-Turk, GE, Mecke, K, J Chem Phys 138, 2013 <https://aip.scitation.org/doi/full/10.1063/1.4774084>`_.
 .. [2] `Haeberle, J, Sperl, M, Born, P Arxiv 2019 <https://arxiv.org/abs/1906.08111>`_.
+
+..  note:: Associated methods
+
+    :func:`~pyscal.core.System.find_neighbors`
+    :func:`~pyscal.core.System.calculate_q`
+    :func:`~pyscal.core.System.get_qvals`
+    :func:`~pyscal.catom.Atom.get_q`

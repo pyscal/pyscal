@@ -26,3 +26,9 @@ method -
 The calculated angular criteria value can be accessed for each atom using :attr:`~pyscal.catom.Atom.angular`.
 
 .. [1] Uttormark, MJ, Thompson, MO, Clancy, P, Phys. Rev. B 47, 1993
+
+..  note:: Associated methods
+
+    :func:`~pyscal.core.System.calculate_angularcriteria`
+    :attr:`~pyscal.catom.Atom.angular`
+    

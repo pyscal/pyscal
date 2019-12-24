@@ -24,5 +24,11 @@ in the publication [1]_.
     sys.find_neighbors(method='cutoff', cutoff='adaptive')
     sys.calculate_chiparams()
 
+The calculated values for each atom can be accessed using :attr:`~pyscal.catom.Atom.chiparams`.
 
 .. [1] Ackland, Jones, Phys. Rev. B 73, 2006
+
+..  note:: Associated methods
+
+    :func:`~pyscal.core.System.calculate_chiparams`
+    :attr:`~pyscal.catom.Atom.chiparams`

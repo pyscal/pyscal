@@ -26,3 +26,10 @@ keyword ``averaged=True`` as follows.
     q = sys.get_qvals([4, 6], averaged=True)
 
 .. [1] `Lechner, W, Dellago, C, J Chem Phys, 2013 <https://aip.scitation.org/doi/full/10.1063/1.2977970>`_.
+
+..  note:: Associated methods
+
+    :func:`~pyscal.core.System.find_neighbors`
+    :func:`~pyscal.core.System.calculate_q`
+    :func:`~pyscal.core.System.get_qvals`
+    :func:`~pyscal.catom.Atom.get_q`
