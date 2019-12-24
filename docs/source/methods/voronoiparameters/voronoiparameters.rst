@@ -26,3 +26,12 @@ can be accessed using :attr:`~pyscal.catom.Atom.avg_volume`.
 
 .. [1] Finney, J. L. PRS 319 ,1970
 .. [2] Tanemura et al., PTP 58, 1977
+
+.. note::
+
+    Associated methods-
+    :func:`~pyscal.core.System.find_neighbors`
+    :func:`~pyscal.core.System.calculate_vorovector`
+    :attr:`~pyscal.catom.Atom.vorovector`    
+    :attr:`~pyscal.catom.Atom.volume`
+    :attr:`~pyscal.catom.Atom.avg_volume`
