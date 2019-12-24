@@ -9,20 +9,8 @@ be found `here <https://www.datacamp.com/community/tutorials/tutorial-jupyter-no
 can be found in ``examples/`` folder of the main `repository <https://github.com/srmnitc/pyscal>`_. A copy of the repository
 can be downloaded from `here <https://pyscal.readthedocs.io/en/latest/download.html>`_.
 
-Basic examples
---------------
 
 .. toctree::
 
-   example1basic
-   example2basic
-
-Advanced examples
------------------
-
-.. toctree::
-
-   example3basic
-   example_clustering
-   pickling
-   angular_params
+   examples/basic/basic
+   examples/neighbormethods/coordination
