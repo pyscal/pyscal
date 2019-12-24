@@ -7,3 +7,5 @@ Steinhardt's bond orientational order parameters
     traditionalsteinhardtparameters
     avgsteinhardtparameters
     voronoiweighted
+    disorder
+    solidliquid
