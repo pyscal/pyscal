@@ -5,4 +5,4 @@ Methods implemented in pyscal
 
     methods/nearestneighbormethods/nearestneighbormethods
     methods/steinhardtparameters/steinhardtparameters
-    solidliquid
+    methods/angularmethods/angularmethods
