@@ -14,3 +14,4 @@ can be downloaded from `here <https://pyscal.readthedocs.io/en/latest/download.h
 
    examples/basic/basic
    examples/neighbormethods/coordination
+   examples/steinhardtparameters/calculateq
