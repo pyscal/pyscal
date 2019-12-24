@@ -1,6 +1,6 @@
 
-Local structural classification based on nearest neighbor angles
-----------------------------------------------------------------
+Angle based methods
+-------------------
 
 .. toctree::
 
