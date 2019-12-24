@@ -5,7 +5,7 @@ pyscal module for creating crystal structures.
 import pyscal.catom as pc
 import numpy as np
 
-def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633):
+def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.
@@ -24,6 +24,9 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
 
     ca_ratio : float, optional
         ratio of c/a for hcp structures, default 1.633
+
+    noise : float, optional
+        If provided add normally distributed noise with standard deviation `noise` to the atomic positions.
 
     Returns
     -------
@@ -189,6 +192,9 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                     posx = (unitcellx[l-1]+(lattice_constant*xfact*(float(i)-1)))
                     posy = (unitcelly[l-1]+(lattice_constant*yfact*(float(j)-1)))
                     posz = (unitcellz[l-1]+(lattice_constant*zfact*(float(k)-1)))
+                    posx = posx + np.random.normal(loc=0.0, scale=noise)*posx
+                    posy = posy + np.random.normal(loc=0.0, scale=noise)*posy
+                    posz = posz + np.random.normal(loc=0.0, scale=noise)*posz
                     atom = pc.Atom()
                     atom.pos = [posx, posy, posz]
                     atom.id = co
