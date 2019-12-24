@@ -6,3 +6,4 @@ Methods implemented in pyscal
     methods/nearestneighbormethods/nearestneighbormethods
     methods/steinhardtparameters/steinhardtparameters
     methods/angularmethods/angularmethods
+    methods/voronoiparameters/voronoiparameters
