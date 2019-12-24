@@ -3,7 +3,7 @@ import os
 import numpy as np
 import pyscal.core as pc
 import pyscal.crystal_structures as pcs
-
+#from pytest.benchmark import benchmark
 def test_neighbors_sann():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [6, 6, 6])
@@ -14,7 +14,8 @@ def test_neighbors_sann():
 
     #then lets find neighbors
     #SANN algo test
-    sys.find_neighbors(method = 'cutoff', cutoff='sann')
+    #sys.find_neighbors(method = 'cutoff', cutoff='sann')
+    sys.find_neighbors(method='cutoff', cutoff='sann')
     #any atom should have 8 neighbors
     atoms = sys.atoms
     assert atoms[0].coordination == 14
