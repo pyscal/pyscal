@@ -56,7 +56,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
 
     if noise > 0.1:
         warnings.warn("Value of noise is rather high. Atom positions might overlap")
-        
+
     if structure == 'bcc':
 
         coord_no = 2
@@ -196,9 +196,10 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                     posx = (unitcellx[l-1]+(lattice_constant*xfact*(float(i)-1)))
                     posy = (unitcelly[l-1]+(lattice_constant*yfact*(float(j)-1)))
                     posz = (unitcellz[l-1]+(lattice_constant*zfact*(float(k)-1)))
-                    posx = posx + np.random.normal(loc=0.0, scale=noise)*posx
-                    posy = posy + np.random.normal(loc=0.0, scale=noise)*posy
-                    posz = posz + np.random.normal(loc=0.0, scale=noise)*posz
+                    if noise > 0:
+                        posx = np.random.normal(loc=posx, scale=noise*posx)
+                        posy = np.random.normal(loc=posy, scale=noise*posy)
+                        posz = np.random.normal(loc=posz, scale=noise*posz)
                     atom = pc.Atom()
                     atom.pos = [posx, posy, posz]
                     atom.id = co
