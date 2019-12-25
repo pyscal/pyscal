@@ -1,5 +1,5 @@
-Calculating coordination numbers
---------------------------------
+Find neighbors of an atom and calculating coordination numbers
+--------------------------------------------------------------
 
 In this example, we will read in a configuration from an MD simulation
 and then calculate the coordination number distribution.
