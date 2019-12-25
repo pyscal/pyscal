@@ -177,13 +177,13 @@ over the neighbors for each atom can also be calculated as shown below.
 The disorder parameter can also be calculated for values of Steinhardt
 parameter other than 6. For example,
 
-.. code:: ipython3
+.. code:: python
 
     fcc_d2.find_neighbors(method='cutoff', cutoff='adaptive')
     fcc_d2.calculate_q([4, 6])
     fcc_d2.calculate_disorder(q=4, averaged=True)
 
-.. code:: ipython3
+.. code:: python
 
     atoms_d2 = fcc_d2.atoms
     disorder = [atom.disorder for atom in atoms_d2]
