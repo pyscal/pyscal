@@ -18,3 +18,4 @@ can be downloaded from `here <https://pyscal.readthedocs.io/en/latest/download.h
    examples/steinhardtparameters/example_clustering
    examples/steinhardtparameters/example_disorder
    examples/angularparams/angular_params
+   examples/voronoi/example_voronoi
