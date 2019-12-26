@@ -32,3 +32,4 @@ The calculated values for each atom can be accessed using :attr:`~pyscal.catom.A
 
     :func:`~pyscal.core.System.calculate_chiparams`
     :attr:`~pyscal.catom.Atom.chiparams`
+    `Example <http://pyscal.com/en/latest/examples/angularparams/example_chiparams.html>`_

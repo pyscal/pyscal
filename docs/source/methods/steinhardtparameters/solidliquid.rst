@@ -60,3 +60,4 @@ also possible to check if each atom is solid or not.
     :func:`~pyscal.core.System.calculate_q`
     :func:`~pyscal.core.System.find_solids`
     :func:`~pyscal.catom.Atom.solid`
+    `Example <http://pyscal.com/en/latest/examples/steinhardtparameters/example_clustering.html>`_

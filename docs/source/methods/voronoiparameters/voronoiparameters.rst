@@ -35,3 +35,4 @@ can be accessed using :attr:`~pyscal.catom.Atom.avg_volume`.
     :attr:`~pyscal.catom.Atom.vorovector`
     :attr:`~pyscal.catom.Atom.volume`
     :attr:`~pyscal.catom.Atom.avg_volume`
+    `Example <http://pyscal.com/en/latest/examples/voronoi/example_voronoi.html>`_

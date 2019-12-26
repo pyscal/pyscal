@@ -31,4 +31,4 @@ The calculated angular criteria value can be accessed for each atom using :attr:
 
     :func:`~pyscal.core.System.calculate_angularcriteria`
     :attr:`~pyscal.catom.Atom.angular`
-    
+    `Example <http://pyscal.com/en/latest/examples/angularparams/angular_criteria.html>`_

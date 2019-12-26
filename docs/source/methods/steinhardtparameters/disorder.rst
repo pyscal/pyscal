@@ -49,4 +49,4 @@ The value of q can be replaced with whichever is required from 2-12. The calcula
     :func:`~pyscal.core.System.calculate_disorder`
     :attr:`~pyscal.catom.Atom.disorder`
     :attr:`~pyscal.catom.Atom.avg_disorder`
-    
+    `Example <http://pyscal.com/en/latest/examples/steinhardtparameters/example_disorder.html>`_

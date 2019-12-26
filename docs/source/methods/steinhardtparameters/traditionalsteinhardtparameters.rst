@@ -44,3 +44,4 @@ straightforward.
     :func:`~pyscal.core.System.calculate_q`
     :func:`~pyscal.core.System.get_qvals`
     :func:`~pyscal.catom.Atom.get_q`
+    `Example <http://pyscal.com/en/latest/examples/steinhardtparameters/calculateq.html>`_
