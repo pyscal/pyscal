@@ -53,3 +53,11 @@ also possible to check if each atom is solid or not.
 
 .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
 .. [2] Bokeloh, J, Rozas, RE, Horbach, J, Wilde, G, Phys. Rev. Lett. 107, 2011
+
+..  note:: Associated methods
+
+    :func:`~pyscal.core.System.find_neighbors`
+    :func:`~pyscal.core.System.calculate_q`
+    :func:`~pyscal.core.System.find_solids`
+    :func:`~pyscal.catom.Atom.solid`
+    `Example <http://pyscal.com/en/latest/examples/steinhardtparameters/example_clustering.html>`_

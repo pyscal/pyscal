@@ -4,8 +4,9 @@ pyscal module for creating crystal structures.
 
 import pyscal.catom as pc
 import numpy as np
+import warnings
 
-def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633):
+def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.
@@ -24,6 +25,9 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
 
     ca_ratio : float, optional
         ratio of c/a for hcp structures, default 1.633
+
+    noise : float, optional
+        If provided add normally distributed noise with standard deviation `noise` to the atomic positions.
 
     Returns
     -------
@@ -49,6 +53,9 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         nx = repetitions[0]
         ny = repetitions[1]
         nz = repetitions[2]
+
+    if noise > 0.1:
+        warnings.warn("Value of noise is rather high. Atom positions might overlap")
 
     if structure == 'bcc':
 
@@ -189,6 +196,10 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                     posx = (unitcellx[l-1]+(lattice_constant*xfact*(float(i)-1)))
                     posy = (unitcelly[l-1]+(lattice_constant*yfact*(float(j)-1)))
                     posz = (unitcellz[l-1]+(lattice_constant*zfact*(float(k)-1)))
+                    if noise > 0:
+                        posx = np.random.normal(loc=posx, scale=noise*posx)
+                        posy = np.random.normal(loc=posy, scale=noise*posy)
+                        posz = np.random.normal(loc=posz, scale=noise*posz)
                     atom = pc.Atom()
                     atom.pos = [posx, posy, posz]
                     atom.id = co

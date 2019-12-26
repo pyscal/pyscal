@@ -3,6 +3,7 @@ Methods implemented in pyscal
 
 .. toctree::
 
-    nearestneighbormethods
-    steinhardtparameters
-    solidliquid
+    methods/nearestneighbormethods/nearestneighbormethods
+    methods/steinhardtparameters/steinhardtparameters
+    methods/angularmethods/angularmethods
+    methods/voronoiparameters/voronoiparameters

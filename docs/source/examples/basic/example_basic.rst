@@ -10,7 +10,7 @@ setting up a system and the atoms.
     import numpy as np
 
 The :class:`~pyscal.core.System` class
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
  :class:`~pyscal.core.System` is the basic class of pyscal and is required to be setup in
 order to perform any calculations. It can be set up as-
@@ -51,7 +51,7 @@ We can easily check if everything worked by getting the box dimensions
 
 
 The :class:`~pyscal.catom.Atom` class
-~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The next part is assigning the atoms. This can be done using the
 :class:`~pyscal.catom.Atom` class. Here, we will only look at the basic properties of
@@ -99,7 +99,7 @@ We can check the details of the atom by querying it
 
 
 Combining :class:`~pyscal.core.System` and :class:`~pyscal.catom.Atom`
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now that we have created the atoms, we can assign them to the system. We
 can also assign the same box we created before.
