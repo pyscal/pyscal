@@ -13,10 +13,8 @@ can be downloaded from `here <https://pyscal.readthedocs.io/en/latest/download.h
 .. toctree::
 
    examples/basic/basic
-   examples/neighbormethods/coordination
-   examples/steinhardtparameters/calculateq
-   examples/steinhardtparameters/example_clustering
-   examples/steinhardtparameters/example_disorder
-   examples/angularparams/angular_params
-   examples/voronoi/example_voronoi
-   examples/others/pickling
+   examples/neighbormethods/neighbormethods
+   examples/steinhardtparameters/steinhardtparameters
+   examples/angularparams/angularparams
+   examples/voronoi/voronoi
+   examples/others/others
