@@ -1233,8 +1233,8 @@ class System(pc.System):
                     atom.sro = [shell1, shell2]
                 elif shells == 1:
                     set1ref = np.sum([1 for n in neighs if atoms[n].type == reference_type])
-                    set1otr = len(set1) - set1ref
-                    shell1 = 1 - (set1otr/(len(set1)*motr))
+                    set1otr = len(neighs) - set1ref
+                    shell1 = 1 - (set1otr/(len(neighs)*motr))
                     atom.sro = [shell1]
 
         #add atoms
