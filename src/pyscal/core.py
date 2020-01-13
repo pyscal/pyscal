@@ -1148,7 +1148,7 @@ class System(pc.System):
             self.ccalculate_avg_disorder()
 
 
-    def calculate_sro(self, reference_type=1, average=True):
+    def calculate_sro(self, reference_type=1, average=True, shells=2):
         """
         Calculate short range order
 
@@ -1219,17 +1219,23 @@ class System(pc.System):
                 avgdistance = np.mean(distances)
                 distsplit = avgdistance/2.00
                 #find two shells of atoms
-                set1 = [neighs[n] for n, dist in enumerate(distances) if dist <= avgdistance]
-                set2 = [neighs[n] for n, dist in enumerate(distances) if dist > avgdistance]
-                #now evaluate types of atoms
-                set1ref = np.sum([1 for n in set1 if atoms[n].type == reference_type])
-                set1otr = len(set1) - set1ref
-                set2ref = np.sum([1 for n in set2 if atoms[n].type == reference_type])
-                set2otr = len(set2) - set2ref
-                #now calculate values
-                shell1 = 1 - (set1otr/(len(set1)*motr))
-                shell2 = 1 - (set2otr/(len(set2)*motr))
-                atom.sro = [shell1, shell2]
+                if shells == 2:
+                    set1 = [neighs[n] for n, dist in enumerate(distances) if dist <= avgdistance]
+                    set2 = [neighs[n] for n, dist in enumerate(distances) if dist > avgdistance]
+                    #now evaluate types of atoms
+                    set1ref = np.sum([1 for n in set1 if atoms[n].type == reference_type])
+                    set1otr = len(set1) - set1ref
+                    set2ref = np.sum([1 for n in set2 if atoms[n].type == reference_type])
+                    set2otr = len(set2) - set2ref
+                    #now calculate values
+                    shell1 = 1 - (set1otr/(len(set1)*motr))
+                    shell2 = 1 - (set2otr/(len(set2)*motr))
+                    atom.sro = [shell1, shell2]
+                elif shells == 1:
+                    set1ref = np.sum([1 for n in neighs if atoms[n].type == reference_type])
+                    set1otr = len(set1) - set1ref
+                    shell1 = 1 - (set1otr/(len(set1)*motr))
+                    atom.sro = [shell1]
 
         #add atoms
         self.atoms = atoms
