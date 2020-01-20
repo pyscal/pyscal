@@ -317,7 +317,7 @@ def read_poscar(infile, compressed = False, box_vectors = False):
         nlev = 6
         no_atoms = np.array(no_atoms)
         no_atoms = no_atoms.astype(int)
-    else:
+    except:
         raise ValueError("Unknown no of atoms")
 
     natoms = np.sum(no_atoms)
