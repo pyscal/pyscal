@@ -44,7 +44,7 @@ def read_ase(aseobject, check_triclinic=False, box_vectors=False):
     #now start parsing atoms
     atoms = []
     positions = aseobject.positions
-    for count, position in positions:
+    for count, position in enumerate(positions):
         atom = pca.Atom()
         atom.pos = list(position)
         atom.id = count
