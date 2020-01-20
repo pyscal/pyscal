@@ -266,7 +266,7 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
     else:
         return atoms, boxdims
 
-def read_poscar(infile, compressed = False, box_vectors = Falses):
+def read_poscar(infile, compressed = False, box_vectors = False):
     """
     Function to read a POSCAR format.
 
@@ -308,11 +308,17 @@ def read_poscar(infile, compressed = False, box_vectors = Falses):
 
     no_atoms = data[5].split()
     nlev = 5
-    if isinstance(no_atoms[0], str):
+
+    try:
+        no_atoms = np.array(no_atoms)
+        no_atoms = no_atoms.astype(int)
+    except ValueError:
         no_atoms = data[6].split()
         nlev = 6
-    no_atoms = np.array(no_atoms)
-    no_atoms = no_atoms.astype(int)
+        no_atoms = np.array(no_atoms)
+        no_atoms = no_atoms.astype(int)
+    else:
+        raise ValueError("Unknown no of atoms")
 
     natoms = np.sum(no_atoms)
     atom_list = no_atoms
