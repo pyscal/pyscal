@@ -187,9 +187,13 @@ class System(pc.System):
 
         elif format == 'poscar':
             if os.path.exists(filename):
-                atoms, boxdims = ptp.read_poscar(filename, compressed=compressed)
+                atoms, boxdims, box = ptp.read_poscar(filename, compressed=compressed, box_vectors = True)
                 self.atoms = atoms
                 self.box = boxdims
+                if triclinic:
+                    rot = box.T
+                    rotinv = np.linalg.inv(rot)
+                    self.assign_triclinic_params(rot, rotinv)
             else:
                 raise IOError("input file %s not found"%filename)
 

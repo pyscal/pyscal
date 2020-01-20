@@ -266,7 +266,7 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
     else:
         return atoms, boxdims
 
-def read_poscar(infile, compressed = False):
+def read_poscar(infile, compressed = False, box_vectors = Falses):
     """
     Function to read a POSCAR format.
 
@@ -308,7 +308,7 @@ def read_poscar(infile, compressed = False):
 
     no_atoms = data[5].split()
     nlev = 5
-    if type(no_atoms[0]) == 'str':
+    if isinstance(no_atoms[0], str):
         no_atoms = data[6].split()
         nlev = 6
     no_atoms = np.array(no_atoms)
@@ -321,6 +321,7 @@ def read_poscar(infile, compressed = False):
     xvector = np.array(data[2].strip().split()).astype(float)
     yvector = np.array(data[3].strip().split()).astype(float)
     zvector = np.array(data[4].strip().split()).astype(float)
+    boxvecs = [xvector, yvector, zvector]
 
     xlow = 0
     xhigh = scaling_factor*xvector[0]
@@ -337,6 +338,11 @@ def read_poscar(infile, compressed = False):
     else:
         cord_system=data[nlev+1].strip()
         atom_start = nlev+2
+
+    if cord_system in ['Cartesian', 'cartesian']:
+        xhigh = 1
+        yhigh = 1
+        zhigh = 1
 
     species = 1
     count = 0
@@ -379,7 +385,10 @@ def read_poscar(infile, compressed = False):
         else:
             species+=1
 
-    return atoms, boxdims
+    if box_vectors:
+        return atoms, boxdims, boxvecs
+    else:
+        return atoms, boxdims
 
 def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, customkey=None, customvals=None):
     """
