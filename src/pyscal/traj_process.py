@@ -307,6 +307,10 @@ def read_poscar(infile, compressed = False):
         data.append(line)
 
     no_atoms = data[5].split()
+    nlev = 5
+    if type(no_atoms[0]) == 'str':
+        no_atoms = data[6].split()
+        nlev = 6
     no_atoms = np.array(no_atoms)
     no_atoms = no_atoms.astype(int)
 
@@ -326,13 +330,13 @@ def read_poscar(infile, compressed = False):
     zhigh = scaling_factor*zvector[2]
     boxdims = [[xlow, xhigh],[ylow, yhigh],[zlow, zhigh]]
 
-    if (data[6].strip().split()[0]=='s' or data[6].strip().split()[0]=='S'):
+    if (data[nlev+1].strip().split()[0]=='s' or data[nlev+1].strip().split()[0]=='S'):
         selective_dynamics=True
-        cord_system=data[7].strip()
-        atom_start = 8
+        cord_system=data[nlev+2].strip()
+        atom_start = nlev+3
     else:
-        cord_system=data[6].strip()
-        atom_start = 7
+        cord_system=data[nlev+1].strip()
+        atom_start = nlev+2
 
     species = 1
     count = 0
