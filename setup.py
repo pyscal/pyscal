@@ -77,7 +77,7 @@ with open('README.rst') as readme_file:
 
 setup(
     name='pyscal',
-    version='2.3.2',
+    version='2.3.3',
     author='Sarath Menon, Jutta Rogal, Grisell Diaz Leines',
     author_email='sarath.menon@rub.de',
     description='Python library written in C++ for calculation of local atomic structural environment',
@@ -92,7 +92,7 @@ setup(
     # add custom build_ext command
     cmdclass=dict(build_ext=CMakeBuild),
     zip_safe=False,
-    download_url = 'https://github.com/srmnitc/pyscal/archive/2.3.2.tar.gz',
+    download_url = 'https://github.com/srmnitc/pyscal/archive/2.3.3.tar.gz',
     url = 'https://github.com/srmnitc/pyscal',
     install_requires=['numpy'],
     classifiers=[
