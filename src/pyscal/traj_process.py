@@ -36,14 +36,14 @@ def read_ase(aseobject, check_triclinic=False, box_vectors=False):
     boxdims = np.array([[0, np.sqrt(np.sum(a**2))],[0, np.sqrt(np.sum(b**2))],[0, np.sqrt(np.sum(c**2))]])
 
     #box and box dims are set. Now handle atoms
-    chems = np.array(atoms.get_chemical_symbols())
-    atomsymbols = np.unique(atoms.get_chemical_symbols())
+    chems = np.array(aseobject.get_chemical_symbols())
+    atomsymbols = np.unique(aseobject.get_chemical_symbols())
     atomtypes = np.array(range(1, len(atomsymbols)+1))
     typedict = dict(zip(atomsymbols, atomtypes))
 
     #now start parsing atoms
     atoms = []
-    positions = atoms.positions
+    positions = aseobject.positions
     for count, position in positions:
         atom = pca.Atom()
         atom.pos = list(position)
