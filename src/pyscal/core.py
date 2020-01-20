@@ -190,7 +190,7 @@ class System(pc.System):
                 atoms, boxdims, box = ptp.read_poscar(filename, compressed=compressed, box_vectors = True)
                 self.atoms = atoms
                 self.box = boxdims
-                if triclinic:
+                if is_triclinic:
                     rot = box.T
                     rotinv = np.linalg.inv(rot)
                     self.assign_triclinic_params(rot, rotinv)
