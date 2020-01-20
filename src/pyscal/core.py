@@ -77,7 +77,7 @@ class System(pc.System):
         self.neighbors_found = False
         pc.System.__init__(self)
 
-    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None):
+    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None, is_triclinic = False):
         """
 
         Read input file that contains the information of system configuration.
@@ -87,8 +87,8 @@ class System(pc.System):
         filename : string
             name of the input file.
 
-        format : {'lammps-dump', 'poscar'}
-            format of the input file
+        format : {'lammps-dump', 'poscar', 'ase'}
+            format of the input file, in case of `ase` the ASE Atoms object
 
         compressed : bool, optional
             If True, force to read a `gz` compressed format, default False.
@@ -105,6 +105,10 @@ class System(pc.System):
             A list containing names of headers of extra data that needs to be read in from the
             input file.
 
+        is_triclinc : bool, optional
+            Only used in the case of `format='ase'`. If the read ase object is triclinic, this
+            options should be set to True.
+
         Returns
         -------
         None
@@ -112,7 +116,9 @@ class System(pc.System):
         Notes
         -----
         `format` keyword specifies the format of the input file. Currently only
-        a `lammps-dump` and `poscar` files are supported.  This function uses the
+        a `lammps-dump` and `poscar` files are supported.  Additionaly, the widely
+        use Atomic Simulation environment (https://wiki.fysik.dtu.dk/ase/ase/ase.html)
+        Atoms object can also be used directly. This function uses the
         :func:`~pyscal.traj_process` module to process a file which is then assigned to system.
 
         `compressed` keyword is not required if a file ends with `.gz` extension, it is
@@ -186,6 +192,15 @@ class System(pc.System):
                 self.box = boxdims
             else:
                 raise IOError("input file %s not found"%filename)
+
+        elif format == 'ase':
+            atoms, boxdims, box = ptp.read_ase(filename, box_vectors = True)
+            self.atoms = atoms
+            self.box = boxdims
+            if is_triclinic:
+                rot = box.T
+                rotinv = np.linalg.inv(rot)
+                self.assign_triclinic_params(rot, rotinv)
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 

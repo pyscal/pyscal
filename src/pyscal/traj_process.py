@@ -8,6 +8,57 @@ import numpy as np
 import gzip
 import pyscal.catom as pca
 
+#new function to wrap over ase objects
+def read_ase(aseobject, check_triclinic=False, box_vectors=False):
+    """
+    Function to read from a ASE atoms objects
+
+    Parameters
+    ----------
+    aseobject : ASE Atoms object
+        name of the ASE atoms object
+
+    triclinic : bool, optional
+        True if the configuration is triclinic
+
+    box_vectors : bool, optional
+        If true, return the full box vectors along with `boxdims` which gives upper and lower bounds.
+        default False.
+    """
+    #We have to process atoms and atomic objects from ase
+    #Known issues lammps -dump modified format
+    #first get box
+    a = np.array(aseobject.cell[0])
+    b = np.array(aseobject.cell[1])
+    c = np.array(aseobject.cell[2])
+
+    box = np.array([a, b, c])
+    boxdims = np.array([[0, np.sqrt(np.sum(a**2))],[0, np.sqrt(np.sum(b**2))],[0, np.sqrt(np.sum(c**2))]])
+
+    #box and box dims are set. Now handle atoms
+    chems = np.array(atoms.get_chemical_symbols())
+    atomsymbols = np.unique(atoms.get_chemical_symbols())
+    atomtypes = np.array(range(1, len(atomsymbols)+1))
+    typedict = dict(zip(atomsymbols, atomtypes))
+
+    #now start parsing atoms
+    atoms = []
+    positions = atoms.positions
+    for count, position in positions:
+        atom = pca.Atom()
+        atom.pos = list(position)
+        atom.id = count
+        atom.type = typedict[chems[count]]
+        atom.loc = count
+
+        customdict = {'species': chems[count]}
+        atom.custom = customdict
+        atoms.append(atom)
+
+    if box_vectors:
+        return atoms, boxdims, box
+    else:
+        return atoms, box
 
 #functions that are not wrapped from C++
 def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False, customkeys=None):
