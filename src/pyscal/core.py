@@ -89,7 +89,7 @@ class System(pc.System):
         filename : string
             name of the input file.
 
-        format : {'lammps-dump', 'poscar', 'ase'}
+        format : {'lammps-dump', 'poscar', 'ase', 'mdtraj'}
             format of the input file, in case of `ase` the ASE Atoms object
 
         compressed : bool, optional
@@ -119,7 +119,10 @@ class System(pc.System):
         -----
         `format` keyword specifies the format of the input file. Currently only
         a `lammps-dump` and `poscar` files are supported.  Additionaly, the widely
-        use Atomic Simulation environment (https://wiki.fysik.dtu.dk/ase/ase/ase.html)
+        use Atomic Simulation environment (https://wiki.fysik.dtu.dk/ase/ase/ase.html).
+        mdtraj objects (http://mdtraj.org/1.9.3/) are also supported by using the keyword
+        `'mdtraj'` for format. Please note that triclinic boxes are not yet supported for
+        mdtraj format.
         Atoms object can also be used directly. This function uses the
         :func:`~pyscal.traj_process` module to process a file which is then assigned to system.
 
@@ -207,6 +210,16 @@ class System(pc.System):
                 rot = box.T
                 rotinv = np.linalg.inv(rot)
                 self.assign_triclinic_params(rot, rotinv)
+
+        elif format == 'mdtraj':
+            atoms, boxdims, box = ptp.read_mdtraj(filename, box_vectors = True)
+            self.atoms = atoms
+            self.box = boxdims
+            if is_triclinic:
+                rot = box.T
+                rotinv = np.linalg.inv(rot)
+                self.assign_triclinic_params(rot, rotinv)
+
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 
@@ -866,18 +879,22 @@ class System(pc.System):
                 return lc
         else:
             atoms = self.atoms
-            pos = np.array([atom.pos for atom in atoms if condition(atom)])
+            idd = np.array([atom.loc for x, atom in enumerate(atoms) if atom.solid])
+            pos = np.array([atom.pos for x, atom in enumerate(atoms) if atom.solid])
             tdist = np.zeros(int((len(pos)*(len(pos)-1))/2))
             for d in range(3):
                 dist = pdist(pos[:,d].reshape(pos.shape[0],1))
-                l = sys.box[d][1] - sys.box[d][0]
+                l = self.box[d][1] - self.box[d][0]
                 dist[dist > (0.5*l)] -= l
                 dist[dist < -(0.5*l)] += l
                 tdist += dist**2
             sdist = squareform(tdist**0.5)
             clustering = cluster.AgglomerativeClustering(affinity='precomputed', linkage='average').fit(sdist)
+            labels = clustering.labels_
+            for c, d in enumerate(idd):
+                atoms[d].largest_cluster = labels[c]
             if largest:
-                return np.sum(clustering.labels_)
+                return np.sum(labels)
 
 
 
