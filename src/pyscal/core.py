@@ -12,6 +12,8 @@ import warnings
 import pyscal.csystem as pc
 from pyscal.catom import Atom
 import itertools
+from sklearn import cluster
+from scipy.spatial.distance import pdist, squareform
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -683,7 +685,7 @@ class System(pc.System):
             self.ccalculate_aq(qq)
 
 
-    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6):
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6, new_algo=False):
         """
         Distinguish solid and liquid atoms in the system.
 
@@ -795,11 +797,11 @@ class System(pc.System):
             def ccondition(atom):
                 return atom.solid
 
-            lc = self.cluster_atoms(ccondition, largest=True)
+            lc = self.cluster_atoms(ccondition, largest=True, new_algo=new_algo)
             return lc
 
 
-    def cluster_atoms(self, condition, largest = True):
+    def cluster_atoms(self, condition, largest = True, new_algo = False):
         """
         Cluster atoms based on a property
 
@@ -846,22 +848,36 @@ class System(pc.System):
         except:
             raise RuntimeError("condition did not work")
 
-        #now loop
-        atoms = self.atoms
-        for atom in atoms:
-            cval = condition(atom)
-            atom.condition = cval
-        self.atoms = atoms
+        if not new_algo:
+            #now loop
+            atoms = self.atoms
+            for atom in atoms:
+                cval = condition(atom)
+                atom.condition = cval
+            self.atoms = atoms
 
-        self.cfind_clusters_recursive()
+            self.cfind_clusters_recursive()
 
-        #done!
-        lc = self.find_largest_cluster()
-        #pcs.System.get_largest_cluster_atoms(self)
+            #done!
+            lc = self.find_largest_cluster()
+            #pcs.System.get_largest_cluster_atoms(self)
 
-        if largest:
-            return lc
-
+            if largest:
+                return lc
+        else:
+            atoms = self.atoms
+            pos = np.array([atom.pos for atom in atoms if condition(atom)])
+            tdist = np.zeros(int((len(pos)*(len(pos)-1))/2))
+            for d in range(3):
+                dist = pdist(pos[:,d].reshape(pos.shape[0],1))
+                l = sys.box[d][1] - sys.box[d][0]
+                dist[dist > (0.5*l)] -= l
+                dist[dist < -(0.5*l)] += l
+                tdist += dist**2
+            sdist = squareform(tdist**0.5)
+            clustering = cluster.AgglomerativeClustering(affinity='precomputed', linkage='average').fit(sdist)
+            if largest:
+                return np.sum(clustering.labels_)
 
 
 
