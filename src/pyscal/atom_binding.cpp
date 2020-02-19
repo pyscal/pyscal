@@ -88,6 +88,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         atoms which indicate their position in the list of all atoms.
     )mydelimiter")
 
+    .def_property("neighbor_distance",&Atom::gneighdist, &Atom::sneighdist, R"mydelimiter(
+        *List of floats*.
+        List of neighbor distances of the atom.
+    )mydelimiter")
+
     .def_property("coordination",&Atom::gnneighbors, &Atom::snneighbors,R"mydelimiter(
         *int*.
         coordination number of the atom. Coordination will only be updated
@@ -164,6 +169,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         int specifying type of the atom.
     )mydelimiter")
 
+    .def_property("cutoff",&Atom::gcutoff,&Atom::scutoff, R"mydelimiter(
+        *double*.
+        cutoff used for finding neighbors for each atom.
+    )mydelimiter")
+
     .def_property("custom",&Atom::gcustom,&Atom::scustom, R"mydelimiter(
         *dict*.
         dictionary specfying custom values for an atom. The module only stores the id, type and
@@ -226,10 +236,17 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     )mydelimiter")
 
-    .def_property("avg_connection", &Atom::gasij, &Atom::sasij, R"mydelimiter(
+    .def_property("sij", &Atom::gsij, &Atom::ssij, R"mydelimiter(
+          *float*. Value of s_ij which is used for identification of solid atoms. s_ij is defined by
+
+          .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
+
+    )mydelimiter")
+
+    .def_property("avg_sij", &Atom::gasij, &Atom::sasij, R"mydelimiter(
           *float*. Value of averaged s_ij which is used for identification of solid atoms. s_ij is defined by
 
-          .. math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i)
+          .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
 
     )mydelimiter")
 

@@ -87,7 +87,7 @@ class System(pc.System):
         filename : string
             name of the input file.
 
-        format : {'lammps-dump', 'poscar', 'ase'}
+        format : {'lammps-dump', 'poscar', 'ase', 'mdtraj'}
             format of the input file, in case of `ase` the ASE Atoms object
 
         compressed : bool, optional
@@ -117,7 +117,10 @@ class System(pc.System):
         -----
         `format` keyword specifies the format of the input file. Currently only
         a `lammps-dump` and `poscar` files are supported.  Additionaly, the widely
-        use Atomic Simulation environment (https://wiki.fysik.dtu.dk/ase/ase/ase.html)
+        use Atomic Simulation environment (https://wiki.fysik.dtu.dk/ase/ase/ase.html).
+        mdtraj objects (http://mdtraj.org/1.9.3/) are also supported by using the keyword
+        `'mdtraj'` for format. Please note that triclinic boxes are not yet supported for
+        mdtraj format.
         Atoms object can also be used directly. This function uses the
         :func:`~pyscal.traj_process` module to process a file which is then assigned to system.
 
@@ -205,6 +208,16 @@ class System(pc.System):
                 rot = box.T
                 rotinv = np.linalg.inv(rot)
                 self.assign_triclinic_params(rot, rotinv)
+
+        elif format == 'mdtraj':
+            atoms, boxdims, box = ptp.read_mdtraj(filename, box_vectors = True)
+            self.atoms = atoms
+            self.box = boxdims
+            if is_triclinic:
+                rot = box.T
+                rotinv = np.linalg.inv(rot)
+                self.assign_triclinic_params(rot, rotinv)
+
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 
@@ -683,7 +696,7 @@ class System(pc.System):
             self.ccalculate_aq(qq)
 
 
-    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6):
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6, new_algo=False, cutoff=0):
         """
         Distinguish solid and liquid atoms in the system.
 
@@ -781,10 +794,8 @@ class System(pc.System):
         #Set the vlaue of q
         self.solidq = q
         #first calculate q
-
         self.ccalculate_q([q])
         #self.calculate_q(6)
-
         #calculate solid neighs
         self.set_nucsize_parameters(bonds, threshold, avgthreshold)
         self.calculate_frenkelnumbers()
@@ -795,11 +806,11 @@ class System(pc.System):
             def ccondition(atom):
                 return atom.solid
 
-            lc = self.cluster_atoms(ccondition, largest=True)
+            lc = self.cluster_atoms(ccondition, largest=True, new_algo=new_algo, cutoff=cutoff)
             return lc
 
 
-    def cluster_atoms(self, condition, largest = True):
+    def cluster_atoms(self, condition, largest = True, new_algo = False, cutoff=0):
         """
         Cluster atoms based on a property
 
@@ -853,7 +864,7 @@ class System(pc.System):
             atom.condition = cval
         self.atoms = atoms
 
-        self.cfind_clusters_recursive()
+        self.cfind_clusters_recursive(cutoff)
 
         #done!
         lc = self.find_largest_cluster()
@@ -861,8 +872,6 @@ class System(pc.System):
 
         if largest:
             return lc
-
-
 
 
     def calculate_nucsize(self, frenkelnums, threshold, avgthreshold):

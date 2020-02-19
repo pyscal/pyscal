@@ -31,6 +31,7 @@ System::System(){
     solidq = 6;
     criteria = 0;
     usecells = 0;
+    neighbordistance = 0;
 
 }
 
@@ -588,6 +589,7 @@ void System::get_all_neighbors_cells(){
                         atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
                         atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
                         atoms[ti].n_neighbors += 1;
+                        atoms[ti].cutoff = neighbordistance;
 
                         atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
                         atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
@@ -601,6 +603,7 @@ void System::get_all_neighbors_cells(){
                         atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
                         atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
                         atoms[tj].n_neighbors +=1;
+                        atoms[tj].cutoff = neighbordistance;
                       }
                   }
                }
@@ -650,6 +653,7 @@ void System::get_all_neighbors_normal(){
                 atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
                 atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
                 atoms[ti].n_neighbors += 1;
+                atoms[ti].cutoff = neighbordistance;
 
                 atoms[tj].neighbors[atoms[tj].n_neighbors] = ti;
                 atoms[tj].neighbordist[atoms[tj].n_neighbors] = d;
@@ -663,6 +667,7 @@ void System::get_all_neighbors_normal(){
                 atoms[tj].n_phi[atoms[tj].n_neighbors] = phi;
                 atoms[tj].n_theta[atoms[tj].n_neighbors] = theta;
                 atoms[tj].n_neighbors +=1;
+                atoms[tj].cutoff = neighbordistance;
             }
         }
 
@@ -741,6 +746,7 @@ void System::get_all_neighbors_voronoi(){
             atoms[ti].volume = vol;
             atoms[ti].vertex_vectors = v;
             atoms[ti].vertex_numbers = vert_nos;
+            atoms[ti].cutoff = cbrt(3*vol/(4*3.141592653589793));
             //assign to the atom
             //atoms[ti].vorovector = nvector;
 
@@ -984,6 +990,7 @@ int System::get_all_neighbors_sann(double prefactor){
             //find new dcut
             summ = summ + atoms[ti].temp_neighbors[m].dist;
             dcut = summ/float(m-2);
+            atoms[ti].cutoff = dcut;
         }
 
         //find if there was an error
@@ -1099,6 +1106,7 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
                 atoms[ti].n_phi[atoms[ti].n_neighbors] = phi;
                 atoms[ti].n_theta[atoms[ti].n_neighbors] = theta;
                 atoms[ti].n_neighbors += 1;
+                atoms[ti].cutoff = dcut;
 
             }
         }
@@ -1484,6 +1492,7 @@ void System::calculate_frenkel_numbers(){
         for (int c = 0;c<atoms[ti].n_neighbors;c++){
 
             scalar = get_number_from_bond(ti,atoms[ti].neighbors[c]);
+            atoms[ti].sij[c] = scalar;
             if (scalar > threshold) frenkelcons += 1;
             atoms[ti].avq6q6 += scalar;
         }
@@ -1531,8 +1540,12 @@ void System::find_solid_atoms(){
 }
 
 
-void System::find_clusters(){
-
+void System::find_clusters(double clustercutoff){
+        if (clustercutoff != 0){
+          for(int ti=0; ti<nop;ti++){
+              atoms[ti].cutoff = clustercutoff;
+          }
+        }
         for(int ti=0; ti<nop;ti++){
             atoms[ti].belongsto = -1;
         }
@@ -1540,10 +1553,12 @@ void System::find_clusters(){
         for (int ti= 0;ti<nop;ti++){
 
             if (!atoms[ti].condition) continue;
+
             if (atoms[ti].belongsto==-1) {atoms[ti].belongsto = atoms[ti].id; }
             for (int c = 0;c<atoms[ti].n_neighbors;c++){
 
                 if(!atoms[atoms[ti].neighbors[c]].condition) continue;
+                if(!(atoms[ti].neighbordist[atoms[ti].neighbors[c]] <= atoms[ti].cutoff)) continue;
                 if (atoms[atoms[ti].neighbors[c]].belongsto==-1){
                     atoms[atoms[ti].neighbors[c]].belongsto = atoms[ti].belongsto;
                 }
@@ -1562,6 +1577,7 @@ void System::harvest_cluster(const int ti, const int clusterindex){
     for(int i=0; i<atoms[ti].n_neighbors; i++){
         neigh = atoms[ti].neighbors[i];
         if(!atoms[neigh].condition) continue;
+        if(!(atoms[ti].neighbordist[i] <= atoms[ti].cutoff)) continue;
         if (atoms[neigh].belongsto==-1){
             atoms[neigh].belongsto = clusterindex;
             harvest_cluster(neigh, clusterindex);
@@ -1569,7 +1585,13 @@ void System::harvest_cluster(const int ti, const int clusterindex){
     }
 }
 
-void System::find_clusters_recursive(){
+void System::find_clusters_recursive(double clustercutoff){
+
+  if (clustercutoff != 0){
+    for(int ti=0; ti<nop;ti++){
+        atoms[ti].cutoff = clustercutoff;
+    }
+  }
 
     int clusterindex;
     clusterindex = 0;

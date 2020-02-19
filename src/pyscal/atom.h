@@ -95,6 +95,7 @@ class Atom{
         double n_r[MAXNUMBEROFNEIGHBORS];
         double n_phi[MAXNUMBEROFNEIGHBORS];
         double n_theta[MAXNUMBEROFNEIGHBORS];
+        double sij[MAXNUMBEROFNEIGHBORS];
         int n3, n4, n5, n6;
         int n_neighbors;
         vector<datom> temp_neighbors;
@@ -143,6 +144,9 @@ class Atom{
         int structure;
         int type;
         int condition;
+        double cutoff;
+        void scutoff(double);
+        double gcutoff();
 
 
         //indicator which is 1 if neighbors are already provided
@@ -160,6 +164,10 @@ class Atom{
         //but that doesnt matter because we wont use it regularl
 
         //function to set neighbors
+        void sneighdist(vector<double>);
+        vector<double> gneighdist();
+        void ssij(vector<double>);
+        vector<double> gsij();
         void sneighbors(vector<int> nns);
         vector<int> gneighbors();
         vector<int> gfacevertices();

@@ -35,6 +35,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
         facevertices[tn] = -1;
         faceverticenumbers[tn] = -1;
         faceperimeters[tn] = -1.0;
+        sij[tn] = -1.0;
         //edgelengths[tn] = -1.0;
 
     }
@@ -72,6 +73,28 @@ void Atom::snneighbors(int dd){
 
 }
 
+void Atom::sneighdist(vector<double> dd){
+}
+
+vector<double> Atom::gneighdist(){
+  vector<double> neighdist;
+  for(int i=0; i<n_neighbors; i++){
+    neighdist.emplace_back(neighbordist[i]);
+  }
+  return neighdist;
+}
+
+void Atom::ssij(vector<double> dd){
+}
+
+vector<double> Atom::gsij(){
+  vector<double> ss;
+  for(int i=0; i<n_neighbors; i++){
+    ss.emplace_back(sij[i]);
+  }
+  return ss;
+}
+
 int Atom::gid(){ return id; }
 int Atom::gfrenkelnumber(){ return frenkelnumber; }
 void Atom::sfrenkelnumber(int nn){ frenkelnumber=nn; }
@@ -82,6 +105,8 @@ int Atom::gtype(){ return type; }
 void Atom::stype(int idd){ type=idd; }
 double Atom::gvolume(){ return volume; }
 void Atom::svolume(double vv){ volume = vv; }
+double Atom::gcutoff(){ return cutoff; }
+void Atom::scutoff(double cc){ cutoff = cc; }
 double Atom::gasij(){ return avq6q6; }
 void Atom::sasij(double vv){ avq6q6 = vv; }
 double Atom::gavgvolume(){ return avgvolume; }
