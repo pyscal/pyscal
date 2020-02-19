@@ -1577,7 +1577,7 @@ void System::harvest_cluster(const int ti, const int clusterindex){
     for(int i=0; i<atoms[ti].n_neighbors; i++){
         neigh = atoms[ti].neighbors[i];
         if(!atoms[neigh].condition) continue;
-        //if(!(atoms[ti].neighbordist[i] <= atoms[ti].cutoff)) continue;
+        if(!(atoms[ti].neighbordist[i] <= atoms[ti].cutoff)) continue;
         if (atoms[neigh].belongsto==-1){
             atoms[neigh].belongsto = clusterindex;
             harvest_cluster(neigh, clusterindex);
