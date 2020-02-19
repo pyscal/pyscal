@@ -1484,6 +1484,7 @@ void System::calculate_frenkel_numbers(){
         for (int c = 0;c<atoms[ti].n_neighbors;c++){
 
             scalar = get_number_from_bond(ti,atoms[ti].neighbors[c]);
+            atoms[ti].sij[atoms[ti].neighbors[c]] = scalar;
             if (scalar > threshold) frenkelcons += 1;
             atoms[ti].avq6q6 += scalar;
         }

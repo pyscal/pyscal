@@ -71,8 +71,8 @@ int Atom::gnneighbors(){
 void Atom::snneighbors(int dd){
 
 }
-void Atom::sneighdist(vector<double> dd){
 
+void Atom::sneighdist(vector<double> dd){
 }
 
 vector<double> Atom::gneighdist(){
@@ -81,6 +81,17 @@ vector<double> Atom::gneighdist(){
     neighdist.emplace_back(neighbordist[i]);
   }
   return neighdist;
+}
+
+void Atom::ssij(vector<double> dd){
+}
+
+vector<double> Atom::gsij(){
+  vector<double> ss;
+  for(int i=0; i<n_neighbors; i++){
+    ss.emplace_back(sij[i]);
+  }
+  return ss;
 }
 
 int Atom::gid(){ return id; }

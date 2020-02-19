@@ -90,7 +90,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def_property("neighbor_distance",&Atom::gneighdist, &Atom::sneighdist, R"mydelimiter(
         *List of floats*.
-        List of neighbor distances of the atom. 
+        List of neighbor distances of the atom.
     )mydelimiter")
 
     .def_property("coordination",&Atom::gnneighbors, &Atom::snneighbors,R"mydelimiter(
@@ -231,10 +231,17 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     )mydelimiter")
 
-    .def_property("avg_connection", &Atom::gasij, &Atom::sasij, R"mydelimiter(
+    .def_property("sij", &Atom::gsij, &Atom::ssij, R"mydelimiter(
+          *float*. Value of s_ij which is used for identification of solid atoms. s_ij is defined by
+
+          .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
+
+    )mydelimiter")
+
+    .def_property("avg_sij", &Atom::gasij, &Atom::sasij, R"mydelimiter(
           *float*. Value of averaged s_ij which is used for identification of solid atoms. s_ij is defined by
 
-          .. math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i)
+          .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
 
     )mydelimiter")
 
