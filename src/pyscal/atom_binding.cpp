@@ -88,6 +88,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         atoms which indicate their position in the list of all atoms.
     )mydelimiter")
 
+    .def_property("neighbor_distance",&Atom::gneighdist, &Atom::sneighdist, R"mydelimiter(
+        *List of floats*.
+        List of neighbor distances of the atom. 
+    )mydelimiter")
+
     .def_property("coordination",&Atom::gnneighbors, &Atom::snneighbors,R"mydelimiter(
         *int*.
         coordination number of the atom. Coordination will only be updated

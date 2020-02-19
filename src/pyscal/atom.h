@@ -160,6 +160,8 @@ class Atom{
         //but that doesnt matter because we wont use it regularl
 
         //function to set neighbors
+        void sneighdist(vector<double>);
+        vector<double> gneighdist();
         void sneighbors(vector<int> nns);
         vector<int> gneighbors();
         vector<int> gfacevertices();

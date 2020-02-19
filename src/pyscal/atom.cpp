@@ -71,6 +71,17 @@ int Atom::gnneighbors(){
 void Atom::snneighbors(int dd){
 
 }
+void sneighdist(vector<double> dd){
+
+}
+
+vector<double> gneighdist(){
+  vector<double> neighdist;
+  for(int i=0; i<n_neighbors; i++){
+    neighdist.emplace_back(neighbordist[i]);
+  }
+  return neighdist;
+}
 
 int Atom::gid(){ return id; }
 int Atom::gfrenkelnumber(){ return frenkelnumber; }
