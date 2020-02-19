@@ -698,7 +698,7 @@ class System(pc.System):
             self.ccalculate_aq(qq)
 
 
-    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6, new_algo=False):
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6, new_algo=False, cutoff=0):
         """
         Distinguish solid and liquid atoms in the system.
 
@@ -810,11 +810,11 @@ class System(pc.System):
             def ccondition(atom):
                 return atom.solid
 
-            lc = self.cluster_atoms(ccondition, largest=True, new_algo=new_algo)
+            lc = self.cluster_atoms(ccondition, largest=True, new_algo=new_algo, cutoff=cutoff)
             return lc
 
 
-    def cluster_atoms(self, condition, largest = True, new_algo = False):
+    def cluster_atoms(self, condition, largest = True, new_algo = False, cutoff=0):
         """
         Cluster atoms based on a property
 
@@ -869,7 +869,7 @@ class System(pc.System):
                 atom.condition = cval
             self.atoms = atoms
 
-            self.cfind_clusters_recursive()
+            self.cfind_clusters_recursive(cutoff)
 
             #done!
             lc = self.find_largest_cluster()

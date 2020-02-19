@@ -62,9 +62,9 @@ class System{
         int calculate_nucsize();	//variant of function above
         int cluster_criteria(int,int );
         void find_solid_atoms();
-        void find_clusters();
-        void harvest_cluster(const int, const int);
-        void find_clusters_recursive();
+        void find_clusters(double);
+        void harvest_cluster(const int, const int, double);
+        void find_clusters_recursive(double);
         void harvest_cluster_old(const int, const int);
         void find_clusters_recursive_old();
         int largest_cluster();

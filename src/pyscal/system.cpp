@@ -1531,8 +1531,10 @@ void System::find_solid_atoms(){
 }
 
 
-void System::find_clusters(){
-
+void System::find_clusters(double clustercutoff){
+        if (clustercutoff == 0){
+          clustercutoff = neighbordistance;
+        }
         for(int ti=0; ti<nop;ti++){
             atoms[ti].belongsto = -1;
         }
@@ -1540,10 +1542,12 @@ void System::find_clusters(){
         for (int ti= 0;ti<nop;ti++){
 
             if (!atoms[ti].condition) continue;
+
             if (atoms[ti].belongsto==-1) {atoms[ti].belongsto = atoms[ti].id; }
             for (int c = 0;c<atoms[ti].n_neighbors;c++){
 
                 if(!atoms[atoms[ti].neighbors[c]].condition) continue;
+                if(!(atoms[ti].neighbordist[atoms[ti].neighbors[c]] <= clustercutoff)) continue;
                 if (atoms[atoms[ti].neighbors[c]].belongsto==-1){
                     atoms[atoms[ti].neighbors[c]].belongsto = atoms[ti].belongsto;
                 }
@@ -1556,20 +1560,25 @@ void System::find_clusters(){
 
 //we have to test with a recursive algorithm - to match the values that is presented
 //in Grisells code.
-void System::harvest_cluster(const int ti, const int clusterindex){
+void System::harvest_cluster(const int ti, const int clusterindex, double clustercutoff){
 
     int neigh;
     for(int i=0; i<atoms[ti].n_neighbors; i++){
         neigh = atoms[ti].neighbors[i];
         if(!atoms[neigh].condition) continue;
+        if(!(atoms[ti].neighbordist[neigh] <= clustercutoff)) continue;
         if (atoms[neigh].belongsto==-1){
             atoms[neigh].belongsto = clusterindex;
-            harvest_cluster(neigh, clusterindex);
+            harvest_cluster(neigh, clusterindex, clustercutoff);
         }
     }
 }
 
-void System::find_clusters_recursive(){
+void System::find_clusters_recursive(double clustercutoff){
+
+  if (clustercutoff == 0){
+    clustercutoff = neighbordistance;
+  }
 
     int clusterindex;
     clusterindex = 0;
@@ -1584,7 +1593,7 @@ void System::find_clusters_recursive(){
         if (atoms[ti].belongsto==-1){
             clusterindex += 1;
             atoms[ti].belongsto = clusterindex;
-            harvest_cluster(ti, clusterindex);
+            harvest_cluster(ti, clusterindex, clustercutoff);
         }
 
     }
