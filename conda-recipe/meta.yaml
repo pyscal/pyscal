@@ -17,8 +17,6 @@ requirements:
     - python
     - numpy
     - matplotlib
-    - sklearn
-    - scipy
 
 build:
     script_env:

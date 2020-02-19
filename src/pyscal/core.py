@@ -12,8 +12,6 @@ import warnings
 import pyscal.csystem as pc
 from pyscal.catom import Atom
 import itertools
-from sklearn import cluster
-from scipy.spatial.distance import pdist, squareform
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -803,7 +801,7 @@ class System(pc.System):
         self.calculate_frenkelnumbers()
         #now find solids
         self.find_solid_atoms()
-        
+
         if cluster:
             def ccondition(atom):
                 return atom.solid
@@ -859,41 +857,21 @@ class System(pc.System):
         except:
             raise RuntimeError("condition did not work")
 
-        if not new_algo:
-            #now loop
-            atoms = self.atoms
-            for atom in atoms:
-                cval = condition(atom)
-                atom.condition = cval
-            self.atoms = atoms
+        #now loop
+        atoms = self.atoms
+        for atom in atoms:
+            cval = condition(atom)
+            atom.condition = cval
+        self.atoms = atoms
 
-            self.cfind_clusters_recursive(cutoff)
+        self.cfind_clusters_recursive(cutoff)
 
-            #done!
-            lc = self.find_largest_cluster()
-            #pcs.System.get_largest_cluster_atoms(self)
+        #done!
+        lc = self.find_largest_cluster()
+        #pcs.System.get_largest_cluster_atoms(self)
 
-            if largest:
-                return lc
-        else:
-            atoms = self.atoms
-            idd = np.array([atom.loc for x, atom in enumerate(atoms) if atom.solid])
-            pos = np.array([atom.pos for x, atom in enumerate(atoms) if atom.solid])
-            tdist = np.zeros(int((len(pos)*(len(pos)-1))/2))
-            for d in range(3):
-                dist = pdist(pos[:,d].reshape(pos.shape[0],1))
-                l = self.box[d][1] - self.box[d][0]
-                dist[dist > (0.5*l)] -= l
-                dist[dist < -(0.5*l)] += l
-                tdist += dist**2
-            sdist = squareform(tdist**0.5)
-            clustering = cluster.AgglomerativeClustering(affinity='precomputed', linkage='average').fit(sdist)
-            labels = clustering.labels_
-            for c, d in enumerate(idd):
-                atoms[d].largest_cluster = labels[c]
-            if largest:
-                return np.sum(labels)
-
+        if largest:
+            return lc
 
 
     def calculate_nucsize(self, frenkelnums, threshold, avgthreshold):

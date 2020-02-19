@@ -94,7 +94,7 @@ setup(
     zip_safe=False,
     download_url = 'https://github.com/srmnitc/pyscal/archive/2.3.3.tar.gz',
     url = 'https://github.com/srmnitc/pyscal',
-    install_requires=['numpy', 'sklearn', 'scipy'],
+    install_requires=['numpy'],
     classifiers=[
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 2',
