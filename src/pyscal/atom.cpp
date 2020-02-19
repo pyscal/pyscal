@@ -71,11 +71,11 @@ int Atom::gnneighbors(){
 void Atom::snneighbors(int dd){
 
 }
-void sneighdist(vector<double> dd){
+void Atom::sneighdist(vector<double> dd){
 
 }
 
-vector<double> gneighdist(){
+vector<double> Atom::gneighdist(){
   vector<double> neighdist;
   for(int i=0; i<n_neighbors; i++){
     neighdist.emplace_back(neighbordist[i]);
