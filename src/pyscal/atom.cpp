@@ -35,6 +35,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
         facevertices[tn] = -1;
         faceverticenumbers[tn] = -1;
         faceperimeters[tn] = -1.0;
+        sij[tn] = -1.0;
         //edgelengths[tn] = -1.0;
 
     }

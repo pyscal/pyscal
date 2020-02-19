@@ -796,16 +796,14 @@ class System(pc.System):
         #Set the vlaue of q
         self.solidq = q
         #first calculate q
-
         self.ccalculate_q([q])
         #self.calculate_q(6)
-
         #calculate solid neighs
         self.set_nucsize_parameters(bonds, threshold, avgthreshold)
         self.calculate_frenkelnumbers()
         #now find solids
         self.find_solid_atoms()
-
+        
         if cluster:
             def ccondition(atom):
                 return atom.solid

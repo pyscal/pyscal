@@ -1492,7 +1492,7 @@ void System::calculate_frenkel_numbers(){
         for (int c = 0;c<atoms[ti].n_neighbors;c++){
 
             scalar = get_number_from_bond(ti,atoms[ti].neighbors[c]);
-            atoms[ti].sij[atoms[ti].neighbors[c]] = scalar;
+            atoms[ti].sij[c] = scalar;
             if (scalar > threshold) frenkelcons += 1;
             atoms[ti].avq6q6 += scalar;
         }
@@ -1577,7 +1577,7 @@ void System::harvest_cluster(const int ti, const int clusterindex){
     for(int i=0; i<atoms[ti].n_neighbors; i++){
         neigh = atoms[ti].neighbors[i];
         if(!atoms[neigh].condition) continue;
-        if(!(atoms[ti].neighbordist[neigh] <= atoms[ti].cutoff)) continue;
+        //if(!(atoms[ti].neighbordist[i] <= atoms[ti].cutoff)) continue;
         if (atoms[neigh].belongsto==-1){
             atoms[neigh].belongsto = clusterindex;
             harvest_cluster(neigh, clusterindex);
