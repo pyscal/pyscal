@@ -104,6 +104,8 @@ int Atom::gtype(){ return type; }
 void Atom::stype(int idd){ type=idd; }
 double Atom::gvolume(){ return volume; }
 void Atom::svolume(double vv){ volume = vv; }
+double Atom::gcutoff(){ return cutoff; }
+void Atom::scutoff(double cc){ cutoff = cc; }
 double Atom::gasij(){ return avq6q6; }
 void Atom::sasij(double vv){ avq6q6 = vv; }
 double Atom::gavgvolume(){ return avgvolume; }

@@ -63,7 +63,7 @@ class System{
         int cluster_criteria(int,int );
         void find_solid_atoms();
         void find_clusters(double);
-        void harvest_cluster(const int, const int, double);
+        void harvest_cluster(const int, const int);
         void find_clusters_recursive(double);
         void harvest_cluster_old(const int, const int);
         void find_clusters_recursive_old();

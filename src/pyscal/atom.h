@@ -144,6 +144,9 @@ class Atom{
         int structure;
         int type;
         int condition;
+        double cutoff;
+        void scutoff(double);
+        double gcutoff();
 
 
         //indicator which is 1 if neighbors are already provided

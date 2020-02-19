@@ -169,6 +169,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         int specifying type of the atom.
     )mydelimiter")
 
+    .def_property("cutoff",&Atom::gcutoff,&Atom::scutoff, R"mydelimiter(
+        *double*.
+        cutoff used for finding neighbors for each atom.
+    )mydelimiter")
+
     .def_property("custom",&Atom::gcustom,&Atom::scustom, R"mydelimiter(
         *dict*.
         dictionary specfying custom values for an atom. The module only stores the id, type and
