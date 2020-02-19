@@ -13,8 +13,6 @@ on how to set up Bash on Windows.
 Installation using `conda <https://anaconda.org>`_
 --------------------------------------------------
 
-**For python 3**
-
 pyscal can be installed directly using `Conda <https://docs.conda.io/en/latest/>`_ from the `conda-forge channel <https://conda-forge.org/>`_ by the following statement-
 
 .. code:: console
@@ -32,14 +30,7 @@ An always updated version can be installed using-
     conda install -c pyscal pyscal
 
 
-**For python 2**
-
-Python 2 version of pyscal can be installed using-
-
-.. code:: console
-
-    conda install -c pyscal pyscal
-
+pyscal is no longer maintained for Python 2.
 
 Quick installation
 ------------------
@@ -69,7 +60,7 @@ pyscal can be built from the repository by-
 Using a conda environment
 -------------------------
 
-pyscal can also be installed in a conda environment, making it easier to manage dependencies. pyscal works with both python3 and python2.
+pyscal can also be installed in a conda environment, making it easier to manage dependencies.
 A python3 Conda environment can be created by,
 
 .. code:: console
