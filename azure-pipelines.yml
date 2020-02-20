@@ -20,8 +20,8 @@ jobs:
     matrix:
       Python37:
         python.version: '3.7'
-      Python38:
-        python.version: '3.8'
+      Python36:
+        python.version: '3.6'
     maxParallel: 4
 
   steps:
@@ -58,8 +58,8 @@ jobs:
     matrix:
       Python37:
         python.version: '3.7'
-      Python38:
-        python.version: '3.8'
+      Python36:
+        python.version: '3.6'
     maxParallel: 4
 
   steps:
