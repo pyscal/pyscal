@@ -23,12 +23,6 @@ pyscal can be installed directly using `Conda <https://docs.conda.io/en/latest/>
 This is the recommended way to install if you have an `Anaconda <https://www.anaconda.com/>`_ distribution.
 
 The above command installs the `latest release version <https://github.com/srmnitc/pyscal/releases>`_ of pyscal.
-An always updated version can be installed using-
-
-.. code:: console
-
-    conda install -c pyscal pyscal
-
 
 pyscal is no longer maintained for Python 2.
 
