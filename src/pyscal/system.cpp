@@ -195,13 +195,7 @@ void System::set_atoms( vector<Atom> atomitos){
 
 //this function allows for handling custom formats of atoms and so on
 vector<Atom> System::get_atoms( ){
-    //atomitos are just a list of Atom objects
-    //boxd is a vector of 6 values - [xlow, xhigh, ylow, yhigh, zlow, zhigh]
     return atoms;
-    //for(int i=0; i<atoms.size(); i++){
-    //  atomitos.emplace_back(atoms[i]);
-    //}
-    //return atomitos;
 
 }
 
@@ -1503,24 +1497,6 @@ void System::calculate_frenkel_numbers(){
     }
 }
 
-//again to be overloaded?
-//maybe not now-im lazy
-int System::cluster_criteria(int ti, int criterium){
-
-    int value=0;
-
-    if (criterium == 0){
-
-        if ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > avgthreshold) ){
-            value = 1;
-        }
-        else{
-            value = 0;
-        }
-    }
-    return value;
-}
-
 
 void System::find_solid_atoms(){
 
@@ -1612,35 +1588,6 @@ void System::find_clusters_recursive(double clustercutoff){
     }
 }
 
-//old code - just keeping it here
-void System::harvest_cluster_old(const int ti, const int clusterindex){
-
-    int neigh;
-    for(int i=0; i<atoms[ti].n_neighbors; i++){
-        neigh = atoms[ti].neighbors[i];
-        if(!atoms[neigh].issolid) continue;
-        if (atoms[neigh].belongsto==-1){
-            atoms[neigh].belongsto = clusterindex;
-            harvest_cluster_old(neigh, clusterindex);
-        }
-    }
-}
-
-void System::find_clusters_recursive_old(){
-
-    int clusterindex;
-    clusterindex = 0;
-
-    for (int ti= 0;ti<nop;ti++){
-        if (!atoms[ti].issolid) continue;
-        if (atoms[ti].belongsto==-1){
-            clusterindex += 1;
-            atoms[ti].belongsto = clusterindex;
-            harvest_cluster_old(ti, clusterindex);
-        }
-
-    }
-}
 
 
 int System::largest_cluster(){
@@ -1691,34 +1638,6 @@ void System::get_largest_cluster_atoms(){
             }
         }
 }
-
-int System::calculate_nucsize()
-{
-
-        int greatestbelongsto;
-        //Find all particles within a radius of neighbourdistancess
-        //read_particle_file();
-        //get_all_neighbors_normal();
-        //Get Q6 values
-        //cout<<"step 1"<<endl;
-        //calculate_complexQLM_6();
-        //cout<<"step 2"<<endl;
-        //and the number of bonds to find the largest cluster
-        calculate_frenkel_numbers();
-        //cout<<"step 3"<<endl;
-
-        find_solid_atoms();
-        //cout<<"step 4"<<endl;
-        //find_clusters();
-        find_clusters_recursive_old();
-        //cout<<"step 5"<<endl;
-        greatestbelongsto = largest_cluster();
-        //cout<<"step 6"<<endl;
-        get_largest_cluster_atoms();
-        //cout<<"step 7"<<endl;
-        return greatestbelongsto;
-}
-
 
 
 

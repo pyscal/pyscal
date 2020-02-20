@@ -874,38 +874,6 @@ class System(pc.System):
             return lc
 
 
-    def calculate_nucsize(self, frenkelnums, threshold, avgthreshold):
-        """
-        Calculate the size of the largest cluster in the given system.
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        cluster size : int
-            size of the largest solid cluster in liquid (number of atoms)
-
-        Notes
-        -----
-        Calculation of the the size of the largest solid cluster needs various prerequisites that can be set
-        by the functions `set_nucsize_parameters`.
-
-        .. warning::
-
-            This function is deprecated and will be removed in a future release. Please use
-            :func:`System.find_solids` instead.
-
-        """
-        #print("this raaan")
-        #warnings.simplefilter('always', DeprecationWarning)
-        #warnings.warn("This function is deprecated - use find_solids instead", DeprecationWarning)
-
-        self.ccalculate_q([6])
-        self.set_nucsize_parameters(frenkelnums, threshold, avgthreshold)
-        return self.ccalculate_nucsize()
-
     def calculate_solidneighbors(self):
         """
         Find Solid neighbors of all atoms in the system.

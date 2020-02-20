@@ -59,14 +59,10 @@ class System{
         void assign_particles( vector<Atom>);
         void read_particle_file(string);
         //void read_particle_instance(int,int);
-        int calculate_nucsize();	//variant of function above
-        int cluster_criteria(int,int );
         void find_solid_atoms();
         void find_clusters(double);
         void harvest_cluster(const int, const int);
         void find_clusters_recursive(double);
-        void harvest_cluster_old(const int, const int);
-        void find_clusters_recursive_old();
         int largest_cluster();
         void set_nucsize_parameters(double,double,double);
         //void set_inputfile(string);

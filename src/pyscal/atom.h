@@ -144,6 +144,12 @@ class Atom{
         int structure;
         int type;
         int condition;
+
+        //mask for calculations to exclude atoms
+        bool mask;
+        void smask(bool);
+        bool gmask();
+
         double cutoff;
         void scutoff(double);
         double gcutoff();

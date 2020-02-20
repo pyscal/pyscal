@@ -1,5 +1,5 @@
-pip==19.0.3
-pytest==4.3.0
+pip
+pytest
 pytest-cov
 pytest-benchmark
 codecov

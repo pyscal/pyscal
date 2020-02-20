@@ -96,7 +96,6 @@ setup(
     url = 'https://github.com/srmnitc/pyscal',
     install_requires=['numpy'],
     classifiers=[
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3'
     ]
 )

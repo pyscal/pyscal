@@ -40,7 +40,6 @@ PYBIND11_MODULE(csystem, m) {
         .def_property("usecells", &System::gusecells, &System::susecells)
         //.def("get_atoms", &System::get_atoms)
         //.def("set_atoms", &System::set_atoms)
-        .def("ccalculate_nucsize",&System::calculate_nucsize)
         .def("cget_atom",  &System::gatom)
         .def("cset_atom", &System::satom)
         .def_property("voroexp", &System::galpha, &System::salpha)

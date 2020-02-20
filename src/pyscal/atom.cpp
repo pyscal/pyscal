@@ -118,6 +118,14 @@ void Atom::ssolid(int idd){
   }
   issolid=idd; }
 
+bool Atom::gmask(){ return mask; }
+void Atom::smask(bool mm){
+  if (!((mm == true) || (mm == false))){
+    throw invalid_argument("mask should be true or false");
+  }
+  mask=mm;
+}
+
 int Atom::gstructure(){ return structure; }
 void Atom::sstructure(int idd){ structure=idd; }
 void Atom::scondition(int idd){ condition=idd; }
