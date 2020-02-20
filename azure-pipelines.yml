@@ -49,19 +49,6 @@ jobs:
         bash <(curl -s https://codecov.io/bash)
       displayName: Run tests
 
-    - bash: |
-        source activate conenv
-        conda install conda-build
-        conda install anaconda-client
-        mkdir ~/conda-bld
-        conda config --set anaconda_upload no
-        export CONDA_BLD_PATH=~/conda-bld
-        export VERSION=`date +%Y.%m.%d`
-        conda build .
-        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u pyscal -l main $CONDA_BLD_PATH/linux-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-      displayName: Upload to conda
-
 
 - job: 'MacOS'
   pool:
@@ -104,16 +91,3 @@ jobs:
         pytest --cov-report term-missing --cov=pyscal tests/
         codecov
       displayName: Run tests
-
-    - bash: |
-        source activate conenv
-        conda install conda-build
-        conda install anaconda-client
-        mkdir ~/conda-bld
-        conda config --set anaconda_upload no
-        export CONDA_BLD_PATH=~/conda-bld
-        export VERSION=`date +%Y.%m.%d`
-        conda build .
-        anaconda -t $(CONDA_UPLOAD_TOKEN) upload -u pyscal -l main $CONDA_BLD_PATH/osx-64/pyscal-`date +%Y.%m.%d`-*.tar.bz2 --force
-      condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-      displayName: Upload to conda
