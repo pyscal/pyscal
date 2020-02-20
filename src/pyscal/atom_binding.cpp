@@ -149,6 +149,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         Indicates the structure of atom. Not used currently.
     )mydelimiter")
 
+    .def_property("mask",&Atom::gmask, &Atom::smask, R"mydelimiter(
+        *bool*.
+        Mask variable for atom. If mask is true, the atom is ignored from calculations.
+    )mydelimiter")
+
     .def_property("loc",&Atom::gloc,&Atom::sloc, R"mydelimiter(
         *int*.
         indicates the position of the atom in the list of all atoms.
