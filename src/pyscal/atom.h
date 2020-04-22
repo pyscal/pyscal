@@ -11,6 +11,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <complex>
 
 namespace py = pybind11;
 using namespace std;
@@ -194,10 +195,14 @@ class Atom{
         //invidual variables or arrays - individual ones are easier!
         double q[11];
         double aq[11];
+
+        //access functions are to be added
         double realq[11][25];
         double imgq[11][25];
         double arealq[11][25];
         double aimgq[11][25];
+        vector<complex<double>> get_qcomps(int, bool);
+
 
         vector<double> gallq();
         vector<double> gallaq();
@@ -212,7 +217,7 @@ class Atom{
         vector<double> gq_big(vector<int>, bool);
         void sq_big(vector<int>, vector<double>, bool);
 
-        vector <vector<double>> gqlm(int);
+        //vector <vector<double>> gqlm(int);
 
         double gaq(int);
         int gid();
@@ -222,7 +227,7 @@ class Atom{
         int gtype();
         void stype(int);
         void saq(int, double);
-        vector <vector<double>> gaqlm(int);
+        //vector <vector<double>> gaqlm(int);
 
         int gsolid();
         void ssolid(int);
