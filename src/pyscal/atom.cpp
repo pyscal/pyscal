@@ -6,6 +6,7 @@
 #include "string.h"
 #include <chrono>
 #include <pybind11/stl.h>
+#include <complex>
 
 //functions for atoms
 //-------------------------------------------------------------------------------------------------------------------------
@@ -205,26 +206,7 @@ void Atom::scustom(py::dict cc){
     custom = cc;
 }
 
-vector<vector <double>> Atom::gqlm(int qq) {
 
-    vector< vector <double>> qlms;
-    vector <double> rqlms;
-    vector <double> iqlms;
-    qlms.reserve(2);
-    rqlms.reserve(2*qq+1);
-    iqlms.reserve(2*qq+1);
-
-    for(int i=0;i<(2*qq+1);i++){
-        rqlms.emplace_back(realq[qq-2][i]);
-        iqlms.emplace_back(imgq[qq-2][i]);
-    }
-
-    qlms.emplace_back(rqlms);
-    qlms.emplace_back(iqlms);
-
-    return qlms;
-
-}
 
 //for q vals
 double Atom::gq(int qq){ return q[qq-2]; }
@@ -301,28 +283,6 @@ void Atom::sq_big(vector<int> qval, vector<double> setvals, bool averaged){
 }
 
 
-//takes int and returns double - one value
-
-vector<vector <double>> Atom::gaqlm(int qq) {
-
-    vector< vector <double>> qlms;
-    vector <double> rqlms;
-    vector <double> iqlms;
-    qlms.reserve(2);
-    rqlms.reserve(2*qq+1);
-    iqlms.reserve(2*qq+1);
-
-    for(int i=0;i<(2*qq+1);i++){
-        rqlms.emplace_back(arealq[qq-2][i]);
-        iqlms.emplace_back(aimgq[qq-2][i]);
-    }
-
-    qlms.emplace_back(rqlms);
-    qlms.emplace_back(iqlms);
-
-    return qlms;
-
-}
 
 
 //functions to set the neighbors for each atoms
@@ -480,4 +440,23 @@ vector<double> Atom::gsro(){
 
 void Atom::ssro(vector<double> dd){
     sro = dd;
+}
+
+vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
+
+  vector<complex<double>> qlms;
+  qlms.reserve(2*qq+1);
+  if (!averaged){
+    for(int i=0;i<(2*qq+1);i++){
+        complex<double> lmval(realq[qq-2][i], imgq[qq-2][i]);
+        qlms.emplace_back(lmval);
+    }
+  }
+  else{
+    for(int i=0;i<(2*qq+1);i++){
+        complex<double> lmval(arealq[qq-2][i], aimgq[qq-2][i]);
+        qlms.emplace_back(lmval);
+    }
+  }
+  return qlms;
 }

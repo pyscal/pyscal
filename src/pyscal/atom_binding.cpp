@@ -340,6 +340,28 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         *Float*.
         The value of short range order parameter.
     )mydelimiter")
+
+    .def("get_qlm", &Atom::get_qcomps, py::arg(), py::arg("averaged")=false, R"mydelimiter(
+          Get the q_lm values.
+
+          Parameters
+          ----------
+          q : int
+              number of the required q_l - from 2-12
+
+          averaged : bool, optional
+              If True, return the averaged qlm values,
+              If False, return the non averaged ones
+              default False
+
+          Returns
+          -------
+          q_lm : complex vector
+              vector of complex numbers.
+
+          Meaningful values are only returned if :func:`~pyscal.core.System.calculate_q` is used.
+    )mydelimiter")
+
     ;
 
 
