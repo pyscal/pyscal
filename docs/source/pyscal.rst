@@ -45,3 +45,11 @@ pyscal.pickle module
    :members:
    :undoc-members:
    :show-inheritance:
+
+pyscal.misc module
+--------------------
+
+.. automodule:: pyscal.misc
+  :members:
+  :undoc-members:
+  :show-inheritance:
