@@ -412,7 +412,7 @@ def read_poscar(infile, compressed = False, box_vectors = False):
 
     while i in range(atom_start,atom_start+natoms):
         if (count<cum_list[species-1]):
-            raw = np.array(data[i].strip().split()).astype(float)
+            raw = np.array(data[i].strip().split()[:3]).astype(float)
             typ = species
             x = float(raw[0])*xhigh
             y = float(raw[1])*yhigh
