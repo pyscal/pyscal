@@ -2,7 +2,7 @@ import pyscal.core as pc
 import numpy as np
 import warnings
 
-def compare_atomic_env(infile, atomtype=2, precision=3, format="poscar", print_results=True):
+def compare_atomic_env(infile, atomtype=2, precision=2, format="poscar", print_results=True, return_system=False):
     """
     Compare the atomic environment of given types of atoms
     in the inputfile. The comparison is made in terms of Voronoi
@@ -28,6 +28,10 @@ def compare_atomic_env(infile, atomtype=2, precision=3, format="poscar", print_r
     print_results: bool, optional
         if True, print the results. If False, return the data
         instead. default True
+
+    return_system: bool, optional
+        if True, return the system object.
+        default False
 
     Returns
     -------
@@ -55,12 +59,27 @@ def compare_atomic_env(infile, atomtype=2, precision=3, format="poscar", print_r
     vols = np.round(vols, decimals=precision)
     vvx, vvc = np.unique(vols, return_counts=True)
     vrx, vrc = np.unique(vors, return_counts=True)
+
+    length_mismatch = False
     if (len(vvx) != len(vrx)):
-        warnings.warn("Different voronoi polyhedra with same volume!")
+        warnings.warn("Different voronoi polyhedra with same volume! Fingerprint wont be printed. Maybe change precision?")
+        length_mismatch = True
+
+    if precision > 3:
+        warnings.warn("More than 3 digits of precision selected!")
 
     if print_results:
         print("%d clusters found"%len(vvx))
-        for i in range(len(vvx)):
-            print("voro fingerprint = <%s>, vol = %.3f, counts = %d"%(vrx[i], vvx[i], vvc[i]))
+        if not length_mismatch:
+            for i in range(len(vvx)):
+                print("voro fingerprint = <%s>, vol = %.3f, counts = %d"%(vrx[i], vvx[i], vvc[i]))
+        else:
+            for i in range(len(vvx)):
+                print("voro fingerprint = <x x x x>, vol = %.3f, counts = %d"%(vvx[i], vvc[i]))
+        if return_system:
+            return sys
     else:
-        return vvx, vrx, vvc
+        if return_system:
+            return np.array([vvx, vrx, vvc]), sys
+        else:
+            return np.array([vvx, vrx, vvc])
