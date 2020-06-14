@@ -1375,7 +1375,7 @@ class System(pc.System):
             rotinv = np.linalg.inv(rot)
             self.assign_triclinic_params(rot, rotinv)
 
-    def to_file(self, outfile, format='lammps-dump', custom=None, compressed=False):
+    def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0):
         """
         Save the system instance to a trajectory file.
 
@@ -1388,11 +1388,14 @@ class System(pc.System):
             format of the output file, default `lammps-dump`
             Currently only `lammps-dump` format is supported.
 
-        custom : list of strings, optional
+        customkeys : list of strings, optional
             a list of extra atom wise values to be written in the output file.
 
         compressed : bool, optional
             If true, the output is written as a compressed file.
+
+        timestep : int, optional
+            timestep to be written to file. default 0
 
         Returns
         -------
@@ -1402,8 +1405,8 @@ class System(pc.System):
         -----
 
         """
-        if custom == None:
-            custom = []
+        if customkeys == None:
+            customkeys = []
 
         def get_custom(atom, customkeys):
             #first option - maybe it appears
@@ -1441,8 +1444,8 @@ class System(pc.System):
         boxdims = self.box
         atoms = self.atoms
 
-        if len(custom) > 0:
-            cvals = [get_custom(atom, custom) for atom in atoms]
+        if len(customkeys) > 0:
+            cvals = [get_custom(atom, customkeys) for atom in atoms]
 
         #open files for writing
         if compressed:
@@ -1454,7 +1457,7 @@ class System(pc.System):
 
         #now write
         dump.write("ITEM: TIMESTEP\n")
-        dump.write("0\n")
+        dump.write("%d\n" % timestep)
         dump.write("ITEM: NUMBER OF ATOMS\n")
         dump.write("%d\n" % len(atoms))
         dump.write("ITEM: BOX BOUNDS\n")
@@ -1463,8 +1466,8 @@ class System(pc.System):
         dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
 
         #now write header
-        if len(custom) > 0:
-            ckey = " ".join(custom)
+        if len(customkeys) > 0:
+            ckey = " ".join(customkeys)
             title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
         else:
             title_str = "ITEM: ATOMS id type x y z\n"
@@ -1473,7 +1476,7 @@ class System(pc.System):
 
         for cc, atom in enumerate(atoms):
             pos = atom.pos
-            if len(custom) > 0:
+            if len(customkeys) > 0:
                 cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
                 atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
             else:
