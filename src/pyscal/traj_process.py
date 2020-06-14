@@ -449,7 +449,7 @@ def read_poscar(infile, compressed = False, box_vectors = False):
     else:
         return atoms, boxdims
 
-def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, customkey=None, customvals=None):
+def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, customkey=None, customvals=None, timestep=0):
     """
     Write the state of the system to a trajectory file.
 
@@ -474,6 +474,9 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
     customvals : list or list of lists, optional
         If `customkey` is specified, `customvals` take an array of the same length
         as number of atoms, which contains the values to be written out.
+    
+    timestep: int, optional
+        Specify the timestep value, default 0
 
     Returns
     -------
@@ -493,10 +496,10 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
 
     #now write
     dump.write("ITEM: TIMESTEP\n")
-    dump.write("0\n")
+    dump.write("%d\n" % timestep)
     dump.write("ITEM: NUMBER OF ATOMS\n")
     dump.write("%d\n" % len(atoms))
-    dump.write("ITEM: BOX BOUNDS\n")
+    dump.write("ITEM: BOX BOUNDS pp pp pp\n")
     dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
     dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
     dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
