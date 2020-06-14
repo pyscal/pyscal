@@ -640,7 +640,7 @@ def split_traj_lammps_dump(infile, compressed = False):
         if(count==1):
             ff = ".".join([infile, 'snap', str(startblock), 'dat'])
             lines = []
-            lines.apped(line)
+            lines.append(line)
 
         elif(count<nblock):
             lines.append(line)
