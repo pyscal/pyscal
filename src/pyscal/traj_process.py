@@ -639,16 +639,20 @@ def split_traj_lammps_dump(infile, compressed = False):
     for line in f:
         if(count==1):
             ff = ".".join([infile, 'snap', str(startblock), 'dat'])
-            snaps.append(ff)
-            fout = open(ff,'w')
-            fout.write(line)
+            lines = []
+            lines.apped(line)
 
         elif(count<nblock):
-            fout.write(line)
+            lines.append(line)
 
         else:
-            fout.write(line)
+            lines.append(line)
+            snaps.append(ff)
+            fout = open(ff,'w')
+            for wline in lines:
+                fout.write(wline)
             fout.close()
+
             count=0
             startblock+=1
         count+=1
