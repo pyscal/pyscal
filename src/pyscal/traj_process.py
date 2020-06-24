@@ -493,7 +493,7 @@ def write_poscar(sys, outfile, comments="pyscal"):
         fout.write("%d   "%int(c))
     fout.write("\n")
 
-    fout.write("Direct\n")
+    fout.write("Cartesian\n")
 
     for i in range(len(atomgroups)):
         for atom in atomgroups[i]:
