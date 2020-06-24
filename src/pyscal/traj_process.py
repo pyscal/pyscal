@@ -1,3 +1,8 @@
+
+
+
+
+
 """
 pyscal module containing methods for processing of a trajectory. Methods for
 reading of input files formats, writing of output files etc are provided in
@@ -448,6 +453,55 @@ def read_poscar(infile, compressed = False, box_vectors = False):
         return atoms, boxdims, boxvecs
     else:
         return atoms, boxdims
+
+def write_poscar(sys, outfile, comments="pyscal"):
+    """
+    Function to read a POSCAR format.
+
+    Parameters
+    ----------
+    outfile : string
+        name of the input file
+
+
+    """
+
+    fout = open(outfile, 'w')
+
+    fout.write(comments+"\n")
+    fout.write("   1.00000000000000\n")
+
+    #write box
+    vecs = sys.get_boxvecs()
+    fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[0][0], vecs[0][1], vecs[0][2]))
+    fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[1][0], vecs[1][1], vecs[1][2]))
+    fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[2][0], vecs[2][1], vecs[2][2]))
+
+    atoms = sys.atoms
+    atypes = [atom.type for atom in atoms]
+    
+    tt, cc  = np.unique(atypes, return_counts=True)
+    atomgroups = [[] for x in range(len(tt))]
+    
+    for t in tt:
+        for atom in atoms:
+            if int(atom.type) == t:
+                atomgroups[t-1].append(atom)
+
+    fout.write("  ")
+    for c in cc:
+        fout.write("%d   "%int(c))
+    fout.write("\n")
+
+    fout.write("Direct\n")
+
+    for i in range(len(atomgroups)):
+        for atom in atomgroups[i]:
+            pos = atom.pos
+            fout.write(" %1.14f %1.14f %1.14f\n"%(pos[0], pos[1], pos[2]))
+
+    fout.close()
+
 
 def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, customkey=None, customvals=None, timestep=0):
     """
