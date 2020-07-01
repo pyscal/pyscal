@@ -35,11 +35,6 @@ class System{
         ~System();
         int nop;
 
-        int baseunit;
-        string inputfile;
-        int fileread;
-
-
         //-----------------------------------------------------
         // Simulation box related methods
         //-----------------------------------------------------
@@ -70,6 +65,13 @@ class System{
         //----------------------------------------------------
         // Neighbor methods
         //----------------------------------------------------
+        int filter;
+        int usecells;
+        int nx, ny, nz;
+        int total_cells;
+        cell *cells;
+        double neighbordistance;
+        int neighborsfound;
         void get_all_neighbors_normal();
         void process_neighbor(int, int);
         int get_all_neighbors_sann(double);
@@ -82,17 +84,8 @@ class System{
         void set_neighbordistance(double);
         vector<double> get_pairdistances();
         //variables for a filter
-        int filter;
-        void sfilter(int);
-        int gfilter();
-        double neighbordistance;
-        int neighborsfound;
-        int usecells;
         void susecells(int);
         int gusecells();
-        cell *cells;
-        int nx, ny, nz;
-        int total_cells;
         int cell_index(int, int, int);
         void set_up_cells();
         vector<int> cell_periodic(int, int, int);
@@ -104,14 +97,18 @@ class System{
         //---------------------------------------------------
         // Methods for q calculation
         //---------------------------------------------------
-        void set_reqd_qs(vector<int>);
-        void set_reqd_aqs(vector<int>);
-        void calculate_q(vector <int>);
-        void calculate_aq(vector <int>);
         int *reqdqs;
         int lenqs;
         int *reqdaqs;
         int lenaqs;
+        vector<double> gqvals(int qq);
+        vector<double> gaqvals(int qq);
+        vector<int> rq_backup;
+        int qsfound;
+        void set_reqd_qs(vector<int>);
+        void set_reqd_aqs(vector<int>);
+        void calculate_q(vector <int>);
+        void calculate_aq(vector <int>);
         double dfactorial(int ,int );
         void convert_to_spherical_coordinates(double , double , double , double &, double &, double &);
         double PLM(int, int, double);
@@ -121,10 +118,6 @@ class System{
         double get_number_from_bond(int,int);
         double get_number_from_bond(Atom ,Atom );
         void calculate_frenkel_numbers();
-        vector<double> gqvals(int qq);
-        vector<double> gaqvals(int qq);
-        vector<int> rq_backup;
-        int qsfound;
         //disorder vars
         void calculate_disorder();
         void find_average_disorder();        
@@ -136,6 +129,8 @@ class System{
         double threshold;
         double avgthreshold;
         int maxclusterid;
+        int solidq;
+        int criteria;
         void find_solid_atoms();
         void find_clusters(double);
         void harvest_cluster(const int, const int);
@@ -143,21 +138,11 @@ class System{
         int largest_cluster();
         void set_nucsize_parameters(double,double,double);
         void get_largest_cluster_atoms();
-        int glargestclusterid();
-        void slargestclusterid(int);
-        int solidq;
-        int gsolidq();
-        void ssolidq( int);
-        int criteria;
-        int gcriteria();
-        void scriteria( int);
 
         //-----------------------------------------------------
         // Voronoi based methods
         //-----------------------------------------------------
         int alpha;
-        void salpha(int);
-        int galpha();
         void find_average_volume();
         int voronoiused;
         double face_cutoff;

@@ -16,29 +16,25 @@ using namespace voro;
 System::System(){
 
     nop = -1;
+    triclinic = 0;
+    usecells = 0;
+    filter = 0;
+
+
     maxclusterid = -1;
     neighborsfound = 0;
     qsfound = 0;
-    fileread = 0;
-    filter = 0;
-    triclinic = 0;
+    
     alpha = 1;
     voronoiused = 0;
     solidq = 6;
     criteria = 0;
-    usecells = 0;
+    
     neighbordistance = 0;
 
 }
 
 System::~System(){
-
-}
-
-
-void System::read_particle_file(string nn){
-
-    fileread = 1;
 
 }
 
@@ -160,15 +156,6 @@ void System::satom(Atom atom1) {
 //----------------------------------------------------
 // Neighbor methods
 //----------------------------------------------------
-void System::susecells(int a){
-
-    usecells = a;
-}
-
-int System::gusecells(){
-
-    return usecells ;
-}
 
 double System::get_abs_distance(int ti ,int tj,double &diffx ,double &diffy,double &diffz){
 
@@ -374,13 +361,6 @@ void System::reset_all_neighbors(){
     }
 }
 
-void System::sfilter(int fno){
-
-    filter = fno;
-}
-int System::gfilter(){
-  return filter;
-}
 
 vector<double> System::get_pairdistances(){
 
@@ -1544,28 +1524,9 @@ void System::get_largest_cluster_atoms(){
 
 void System::set_nucsize_parameters(double n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
 
-int System::gsolidq() { return solidq; }
-void System::ssolidq( int n) { solidq = n; }
-//access function for criteria
-int System::gcriteria() { return criteria; }
-void System::scriteria( int n) { criteria = n; }
-
-int System::glargestclusterid() { return maxclusterid; }
-void System::slargestclusterid(int idd) { }
-
 //-----------------------------------------------------
 // Voronoi based methods
 //-----------------------------------------------------
-void System::salpha(int a){
-
-    alpha = a;
-}
-
-int System::galpha(){
-
-    return alpha ;
-}
-
 void System::set_face_cutoff(double fcut){
     face_cutoff = fcut;
 }

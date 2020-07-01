@@ -39,6 +39,7 @@ PYBIND11_MODULE(csystem, m) {
         .def_property("box", &System::gbox, &System::sbox )
         .def("assign_triclinic_params",&System::assign_triclinic_params)
         .def("get_triclinic_params",&System::get_triclinic_params)
+        .def_readwrite("triclinic", &System::triclinic)
         .def("get_boxvecs", &System::gboxvecs)
 
         //-----------------------------------------------------
@@ -51,7 +52,8 @@ PYBIND11_MODULE(csystem, m) {
         //----------------------------------------------------
         // Neighbor methods
         //----------------------------------------------------
-        .def_property("usecells", &System::gusecells, &System::susecells)
+        .def_readwrite("usecells", &System::usecells)
+        .def_readwrite("filter", &System::filter)
         .def("get_absdistance", (double (System::*) (Atom, Atom))  &System::get_abs_distance)
         .def("get_absdistance_vector", &System::get_distance_vector)
         .def("get_all_neighbors_cells",&System::get_all_neighbors_cells)
@@ -61,7 +63,6 @@ PYBIND11_MODULE(csystem, m) {
         .def("get_all_neighbors_voronoi",&System::get_all_neighbors_voronoi)
         .def("set_neighbordistance", &System::set_neighbordistance)
         .def("reset_allneighbors", &System::reset_all_neighbors)
-        .def_property("filter",&System::gfilter,&System::sfilter)
         .def("get_pairdistances",&System::get_pairdistances)
 
         //---------------------------------------------------
@@ -77,10 +78,10 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         // Solids and Clustering methods
         //-----------------------------------------------------
-        .def_property("largest_clusterid", &System::glargestclusterid, &System::slargestclusterid)
+        .def_readwrite("largest_clusterid", &System::largestclusterid)
+        .def_readwrite("solidq", &System::solidq)
         .def("set_nucsize_parameters",&System::set_nucsize_parameters)
-        .def_property("solidq", &System::gsolidq, &System::ssolidq)
-        .def_property("criteria", &System::gcriteria, &System::scriteria)
+        .def_readwrite("criteria", &System::criteria)
         .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond)
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
         .def("cfind_clusters",&System::find_clusters)
@@ -92,7 +93,7 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         // Voronoi based methods
         //-----------------------------------------------------
-        .def_property("voroexp", &System::galpha, &System::salpha)
+        .def_readwrite("voroexp", &System::alpha)
         .def("find_average_volume",&System::find_average_volume)
         ;
 
