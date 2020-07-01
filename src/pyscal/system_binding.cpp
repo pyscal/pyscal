@@ -31,9 +31,7 @@ PYBIND11_MODULE(csystem, m) {
         // Constructor, Destructor and Access functions
         //-----------------------------------------------------        
         .def(py::init< >())
-        .def_property("nop",&System::gnop,&System::snop)
-        .def("get_indicators",&System::get_indicators)
-        .def("set_indicators",&System::set_indicators)
+        .def_readonly("nop", &System::nop)
 
         //-----------------------------------------------------
         // Simulation box related methods
@@ -41,7 +39,7 @@ PYBIND11_MODULE(csystem, m) {
         .def_property("box", &System::gbox, &System::sbox )
         .def("assign_triclinic_params",&System::assign_triclinic_params)
         .def("get_triclinic_params",&System::get_triclinic_params)
-        .def("get_boxvecs",&System::gboxvecs)
+        .def("get_boxvecs", &System::gboxvecs)
 
         //-----------------------------------------------------
         // Atom related methods

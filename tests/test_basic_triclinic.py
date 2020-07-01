@@ -12,9 +12,6 @@ def test_triclinic():
     neighs = atoms[0].neighbors
     assert len(neighs) == 14
 
-    indicators = sys.get_indicators()
-    assert indicators[6] == 1
-
     sys.find_neighbors(method = 'cutoff', cutoff=0.9)
     atoms = sys.atoms
     neighs = atoms[0].neighbors

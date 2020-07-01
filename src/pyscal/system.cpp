@@ -35,34 +35,6 @@ System::~System(){
 
 }
 
-vector<int> System::get_indicators(){
-
-    vector<int> indicators;
-    indicators.emplace_back(nop);
-    indicators.emplace_back(maxclusterid);
-    indicators.emplace_back(neighborsfound);
-    indicators.emplace_back(qsfound);
-    indicators.emplace_back(fileread);
-    indicators.emplace_back(filter);
-    indicators.emplace_back(triclinic);
-    indicators.emplace_back(alpha);
-    indicators.emplace_back(voronoiused);
-
-    return indicators;
-}
-
-void System::set_indicators(vector<int> indicators){
-
-    nop = indicators[0];
-    maxclusterid = indicators[1];
-    neighborsfound = indicators[2];
-    qsfound = indicators[3];
-    fileread = indicators[4];
-    filter = indicators[5];
-    triclinic = indicators[6];
-    alpha = indicators[7];
-    voronoiused = indicators[8];
-}
 
 void System::read_particle_file(string nn){
 
@@ -115,6 +87,20 @@ void System::sbox(vector<vector <double>> boxd) {
     boxz = boxd[2][1] - boxd[2][0];
 }
 
+vector<vector<double>> System::gbox(){
+    vector<vector<double>> qres;
+    vector<double> qd;
+
+    for(int i=0;i<3;i++){
+        qd.clear();
+        for(int j=0;j<2;j++){
+            qd.emplace_back(boxdims[i][j]);
+        }
+        qres.emplace_back(qd);
+    }
+    return qres;
+}
+
 vector<vector<double>> System::gboxvecs(){
     vector<vector<double>> qres;
     vector<double> dqres;
@@ -144,19 +130,7 @@ vector<vector<double>> System::gboxvecs(){
     return qres;
 }
 
-vector<vector<double>> System::gbox(){
-    vector<vector<double>> qres;
-    vector<double> qd;
 
-    for(int i=0;i<3;i++){
-        qd.clear();
-        for(int j=0;j<2;j++){
-            qd.emplace_back(boxdims[i][j]);
-        }
-        qres.emplace_back(qd);
-    }
-    return qres;
-}
 //-----------------------------------------------------
 // Atom related methods
 //-----------------------------------------------------

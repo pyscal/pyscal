@@ -38,8 +38,6 @@ class System{
         int baseunit;
         string inputfile;
         int fileread;
-        vector<int> get_indicators();       // TBDep
-        void set_indicators(vector<int>);   // TBDep
 
 
         //-----------------------------------------------------
