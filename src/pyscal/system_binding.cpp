@@ -78,7 +78,7 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         // Solids and Clustering methods
         //-----------------------------------------------------
-        .def_readwrite("largest_clusterid", &System::largestclusterid)
+        .def_readwrite("largest_clusterid", &System::maxclusterid)
         .def_readwrite("solidq", &System::solidq)
         .def("set_nucsize_parameters",&System::set_nucsize_parameters)
         .def_readwrite("criteria", &System::criteria)

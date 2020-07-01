@@ -19,11 +19,7 @@ System::System(){
     triclinic = 0;
     usecells = 0;
     filter = 0;
-
-
     maxclusterid = -1;
-    neighborsfound = 0;
-    qsfound = 0;
     
     alpha = 1;
     voronoiused = 0;
@@ -35,10 +31,7 @@ System::System(){
 }
 
 System::~System(){
-
 }
-
-
 
 //-----------------------------------------------------
 // Simulation box related methods
@@ -555,7 +548,6 @@ void System::get_all_neighbors_cells(){
         }
     }
 
-    neighborsfound = 1;
 
 }
 
@@ -570,8 +562,6 @@ void System::get_all_neighbors_normal(){
     double d;
     double diffx,diffy,diffz;
     double r,theta,phi;
-
-    if (!fileread) { read_particle_file(inputfile); }
 
     for (int ti=0; ti<nop; ti++){
         for (int tj=ti; tj<nop; tj++){
@@ -615,8 +605,6 @@ void System::get_all_neighbors_normal(){
 
     }
 
-    //mark end of neighbor calc
-    neighborsfound = 1;
 
 }
 
@@ -776,11 +764,6 @@ int System::get_all_neighbors_sann(double prefactor){
     guessdist = prefactor*guessdist;
     neighbordistance = guessdist;
 
-
-    //if file is not read - read it in at this point
-    //we have to work on indicator functions
-    if (!fileread) { read_particle_file(inputfile); }
-
     if (usecells){
         get_temp_neighbors_cells();
     }
@@ -833,8 +816,7 @@ int System::get_all_neighbors_sann(double prefactor){
 
     }
 
-    //mark end of neighbor calc
-    neighborsfound = 1;
+
     return finished;
 
 
@@ -880,11 +862,6 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
     //now add some safe padding - this is the prefactor which we will read in
     guessdist = prefactor*guessdist;
     neighbordistance = guessdist;
-
-    //if file is not read - read it in at this point
-    //we have to work on indicator functions
-    if (!fileread) { read_particle_file(inputfile); }
-
 
     //introduce cell lists here - instead of looping over all neighbors
     //use cells
@@ -942,8 +919,7 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
 
     }
 
-    //mark end of neighbor calc
-    neighborsfound = 1;
+
     return 1;
 
 }
@@ -1113,10 +1089,6 @@ void System::calculate_q(vector <int> qs){
         }
     }
 
-    //now check if neighbors are found
-    if (!neighborsfound){
-        get_all_neighbors_normal();
-    }
 
     //note that the qvals will be in -2 pos
     //q2 will be in q0 pos and so on
@@ -1164,7 +1136,6 @@ void System::calculate_q(vector <int> qs){
 
     }
 
-    qsfound = 1;
 }
 
 
@@ -1555,8 +1526,6 @@ void System::get_all_neighbors_voronoi(){
     double weightsum;
 
 
-    if (!fileread) { read_particle_file(inputfile); }
-
     //pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
     pre_container pcon(0.00, boxx, 0.00, boxy, 0.0, boxz, true, true, true);
     for(int i=0; i<nop; i++){
@@ -1629,8 +1598,6 @@ void System::get_all_neighbors_voronoi(){
 
     } while (cl.inc());
 
-    //mark end of neighbor calc
-    neighborsfound = 1;
 
     //now calculate the averged volume
     find_average_volume();

@@ -71,7 +71,6 @@ class System{
         int total_cells;
         cell *cells;
         double neighbordistance;
-        int neighborsfound;
         void get_all_neighbors_normal();
         void process_neighbor(int, int);
         int get_all_neighbors_sann(double);
@@ -104,7 +103,6 @@ class System{
         vector<double> gqvals(int qq);
         vector<double> gaqvals(int qq);
         vector<int> rq_backup;
-        int qsfound;
         void set_reqd_qs(vector<int>);
         void set_reqd_aqs(vector<int>);
         void calculate_q(vector <int>);
