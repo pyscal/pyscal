@@ -1,6 +1,12 @@
 Saving System and Atom objects to file
 --------------------------------------
 
+.. note::
+
+    Pickling support has been deprecated and will be removed
+    in a future release
+
+    
 pyscal offers tools to save :class:`~pyscal.core.System` and :class:`~pyscal.catom.Atom` classes to file.
 There are two methods to do this. The :func:`~pyscal.core.System.to_file` method can save a
 trajectory file which contains all the atom positions and system box
