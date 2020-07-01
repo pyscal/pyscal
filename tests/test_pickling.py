@@ -65,7 +65,7 @@ def test_file_system():
     sys3 = pc.System()
     sys3.atoms = atoms
     sys3.box = boxdims
-    sys3.to_file('tests/tjkf.dat', custom=['velocity'])
+    sys3.to_file('tests/tjkf.dat', customkeys=['velocity'])
 
     #now read it again
     sys4 = pc.System()
