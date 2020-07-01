@@ -28,33 +28,46 @@ class System{
 
     public:
 
-        //---------------------------------------------------
-        // Methods for q calculation
-        //---------------------------------------------------
-        void set_reqd_qs(vector<int>);
-        void set_reqd_aqs(vector<int>);
-        void calculate_q(vector <int>);
-        void calculate_aq(vector <int>);
-        int *reqdqs;
-        int lenqs;
-        int *reqdaqs;
-        int lenaqs;
-        double dfactorial(int ,int );
-        void convert_to_spherical_coordinates(double , double , double , double &, double &, double &);
-        double PLM(int, int, double);
-        void YLM(int , int , double , double , double &, double &);
-        void QLM(int ,int ,double ,double ,double &, double & );
-        void calculate_complexQLM_6();
-        double get_number_from_bond(int,int);
-        double get_number_from_bond(Atom ,Atom );
-        void calculate_frenkel_numbers();
-        vector<double> gqvals(int qq);
-        vector<double> gaqvals(int qq);
-        vector<int> rq_backup;
-        int qsfound;
-        //disorder vars
-        void calculate_disorder();
-        void find_average_disorder();        
+        //-----------------------------------------------------
+        // Constructor, Destructor and Access functions
+        //-----------------------------------------------------
+        System();
+        ~System();
+        int nop;
+
+        int baseunit;
+        string inputfile;
+        int fileread;
+        vector<int> get_indicators();       // TBDep
+        void set_indicators(vector<int>);   // TBDep
+
+
+        //-----------------------------------------------------
+        // Simulation box related methods
+        //-----------------------------------------------------
+        double rot[3][3];
+        double rotinv[3][3];
+        int triclinic;
+        double boxx, boxy, boxz;
+        double boxdims[3][2];
+        void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
+        vector<vector<double>> get_triclinic_params();
+        vector<vector<double>> gboxvecs();
+        void sbox(vector<vector<double>>);
+        vector<vector<double>> gbox();
+        vector<double> gboxdims();
+
+        //-----------------------------------------------------
+        // Atom related methods
+        //-----------------------------------------------------
+        vector<Atom> atoms;
+        void assign_particles( vector<Atom>);
+        void read_particle_file(string);    // TBDep
+        void set_atoms( vector<Atom>);
+        vector<Atom> get_atoms();
+        Atom gatom(int);
+        void satom(Atom);
+
 
         //----------------------------------------------------
         // Neighbor methods
@@ -89,49 +102,34 @@ class System{
         void get_temp_neighbors_cells();
         void get_temp_neighbors_brute();
 
-         
 
-        //-----------------------------------------------------
-        // Atom related methods
-        //-----------------------------------------------------
-        vector<Atom> atoms;
-        void assign_particles( vector<Atom>);
-        void read_particle_file(string);    // TBDep
-        void set_atoms( vector<Atom>);
-        vector<Atom> get_atoms();
-        Atom gatom(int);
-        void satom(Atom);
-
-        //-----------------------------------------------------
-        // Simulation box related methods
-        //-----------------------------------------------------
-        double rot[3][3];
-        double rotinv[3][3];
-        int triclinic;
-        double boxx, boxy, boxz;
-        double boxdims[3][2];
-        void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
-        vector<vector<double>> get_triclinic_params();
-        vector<vector<double>> gboxvecs();
-        void sbox(vector<vector<double>>);
-        vector<vector<double>> gbox();
-        vector<double> gboxdims();
-
-
-        //-----------------------------------------------------
-        // Constructor, Destructor and Access functions
-        //-----------------------------------------------------
-        System();
-        ~System();
-        vector<int> get_indicators();       // TBDep
-        void set_indicators(vector<int>);   // TBDep
-        int nop;
-        int baseunit;
-        string inputfile;
-        int gnop();
-        void snop(int);
-        int fileread;
-
+        //---------------------------------------------------
+        // Methods for q calculation
+        //---------------------------------------------------
+        void set_reqd_qs(vector<int>);
+        void set_reqd_aqs(vector<int>);
+        void calculate_q(vector <int>);
+        void calculate_aq(vector <int>);
+        int *reqdqs;
+        int lenqs;
+        int *reqdaqs;
+        int lenaqs;
+        double dfactorial(int ,int );
+        void convert_to_spherical_coordinates(double , double , double , double &, double &, double &);
+        double PLM(int, int, double);
+        void YLM(int , int , double , double , double &, double &);
+        void QLM(int ,int ,double ,double ,double &, double & );
+        void calculate_complexQLM_6();
+        double get_number_from_bond(int,int);
+        double get_number_from_bond(Atom ,Atom );
+        void calculate_frenkel_numbers();
+        vector<double> gqvals(int qq);
+        vector<double> gaqvals(int qq);
+        vector<int> rq_backup;
+        int qsfound;
+        //disorder vars
+        void calculate_disorder();
+        void find_average_disorder();        
 
         //-----------------------------------------------------
         // Solids and Clustering methods

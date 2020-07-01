@@ -21,31 +21,39 @@ public:
 };
 
 
-
 PYBIND11_MODULE(csystem, m) {
     py::options options;
     options.disable_function_signatures();
 
-
     //bindings and documentation for individual functions
     py::class_<System>(m,"System")
+        //-----------------------------------------------------
+        // Constructor, Destructor and Access functions
+        //-----------------------------------------------------        
         .def(py::init< >())
-        //.def("assign_particles", &System::assign_particles, py::keep_alive<1, 2>())
-        .def_property("largest_clusterid", &System::glargestclusterid, &System::slargestclusterid)
-        .def("set_nucsize_parameters",&System::set_nucsize_parameters)
+        .def_property("nop",&System::gnop,&System::snop)
+        .def("get_indicators",&System::get_indicators)
+        .def("set_indicators",&System::set_indicators)
+
+        //-----------------------------------------------------
+        // Simulation box related methods
+        //-----------------------------------------------------
         .def_property("box", &System::gbox, &System::sbox )
+        .def("assign_triclinic_params",&System::assign_triclinic_params)
+        .def("get_triclinic_params",&System::get_triclinic_params)
+        .def("get_boxvecs",&System::gboxvecs)
+
+        //-----------------------------------------------------
+        // Atom related methods
+        //-----------------------------------------------------
         .def_property("atoms", &System::get_atoms, &System::set_atoms)
-        .def_property("solidq", &System::gsolidq, &System::ssolidq)
-        .def_property("criteria", &System::gcriteria, &System::scriteria)
-        .def_property("usecells", &System::gusecells, &System::susecells)
-        //.def("get_atoms", &System::get_atoms)
-        //.def("set_atoms", &System::set_atoms)
         .def("cget_atom",  &System::gatom)
         .def("cset_atom", &System::satom)
-        .def_property("voroexp", &System::galpha, &System::salpha)
-        .def_property("nop",&System::gnop,&System::snop)
-        .def("cget_qvals",&System::gqvals)
-        .def("cget_aqvals",&System::gaqvals)
+
+        //----------------------------------------------------
+        // Neighbor methods
+        //----------------------------------------------------
+        .def_property("usecells", &System::gusecells, &System::susecells)
         .def("get_absdistance", (double (System::*) (Atom, Atom))  &System::get_abs_distance)
         .def("get_absdistance_vector", &System::get_distance_vector)
         .def("get_all_neighbors_cells",&System::get_all_neighbors_cells)
@@ -55,25 +63,39 @@ PYBIND11_MODULE(csystem, m) {
         .def("get_all_neighbors_voronoi",&System::get_all_neighbors_voronoi)
         .def("set_neighbordistance", &System::set_neighbordistance)
         .def("reset_allneighbors", &System::reset_all_neighbors)
+        .def_property("filter",&System::gfilter,&System::sfilter)
+        .def("get_pairdistances",&System::get_pairdistances)
+
+        //---------------------------------------------------
+        // Methods for q calculation
+        //---------------------------------------------------
+        .def("cget_qvals",&System::gqvals)
+        .def("cget_aqvals",&System::gaqvals)
         .def("ccalculate_q",&System::calculate_q)
         .def("ccalculate_aq",&System::calculate_aq)
+        .def("ccalculate_disorder",&System::calculate_disorder)
+        .def("ccalculate_avg_disorder",&System::find_average_disorder)
+
+        //-----------------------------------------------------
+        // Solids and Clustering methods
+        //-----------------------------------------------------
+        .def_property("largest_clusterid", &System::glargestclusterid, &System::slargestclusterid)
+        .def("set_nucsize_parameters",&System::set_nucsize_parameters)
+        .def_property("solidq", &System::gsolidq, &System::ssolidq)
+        .def_property("criteria", &System::gcriteria, &System::scriteria)
         .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond)
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
         .def("cfind_clusters",&System::find_clusters)
         .def("cfind_clusters_recursive",&System::find_clusters_recursive)
         .def("find_largest_cluster",&System::largest_cluster)
         .def("get_largest_cluster_atoms",&System::get_largest_cluster_atoms)
-        .def_property("filter",&System::gfilter,&System::sfilter)
-        .def("assign_triclinic_params",&System::assign_triclinic_params)
-        .def("get_triclinic_params",&System::get_triclinic_params)
-        .def("get_boxvecs",&System::gboxvecs)
-        .def("get_pairdistances",&System::get_pairdistances)
-        .def("find_average_volume",&System::find_average_volume)
-        .def("get_indicators",&System::get_indicators)
-        .def("set_indicators",&System::set_indicators)
         .def("find_solid_atoms",&System::find_solid_atoms)
-        .def("ccalculate_disorder",&System::calculate_disorder)
-        .def("ccalculate_avg_disorder",&System::find_average_disorder)
+
+        //-----------------------------------------------------
+        // Voronoi based methods
+        //-----------------------------------------------------
+        .def_property("voroexp", &System::galpha, &System::salpha)
+        .def("find_average_volume",&System::find_average_volume)
         ;
 
 
