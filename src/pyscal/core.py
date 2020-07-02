@@ -5,7 +5,6 @@
 
 
 import pyscal.traj_process as ptp
-import pyscal.pickle_object as pp
 import os
 import numpy as np
 import warnings
@@ -816,8 +815,9 @@ class System(pc.System):
 
         Parameters
         ----------
-        condition : callable
-            function which should take an :class:`~Atom` object, and give a True/False output
+        condition : callable or atom property
+            Either function which should take an :class:`~Atom` object, and give a True/False output
+            or an attribute of atom class which has value or 1 or 0.
 
         largest : bool, optional
             If True returns the size of the largest cluster. Default False.
@@ -831,8 +831,11 @@ class System(pc.System):
         Notes
         -----
         This function helps to cluster atoms based on a defined property. This property
-        is defined by the user through the function `condition` which is passed as a parameter.
-        For each atom in the system, the `condition` should give a True/False values.
+        is defined by the user through the argument `condition` which is passed as a parameter.
+        `condition` can be of two types. The first type is a function which takes an 
+        :class:`~Atom` object and should give a True/False value. `condition` can also be an
+        :class:`~Atom` attribute or a value from `custom` values stored in an atom.
+
 
         When clustering, the code loops over each atom and its neighbors. If the
         `condition` is true for both host atom and the neighbor, they are assigned to
@@ -844,26 +847,42 @@ class System(pc.System):
                 #if both atom is solid
                 return (atom1.solid)
 
-        Check examples for more details.
+        The same can be done by passing `"solid"` as the condition argument instead of the above
+        function. Passing a function allows to evaluate complex conditions, but is slower than
+        passing an attribute.
 
         """
         testatom = self.atoms[0]
 
         #test the condition
+        isatomattr = False
+
         try:
             out = condition(testatom)
-            if out not in [True, False]:
+            if out not in [True, False, 0, 1]:
                 raise RuntimeError("The output of condition should be either True or False. Received %s"%str(out))
-        except:
-            raise RuntimeError("condition did not work")
 
+        except:
+            try:
+                out = self.get_custom(testatom, [condition])[0]
+                if out not in [True, False, 0, 1]:
+                    raise RuntimeError("The output of condition should be either True or False. Received %s"%str(out))
+                isatomattr = True        
+            except:
+                raise RuntimeError("condition did not work")
+        
         #now loop
         atoms = self.atoms
-        for atom in atoms:
-            cval = condition(atom)
-            atom.condition = cval
-        self.atoms = atoms
 
+        if isatomattr:
+            for atom in atoms:
+                atom.condition = self.get_custom(atom, [condition])[0]
+        else:
+            for atom in atoms:
+                cval = condition(atom)
+                atom.condition = cval
+        
+        self.atoms = atoms
         self.cfind_clusters_recursive(cutoff)
 
         #done!
@@ -1245,141 +1264,59 @@ class System(pc.System):
                     count += 1
             return vec/float(count)
 
-
-
-
-
-
-
-
-
-    def prepare_pickle(self):
+    def get_custom(self, atom, customkeys):
         """
-        Prepare the system for pickling and create a picklable system
+        Get a custom attribute from Atom
 
         Parameters
         ----------
-        None
+        atom : Atom object
+
+        customkeys : list of strings
+            the list of keys to be found
 
         Returns
         -------
-        psys : picklable system object
-
-        Notes
-        -----
-        This function prepares the system object for pickling. From
-        a user perspective, the :func:`~pyscal.core.System.to_pickle` method should be used
-        directly.
-
-        See also
-        --------
-        to_file()
+        vals : list
+            array of custom values
 
         """
+        #first option - maybe it appears
+        vals = []
+        for ckey in customkeys:
+            #if the key is there - ignore it
+            if not ckey in atom.custom.keys():
+                #try to get from attribute
+                try:
+                    val = getattr(atom, ckey)
+                    vals.append(val)
 
-        #get the basic system indicators
-        indicators = self.get_indicators()
-        #get box dims and triclinic params if triclinic
-        box = self.box
-        if indicators[6] == 1:
-            rot = self.get_triclinic_params()
-        else:
-            rot = 0
+                except AttributeError:
+                    #since attr failed, check if they are q or aq values
+                    if ckey[0] == 'q':
+                        qkey = ckey[1:]
+                        #try to acess this value
+                        val = atom.get_q(int(qkey))
+                        #add this pair to dict - as string vals
+                        vals.append(val)
 
-        #now finally get atoms
-        atoms = self.atoms
-        #convert them to picklabale atoms
-        patoms = [pp.pickle_atom(atom) for atom in atoms]
+                    elif ckey[:2] == 'aq':
+                        qkey = ckey[2:]
+                        val = atom.get_q(int(qkey), averaged=True)
+                        vals.append(val)
 
-        #create System instance and assign things
-        psys = pp.pickleSystem()
-        psys.indicators = indicators
-        psys.atoms = patoms
-        psys.box = box
-        psys.rot = rot
-
-        return psys
-
-    def to_pickle(self, file):
-        """
-        Save a system to pickle file
-
-        Parameters
-        ----------
-        file : string
-            name of output file
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        This function can be used to save a :class:`~pyscal.core.System` object directly to
-        file. This retains all the calculated quantities of the system,
-        including the atoms and their properties. This can be useful to
-        restart the calculation. The function uses `numpy.save` method
-        to save the information. Hence pickling between different versions
-        of python could lead to issues.
-
-        .. warning::
-
-            Pickling between different versions of numpy or python could be incompatible.
-            Pickling is not secure. You should only unpickle objects that you trust.
-
-        """
-        psys = self.prepare_pickle()
-        np.save(file, psys, allow_pickle=True)
-
-
-    def from_pickle(self, file):
-        """
-        Read the contents of :class:`~pyscal.core.System` object from a
-        pickle file.
-
-        Parameters
-        ----------
-        file : string
-            name of input file
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        This function can be used to set up a system
-        from a file. A :class:`~pyscal.core.System` object needs to be created first.
-
-        Examples
-        --------
-
-        >>> sys = System()
-        >>> sys.from_pickle(filename)
-
-        """
-        if os.path.exists(file):
-            psys = np.load(file, allow_pickle=True).flatten()[0]
-        else:
-            raise IOError("file does not exist")
-        #set up indicators
-        self.set_indicators(psys.indicators)
-        #unpickle atoms
-        self.atoms = [pp.unpickle_atom(atom) for atom in psys.atoms]
-        self.box = psys.box
-
-
-        #if triclinic, get those
-        if psys.indicators[6] == 1:
-            rot = psys.rot
-            rotinv = np.linalg.inv(rot)
-            self.assign_triclinic_params(rot, rotinv)
+                    else:
+                        raise AttributeError("custom key was not found")
+            else:
+                val = atom.custom[ckey]
+                vals.append(val)
+        return vals
 
     def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0):
         """
         Save the system instance to a trajectory file.
 
-        Parameters
+         Parameters
         ----------
         outfile : string
             name of the output file
@@ -1408,44 +1345,13 @@ class System(pc.System):
         if customkeys == None:
             customkeys = []
 
-        def get_custom(atom, customkeys):
-            #first option - maybe it appears
-            vals = []
-            for ckey in customkeys:
-                #if the key is there - ignore it
-                if not ckey in atom.custom.keys():
-                    #try to get from attribute
-                    try:
-                        val = getattr(atom, ckey)
-                        vals.append(val)
-
-                    except AttributeError:
-                        #since attr failed, check if they are q or aq values
-                        if ckey[0] == 'q':
-                            qkey = ckey[1:]
-                            #try to acess this value
-                            val = atom.get_q(int(qkey))
-                            #add this pair to dict - as string vals
-                            vals.append(val)
-
-                        elif ckey[:2] == 'aq':
-                            qkey = ckey[2:]
-                            val = atom.get_q(int(qkey), averaged=True)
-                            vals.append(val)
-
-                        else:
-                            raise AttributeError("custom key was not found")
-                else:
-                    val = atom.custom[ckey]
-                    vals.append(val)
-            return vals
 
 
         boxdims = self.box
         atoms = self.atoms
 
         if len(customkeys) > 0:
-            cvals = [get_custom(atom, customkeys) for atom in atoms]
+            cvals = [self.get_custom(atom, customkeys) for atom in atoms]
 
         #open files for writing
         if compressed:
