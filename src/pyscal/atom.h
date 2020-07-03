@@ -107,7 +107,7 @@ class Atom{
         double n_theta[MAXNUMBEROFNEIGHBORS];
         vector<datom> temp_neighbors;
         double cutoff;
-
+        int n_neighbors;
         int isneighborset;
         //function to set neighbors
         void sneighdist(vector<double>);
@@ -167,20 +167,11 @@ class Atom{
         int faceverticenumbers[MAXNUMBEROFNEIGHBORS];
         double faceperimeters[MAXNUMBEROFNEIGHBORS];
         int n3, n4, n5, n6;
-        int n_neighbors;
         vector<vector<double>> edgelengths;
         vector<double> vertex_vectors;
         vector<int> vertex_numbers;
-        vector<double> gvertex_vectors();
-        void svertex_vectors(vector<double>);
-        vector<int> gvertex_numbers();
-        void svertex_numbers(vector<int>);        
         double volume;
         double avgvolume;
-        double gvolume();
-        double gavgvolume();
-        void svolume(double);
-        void savgvolume(double);
         vector<int> gfacevertices();
         void sfacevertices(vector<int>);
         vector<double> gfaceperimeters();
@@ -196,21 +187,12 @@ class Atom{
         //-------------------------------------------------------
         double angular;
         double avg_angular;
-        double gangular();
-        void sangular(double);
-        double gavgangular();
-        void savgangular(double);
         vector<int> chiparams;
-        vector<int> gchiparams();
-        void schiparams(vector<int>);
-
 
         //-------------------------------------------------------
         // Other order parameters
         //-------------------------------------------------------
         vector<double> sro;
-        vector<double> gsro();
-        void ssro(vector<double>);
 
 
 

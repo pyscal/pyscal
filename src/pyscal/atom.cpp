@@ -283,10 +283,6 @@ vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
 //-------------------------------------------------------
 // Voronoi related properties
 //-------------------------------------------------------
-double Atom::gvolume(){ return volume; }
-void Atom::svolume(double vv){ volume = vv; }
-double Atom::gavgvolume(){ return avgvolume; }
-void Atom::savgvolume(double vv){ avgvolume = vv; }
 void Atom::sfacevertices(vector<int> nss){
     for(int i=0; i<nss.size(); i++){
         facevertices[i] = nss[i];
@@ -299,24 +295,6 @@ vector<int> Atom::gfacevertices(){
         rqlms.emplace_back(facevertices[i]);
     }
     return rqlms;
-}
-
-void Atom::svertex_numbers(vector<int> nss){
-    vertex_numbers = nss;
-}
-
-vector<int> Atom::gvertex_numbers(){
-
-    //loop over face vertices
-    return vertex_numbers;
-}
-
-void Atom::svertex_vectors(vector<double> nss){
-    vertex_vectors = nss;
-}
-
-vector<double> Atom::gvertex_vectors(){
-    return vertex_vectors;
 }
 
 void Atom::sfaceperimeters(vector<double> nss){
@@ -362,41 +340,10 @@ void Atom::svorovector(vector<int> voro){
 //-------------------------------------------------------
 // Angle related properties
 //-------------------------------------------------------
-double Atom::gangular(){
-    return angular;
-}
-
-void Atom::sangular(double dd){
-    angular = dd;
-}
-
-double Atom::gavgangular(){
-    return avg_angular;
-}
-
-void Atom::savgangular(double dd){
-    avg_angular = dd;
-}
-
-
-vector<int> Atom::gchiparams(){
-  return chiparams;
-}
-
-void Atom::schiparams(vector<int> nns){
-  chiparams.clear();
-  chiparams = nns;
-}
 
 
 //-------------------------------------------------------
 // Other order parameters
 //-------------------------------------------------------
-vector<double> Atom::gsro(){
-    return sro;
-}
 
-void Atom::ssro(vector<double> dd){
-    sro = dd;
-}
    

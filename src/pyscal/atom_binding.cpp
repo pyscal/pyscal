@@ -302,42 +302,48 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     //-------------------------------------------------------
     // Voronoi related properties
     //-------------------------------------------------------
-    .def_property("volume",&Atom::gvolume,&Atom::svolume, R"mydelimiter(
+    .def_readwrite("volume", &Atom::volume, R"mydelimiter(
         *float*. Voronoi volume of the atom. The Voronoi volume is only calculated if neighbors
         are found using the :func:`~pyscal.core.System.find_neighbors` using the `method='voronoi'`
         option.
-
     )mydelimiter")
-    .def_property("avg_volume",&Atom::gavgvolume,&Atom::savgvolume, R"mydelimiter(
+
+    .def_readwrite("avg_volume", &Atom::avgvolume, R"mydelimiter(
         *float*. Averaged version of the Voronoi volume which is calculated as an average over
         itself and its neighbors. Only calculated when the :func:`~pyscal.core.System.find_neighbors`
         using the `method='voronoi'` option is used.
     )mydelimiter")
+
     .def_property("face_vertices", &Atom::gfacevertices, &Atom::sfacevertices, R"mydelimiter(
           *list of floats*. A list of the number of vertices shared between an atom and its
           neighbors.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
+
     .def_property("face_perimeters", &Atom::gfaceperimeters, &Atom::sfaceperimeters, R"mydelimiter(
           *list of floats*. List consisting of the perimeters of each Voronoi face of an atom.
           Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
-    .def_property("vertex_numbers", &Atom::gvertex_numbers, &Atom::svertex_numbers, R"mydelimiter(
+
+    .def_readwrite("vertex_numbers", &Atom::vertex_numbers, R"mydelimiter(
           *list of floats*. For each Voronoi face of the atom, this values includes a List
           of vertices that constitute the face.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
-    .def_property("vertex_vectors", &Atom::gvertex_vectors, &Atom::svertex_vectors, R"mydelimiter(
+
+    .def_readwrite("vertex_vectors", &Atom::vertex_vectors, R"mydelimiter(
           *list of floats*. A list of positions of each vertex of the Voronoi polyhedra of
           the atom.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
+
     .def_property("edge_lengths", &Atom::gedgelengths, &Atom::sedgelengths, R"mydelimiter(
           *list of floats*. For each face, this vector contains the lengths of edges
           that make up the Voronoi polyhedra of the atom.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
           using the `method='voronoi'` option is used.
     )mydelimiter")
+
     .def_property("vorovector", &Atom::gvorovector, &Atom::svorovector, R"mydelimiter(
           *list of ints*. A vector of the form `(n3, n4, n5, n6)` where n3 is the number of faces with 3 vertices,
           n4 is the number of faces with 4 vertices and so on. This can be used to identify structures [1][2].
@@ -354,27 +360,27 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     //-------------------------------------------------------
     // Angle related properties
     //-------------------------------------------------------
-    .def_property("angular",&Atom::gangular, &Atom::sangular, R"mydelimiter(
+    .def_readwrite("angular", &Atom::angular, R"mydelimiter(
         *Float*.
         The value of angular parameter A of an atom. The angular parameter measures the tetrahedral coordination of an atom.
         Meaningful values are only returned if the property is calculated using :func:`~pyscal.core.System.calculate_angularcriteria`.
     )mydelimiter")
 
-    .def_property("chiparams",&Atom::gchiparams, &Atom::schiparams, R"mydelimiter(
+    .def_readwrite("avg_angular", &Atom::avg_angular, R"mydelimiter(
+        *Float*.
+        The average angular parameter value. Not used currently.
+    )mydelimiter")
+
+    .def_readwrite("chiparams", &Atom::chiparams, R"mydelimiter(
         *Float*.
         The value of chiparameter of an atom. The return value is a vector of length 8.
         Meaningful values are only returned if chi params are calculated using :func:`~pyscal.core.System.calculate_chiparams`.
     )mydelimiter")
 
-    .def_property("avg_angular",&Atom::gavgangular, &Atom::savgangular, R"mydelimiter(
-        *Float*.
-        The average angular parameter value. Not used currently.
-    )mydelimiter")
-
     //-------------------------------------------------------
     // Other order parameters
     //-------------------------------------------------------
-    .def_property("sro",&Atom::gsro, &Atom::ssro, R"mydelimiter(
+    .def_readwrite("sro", &Atom::sro, R"mydelimiter(
         *Float*.
         The value of short range order parameter.
     )mydelimiter")
