@@ -8,8 +8,9 @@
 #include <pybind11/stl.h>
 #include <complex>
 
-//functions for atoms
-//-------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------
+// Constructor, Destructor
+//-------------------------------------------------------
 Atom::Atom( vector<double> pos, int idd, int typ){
 
     posx = pos[0];
@@ -57,7 +58,31 @@ Atom::Atom( vector<double> pos, int idd, int typ){
 
 Atom::~Atom(){ }
 
+//-------------------------------------------------------
+// Basic Atom properties
+//-------------------------------------------------------
 
+
+//aceesss funcs
+vector<double> Atom::gx(){
+    vector<double> pos;
+    pos.emplace_back(posx);
+    pos.emplace_back(posy);
+    pos.emplace_back(posz);
+    return pos;
+}
+
+void Atom::sx(vector<double> rls){
+    posx = rls[0];
+    posy = rls[1];
+    posz = rls[2];
+}
+
+
+
+//-------------------------------------------------------
+// Neighbor related properties
+//-------------------------------------------------------
 vector<int> Atom::gneighbors(){
     vector<int> nn;
     nn.reserve(n_neighbors);
@@ -66,14 +91,12 @@ vector<int> Atom::gneighbors(){
     }
     return nn;
 }
-
 int Atom::gnneighbors(){
     return n_neighbors;
 }
 void Atom::snneighbors(int dd){
 
 }
-
 void Atom::sneighdist(vector<double> dd){
 }
 
@@ -84,7 +107,46 @@ vector<double> Atom::gneighdist(){
   }
   return neighdist;
 }
+double Atom::gcutoff(){ return cutoff; }
+void Atom::scutoff(double cc){ cutoff = cc; }
+void Atom::sneighbors(vector<int> nns){
 
+    //first reset all neighbors
+    for (int i = 0;i<MAXNUMBEROFNEIGHBORS;i++){
+        neighbors[i] = NILVALUE;
+        neighbordist[i] = -1.0;
+    }
+
+    //now assign the neighbors
+    for(int i=0; i<nns.size(); i++){
+        neighbors[i] = nns[i];
+        //auto assign weight to 1
+        neighborweight[i] = 1.00;
+    }
+
+    n_neighbors = nns.size();
+    isneighborset = 1;
+
+}
+
+void Atom::sneighborweights(vector<double> nss){
+    for(int i=0; i<nss.size(); i++){
+        neighborweight[i] = nss[i];
+    }
+}
+
+vector<double> Atom::gneighborweights(){
+    vector <double> rqlms;
+    for(int i=0; i<n_neighbors; i++){
+        rqlms.emplace_back(neighborweight[i]);
+    }
+    return rqlms;
+}
+
+
+//-------------------------------------------------------
+// Q parameter properties
+//-------------------------------------------------------
 void Atom::ssij(vector<double> dd){
 }
 
@@ -95,43 +157,8 @@ vector<double> Atom::gsij(){
   }
   return ss;
 }
-
-int Atom::gid(){ return id; }
-int Atom::gfrenkelnumber(){ return frenkelnumber; }
-void Atom::sfrenkelnumber(int nn){ frenkelnumber=nn; }
-void Atom::sid(int idd){ id=idd; }
-int Atom::gloc(){ return loc; }
-void Atom::sloc(int idd){ loc=idd; }
-int Atom::gtype(){ return type; }
-void Atom::stype(int idd){ type=idd; }
-double Atom::gvolume(){ return volume; }
-void Atom::svolume(double vv){ volume = vv; }
-double Atom::gcutoff(){ return cutoff; }
-void Atom::scutoff(double cc){ cutoff = cc; }
 double Atom::gasij(){ return avq6q6; }
 void Atom::sasij(double vv){ avq6q6 = vv; }
-double Atom::gavgvolume(){ return avgvolume; }
-void Atom::savgvolume(double vv){ avgvolume = vv; }
-int Atom::gsolid(){ return issolid; }
-void Atom::ssolid(int idd){
-  if (!((idd == 0) || (idd == 1))){
-    throw invalid_argument("surface should be 1 or 0");
-  }
-  issolid=idd; }
-
-bool Atom::gmask(){ return mask; }
-void Atom::smask(bool mm){
-  if (!((mm == true) || (mm == false))){
-    throw invalid_argument("mask should be true or false");
-  }
-  mask=mm;
-}
-
-int Atom::gstructure(){ return structure; }
-void Atom::sstructure(int idd){ structure=idd; }
-void Atom::scondition(int idd){ condition=idd; }
-int Atom::gcondition(){ return condition; }
-
 vector<double> Atom::gallq(){
     vector<double> allq;
     for(int i=0; i<11; i++){
@@ -159,56 +186,6 @@ void Atom::sallaq(vector<double> allaq){
         aq[i] = allaq[i];
     }
 }
-
-//aceesss funcs
-vector<double> Atom::gx(){
-    vector<double> pos;
-    pos.emplace_back(posx);
-    pos.emplace_back(posy);
-    pos.emplace_back(posz);
-    return pos;
-}
-
-void Atom::sx(vector<double> rls){
-    posx = rls[0];
-    posy = rls[1];
-    posz = rls[2];
-}
-
-
-//structure properties
-int Atom::gsurface() {return issurface; }
-int Atom::gcluster() {return belongsto; }
-void Atom::ssurface( int val) {
-  if (!((val == 0) || (val == 1))){
-    throw invalid_argument("surface should be 1 or 0");
-  }
-  issurface = val; }
-
-void Atom::scluster( int val) {
-  belongsto = val; }
-
-int Atom::glcluster() {return lcluster; }
-void Atom::slcluster( int val) {
-  if (!((val == 0) || (val == 1))){
-    throw invalid_argument("largest_cluster should be 1 or 0");
-  }
-
-  lcluster = val; }
-
-
-py::dict Atom::gcustom(){
-
-    return custom;
-}
-
-void Atom::scustom(py::dict cc){
-    custom = cc;
-}
-
-
-
-//for q vals
 double Atom::gq(int qq){ return q[qq-2]; }
 void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
 
@@ -282,44 +259,80 @@ void Atom::sq_big(vector<int> qval, vector<double> setvals, bool averaged){
     }
 }
 
-
-
-
-//functions to set the neighbors for each atoms
-void Atom::sneighbors(vector<int> nns){
-
-    //first reset all neighbors
-    for (int i = 0;i<MAXNUMBEROFNEIGHBORS;i++){
-        neighbors[i] = NILVALUE;
-        neighbordist[i] = -1.0;
-    }
-
-    //now assign the neighbors
-    for(int i=0; i<nns.size(); i++){
-        neighbors[i] = nns[i];
-        //auto assign weight to 1
-        neighborweight[i] = 1.00;
-    }
-
-    n_neighbors = nns.size();
-    isneighborset = 1;
-
+double Atom::gdisorder(){
+    return disorder;
 }
 
-void Atom::sneighborweights(vector<double> nss){
-    for(int i=0; i<nss.size(); i++){
-        neighborweight[i] = nss[i];
-    }
+void Atom::sdisorder(double dd){
+    disorder = dd;
 }
 
-vector<double> Atom::gneighborweights(){
-    vector <double> rqlms;
-    for(int i=0; i<n_neighbors; i++){
-        rqlms.emplace_back(neighborweight[i]);
-    }
-    return rqlms;
+double Atom::gavgdisorder(){
+    return avgdisorder;
 }
 
+void Atom::savgdisorder(double dd){
+    avgdisorder = dd;
+}
+vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
+
+  vector<complex<double>> qlms;
+  qlms.reserve(2*qq+1);
+  if (!averaged){
+    for(int i=0;i<(2*qq+1);i++){
+        complex<double> lmval(realq[qq-2][i], imgq[qq-2][i]);
+        qlms.emplace_back(lmval);
+    }
+  }
+  else{
+    for(int i=0;i<(2*qq+1);i++){
+        complex<double> lmval(arealq[qq-2][i], aimgq[qq-2][i]);
+        qlms.emplace_back(lmval);
+    }
+  }
+  return qlms;
+}
+
+
+//-------------------------------------------------------
+// Solid related properties
+//-------------------------------------------------------
+int Atom::gfrenkelnumber(){ return frenkelnumber; }
+void Atom::sfrenkelnumber(int nn){ frenkelnumber=nn; }
+int Atom::gsolid(){ return issolid; }
+void Atom::ssolid(int idd){
+  if (!((idd == 0) || (idd == 1))){
+    throw invalid_argument("surface should be 1 or 0");
+  }
+  issolid=idd; }
+int Atom::gstructure(){ return structure; }
+void Atom::sstructure(int idd){ structure=idd; }
+int Atom::gsurface() {return issurface; }
+int Atom::gcluster() {return belongsto; }
+void Atom::ssurface( int val) {
+  if (!((val == 0) || (val == 1))){
+    throw invalid_argument("surface should be 1 or 0");
+  }
+  issurface = val; }
+
+void Atom::scluster( int val) {
+  belongsto = val; }
+int Atom::glcluster() {return lcluster; }
+void Atom::slcluster( int val) {
+  if (!((val == 0) || (val == 1))){
+    throw invalid_argument("largest_cluster should be 1 or 0");
+  }
+
+  lcluster = val; }
+
+
+//-------------------------------------------------------
+// Voronoi related properties
+//-------------------------------------------------------
+double Atom::gvolume(){ return volume; }
+void Atom::svolume(double vv){ volume = vv; }
+double Atom::gavgvolume(){ return avgvolume; }
+void Atom::savgvolume(double vv){ avgvolume = vv; }
 void Atom::sfacevertices(vector<int> nss){
     for(int i=0; i<nss.size(); i++){
         facevertices[i] = nss[i];
@@ -392,6 +405,9 @@ void Atom::svorovector(vector<int> voro){
     n6 = voro[3];
 }
 
+//-------------------------------------------------------
+// Angle related properties
+//-------------------------------------------------------
 double Atom::gangular(){
     return angular;
 }
@@ -418,22 +434,10 @@ void Atom::schiparams(vector<int> nns){
   chiparams = nns;
 }
 
-double Atom::gdisorder(){
-    return disorder;
-}
 
-void Atom::sdisorder(double dd){
-    disorder = dd;
-}
-
-double Atom::gavgdisorder(){
-    return avgdisorder;
-}
-
-void Atom::savgdisorder(double dd){
-    avgdisorder = dd;
-}
-
+//-------------------------------------------------------
+// Other order parameters
+//-------------------------------------------------------
 vector<double> Atom::gsro(){
     return sro;
 }
@@ -441,22 +445,4 @@ vector<double> Atom::gsro(){
 void Atom::ssro(vector<double> dd){
     sro = dd;
 }
-
-vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
-
-  vector<complex<double>> qlms;
-  qlms.reserve(2*qq+1);
-  if (!averaged){
-    for(int i=0;i<(2*qq+1);i++){
-        complex<double> lmval(realq[qq-2][i], imgq[qq-2][i]);
-        qlms.emplace_back(lmval);
-    }
-  }
-  else{
-    for(int i=0;i<(2*qq+1);i++){
-        complex<double> lmval(arealq[qq-2][i], aimgq[qq-2][i]);
-        qlms.emplace_back(lmval);
-    }
-  }
-  return qlms;
-}
+   
