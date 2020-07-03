@@ -137,6 +137,42 @@ vector<double> Atom::gneighborweights(){
     return rqlms;
 }
 
+void Atom::sdistvecs(vector<vector<double>> nss){
+
+}
+
+vector<vector<double>> Atom::gdistvecs(){
+    vector<vector<double>> m1;
+    vector <double> m2;
+
+    for(int i=0; i<n_neighbors; i++){
+        m2.clear();
+        m2.emplace_back(n_diffx[i]);
+        m2.emplace_back(n_diffy[i]);
+        m2.emplace_back(n_diffz[i]);
+
+        m1.emplace_back(m2);
+    }
+    return m1;
+}
+
+void Atom::slocalangles(vector<vector<double>> nss){
+
+}
+
+vector<vector<double>> Atom::glocalangles(){
+    vector<vector<double>> m1;
+    vector <double> m2;
+
+    for(int i=0; i<n_neighbors; i++){
+        m2.clear();
+        m2.emplace_back(n_phi[i]);
+        m2.emplace_back(n_theta[i]);
+
+        m1.emplace_back(m2);
+    }
+    return m1;
+}
 
 //-------------------------------------------------------
 // Q parameter properties

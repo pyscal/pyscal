@@ -152,6 +152,16 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         cutoff used for finding neighbors for each atom.
     )mydelimiter")
 
+    .def_property("neighbor_vector",&Atom::gdistvecs, &Atom::sdistvecs, R"mydelimiter(
+        *List of floats of length 3*.
+        List of vectors connecting an atom to its neighbors.
+    )mydelimiter")
+
+    .def_property("local_angles",&Atom::glocalangles, &Atom::slocalangles, R"mydelimiter(
+        *List of floats of length 2*.
+        List of longitude and colatitude of an atom to its neighbors.
+    )mydelimiter")
+
     //-------------------------------------------------------
     // Q parameter properties
     //-------------------------------------------------------

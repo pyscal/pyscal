@@ -1100,7 +1100,9 @@ class System(pc.System):
             distneighs = []
             distvectors = []
 
-            neighs = atom.neighbors
+            #dists = atom.neighbor_distance
+            #distneighs = atom.neighbors
+            #distvectors = atom.
 
             for neigh in neighs:
                 dist, vectors = self.get_distance(atom, atoms[neigh], vector=True)

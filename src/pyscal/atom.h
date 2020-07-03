@@ -105,6 +105,7 @@ class Atom{
         double n_r[MAXNUMBEROFNEIGHBORS];
         double n_phi[MAXNUMBEROFNEIGHBORS];
         double n_theta[MAXNUMBEROFNEIGHBORS];
+
         vector<datom> temp_neighbors;
         double cutoff;
         int n_neighbors;
@@ -116,6 +117,12 @@ class Atom{
         vector<int> gneighbors();
         void sneighborweights(vector<double> nns);
         vector<double> gneighborweights();
+        void sdistvecs(vector<vector<double>>);
+        vector<vector<double>> gdistvecs();
+        void slocalangles(vector<vector<double>>);
+        vector<vector<double>> glocalangles();
+
+
         int head;
  
         //-------------------------------------------------------
