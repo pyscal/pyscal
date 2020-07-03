@@ -91,12 +91,7 @@ vector<int> Atom::gneighbors(){
     }
     return nn;
 }
-int Atom::gnneighbors(){
-    return n_neighbors;
-}
-void Atom::snneighbors(int dd){
 
-}
 void Atom::sneighdist(vector<double> dd){
 }
 
@@ -107,8 +102,7 @@ vector<double> Atom::gneighdist(){
   }
   return neighdist;
 }
-double Atom::gcutoff(){ return cutoff; }
-void Atom::scutoff(double cc){ cutoff = cc; }
+
 void Atom::sneighbors(vector<int> nns){
 
     //first reset all neighbors
@@ -157,8 +151,7 @@ vector<double> Atom::gsij(){
   }
   return ss;
 }
-double Atom::gasij(){ return avq6q6; }
-void Atom::sasij(double vv){ avq6q6 = vv; }
+
 vector<double> Atom::gallq(){
     vector<double> allq;
     for(int i=0; i<11; i++){
@@ -259,21 +252,7 @@ void Atom::sq_big(vector<int> qval, vector<double> setvals, bool averaged){
     }
 }
 
-double Atom::gdisorder(){
-    return disorder;
-}
 
-void Atom::sdisorder(double dd){
-    disorder = dd;
-}
-
-double Atom::gavgdisorder(){
-    return avgdisorder;
-}
-
-void Atom::savgdisorder(double dd){
-    avgdisorder = dd;
-}
 vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
 
   vector<complex<double>> qlms;
@@ -297,33 +276,8 @@ vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
 //-------------------------------------------------------
 // Solid related properties
 //-------------------------------------------------------
-int Atom::gfrenkelnumber(){ return frenkelnumber; }
-void Atom::sfrenkelnumber(int nn){ frenkelnumber=nn; }
-int Atom::gsolid(){ return issolid; }
-void Atom::ssolid(int idd){
-  if (!((idd == 0) || (idd == 1))){
-    throw invalid_argument("surface should be 1 or 0");
-  }
-  issolid=idd; }
-int Atom::gstructure(){ return structure; }
-void Atom::sstructure(int idd){ structure=idd; }
-int Atom::gsurface() {return issurface; }
-int Atom::gcluster() {return belongsto; }
-void Atom::ssurface( int val) {
-  if (!((val == 0) || (val == 1))){
-    throw invalid_argument("surface should be 1 or 0");
-  }
-  issurface = val; }
 
-void Atom::scluster( int val) {
-  belongsto = val; }
-int Atom::glcluster() {return lcluster; }
-void Atom::slcluster( int val) {
-  if (!((val == 0) || (val == 1))){
-    throw invalid_argument("largest_cluster should be 1 or 0");
-  }
 
-  lcluster = val; }
 
 
 //-------------------------------------------------------

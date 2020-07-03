@@ -32,8 +32,7 @@ def test_set_solid():
     atom = pc.Atom(pos=[0,0,0], id=1, type=1)
     atom.solid = 1
     assert atom.solid == 1
-    with pytest.raises(ValueError):
-        atom.solid = 2
+
 
 def test_neighbors():
     atom = pc.Atom(pos=[0,0,0], id=1)

@@ -126,15 +126,18 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         List of neighbors of the atom. The list contains indices of neighbor
         atoms which indicate their position in the list of all atoms.
     )mydelimiter")
+
     .def_property("neighbor_distance",&Atom::gneighdist, &Atom::sneighdist, R"mydelimiter(
         *List of floats*.
         List of neighbor distances of the atom.
     )mydelimiter")
-    .def_property("coordination",&Atom::gnneighbors, &Atom::snneighbors,R"mydelimiter(
+
+    .def_readonly("coordination", &Atom::n_neighbors, R"mydelimiter(
         *int*.
         coordination number of the atom. Coordination will only be updated
         after neighbors are calculated using :func:`~pyscal.core.System.find_neighbors`.
     )mydelimiter")
+
     .def_property("neighbor_weights",&Atom::gneighborweights, &Atom::sneighborweights, R"mydelimiter(
         *List of floats*.
         Used to weight the contribution of each neighbor atom towards the value of
@@ -143,7 +146,8 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         each neighbor gets a weight proportional to the area shared between the neighboring
         atom and host atom.
     )mydelimiter")
-    .def_property("cutoff",&Atom::gcutoff,&Atom::scutoff, R"mydelimiter(
+
+   .def_readwrite("cutoff", &Atom::cutoff, R"mydelimiter(
         *double*.
         cutoff used for finding neighbors for each atom.
     )mydelimiter")
@@ -155,17 +159,20 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         *list of floats*.
         list of all q values of the atom.
     )mydelimiter")
+
     .def_property("allaq",&Atom::gallaq,&Atom::sallaq, R"mydelimiter(
         *list of floats*.
         list of all averaged q values of the atom.
     )mydelimiter")
+
     .def_property("sij", &Atom::gsij, &Atom::ssij, R"mydelimiter(
           *float*. Value of s_ij which is used for identification of solid atoms. s_ij is defined by
 
           .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
 
     )mydelimiter")
-    .def_property("avg_sij", &Atom::gasij, &Atom::sasij, R"mydelimiter(
+
+    .def_readwrite("avg_sij", &Atom::avq6q6, R"mydelimiter(
           *float*. Value of averaged s_ij which is used for identification of solid atoms. s_ij is defined by
 
           .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
@@ -223,15 +230,17 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     )mydelimiter")
 
     .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false)
-    .def_property("disorder",&Atom::gdisorder, &Atom::sdisorder, R"mydelimiter(
+    
+    .def_readwrite("disorder", &Atom::disorder, R"mydelimiter(
         *Float*.
         The value of disorder parameter.
     )mydelimiter")
 
-    .def_property("avg_disorder",&Atom::gavgdisorder, &Atom::savgdisorder, R"mydelimiter(
+    .def_readwrite("avg_disorder", &Atom::avgdisorder, R"mydelimiter(
         *Float*.
         The value of averaged disorder parameter.
     )mydelimiter")
+
     .def("get_qlm", &Atom::get_qcomps, py::arg(), py::arg("averaged")=false, R"mydelimiter(
           Get the q_lm values.
 
@@ -252,37 +261,44 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
           Meaningful values are only returned if :func:`~pyscal.core.System.calculate_q` is used.
     )mydelimiter")
+
     //-------------------------------------------------------
     // Solid related properties
     //-------------------------------------------------------
-    .def_property("cluster",&Atom::gcluster, &Atom::scluster, R"mydelimiter(
+    .def_readwrite("cluster", &Atom::belongsto, R"mydelimiter(
         *int*.
         identification number of the cluster that the atom belongs to.
     )mydelimiter")
-    .def_property("bonds",&Atom::gfrenkelnumber, &Atom::sfrenkelnumber, R"mydelimiter(
+
+    .def_readwrite("bonds", &Atom::frenkelnumber, R"mydelimiter(
         *Int*.
         The number of solid bonds of an atom.
     )mydelimiter")
-    .def_property("solid",&Atom::gsolid,&Atom::ssolid, R"mydelimiter(
+
+    .def_readwrite("solid", &Atom::issolid, R"mydelimiter(
         *bool*.
         True if the atom is solid, False otherwise. Solid atoms are only identified
         after using the :func:`~pyscal.core.System.find_solids` function.
     )mydelimiter")
-    .def_property("surface",&Atom::gsurface,&Atom::ssurface, R"mydelimiter(
+
+    .def_readwrite("surface", &Atom::issurface, R"mydelimiter(
         *bool*.
         True if the atom has at least one liquid neighbor, False otherwise. Surface atoms are only identified
         after using the :func:`~pyscal.core.System.find_solids` function.
 
     )mydelimiter")
-    .def_property("largest_cluster",&Atom::glcluster,&Atom::slcluster, R"mydelimiter(
+
+    .def_readwrite("largest_cluster", &Atom::lcluster, R"mydelimiter(
         *bool*.
         True if the atom belongs to the largest cluster, False otherwise. Largest cluster is only identified
         after using the :func:`~pyscal.core.System.cluster_atoms` function.
     )mydelimiter")
-    .def_property("structure",&Atom::gstructure,&Atom::sstructure, R"mydelimiter(
+
+    .def_readwrite("structure", &Atom::structure, R"mydelimiter(
         *int*.
         Indicates the structure of atom. Not used currently.
-    )mydelimiter")    
+    )mydelimiter")
+
     //-------------------------------------------------------
     // Voronoi related properties
     //-------------------------------------------------------

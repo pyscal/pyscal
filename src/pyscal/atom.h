@@ -107,16 +107,13 @@ class Atom{
         double n_theta[MAXNUMBEROFNEIGHBORS];
         vector<datom> temp_neighbors;
         double cutoff;
-        void scutoff(double);
-        double gcutoff();
+
         int isneighborset;
         //function to set neighbors
         void sneighdist(vector<double>);
         vector<double> gneighdist();
         void sneighbors(vector<int> nns);
         vector<int> gneighbors();
-        int gnneighbors();
-        void snneighbors(int);
         void sneighborweights(vector<double> nns);
         vector<double> gneighborweights();
         int head;
@@ -126,8 +123,6 @@ class Atom{
         //-------------------------------------------------------
         double sij[MAXNUMBEROFNEIGHBORS];
         double realQ6[13],imgQ6[13];
-        double gasij();
-        void sasij(double);
         void ssij(vector<double>);
         vector<double> gsij();
         double q[11];
@@ -152,10 +147,6 @@ class Atom{
         double sii;
         double disorder;
         double avgdisorder;
-        double gdisorder();
-        void sdisorder(double);
-        double gavgdisorder();
-        void savgdisorder(double);
 
         //-------------------------------------------------------
         // Solid related properties
@@ -163,22 +154,10 @@ class Atom{
         int frenkelnumber;
         double avq6q6;
         int belongsto;
-        void scluster(int);
-        int gcluster();
-        int lcluster;
-        void slcluster(int);
-        int glcluster();
-        int issurface;
-        void ssurface(int);
-        int gsurface();
-        int issolid;
+        bool lcluster;
+        bool issurface;
+        bool issolid;
         int structure;
-        int gsolid();
-        void ssolid(int);
-        int gstructure();
-        void sstructure(int);
-        int gfrenkelnumber();
-        void sfrenkelnumber(int);
 
 
         //-------------------------------------------------------
