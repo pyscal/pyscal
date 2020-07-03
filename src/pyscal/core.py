@@ -74,6 +74,7 @@ class System(pc.System):
 
         self.initialized = True
         self.neighbors_found = False
+        self.neighbor_method = None
         pc.System.__init__(self)
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None, is_triclinic = False):
@@ -392,16 +393,18 @@ class System(pc.System):
 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
-                                            voroexp=1, padding=1.2, nlimit=6, cells=False):
+                                            voroexp=1, padding=1.2, nlimit=6, cells=False,
+                                                nmax=12):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
 
         Parameters
         ----------
-        method : {'cutoff', 'voronoi'}
+        method : {'cutoff', 'voronoi', 'number'}
             `cutoff` method finds neighbors of an atom within a specified or adaptive cutoff distance from the atom.
             `voronoi` method finds atoms that share a Voronoi polyhedra face with the atom. Default, `cutoff`
+            `number` method finds a specified number of closest neighbors to the given atom.
 
         cutoff : { float, 'sann', 'adaptive'}
             the cutoff distance to be used for the `cutoff` based neighbor calculation method described above.
@@ -420,11 +423,14 @@ class System(pc.System):
             Steinhardt parameter values. Default 1.
 
         padding : double, optional
-            only used if ``cutoff=adaptive``. A safe padding value used after an adaptive cutoff is found. Default 1.2.
+            only used if ``cutoff=adaptive`` or ``cutoff=number``. A safe padding value used after an adaptive cutoff is found. Default 1.2.
 
         nlimit : int, optional
             only used if ``cutoff=adaptive``. The number of particles to be considered for the calculation of adaptive cutoff.
             Default 6.
+
+        nmax : int, optional
+            only used if ``cutoff=number``. The number of closest neighbors to be found for each atom. Default 12
 
         Returns
         -------
@@ -467,10 +473,13 @@ class System(pc.System):
         The second approach is using Voronoi polyhedra which also assigns a weight to each neighbor in the ratio of the face area between the two atoms.
         Higher powers of this weight can also be used [3]. The keyword `voroexp`
         can be used to set this weight.
+        
+        If method os `number`, instead of using a cutoff value for finding neighbors, a specified number of closest atoms are
+        found. This number can be set through the argument `nmax`.
 
         .. warning::
 
-            Adaptive cutoff uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
+            Adaptive and number cutoff uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
             of a warning that ``threshold`` is inadequate, this parameter should be further increased. High/low value
             of this parameter will correspond to the time taken for finding neighbors.
 
@@ -528,6 +537,15 @@ class System(pc.System):
                     self.get_all_neighbors_cells()
                 else:
                     self.get_all_neighbors_normal()
+
+        elif method == 'number':
+            if threshold < 1:
+                raise ValueError("value of threshold should be at least 1.00")
+
+            self.usecells =  (len(self.atoms) > 4000)
+            finished = self.get_all_neighbors_bynumber(threshold, nmax)
+            if not finished:
+                raise RuntimeError("Could not find enough neighbors - try increasing threshold")
 
         elif method == 'voronoi':
             self.voroexp = int(voroexp)

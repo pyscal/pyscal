@@ -58,6 +58,7 @@ PYBIND11_MODULE(csystem, m) {
         .def("get_absdistance_vector", &System::get_distance_vector)
         .def("get_all_neighbors_cells",&System::get_all_neighbors_cells)
         .def("get_all_neighbors_normal",&System::get_all_neighbors_normal)
+        .def("get_all_neighbors_bynumber",&System::get_all_neighbors_bynumber)
         .def("get_all_neighbors_sann",&System::get_all_neighbors_sann)
         .def("get_all_neighbors_adaptive",&System::get_all_neighbors_adaptive)
         .def("get_all_neighbors_voronoi",&System::get_all_neighbors_voronoi)

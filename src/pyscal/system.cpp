@@ -708,6 +708,88 @@ void System::get_temp_neighbors_cells(){
 
 }
 
+int System::get_all_neighbors_bynumber(double prefactor, int nns){
+    /*
+    A new neighbor algorithm that finds a specified number of 
+    neighbors for each atom.
+    */
+
+    //reset voronoi flag
+    voronoiused = 0;
+
+    double d, dcut;
+    double diffx,diffy,diffz;
+    double r,theta,phi;
+    int m, maxneighs, finished;
+    finished = 1;
+
+    vector<int> nids;
+    vector<double> dists, sorted_dists;
+
+    //double prefactor = 1.21;
+    double summ;
+    double boxvol;
+
+    //some guesswork here
+    //find the box volumes
+    if (triclinic==1){
+        double a1, a2, a3, b1, b2, b3, c1, c2, c3;
+        //rot is the cell vectors transposed
+        a1 = rot[0][0];
+        a2 = rot[1][0];
+        a3 = rot[2][0];
+        b1 = rot[0][1];
+        b2 = rot[1][1];
+        b3 = rot[2][1];
+        c1 = rot[0][2];
+        c2 = rot[1][2];
+        c3 = rot[2][2];
+        boxvol = c1*(a2*b3-a3*b2) - c2*(a1*b3-b1*a3) + c3*(a1*b2-a2*b1);
+    }
+    else{
+        boxvol = boxx*boxy*boxz;
+    }
+
+
+    //now find the volume per particle
+    double guessvol = boxvol/float(nop);
+
+    //guess the side of a cube that is occupied by an atom - this is a guess distance
+    double guessdist = cbrt(guessvol);
+
+    //now add some safe padding - this is the prefactor which we will read in
+    guessdist = prefactor*guessdist;
+    neighbordistance = guessdist;
+
+    if (usecells){
+        get_temp_neighbors_cells();
+    }
+    else{
+        get_temp_neighbors_brute();
+    }
+
+    for (int ti=0; ti<nop; ti++){
+        if (atoms[ti].temp_neighbors.size() < nns){
+            return 0;
+        }
+
+        sort(atoms[ti].temp_neighbors.begin(), atoms[ti].temp_neighbors.end(), by_dist());
+
+        //start with initial routine
+        for(int i=0 ; i<nns; i++){
+            int tj = atoms[ti].temp_neighbors[i].index;
+            process_neighbor(ti, tj);
+        }
+
+        finished = 1;
+    }
+
+
+    return finished;
+
+
+}
+
 
 int System::get_all_neighbors_sann(double prefactor){
     /*

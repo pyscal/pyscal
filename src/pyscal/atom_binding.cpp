@@ -385,8 +385,6 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         The value of short range order parameter.
     )mydelimiter")
      
-
-
     ;
 
 
