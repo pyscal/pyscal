@@ -1100,20 +1100,12 @@ class System(pc.System):
             distneighs = []
             distvectors = []
 
-            #dists = atom.neighbor_distance
-            #distneighs = atom.neighbors
-            #distvectors = atom.
+            dists = atom.neighbor_distance
+            distneighs = atom.neighbors
+            distvectors = atom.neighbor_vector
 
-            for neigh in neighs:
-                dist, vectors = self.get_distance(atom, atoms[neigh], vector=True)
-                dists.append(dist)
-                distneighs.append(neigh)
-                distvectors.append(vectors)
-
-            args = np.argsort(dists)
-            topargs = np.array(args)
-
-            combos = list(itertools.combinations(topargs, 2))
+            args = range(len(dists))
+            combos = list(itertools.combinations(args, 2))
             costhetas = []
             for combo in combos:
                 vec1 = distvectors[combo[0]]
