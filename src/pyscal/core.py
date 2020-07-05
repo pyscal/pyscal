@@ -1276,7 +1276,7 @@ class System(pc.System):
                 data.append(dd)
 
             data = np.array(data)
-            cysm = 0
+            csym = 0
             for ind in sorted_distance_args:
                 ndata = data[combos[:,0]==ind]
                 if len(ndata) > 0:
