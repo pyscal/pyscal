@@ -1175,7 +1175,7 @@ class System(pc.System):
         if not nmax%2 == 0:
             raise ValueError("nmax has to even integer")
 
-        if not calculate_neighbors:
+        if calculate_neighbors:
             self.find_neighbors(method="number", nmax=nmax)
 
         if algorithm == "ges":
