@@ -1151,6 +1151,7 @@ class System(pc.System):
         ----------
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
         .. [2] Bulatov, Cai, ISBN:978-0198526148, 2006
+        .. [3] Larsen, arXiv:2003.08879v1, 2020
         
         Notes
         -----
@@ -1166,7 +1167,7 @@ class System(pc.System):
         Greedy Vertex Matching (GVM) [2] as specified in [3]. GES algorithm is implemented
         in LAMMPS and Ovito, whereas GVM is used in AtomEye and Atomsk. Please see [3] for
         a detailed description of the algorithms. The algorithm can be selected using the
-        `algorithm` argument. 
+        `algorithm` argument. GVM values are not normalised currently.
 
         """
         if not nmax>0:
