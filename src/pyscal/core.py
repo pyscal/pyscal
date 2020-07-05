@@ -1125,15 +1125,23 @@ class System(pc.System):
         self.atoms = atoms
 
 
-    def calculate_centrosymmetry(self, nmax):
+    def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """
-        Greedy edge selection scheme for centrosymmetry parameters
+        Calculate the centrosymmetry parameter
 
         Parameters
         ----------
-        nmax : int
+        nmax : int, optional
             number of neighbors to be considered for centrosymmetry 
-            parameters
+            parameters. Has to be a positive, even integer. Default 12
+
+        calculate_neighbors : bool, optional
+            if True recalculate neighbors using number method, if False
+            neighbor calculation is not done. 
+
+        algorithm : {'ges', 'gvm'}, optional
+            `ges` uses the Greedy Edge Selection algorithm,
+            `gvm` uses Greedy Vertex Matching. Default `ges`.
 
         Returns
         -------
@@ -1143,8 +1151,40 @@ class System(pc.System):
         ----------
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
         .. [2] Bulatov, Cai, ISBN:978-0198526148, 2006
-        """
         
+        Notes
+        -----
+        Calculate the centrosymmetry parameter for each atom which can be accessed by
+        :attr:`~pyscal.catom.centrosymmetry` attribute. It calculates the degree of inversion
+        symmetry of an atomic environment. Centrosymmetry recalculates the neighbor using
+        the number method as specified in :func:`¬pyscal.core.System.find_neighbors` method. This
+        is the ensure that the required number of neighbors are found for calculation of the parameter.
+        The calculation of neighbors through number method can be suppressed by setting
+        ``calculate_neighbors=False``.
+
+        This method uses two different algorithms, The Greedy Edge Selection (GES) [1] or the
+        Greedy Vertex Matching (GVM) [2] as specified in [3]. GES algorithm is implemented
+        in LAMMPS and Ovito, whereas GVM is used in AtomEye and Atomsk. Please see [3] for
+        a detailed description of the algorithms. The algorithm can be selected using the
+        `algorithm` argument. 
+
+        """
+        if not nmax>0:
+            raise ValueError("nmax cannot be negative")
+
+        if not nmax%2 == 0:
+            raise ValueError("nmax has to even integer")
+
+        if not calculate_neighbors:
+            self.find_neighbors(method="number", nmax=nmax)
+
+        if algorithm == "ges":
+            self.greedy_edge_selection(nmax)
+        elif algorithm == "gvm":
+            self.greedy_vertex_matching(nmax)
+        else:
+            raise ValueError("unknown algorithm")
+
 
     def greedy_edge_selection(self, nmax):
         """
