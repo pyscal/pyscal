@@ -1122,9 +1122,137 @@ class System(pc.System):
             atom.chiparams = chivector[0]
             if angles:
                 atom.custom['cosines'] = costhetas
+        self.atoms = atoms
 
+
+    def calculate_centrosymmetry(self, nmax):
+        """
+        Greedy edge selection scheme for centrosymmetry parameters
+
+        Parameters
+        ----------
+        nmax : int
+            number of neighbors to be considered for centrosymmetry 
+            parameters
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+        .. [2] Bulatov, Cai, ISBN:978-0198526148, 2006
+        """
+        
+
+    def greedy_edge_selection(self, nmax):
+        """
+        Greedy edge selection scheme for centrosymmetry parameters
+
+        Parameters
+        ----------
+        nmax : int
+            number of neighbors to be considered for centrosymmetry 
+            parameters
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+
+        """
+        atoms = self.atoms
+        for atom in atoms:
+            distvectors = atom.neighbor_vector
+
+            #go through all combinations
+            combos = list(itertools.combinations(range(atom.coordination), 2))
+            selected_combos = []
+
+            data = []
+
+            for c, combo in enumerate(combos):
+                distsum = np.array(distvectors[combo[0]]) + np.array(distvectors[combo[1]])
+                distsum = np.sum([x**2 for x in distsum])
+                weight = np.sqrt(distsum)
+                dd = [combo, distsum, weight, c]
+                data.append(dd)
+                
+            #now sort weights
+            data = np.array(data)
+            sorted_data = data[np.argsort(data[:,2])]
+
+            csym = 0
+            for i in range(nmax//2):
+                csym += sorted_data[i][1]
+                selected_combos.append(sorted_data[i][0])
+
+            atom.centrosymmetry = csym
 
         self.atoms = atoms
+
+
+    def greedy_vertex_matching(self, nmax):
+        """
+        Greedy vertex matching scheme for centrosymmetry parameters
+
+        Parameters
+        ----------
+        nmax : int
+            number of neighbors to be considered for centrosymmetry 
+            parameters
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [1] Bulatov, Cai, ISBN:978-0198526148, 2006
+        
+        """
+        atoms = self.atoms
+        for atom in atoms:
+            distvectors = atom.neighbor_vector
+            distances = atom.neighbor_distance
+            sorted_distance_args = np.argsort(distances)
+            neighs = atom.neighbors
+            scombos = []
+
+            combos = list(itertools.combinations(range(atom.coordination), 2))
+            combos = np.array(combos)
+
+            data = []
+
+            for c, combo in enumerate(combos):
+                distsum = np.array(distvectors[combo[0]]) + np.array(distvectors[combo[1]])
+                distsum = np.sum([x**2 for x in distsum])
+                weight = np.sqrt(distsum)
+                dd = [combo, distsum, weight, c]
+                data.append(dd)
+
+            data = np.array(data)
+            cysm = 0
+            for ind in sorted_distance_args:
+                ndata = data[combos[:,0]==ind]
+                if len(ndata) > 0:
+                    spair = ndata[np.argsort(ndata[:,2])][0]
+                    csym += spair[1]
+                    scombos.append(spair[0])
+                    i1, i2 = spair[0]
+                    arr = (combos[:,0]!=i1)*(combos[:,1]!=i1)*(combos[:,0]!=i2)*(combos[:,1]!=i2)
+                    combos = combos[arr]
+                    data = data[arr]
+                    if len(combos) == 0:
+                        break 
+            atom.centrosymmetry = csym
+
+        self.atoms = atoms
+
 
     def calculate_disorder(self, averaged=False, q=6):
         """

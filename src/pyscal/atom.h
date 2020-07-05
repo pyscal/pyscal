@@ -200,6 +200,7 @@ class Atom{
         // Other order parameters
         //-------------------------------------------------------
         vector<double> sro;
+        double centrosymmetry;
 
 
 

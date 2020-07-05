@@ -394,6 +394,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         *Float*.
         The value of short range order parameter.
     )mydelimiter")
+
+    .def_readwrite("centrosymmetry", &Atom::centrosymmetry, R"mydelimiter(
+        *Float*.
+        The value of centrosymmetry parameter.
+    )mydelimiter")
      
     ;
 
