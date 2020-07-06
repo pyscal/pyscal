@@ -399,6 +399,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         *Float*.
         The value of centrosymmetry parameter.
     )mydelimiter")
+
+    .def_readwrite("cna", &Atom::cna, R"mydelimiter(
+        *Float*.
+        Common neighbor analysis vector.
+    )mydelimiter")
      
     ;
 

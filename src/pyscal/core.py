@@ -1125,6 +1125,89 @@ class System(pc.System):
         self.atoms = atoms
 
 
+    def calculate_cnavector(self, nmax=12, calculate_neighbors=True):
+        """
+        Calculate the Common Neighbor Analysis indices
+
+        Parameters
+        ----------
+        nmax : int, optional
+            number of neighbors to be considered for centrosymmetry 
+            parameters. Has to be a positive, even integer. Default 12
+
+        calculate_neighbors : bool, optional
+            if True recalculate neighbors using number method, if False
+            neighbor calculation is not done. 
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Calculates the common neighbor analysis indices for each atom.
+        There are three values calculated for each atom namely, `ncn, nb, nclb`. These
+        values can be accessed by :attr:`~pyscal.catom.Atom.cna`.
+        
+        `ncn` is the number of neighbors of an atom with which it shares a neighbors.
+        `nb` is number of bonds between these common neighbors.
+        `nclb` is the number of bonds in the longest chain of bonds connecting these common
+        neighbors.
+        A complete description can be found in [1].
+
+        `nmax` number of neighbors are found around an atom using the `number` method
+        as described in :func:`~pyscal.core.System.find_neighbors` method, if `calculate_neighbors`
+        is set to True.
+
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+
+        """
+        atoms = self.atoms
+
+        for atom in atoms:
+            neighs = atom.neighbors
+            for nn in neighs:
+                #first index - number of common neighbors
+                common_neighs = list(set(atoms[nn].neighbors).intersection(neighs))
+                ncn = len(common_neighs)
+                #bonds between these common_neighs
+                combos = list(itertools.combinations(common_neighs, 2))
+                nb = 0
+                common_pairs = []
+                for combo in combos:
+                    if combo[1] in atoms[combo[0]].neighbors:
+                        nb += 1
+                        common_pairs.append(combo)
+                
+                #now we have to find the longest connect path among common pairs
+                path = []
+                #add the first one
+                
+                path.append(common_pairs[0][0])
+                path.append(common_pairs[0][1])
+                common_pairs.remove(common_pairs[0])
+                
+                finished = False
+                while True:
+                    finished = True
+                    for pair in common_pairs:
+                        if (pair[0] in path) or (pair[1] in path):
+                            path.append(pair[0])
+                            path.append(pair[1])
+                            finished = False
+                            common_pairs.remove(pair)
+                    nlcb = len(path)//2
+                    if finished:
+                        break
+                    if len(common_pairs) == 0:
+                        break           
+                   
+                atom.cna = [ncn, nb, nlcb]
+
+        self.atoms = atoms        
+
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """
         Calculate the centrosymmetry parameter
