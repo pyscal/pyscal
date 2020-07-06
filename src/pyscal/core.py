@@ -1214,7 +1214,8 @@ class System(pc.System):
                 dummy_cna.append([ncn, nb, nlcb])   
             
             ucna, ucounts = np.unique(dummy_cna, return_counts=True, axis=0)
-            atom.cna = [ucna, ucounts]
+            ucmix = np.column_stack((ucna, ucounts))
+            atom.cna = ucmix
 
 
         self.atoms = atoms        
