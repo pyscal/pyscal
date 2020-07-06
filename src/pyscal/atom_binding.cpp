@@ -402,7 +402,8 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def_readwrite("cna", &Atom::cna, R"mydelimiter(
         *Float*.
-        Common neighbor analysis vector.
+        Common neighbor analysis vector. Returns an array of length 2, first set
+        is the cna index and the second set are the corresponding counts.
     )mydelimiter")
      
     ;

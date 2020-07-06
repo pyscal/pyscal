@@ -201,7 +201,7 @@ class Atom{
         //-------------------------------------------------------
         vector<double> sro;
         double centrosymmetry;
-        vector<int> cna;
+        vector<vector<int>> cna;
 
 
 

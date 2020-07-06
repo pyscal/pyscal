@@ -1171,6 +1171,8 @@ class System(pc.System):
 
         for atom in atoms:
             neighs = atom.neighbors
+            dummy_cna = []
+
             for nn in neighs:
                 #first index - number of common neighbors
                 common_neighs = list(set(atoms[nn].neighbors).intersection(neighs))
@@ -1201,13 +1203,19 @@ class System(pc.System):
                             path.append(pair[1])
                             finished = False
                             common_pairs.remove(pair)
-                    nlcb = len(path)//2
+                
                     if finished:
                         break
                     if len(common_pairs) == 0:
                         break           
-                   
-                atom.cna = [ncn, nb, nlcb]
+                
+                nlcb = len(path)//2
+
+                dummy_cna.append([ncn, nb, nlcb])   
+            
+            ucna, ucounts = np.unique(dummy_cna, return_counts=True, axis=0)
+            atom.cna = [ucna, ucounts]
+
 
         self.atoms = atoms        
 
