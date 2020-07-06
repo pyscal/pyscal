@@ -1164,6 +1164,9 @@ class System(pc.System):
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
 
         """
+        if calculate_neighbors:
+            self.find_neighbors(method="number", nmax=nmax)
+
         atoms = self.atoms
 
         for atom in atoms:
