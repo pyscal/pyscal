@@ -1284,7 +1284,7 @@ class System(pc.System):
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
 
         """
-        self.find_neighbors(method="number", number=14)
+        self.find_neighbors(method="number", nmax=14)
         #now each atom has 16 neighbors
         #we we need to find cutoffs and assign atoms
         #start with 12
@@ -1302,7 +1302,7 @@ class System(pc.System):
             dist12 = 1.20710678*dist12
             adist = atom.neighbor_distance
             aneighs = atom.neighbors
-            fneighs = [x for c, x in enumerate(aneighs) if adist[x] <= dist12]
+            fneighs = [x for c, x in enumerate(aneighs) if adist[c] <= dist12]
             atom.custom["neighs12"] = fneighs
             if len(fneighs) < 12:
                 test12 = False 
@@ -1310,7 +1310,7 @@ class System(pc.System):
             #for bcc
             dist14 = (1.1547*np.sum(atom.neighbor_distance[:8]) + np.sum(atom.neighbor_distance[8:14]))/14
             dist14 = 1.20710678*dist14
-            fneighs = [x for c, x in enumerate(aneighs) if adist[x] <= dist14]
+            fneighs = [x for c, x in enumerate(aneighs) if adist[c] <= dist14]
             atom.custom["neighs14"] = fneighs
             if len(fneighs) < 14:
                 test14 = False
