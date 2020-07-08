@@ -1320,10 +1320,10 @@ class System(pc.System):
 
             allneighs = []
             
-            if atom.custom["neighs12"] >= 12:
+            if len(atom.custom["neighs12"]) >= 12:
                 allneighs.append("neighs12")
             
-            if atom.custom["neighs14"] >= 14:
+            if len(atom.custom["neighs14"]) >= 14:
                 allneighs.append("neighs14")
 
             for key in allneighs:
@@ -1351,6 +1351,15 @@ class System(pc.System):
 
                     while True:    
                         path = []
+
+                        #common pairs became zero, break
+                        if len(common_pairs) == 0:
+                            break
+                        
+                        #if len(common pairs) is greater than or equal to half, break
+                        if len(common_pairs) <= act_length/2:
+                            break
+
                         path.append(common_pairs[termno][0])
                         path.append(common_pairs[termno][1])
                         common_pairs.remove(common_pairs[termno])
@@ -1366,14 +1375,7 @@ class System(pc.System):
 
                             if finished:
                                 break
-                        
-                        #common pairs became zero, break
-                        if len(common_pairs) == 0:
-                            break
-                        
-                        #if len(common pairs) is greater than or equal to half, break
-                        if len(common_pairs) <= act_length/2:
-                            break
+                    
                         
                         #if none of this is satisfied, changed termno
                         #it will automatically zero of the new array
@@ -1382,23 +1384,21 @@ class System(pc.System):
                 
                 ucna, ucounts = np.unique(dummy_cna, return_counts=True, axis=0)
                 ucmix = np.column_stack((ucna, ucounts))
-                
+                ucstr = [" ".join(x.astype(str)) for x in ucmix]
                 #now we need to assign structures
-                if [4, 2, 1, 12] in ucmix:
+                if "4 2 1 12" in ucstr:
                     atom.structure = 1
                     atom.cna = ucmix
                     break
-                elif [4, 2, 1, 6] in ucmix:
-                    if [4, 2, 2, 6] in ucmix:
-                        atom.structure = 2
-                        atom.cna = ucmix
-                        break
-                elif [6, 6, 6, 8] in ucmix:
-                    if [4, 4, 4, 6] in ucmix:
-                        atom.structure = 3
-                        atom.cna = ucmix
-                        break
+                elif ("4 2 1 6" in ucstr) and ("4 2 2 6" in ucstr):
+                    atom.structure = 2
+                    atom.cna = ucmix
+                    break
 
+                elif ("6 6 6 8" in ucstr) and ("4 4 4 6" in ucstr):
+                    atom.structure = 3
+                    atom.cna = ucmix
+                    break
 
         self.atoms = atoms
 
