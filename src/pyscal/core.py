@@ -1304,24 +1304,26 @@ class System(pc.System):
             aneighs = atom.neighbors
             fneighs = [x for c, x in enumerate(aneighs) if adist[c] <= dist12]
             atom.custom["neighs12"] = fneighs
-            if len(fneighs) < 12:
-                test12 = False 
+
 
             #for bcc
             dist14 = (1.1547*np.sum(atom.neighbor_distance[:8]) + np.sum(atom.neighbor_distance[8:14]))/14
             dist14 = 1.20710678*dist14
             fneighs = [x for c, x in enumerate(aneighs) if adist[c] <= dist14]
             atom.custom["neighs14"] = fneighs
-            if len(fneighs) < 14:
-                test14 = False
-            
+
+            atom.structure = 0
             #now complete the routine, assign structures
             #dow we need to test for neighbor 12 structures?
 
+        for atom in atoms:
+
             allneighs = []
-            if test12:
+            
+            if atom.custom["neighs12"] >= 12:
                 allneighs.append("neighs12")
-            if test14:
+            
+            if atom.custom["neighs14"] >= 14:
                 allneighs.append("neighs14")
 
             for key in allneighs:
