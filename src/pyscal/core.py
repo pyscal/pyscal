@@ -1320,23 +1320,25 @@ class System(pc.System):
 
             allneighs = []
             if test12:
-                allneighs.append(atom.custom["neighs12"])
+                allneighs.append("neighs12")
             if test14:
-                allneighs.append(atom.custom["neighs14"])
+                allneighs.append("neighs14")
 
-            for neighs in allneighs:
+            for key in allneighs:
                 
+                neighs = atom.custom[key]
                 dummy_cna = []
+                
                 for nn in neighs:
                     #first index - number of common neighbors
-                    common_neighs = list(set(atoms[nn].custom["neighs"]).intersection(neighs))
+                    common_neighs = list(set(atoms[nn].custom[key]).intersection(neighs))
                     ncn = len(common_neighs)
                     #bonds between these common_neighs
                     combos = list(itertools.combinations(common_neighs, 2))
                     nb = 0
                     common_pairs = []
                     for combo in combos:
-                        if combo[1] in atoms[combo[0]].custom["neighs"]:
+                        if combo[1] in atoms[combo[0]].custom[key]:
                             nb += 1
                             common_pairs.append(combo)
 
