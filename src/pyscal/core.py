@@ -1219,11 +1219,7 @@ class System(pc.System):
                     #common pairs became zero, break
                     if len(common_pairs) == 0:
                         break
-                    
-                    #if len(common pairs) is greater than or equal to half, break
-                    if len(common_pairs) <= act_length/2:
-                        break
-                    
+                                        
                     path.append(common_pairs[termno][0])
                     path.append(common_pairs[termno][1])
                     common_pairs.remove(common_pairs[termno])
@@ -1239,6 +1235,10 @@ class System(pc.System):
 
                         if finished:
                             break
+
+                    #if len(common pairs) is greater than or equal to half, break
+                    if len(common_pairs) < act_length/2:
+                        break
                     
                     #if none of this is satisfied, changed termno
                     #it will automatically zero of the new array
@@ -1356,10 +1356,6 @@ class System(pc.System):
                         if len(common_pairs) == 0:
                             break
                         
-                        #if len(common pairs) is greater than or equal to half, break
-                        if len(common_pairs) <= act_length/2:
-                            break
-
                         path.append(common_pairs[termno][0])
                         path.append(common_pairs[termno][1])
                         common_pairs.remove(common_pairs[termno])
@@ -1375,7 +1371,10 @@ class System(pc.System):
 
                             if finished:
                                 break
-                    
+
+                        #if len(common pairs) is greater than or equal to half, break
+                        if len(common_pairs) < act_length/2:
+                            break
                         
                         #if none of this is satisfied, changed termno
                         #it will automatically zero of the new array
