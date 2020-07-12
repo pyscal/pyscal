@@ -32,6 +32,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O2 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-O2 -DNDEBUG")
+#set(CXX_STANDARD 11)
 
 #Finally create the package
 #--------------------------------------------------------

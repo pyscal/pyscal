@@ -1398,6 +1398,8 @@ class System(pc.System):
                     atom.structure = 3
                     atom.cna = ucmix
                     break
+                else:
+                    atom.cna = ucmix
 
         self.atoms = atoms
 

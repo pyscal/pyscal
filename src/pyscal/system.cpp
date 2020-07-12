@@ -780,7 +780,6 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
             int tj = atoms[ti].temp_neighbors[i].index;
             process_neighbor(ti, tj);
         }
-
         finished = 1;
     }
 
@@ -788,6 +787,26 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
     return finished;
 
 
+}
+
+
+void System::store_neighbor_info(){
+    
+    int nn;
+
+    for (int ti=0; ti<nop; ti++){
+        
+        atoms[ti].next_neighbors.reserve(atoms[ti].n_neighbors);
+        atoms[ti].next_neighbor_distances.reserve(atoms[ti].n_neighbors);
+        
+        for(int i=0; i<atoms[ti].n_neighbors; i++){
+            nn = atoms[ti].neighbors[i];
+            for(int j=0; j<atoms[nn].n_neighbors; j++){
+                atoms[ti].next_neighbors[i].emplace_back(atoms[nn].neighbors[j]);
+                atoms[ti].next_neighbor_distances[i].emplace_back(atoms[nn].neighbordist[j]);
+            }
+        }
+    }
 }
 
 

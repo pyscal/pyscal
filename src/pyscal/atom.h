@@ -121,7 +121,9 @@ class Atom{
         vector<vector<double>> gdistvecs();
         void slocalangles(vector<vector<double>>);
         vector<vector<double>> glocalangles();
-
+        void find_filtered_neighbors(double);
+        vector<vector<int>> next_neighbors;
+        vector<vector<double>> next_neighbor_distances;
 
         int head;
  

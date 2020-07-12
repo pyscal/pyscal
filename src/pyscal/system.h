@@ -92,7 +92,7 @@ class System{
         void get_all_neighbors_cells();
         void get_temp_neighbors_cells();
         void get_temp_neighbors_brute();
-
+        void store_neighbor_info();
 
         //---------------------------------------------------
         // Methods for q calculation
