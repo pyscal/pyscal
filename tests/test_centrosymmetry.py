@@ -35,3 +35,11 @@ def test_cs_gvm():
     atoms = sys.atoms
     q = [atom.centrosymmetry for atom in atoms]
     assert np.round(np.mean(np.array(q)), decimals=2) > 0.00
+
+def test_csm_ovito():
+    sys = pc.System()
+    sys.read_inputfile("tests/bcc.csm.dump", customkeys=["Centrosymmetry"])    
+    sys.calculate_centrosymmetry(nmax=8)
+    atoms = sys.atoms
+    ind = np.random.randint(0, len(atoms))
+    assert np.abs(atoms[ind].centrosymmetry - float(atoms[ind].custom["Centrosymmetry"])) < 1E-5
