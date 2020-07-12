@@ -152,6 +152,16 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         cutoff used for finding neighbors for each atom.
     )mydelimiter")
 
+   .def_readwrite("next_neighbors", &Atom::next_neighbors, R"mydelimiter(
+        *double*.
+        cutoff used for finding neighbors for each atom.
+    )mydelimiter")
+
+   .def_readwrite("next_neighbor_distances", &Atom::next_neighbor_distances, R"mydelimiter(
+        *double*.
+        cutoff used for finding neighbors for each atom.
+    )mydelimiter")
+
     .def_property("neighbor_vector",&Atom::gdistvecs, &Atom::sdistvecs, R"mydelimiter(
         *List of floats of length 3*.
         List of vectors connecting an atom to its neighbors.
