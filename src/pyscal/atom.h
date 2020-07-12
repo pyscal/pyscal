@@ -212,6 +212,10 @@ class Atom{
         void find_bonds_of_common_neighbors();
         vector<int> bond_chain_count;
         void find_bond_chains();
+        void set_cna_mask(double);
+        //these are the cutoffs for cna
+        double lcutsmall;
+        double lcutlarge;
 
 
 

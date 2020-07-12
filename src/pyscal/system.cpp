@@ -781,6 +781,27 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
             process_neighbor(ti, tj);
         }
         finished = 1;
+
+        //now find local cutoffs
+        //only if nns >= 14
+        if (atoms[ti].temp_neighbors.size() > 13){
+            double ssum = 0;
+            for(int i=0 ; i<12; i++){
+                ssum += atoms[ti].temp_neighbors[i].dist;
+            }
+            //process sum
+            atoms[ti].lcutsmall = 0.0833333*1.20710678*ssum;
+            double ssum2 = 0;
+            ssum = 0;
+            for(int i=0 ; i<8; i++){
+                ssum += atoms[ti].temp_neighbors[i].dist;
+            }
+            for(int i=8 ; i<14; i++){
+                ssum2 += atoms[ti].temp_neighbors[i].dist;
+            }
+            atoms[ti].lcutlarge = 1.20710678*0.07142857*(1.1547*ssum + ssum2);
+
+        }
     }
 
 

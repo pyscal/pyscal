@@ -381,6 +381,18 @@ void Atom::svorovector(vector<int> voro){
 //-------------------------------------------------------
 // Other order parameters
 //-------------------------------------------------------
+void Atom::set_cna_mask(double fcut){
+    //set a mask for calculation depending on cutoff
+    for(int i=0; i< n_neighbors; i++){
+        if (neighbordist[i] <= fcut){
+            mask = true;
+        }
+        else{
+            mask = false;
+        }
+    }
+}
+
 void Atom::find_common_neighbors(){
     
     common_neighbors.clear();
