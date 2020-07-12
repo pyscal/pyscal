@@ -791,16 +791,20 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
 
 
 void System::store_neighbor_info(){
-    
-    int nn;
+    /*
+    Method to assign neighbors and next nearest neighbors
 
+    */    
+    int nn;
     for (int ti=0; ti<nop; ti++){
         
-        atoms[ti].next_neighbors.reserve(atoms[ti].n_neighbors);
-        atoms[ti].next_neighbor_distances.reserve(atoms[ti].n_neighbors);
-        
+        atoms[ti].next_neighbors.resize(atoms[ti].n_neighbors);
+        atoms[ti].next_neighbor_distances.resize(atoms[ti].n_neighbors);
+        atoms[ti].next_neighbor_counts.resize(atoms[ti].n_neighbors);
+
         for(int i=0; i<atoms[ti].n_neighbors; i++){
             nn = atoms[ti].neighbors[i];
+            atoms[ti].next_neighbor_counts[i] = atoms[nn].n_neighbors;
             for(int j=0; j<atoms[nn].n_neighbors; j++){
                 atoms[ti].next_neighbors[i].emplace_back(atoms[nn].neighbors[j]);
                 atoms[ti].next_neighbor_distances[i].emplace_back(atoms[nn].neighbordist[j]);
@@ -808,6 +812,8 @@ void System::store_neighbor_info(){
         }
     }
 }
+
+
 
 
 int System::get_all_neighbors_sann(double prefactor){

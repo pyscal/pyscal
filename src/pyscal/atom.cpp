@@ -381,6 +381,35 @@ void Atom::svorovector(vector<int> voro){
 //-------------------------------------------------------
 // Other order parameters
 //-------------------------------------------------------
+void Atom::find_common_neighbors(){
+    
+    common_neighbors.clear();
+    common_neighbor_count.clear();
+    common_neighbors.resize(n_neighbors);
+    common_neighbor_count.resize(n_neighbors);
 
+    int main_n;
+    int sub_n;
+
+    //for each neighbor
+    for(int i=0; i< n_neighbors; i++){
+        //loop over that neighbor
+        common_neighbor_count[i] = 0;
+
+        for(int j=0; j < next_neighbor_counts[i]; j++){
+            main_n = next_neighbors[i][j];
+
+            //now loop over self neighbors again
+            for(int k=0; k < n_neighbors; k++){
+                sub_n = neighbors[k];
+                if (main_n == sub_n){
+                    common_neighbor_count[i]++;
+                    common_neighbors[i].emplace_back(main_n);
+                }                  
+            }
+        }
+    }
+
+}
 
    

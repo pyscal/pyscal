@@ -124,7 +124,7 @@ class Atom{
         void find_filtered_neighbors(double);
         vector<vector<int>> next_neighbors;
         vector<vector<double>> next_neighbor_distances;
-
+        vector<int> next_neighbor_counts;
         int head;
  
         //-------------------------------------------------------
@@ -204,6 +204,9 @@ class Atom{
         vector<double> sro;
         double centrosymmetry;
         vector<vector<int>> cna;
+        vector<int> common_neighbor_count;
+        vector<vector<int>> common_neighbors;
+        void find_common_neighbors();
 
 
 

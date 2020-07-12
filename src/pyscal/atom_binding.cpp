@@ -416,7 +416,16 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         Each entry has 4 numbers,  first three are the cna index and 
         the fourth number is the corresponding counts.
     )mydelimiter")
+
+    .def_readwrite("common_neighbors", &Atom::common_neighbors, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common_neighbor_count", &Atom::common_neighbor_count, R"mydelimiter(
+    )mydelimiter")
      
+    .def("find_common_neighbors", &Atom::find_common_neighbors, R"mydelimiter(
+    )mydelimiter")
+
     ;
 
 
