@@ -38,6 +38,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
         faceverticenumbers[tn] = -1;
         faceperimeters[tn] = -1.0;
         sij[tn] = -1.0;
+        masks[tn] = -1;
         //edgelengths[tn] = -1.0;
 
     }
@@ -383,12 +384,14 @@ void Atom::svorovector(vector<int> voro){
 //-------------------------------------------------------
 void Atom::set_cna_mask(double fcut){
     //set a mask for calculation depending on cutoff
+    lneigh = 0;
     for(int i=0; i< n_neighbors; i++){
         if (neighbordist[i] <= fcut){
-            mask = true;
+            masks[i] = 0;
+            lneigh++;
         }
         else{
-            mask = false;
+            masks[i] = 1;
         }
     }
 }
@@ -406,6 +409,7 @@ void Atom::find_common_neighbors(){
     //for each neighbor
     for(int i=0; i< n_neighbors; i++){
         //loop over that neighbor
+        if (masks[i]) continue;
         common_neighbor_count[i] = 0;
 
         for(int j=0; j < next_neighbor_counts[i]; j++){
@@ -440,6 +444,7 @@ void Atom::find_bonds_of_common_neighbors(){
 
     for(int i=0; i< n_neighbors; i++){
         //now take the corresponding common neighbors
+        if (masks[i]) continue;
         common_neighbor_bond_count[i] = 0;
         for(int j=0; j<common_neighbor_count[i]; j++){
             //hcovert it to index
@@ -484,6 +489,7 @@ void Atom::find_bond_chains(){
     //we need a new algo, which loops over
     //first loop is always over neighbors
     for(int n=0; n<n_neighbors; n++){
+        if (masks[n]) continue;
         //now - for each neighbor, we have a bond chain
         //we need a replica array of ones
         //we need a count which we will reduce
@@ -545,6 +551,217 @@ void Atom::find_bond_chains(){
         }
         bond_chain_count[n] = pathlength-1;
 
+    }
+
+}
+
+
+void Atom::check_adaptive_cna12(){
+
+    int ncn4count, ncn5count, count, count1, count2;
+
+    //start checking for cn 12
+    //------------------------
+    //step 1: apply masks
+    set_cna_mask(lcutsmall);
+    
+    //if there are not enough neighbors, skip
+    if (lneigh < 12){
+        structure = 0;
+        return;
+    }
+
+    find_common_neighbors();
+
+    //check if we need to proceed
+    ncn4count=0;
+    ncn5count=0;
+    
+    for(int i=0; i<n_neighbors; i++){
+        if (masks[i]) continue;
+        if (common_neighbor_count[i] == 4){
+            ncn4count++;
+        }
+        else if (common_neighbor_count[i] == 5){
+            ncn5count++;
+        }
+    }
+
+    //check for fcc and hcp
+    if (ncn4count == 12){
+        find_bonds_of_common_neighbors();
+
+        //now check second index 2 x 12 for both structures - reuse ncn4count
+        count = 0;
+        for(int i=0; i<n_neighbors; i++){
+            if (masks[i]) continue;
+            if (common_neighbor_bond_count[i] == 2){
+                count++;
+            }
+        }
+        if (count != 12){
+            structure = 0;
+            return;
+        }
+        //all good - progress
+        find_bond_chains();
+
+        //12 x 1 for fcc and 6 x 1, 6 x 2 for hcp
+        count1 = 0;
+        count2 = 0;
+        for(int i=0; i<n_neighbors; i++){
+            if (masks[i]) continue;
+            if (bond_chain_count[i] == 1){
+                count1 ++;
+            }
+            else if (bond_chain_count[i] == 2){
+                count2 ++;
+            }
+        }
+        if (count1 == 12){
+            structure = 1;
+            return;
+        }
+        else if ((count1==6) && (count2==6)){
+            structure = 2;
+            return;
+        }
+        else{
+            structure = 0;
+            return;
+        }
+    }
+    //check for icosa
+    else if (ncn5count == 12){
+        find_bonds_of_common_neighbors();
+
+        count = 0;
+        for(int i=0; i<n_neighbors; i++){
+            if (masks[i]) continue;
+            if (common_neighbor_bond_count[i] == 5){
+                count++;
+            }
+        }
+        if (count != 12){
+            structure = 0;
+            return;
+        }
+
+        find_bond_chains();
+
+        count = 0;
+        for(int i=0; i<n_neighbors; i++){
+            if (masks[i]) continue;
+            if (bond_chain_count[i] == 5){
+                count ++;
+            }
+        }
+        if (count == 12){
+            structure = 4;
+            return;
+        }
+        else{
+            structure = 0;
+            return;
+        }
+
+    }
+    else{
+        structure = 0;
+        return;
+    }
+    
+}
+
+void Atom::check_adaptive_cna14(){
+
+    int count1, count2;
+
+    //start checking for cn 14
+    //------------------------
+    //step 1: apply masks
+    set_cna_mask(lcutlarge);
+    
+    //if there are not enough neighbors, skip
+    if (lneigh < 14){
+        structure = 0;
+        return;
+    }
+
+    find_common_neighbors();
+
+    //check if we need to proceed
+    count1=0;
+    count2=0;
+    
+    for(int i=0; i<n_neighbors; i++){
+        if (masks[i]) continue;
+        if (common_neighbor_count[i] == 6){
+            count1++;
+        }
+        else if (common_neighbor_count[i] == 4){
+            count2++;
+        }
+    }
+
+    if ((count1 == 8) && (count2 == 6)){
+        
+        find_bonds_of_common_neighbors();
+        count1 = 0;
+        count2 = 0;
+
+        for(int i=0; i<n_neighbors; i++){
+            if (masks[i]) continue;
+            if (common_neighbor_bond_count[i] == 6){
+                count1++;
+            }
+            else if (common_neighbor_bond_count[i] == 4){
+                count2++;
+            }
+        }
+        if ((count1 == 8) && (count2 == 6)){
+            find_bond_chains();
+            count1 = 0;
+            count2 = 0;
+            for(int i=0; i<n_neighbors; i++){
+                if (masks[i]) continue;
+                if (bond_chain_count[i] == 6){
+                    count1++;
+                }
+                else if (bond_chain_count[i] == 4){
+                    count2++;
+                }
+            }
+            if ((count1 == 8) && (count2 == 6)){
+                structure = 3;
+                return;
+            }            
+            else{
+                structure = 0;
+                return;
+            }
+        }
+        else{
+            structure = 0;
+            return;
+        }
+    }
+    else{
+        structure = 0;
+        return;
+    }
+    
+}
+
+void Atom::calculate_adaptive_cna(){
+    //adaptive cna process
+    //do cna one by one and
+    
+    //try number 12 calc
+    check_adaptive_cna12();
+
+    if (structure == 0){
+        check_adaptive_cna14();
     }
 
 }

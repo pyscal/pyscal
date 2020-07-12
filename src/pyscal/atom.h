@@ -97,6 +97,7 @@ class Atom{
         // Neighbor related properties
         //-------------------------------------------------------
         int neighbors[MAXNUMBEROFNEIGHBORS];
+        int masks[MAXNUMBEROFNEIGHBORS];
         double neighbordist[MAXNUMBEROFNEIGHBORS];
         double neighborweight[MAXNUMBEROFNEIGHBORS];
         double n_diffx[MAXNUMBEROFNEIGHBORS];
@@ -123,6 +124,7 @@ class Atom{
         vector<vector<double>> glocalangles();
         void find_filtered_neighbors(double);
         vector<vector<int>> next_neighbors;
+        vector<vector<int>> next_neighbor_masks;
         vector<vector<double>> next_neighbor_distances;
         vector<int> next_neighbor_counts;
         int head;
@@ -216,7 +218,15 @@ class Atom{
         //these are the cutoffs for cna
         double lcutsmall;
         double lcutlarge;
-
-
+        int lneigh;
+        vector<int> ncn;
+        int ncn_count;
+        vector<int> nb;
+        int nb_count;
+        vector<int> nclb;
+        int nclb_count;
+        void check_adaptive_cna12();
+        void check_adaptive_cna14();
+        void calculate_adaptive_cna();
 
 };
