@@ -410,49 +410,8 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         The value of centrosymmetry parameter.
     )mydelimiter")
 
-    .def_readwrite("cna", &Atom::cna, R"mydelimiter(
-        *Float*.
-        Common neighbor analysis vector. Returns a vector of ints. 
-        Each entry has 4 numbers,  first three are the cna index and 
-        the fourth number is the corresponding counts.
-    )mydelimiter")
-
-    .def_readwrite("common_neighbors", &Atom::common_neighbors, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("common_neighbor_count", &Atom::common_neighbor_count, R"mydelimiter(
-    )mydelimiter")
-     
-    .def("find_common_neighbors", &Atom::find_common_neighbors, R"mydelimiter(
-    )mydelimiter")
-
-    .def("find_bonds_of_common_neighbors", &Atom::find_bonds_of_common_neighbors, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("common_neighbor_bond_count", &Atom::common_neighbor_bond_count, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("common_neighbor_bonds", &Atom::common_neighbor_bonds, R"mydelimiter(
-    )mydelimiter")
-
-    .def("find_bond_chains", &Atom::find_bond_chains, R"mydelimiter(
-    )mydelimiter")
-
     .def("calculate_adaptive_cna", &Atom::calculate_adaptive_cna, R"mydelimiter(
     )mydelimiter")
-
-    .def("set_cna_mask", &Atom::set_cna_mask, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("bond_chain_count", &Atom::bond_chain_count, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("lcutsmall", &Atom::lcutsmall, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("lcutlarge", &Atom::lcutlarge, R"mydelimiter(
-    )mydelimiter")
-
     ;
 
 

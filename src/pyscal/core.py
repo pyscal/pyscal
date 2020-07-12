@@ -1125,41 +1125,19 @@ class System(pc.System):
         self.atoms = atoms
 
     
-    def calculate_cna(self, cutoff=None, references=None):
-        """
-        Calculate CNA
-        """
-        #if cutoff is not specified and lattice constant is, find that accordingly        
-        adaptive = False
-        
-        if cutoff is None:
-            adaptive = True
-
-        #if not adaptive, find neighbors norma
-        if not adaptive:
-            self.find_neighbors(method="cutoff", cutoff=cutoff)
-            self.find_cnavector(calculate_neighbors=False)
-            #we still need to assign structures
-
-        #16 is the maximum no of neighbors we need
-        #this does the adaptive routine
-        else:
-            self.find_adaptive_cnavector()
-            #find neighbors by number
-        
-    def find_cnavector(self, nmax=12, calculate_neighbors=True):
+    def calculate_cna(self, cutoff=None, calculate_neighbors=True):
         """
         Calculate the Common Neighbor Analysis indices
 
         Parameters
         ----------
-        nmax : int, optional
-            number of neighbors to be considered for centrosymmetry 
-            parameters. Has to be a positive, even integer. Default 12
+        cutoff : float, optional
+            cutoff value to calculate CNA. If not specified,
+            adaptive CNA will be used
 
         calculate_neighbors : bool, optional
-            if True recalculate neighbors using number method, if False
-            neighbor calculation is not done. 
+            If True, calculate neighbors using number method.
+            If False, existing neighbors will be used. Default True.
 
         Returns
         -------
@@ -1167,19 +1145,10 @@ class System(pc.System):
 
         Notes
         -----
-        Calculates the common neighbor analysis indices for each atom.
-        There are three values calculated for each atom namely, `ncn, nb, nclb`. These
-        values can be accessed by :attr:`~pyscal.catom.Atom.cna`.
-        
-        `ncn` is the number of neighbors of an atom with which it shares a neighbors.
-        `nb` is number of bonds between these common neighbors.
-        `nclb` is the number of bonds in the longest chain of bonds connecting these common
-        neighbors.
-        A complete description can be found in [1].
-
-        `nmax` number of neighbors are found around an atom using the `number` method
-        as described in :func:`~pyscal.core.System.find_neighbors` method, if `calculate_neighbors`
-        is set to True.
+        Performs the common neighbor analysis [1] and assigns a structure to each atom.
+        If `cutoff` is not specified, adaptive common neighbor analysis is used. The
+        assigned structures can be accessed by :attr:`~pyscal.catom.Atom.structure`.
+        The values assigned for stucture are 0 Unknown, 1 fcc, 2 hcp, 3 bcc, 4 icosahedral.
 
         References
         ----------
@@ -1187,221 +1156,15 @@ class System(pc.System):
 
         """
         if calculate_neighbors:
-            self.find_neighbors(method="number", nmax=nmax)
+            self.find_neighbors(method="number", nmax=14)
+        self.store_neighbor_info()
+        #atoms = self.atoms
 
-        atoms = self.atoms
+        for atom in self.atoms:
+            atom.calculate_adaptive_cna()
 
-        for atom in atoms:
-            neighs = atom.neighbors
-            dummy_cna = []
+        #self.atoms = atoms
 
-            for nn in neighs:
-                #first index - number of common neighbors
-                common_neighs = list(set(atoms[nn].neighbors).intersection(neighs))
-                ncn = len(common_neighs)
-                #bonds between these common_neighs
-                combos = list(itertools.combinations(common_neighs, 2))
-                nb = 0
-                common_pairs = []
-                for combo in combos:
-                    if combo[1] in atoms[combo[0]].neighbors:
-                        nb += 1
-                        common_pairs.append(combo)
-
-                #now we have to find the longest connect path among common pairs
-                #add the first one
-                act_length = len(common_pairs)
-                termno = 0
-
-                while True:    
-                    path = []
-                    
-                    #common pairs became zero, break
-                    if len(common_pairs) == 0:
-                        break
-                                        
-                    path.append(common_pairs[termno][0])
-                    path.append(common_pairs[termno][1])
-                    common_pairs.remove(common_pairs[termno])
-                    
-                    while True:
-                        finished = True
-                        for pair in common_pairs:
-                            if (pair[0] in path) or (pair[1] in path):
-                                path.append(pair[0])
-                                path.append(pair[1])
-                                finished = False
-                                common_pairs.remove(pair)
-
-                        if finished:
-                            break
-
-                    #if len(common pairs) is greater than or equal to half, break
-                    if len(common_pairs) < act_length/2:
-                        break
-                    
-                    #if none of this is satisfied, changed termno
-                    #it will automatically zero of the new array
-                nlcb = len(path)//2
-                dummy_cna.append([ncn, nb, nlcb])    
-            
-            ucna, ucounts = np.unique(dummy_cna, return_counts=True, axis=0)
-            ucmix = np.column_stack((ucna, ucounts))
-            atom.cna = ucmix
-
-        self.atoms = atoms
-
-    def find_adaptive_cnavector(self):
-        """
-        Calculate the Common Neighbor Analysis indices
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        Calculates the common neighbor analysis indices for each atom.
-        There are three values calculated for each atom namely, `ncn, nb, nclb`. These
-        values can be accessed by :attr:`~pyscal.catom.Atom.cna`.
-        
-        `ncn` is the number of neighbors of an atom with which it shares a neighbors.
-        `nb` is number of bonds between these common neighbors.
-        `nclb` is the number of bonds in the longest chain of bonds connecting these common
-        neighbors.
-        A complete description can be found in [1].
-
-        `nmax` number of neighbors are found around an atom using the `number` method
-        as described in :func:`~pyscal.core.System.find_neighbors` method, if `calculate_neighbors`
-        is set to True.
-
-        References
-        ----------
-        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
-
-        """
-        self.find_neighbors(method="number", nmax=14)
-        #now each atom has 16 neighbors
-        #we we need to find cutoffs and assign atoms
-        #start with 12
-        atoms = self.atoms
-        #we will use custom liberally to find multiple cutoffs and store them
-        for atom in atoms:
-            
-            #start with struct as 0  - unknown
-            struct = 0
-            test12 = True
-            test14 = True
-
-            # for fcc, hcp and ico
-            dist12 = np.sum(atom.neighbor_distance[:12])/12
-            dist12 = 1.20710678*dist12
-            adist = atom.neighbor_distance
-            aneighs = atom.neighbors
-            fneighs = [x for c, x in enumerate(aneighs) if adist[c] <= dist12]
-            atom.custom["neighs12"] = fneighs
-
-
-            #for bcc
-            dist14 = (1.1547*np.sum(atom.neighbor_distance[:8]) + np.sum(atom.neighbor_distance[8:14]))/14
-            dist14 = 1.20710678*dist14
-            fneighs = [x for c, x in enumerate(aneighs) if adist[c] <= dist14]
-            atom.custom["neighs14"] = fneighs
-
-            atom.structure = 0
-            #now complete the routine, assign structures
-            #dow we need to test for neighbor 12 structures?
-
-        for atom in atoms:
-
-            allneighs = []
-            
-            if len(atom.custom["neighs12"]) >= 12:
-                allneighs.append("neighs12")
-            
-            if len(atom.custom["neighs14"]) >= 14:
-                allneighs.append("neighs14")
-
-            for key in allneighs:
-                
-                neighs = atom.custom[key]
-                dummy_cna = []
-                
-                for nn in neighs:
-                    #first index - number of common neighbors
-                    common_neighs = list(set(atoms[nn].custom[key]).intersection(neighs))
-                    ncn = len(common_neighs)
-                    #bonds between these common_neighs
-                    combos = list(itertools.combinations(common_neighs, 2))
-                    nb = 0
-                    common_pairs = []
-                    for combo in combos:
-                        if combo[1] in atoms[combo[0]].custom[key]:
-                            nb += 1
-                            common_pairs.append(combo)
-
-                    #now we have to find the longest connect path among common pairs
-                    #add the first one
-                    act_length = len(common_pairs)
-                    termno = 0
-
-                    while True:    
-                        path = []
-
-                        #common pairs became zero, break
-                        if len(common_pairs) == 0:
-                            break
-                        
-                        path.append(common_pairs[termno][0])
-                        path.append(common_pairs[termno][1])
-                        common_pairs.remove(common_pairs[termno])
-                        
-                        while True:
-                            finished = True
-                            for pair in common_pairs:
-                                if (pair[0] in path) or (pair[1] in path):
-                                    path.append(pair[0])
-                                    path.append(pair[1])
-                                    finished = False
-                                    common_pairs.remove(pair)
-
-                            if finished:
-                                break
-
-                        #if len(common pairs) is greater than or equal to half, break
-                        if len(common_pairs) < act_length/2:
-                            break
-                        
-                        #if none of this is satisfied, changed termno
-                        #it will automatically zero of the new array
-                    nlcb = len(path)//2
-                    dummy_cna.append([ncn, nb, nlcb])    
-                
-                ucna, ucounts = np.unique(dummy_cna, return_counts=True, axis=0)
-                ucmix = np.column_stack((ucna, ucounts))
-                ucstr = [" ".join(x.astype(str)) for x in ucmix]
-                #now we need to assign structures
-                if "4 2 1 12" in ucstr:
-                    atom.structure = 1
-                    atom.cna = ucmix
-                    break
-                elif ("4 2 1 6" in ucstr) and ("4 2 2 6" in ucstr):
-                    atom.structure = 2
-                    atom.cna = ucmix
-                    break
-
-                elif ("6 6 6 8" in ucstr) and ("4 4 4 6" in ucstr):
-                    atom.structure = 3
-                    atom.cna = ucmix
-                    break
-                else:
-                    atom.cna = ucmix
-
-        self.atoms = atoms
 
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """

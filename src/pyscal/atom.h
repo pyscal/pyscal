@@ -205,7 +205,7 @@ class Atom{
         //-------------------------------------------------------
         vector<double> sro;
         double centrosymmetry;
-        vector<vector<int>> cna;
+
         vector<int> common_neighbor_count;
         vector<vector<int>> common_neighbors;
         void find_common_neighbors(int);
@@ -219,12 +219,7 @@ class Atom{
         double lcutsmall;
         double lcutlarge;
         int lneigh;
-        vector<int> ncn;
-        int ncn_count;
-        vector<int> nb;
-        int nb_count;
-        vector<int> nclb;
-        int nclb_count;
+
         void check_adaptive_cna12();
         void check_adaptive_cna14();
         void calculate_adaptive_cna();
