@@ -404,7 +404,7 @@ void Atom::find_common_neighbors(){
                 sub_n = neighbors[k];
                 if (main_n == sub_n){
                     common_neighbor_count[i]++;
-                    common_neighbors[i].emplace_back(main_n);
+                    common_neighbors[i].emplace_back(k);
                 }                  
             }
         }
@@ -413,3 +413,126 @@ void Atom::find_common_neighbors(){
 }
 
    
+void Atom::find_bonds_of_common_neighbors(){
+
+    common_neighbor_bonds.clear();
+    common_neighbor_bond_count.clear();
+    common_neighbor_bonds.resize(n_neighbors);
+    common_neighbor_bond_count.resize(n_neighbors);
+
+    int main_n, sub_n;
+    int indexmain, indexsub;
+
+    vector<int> pair;
+    pair.resize(2);
+
+    for(int i=0; i< n_neighbors; i++){
+        //now take the corresponding common neighbors
+        common_neighbor_bond_count[i] = 0;
+        for(int j=0; j<common_neighbor_count[i]; j++){
+            //hcovert it to index
+            indexmain = common_neighbors[i][j];
+            main_n = neighbors[indexmain];
+            //this is to avoid double counting
+            for(int k=j+1; k<common_neighbor_count[i]; k++){
+                //if (j==k) continue;
+                //convert to index
+                indexsub = common_neighbors[i][k];
+
+                //check if they are each others neighbors
+                //as in, if j appears in k's neighbors
+                for(int l=0; l < next_neighbor_counts[indexsub]; l++){
+                    sub_n = next_neighbors[indexsub][l];
+                    if (main_n == sub_n){
+                        common_neighbor_bond_count[i] ++;
+                        pair[0] = main_n;
+                        pair[1] = neighbors[indexsub];
+                        common_neighbor_bonds[i].emplace_back(pair);
+                        break;
+                    }
+                }
+            }
+        }
+    }    
+}
+
+void Atom::find_bond_chains(){
+    
+    bond_chain_count.clear();
+    bond_chain_count.resize(n_neighbors);
+
+    int max_length;
+    int count;
+    vector<int> indicator;
+    vector<int> path;
+    int pathlength;
+    int chains;
+    int finished;
+
+    //we need a new algo, which loops over
+    //first loop is always over neighbors
+    for(int n=0; n<n_neighbors; n++){
+        //now - for each neighbor, we have a bond chain
+        //we need a replica array of ones
+        //we need a count which we will reduce
+        //max length of chain
+        max_length = common_neighbor_bond_count[n];
+        //chain number
+        chains = 0;
+        //set the count, which we will reduce
+        count = max_length;
+        //now make array of ones
+        indicator.clear();
+        for(int i=0; i<max_length; i++){
+            indicator.emplace_back(1);
+        }
+        //we are reading - start the first while loop
+        while(true){
+            //clear the path
+            path.clear();
+            pathlength = 0;
+            //if no more terms are to be added, break
+            if (count == 0) break;
+            //add first elements to path
+            if (indicator[chains]==0) chains++;
+
+            path.emplace_back(common_neighbor_bonds[n][chains][0]);
+            path.emplace_back(common_neighbor_bonds[n][chains][1]);
+            pathlength++;
+            //reduce count and set this term to added
+            count--;
+            indicator[chains] = 0;
+
+            //start the next loop
+            while(true){
+                //set finished to true
+                finished = 1;
+                //now loop over bonds
+                for(int i=0; i<max_length; i++){
+                    //is this term valid?
+                    if(!indicator[i]) continue;
+                    //otherwise check if it is in path
+                    //loop over path
+                    int rr = pathlength*2;
+                    for(int j=0; j<rr; j++){
+                        if((common_neighbor_bonds[n][i][0] == path[j]) or (common_neighbor_bonds[n][i][1] == path[j])){
+                            //add the values
+                            path.emplace_back(common_neighbor_bonds[n][i][0]);
+                            path.emplace_back(common_neighbor_bonds[n][i][1]);
+                            pathlength++;
+                            finished = 0;
+                            indicator[i] = 0;
+                            count--;
+                        }    
+                    }
+                }
+                if (finished == 1) break;
+            }
+            if (count <= pathlength) break;
+
+        }
+        bond_chain_count[n] = pathlength-1;
+
+    }
+
+}

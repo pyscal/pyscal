@@ -207,7 +207,11 @@ class Atom{
         vector<int> common_neighbor_count;
         vector<vector<int>> common_neighbors;
         void find_common_neighbors();
-
+        vector<int> common_neighbor_bond_count;
+        vector<vector<vector<int>>> common_neighbor_bonds;
+        void find_bonds_of_common_neighbors();
+        vector<int> bond_chain_count;
+        void find_bond_chains();
 
 
 

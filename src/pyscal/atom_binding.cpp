@@ -426,6 +426,21 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     .def("find_common_neighbors", &Atom::find_common_neighbors, R"mydelimiter(
     )mydelimiter")
 
+    .def("find_bonds_of_common_neighbors", &Atom::find_bonds_of_common_neighbors, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common_neighbor_bond_count", &Atom::common_neighbor_bond_count, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common_neighbor_bonds", &Atom::common_neighbor_bonds, R"mydelimiter(
+    )mydelimiter")
+
+    .def("find_bond_chains", &Atom::find_bond_chains, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("bond_chain_count", &Atom::bond_chain_count, R"mydelimiter(
+    )mydelimiter")
+
     ;
 
 
