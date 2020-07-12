@@ -208,12 +208,12 @@ class Atom{
         vector<vector<int>> cna;
         vector<int> common_neighbor_count;
         vector<vector<int>> common_neighbors;
-        void find_common_neighbors();
+        void find_common_neighbors(int);
         vector<int> common_neighbor_bond_count;
         vector<vector<vector<int>>> common_neighbor_bonds;
-        void find_bonds_of_common_neighbors();
+        void find_bonds_of_common_neighbors(int);
         vector<int> bond_chain_count;
-        void find_bond_chains();
+        void find_bond_chains(int);
         void set_cna_mask(double);
         //these are the cutoffs for cna
         double lcutsmall;
