@@ -1140,10 +1140,13 @@ class System(pc.System):
         calculate_neighbors : bool, optional
             If True, calculate neighbors using number method.
             If False, existing neighbors will be used. Default True.
+            Only used if the cutoff is None.
 
         Returns
         -------
-        None
+        cna : list of ints
+            list of length 5 with number of atoms that belong to each
+            structure.
 
         Notes
         -----
@@ -1157,13 +1160,17 @@ class System(pc.System):
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
 
         """
-        if calculate_neighbors:
-            self.find_neighbors(method="number", nmax=14, assign_neighbor=False)
         
         if cutoff is None:
+            if calculate_neighbors:
+                self.find_neighbors(method="number", nmax=14, assign_neighbor=False)
             cna = self.calculate_acna()
             return cna
-        
+        else:
+            self.find_neighbors(method="cutoff", cutoff=cutoff)
+            cna = self.calculate_cna()
+            return cna
+
 
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """

@@ -153,5 +153,6 @@ class System{
         // Other order parameters
         //-------------------------------------------------------
         vector<int> calculate_acna();
+        vector<int> calculate_cna();
 
 };

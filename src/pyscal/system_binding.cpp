@@ -103,6 +103,7 @@ PYBIND11_MODULE(csystem, m) {
         // Other order parameters
         //-------------------------------------------------------
         .def("calculate_acna",&System::calculate_acna)
+        .def("calculate_cna",&System::calculate_cna)
         ;
 
 
