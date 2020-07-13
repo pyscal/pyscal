@@ -45,8 +45,8 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         // Atom related methods
         //-----------------------------------------------------
-        //.def_property("atoms", &System::get_atoms, &System::set_atoms)
-        .def_readwrite("atoms", &System::atoms)
+        .def_property("atoms", &System::get_atoms, &System::set_atoms)
+        //.def_readwrite("atoms", &System::atoms)
         .def("cget_atom",  &System::gatom)
         .def("cset_atom", &System::satom)
 
@@ -98,6 +98,11 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         .def_readwrite("voroexp", &System::alpha)
         .def("find_average_volume",&System::find_average_volume)
+
+        //-------------------------------------------------------
+        // Other order parameters
+        //-------------------------------------------------------
+        .def("calculate_acna",&System::calculate_acna)
         ;
 
 

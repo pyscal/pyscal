@@ -1749,8 +1749,25 @@ void System::find_average_volume(){
     }
 }
 
+//-------------------------------------------------------
+// Other order parameters
+//-------------------------------------------------------
 
+vector<int> System::calculate_acna(){
+    
+    store_neighbor_info();
+    
+    vector<int> result;
+    for(int i=0; i<5; i++){
+        result.emplace_back(0);
+    }    
+    
+    for(int ti=0; ti<nop; ti++){
+        atoms[ti].calculate_adaptive_cna();
+        result[atoms[ti].structure] += 1;
+    }
 
-
+    return result;
+}
 
 

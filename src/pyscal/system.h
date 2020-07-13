@@ -147,5 +147,9 @@ class System{
         double face_cutoff;
         void set_face_cutoff(double);
 
+        //-------------------------------------------------------
+        // Other order parameters
+        //-------------------------------------------------------
+        vector<int> calculate_acna();
 
 };

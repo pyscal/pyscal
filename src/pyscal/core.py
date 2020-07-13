@@ -1157,14 +1157,11 @@ class System(pc.System):
         """
         if calculate_neighbors:
             self.find_neighbors(method="number", nmax=14)
-        self.store_neighbor_info()
-        #atoms = self.atoms
-
-        for atom in self.atoms:
-            atom.calculate_adaptive_cna()
-
-        #self.atoms = atoms
-
+        
+        if cutoff is None:
+            cna = self.calculate_acna()
+            return cna
+        
 
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """
