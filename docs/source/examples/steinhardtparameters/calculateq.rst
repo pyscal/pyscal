@@ -24,7 +24,7 @@ Perfect structures
 ~~~~~~~~~~~~~~~~~~
 
 To create atoms and box for perfect structures, the
-:mod:`~pyscal.crystal_structures` module is used. The created atoms
+:mod:``~pyscal.crystal_structures`` module is used. The created atoms
 and boxes are then assigned to ``System`` objects.
 
 .. code:: python
@@ -58,7 +58,7 @@ Finding the cutoff distance
 
 The cutoff distance is normally calculated in a such a way that the
 atoms within the first shell is incorporated in this distance. The
-:func:`~pyscal.core.System.calculate_rdf` function can be used to find
+:func:``pyscal.core.System.calculate_rdf`` function can be used to find
 this cutoff distance.
 
 .. code:: python
@@ -85,6 +85,7 @@ Now the calculated rdf is plotted
     ax1.axvline(3.6, color='red')
     ax2.axvline(2.7, color='red')
     ax3.axvline(3.6, color='red')
+
 
 
 .. image:: fig_1.png
@@ -148,26 +149,26 @@ Structures with thermal vibrations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once again, we create the reqd structures using the
-:mod:`~pyscal.crystal_structures` module. Noise can be applied to
+:mod:``~pyscal.crystal_structures`` module. Noise can be applied to
 atomic positions using the ``noise`` keyword as shown below.
 
 .. code:: python
 
-    bcc_atoms, bcc_box = pcs.make_crystal('bcc', lattice_constant=3.147, repetitions=[10,10,10], noise=0.01)
+    bcc_atoms, bcc_box = pcs.make_crystal('bcc', lattice_constant=3.147, repetitions=[10,10,10], noise=0.1)
     bcc = pc.System()
     bcc.atoms = bcc_atoms
     bcc.box = bcc_box
 
 .. code:: python
 
-    fcc_atoms, fcc_box = pcs.make_crystal('fcc', lattice_constant=3.147, repetitions=[10,10,10], noise=0.01)
+    fcc_atoms, fcc_box = pcs.make_crystal('fcc', lattice_constant=3.147, repetitions=[10,10,10], noise=0.1)
     fcc = pc.System()
     fcc.atoms = fcc_atoms
     fcc.box = fcc_box
 
 .. code:: python
 
-    hcp_atoms, hcp_box = pcs.make_crystal('hcp', lattice_constant=3.147, repetitions=[10,10,10], noise=0.01)
+    hcp_atoms, hcp_box = pcs.make_crystal('hcp', lattice_constant=3.147, repetitions=[10,10,10], noise=0.1)
     hcp = pc.System()
     hcp.atoms = hcp_atoms
     hcp.box = hcp_box
@@ -210,11 +211,10 @@ Gather the q vales and plot them
 .. image:: fig_3.png
 
 
-This is not so great as the first case, we can see that the thermal
-vibrations cause the distributions to spread a lot and overlap with each
-other. Lechner and Dellago proposed using the averaged distributions,
-:math:`\bar{q}_4-\bar{q}_6` to better distinguish the distributions.
-Lets try that.
+The thermal vibrations cause the distributions to spread, but it still
+very good. Lechner and Dellago proposed using the averaged
+distributions, :math:`\bar{q}_4-\bar{q}_6` to better distinguish the
+distributions. Lets try that.
 
 .. code:: python
 
@@ -238,6 +238,7 @@ Lets see if these distributions are better..
     plt.xlabel("$q_4$", fontsize=20)
     plt.ylabel("$q_6$", fontsize=20)
     plt.legend(loc=4, fontsize=15)
+
 
 
 .. image:: fig_4.png
