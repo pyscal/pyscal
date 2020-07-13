@@ -382,38 +382,29 @@ void Atom::svorovector(vector<int> voro){
 //-------------------------------------------------------
 // Other order parameters
 //-------------------------------------------------------
-void Atom::set_cna_mask(double fcut){
-    //set a mask for calculation depending on cutoff
-    //mask will be deprecated - but lneigh is useful
-    lneigh = 0;
 
-    for(int i=0; i< n_neighbors; i++){
-        if (neighbordist[i] <= fcut){
-            lneigh++;
-        }
-    }
-}
-
-void Atom::find_common_neighbors(int ncut){
+void Atom::find_common_neighbors(){
     
     common_neighbors.clear();
     common_neighbor_count.clear();
-    common_neighbors.resize(ncut);
-    common_neighbor_count.resize(ncut);
+    common_neighbors.resize(n_neighbors);
+    common_neighbor_count.resize(n_neighbors);
 
     int main_n;
     int sub_n;
+    int nnc;
 
     //for each neighbor
-    for(int i=0; i< ncut; i++){
+    for(int i=0; i< n_neighbors; i++){
         //loop over that neighbor
         common_neighbor_count[i] = 0;
+        nnc = next_neighbor_counts[i]; 
 
-        for(int j=0; j < ncut; j++){
+        for(int j=0; j < nnc; j++){
             main_n = next_neighbors[i][j];
 
             //now loop over self neighbors again
-            for(int k=0; k < ncut; k++){
+            for(int k=0; k < n_neighbors; k++){
                 sub_n = neighbors[k];
                 if (main_n == sub_n){
                     common_neighbor_count[i]++;
@@ -426,12 +417,12 @@ void Atom::find_common_neighbors(int ncut){
 }
 
    
-void Atom::find_bonds_of_common_neighbors(int ncut){
+void Atom::find_bonds_of_common_neighbors(){
 
     common_neighbor_bonds.clear();
     common_neighbor_bond_count.clear();
-    common_neighbor_bonds.resize(ncut);
-    common_neighbor_bond_count.resize(ncut);
+    common_neighbor_bonds.resize(n_neighbors);
+    common_neighbor_bond_count.resize(n_neighbors);
 
     int main_n, sub_n;
     int indexmain, indexsub;
@@ -439,7 +430,7 @@ void Atom::find_bonds_of_common_neighbors(int ncut){
     vector<int> pair;
     pair.resize(2);
 
-    for(int i=0; i< ncut; i++){
+    for(int i=0; i< n_neighbors; i++){
         //now take the corresponding common neighbors
         common_neighbor_bond_count[i] = 0;
         for(int j=0; j<common_neighbor_count[i]; j++){
@@ -454,7 +445,7 @@ void Atom::find_bonds_of_common_neighbors(int ncut){
 
                 //check if they are each others neighbors
                 //as in, if j appears in k's neighbors
-                for(int l=0; l < ncut; l++){
+                for(int l=0; l < next_neighbor_counts[indexsub]; l++){
                     sub_n = next_neighbors[indexsub][l];
                     if (main_n == sub_n){
                         common_neighbor_bond_count[i] ++;
@@ -469,10 +460,10 @@ void Atom::find_bonds_of_common_neighbors(int ncut){
     }    
 }
 
-void Atom::find_bond_chains(int ncut){
+void Atom::find_bond_chains(){
     
     bond_chain_count.clear();
-    bond_chain_count.resize(ncut);
+    bond_chain_count.resize(n_neighbors);
 
     int max_length;
     int count;
@@ -484,7 +475,7 @@ void Atom::find_bond_chains(int ncut){
 
     //we need a new algo, which loops over
     //first loop is always over neighbors
-    for(int n=0; n<ncut; n++){
+    for(int n=0; n<n_neighbors; n++){
         //now - for each neighbor, we have a bond chain
         //we need a replica array of ones
         //we need a count which we will reduce
@@ -566,22 +557,21 @@ void Atom::check_adaptive_cna12(){
     //start checking for cn 12
     //------------------------
     //step 1: apply masks
-    set_cna_mask(lcutsmall);
-    int ncut = 12;
+    
     
     //if there are not enough neighbors, skip
-    if (lneigh < 12){
+    if (n_neighbors < 12){
         structure = 0;
         return;
     }
 
-    find_common_neighbors(ncut);
+    find_common_neighbors();
 
     //check if we need to proceed
     ncn4count=0;
     ncn5count=0;
     
-    for(int i=0; i<ncut; i++){
+    for(int i=0; i<n_neighbors; i++){
         
         if (common_neighbor_count[i] == 4){
             ncn4count++;
@@ -593,11 +583,11 @@ void Atom::check_adaptive_cna12(){
 
     //check for fcc and hcp
     if (ncn4count == 12){
-        find_bonds_of_common_neighbors(ncut);
+        find_bonds_of_common_neighbors();
 
         //now check second index 2 x 12 for both structures - reuse ncn4count
         count = 0;
-        for(int i=0; i<ncut; i++){
+        for(int i=0; i<n_neighbors; i++){
             
             if (common_neighbor_bond_count[i] == 2){
                 count++;
@@ -608,12 +598,12 @@ void Atom::check_adaptive_cna12(){
             return;
         }
         //all good - progress
-        find_bond_chains(ncut);
+        find_bond_chains();
 
         //12 x 1 for fcc and 6 x 1, 6 x 2 for hcp
         count1 = 0;
         count2 = 0;
-        for(int i=0; i<ncut; i++){
+        for(int i=0; i<n_neighbors; i++){
             
             if (bond_chain_count[i] == 1){
                 count1 ++;
@@ -637,10 +627,10 @@ void Atom::check_adaptive_cna12(){
     }
     //check for icosa
     else if (ncn5count == 12){
-        find_bonds_of_common_neighbors(ncut);
+        find_bonds_of_common_neighbors();
 
         count = 0;
-        for(int i=0; i<ncut; i++){
+        for(int i=0; i<n_neighbors; i++){
             
             if (common_neighbor_bond_count[i] == 5){
                 count++;
@@ -651,10 +641,10 @@ void Atom::check_adaptive_cna12(){
             return;
         }
 
-        find_bond_chains(ncut);
+        find_bond_chains();
 
         count = 0;
-        for(int i=0; i<ncut; i++){
+        for(int i=0; i<n_neighbors; i++){
             
             if (bond_chain_count[i] == 5){
                 count ++;
@@ -680,25 +670,23 @@ void Atom::check_adaptive_cna12(){
 void Atom::check_adaptive_cna14(){
 
     int count1, count2;
-    int ncut = 14;
     //start checking for cn 14
     //------------------------
-    //step 1: apply masks
-    set_cna_mask(lcutlarge);
+
     
     //if there are not enough neighbors, skip
-    if (lneigh < 14){
+    if (n_neighbors < 14){
         structure = 0;
         return;
     }
 
-    find_common_neighbors(ncut);
+    find_common_neighbors();
 
     //check if we need to proceed
     count1=0;
     count2=0;
     
-    for(int i=0; i<ncut; i++){
+    for(int i=0; i<n_neighbors; i++){
         
         if (common_neighbor_count[i] == 6){
             count1++;
@@ -710,11 +698,11 @@ void Atom::check_adaptive_cna14(){
 
     if ((count1 == 8) && (count2 == 6)){
         
-        find_bonds_of_common_neighbors(ncut);
+        find_bonds_of_common_neighbors();
         count1 = 0;
         count2 = 0;
 
-        for(int i=0; i<ncut; i++){
+        for(int i=0; i<n_neighbors; i++){
             
             if (common_neighbor_bond_count[i] == 6){
                 count1++;
@@ -724,10 +712,10 @@ void Atom::check_adaptive_cna14(){
             }
         }
         if ((count1 == 8) && (count2 == 6)){
-            find_bond_chains(ncut);
+            find_bond_chains();
             count1 = 0;
             count2 = 0;
-            for(int i=0; i<ncut; i++){
+            for(int i=0; i<n_neighbors; i++){
                 
                 if (bond_chain_count[i] == 6){
                     count1++;
@@ -757,15 +745,15 @@ void Atom::check_adaptive_cna14(){
     
 }
 
-void Atom::calculate_adaptive_cna(){
+void Atom::calculate_adaptive_cna(int nc){
     //adaptive cna process
     //do cna one by one and
     
     //try number 12 calc
-    check_adaptive_cna12();
+    if (nc == 12)
+        check_adaptive_cna12();
 
-    if (structure == 0){
+    if (nc == 14)
         check_adaptive_cna14();
-    }
 
 }

@@ -74,10 +74,12 @@ class System{
         void get_all_neighbors_normal();
         void process_neighbor(int, int);
         int get_all_neighbors_sann(double);
-        int get_all_neighbors_bynumber(double, int);
+        int get_all_neighbors_bynumber(double, int, int);
+        int get_neighbors_from_temp(int);
         int get_all_neighbors_adaptive(double, int, double);
         void get_all_neighbors_voronoi();
-        void reset_all_neighbors();        
+        void reset_all_neighbors();
+        void reset_main_neighbors();        
         double get_abs_distance(int,int,double&,double&,double&);
         double get_abs_distance(Atom , Atom );
         vector<double> get_distance_vector(Atom , Atom);

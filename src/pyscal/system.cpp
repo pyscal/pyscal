@@ -354,6 +354,20 @@ void System::reset_all_neighbors(){
     }
 }
 
+void System::reset_main_neighbors(){
+    for (int ti = 0;ti<nop;ti++){
+
+        atoms[ti].n_neighbors=0;
+        //atoms[ti].temp_neighbors.clear();
+
+        for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
+
+            atoms[ti].neighbors[tn] = NILVALUE;
+            atoms[ti].neighbordist[tn] = -1.0;
+        }
+    }
+}
+
 
 vector<double> System::get_pairdistances(){
 
@@ -707,15 +721,15 @@ void System::get_temp_neighbors_cells(){
     }
 
 }
-
-int System::get_all_neighbors_bynumber(double prefactor, int nns){
+int System::get_all_neighbors_bynumber(double prefactor, int nns, int assign){
     /*
     A new neighbor algorithm that finds a specified number of 
-    neighbors for each atom.
+    neighbors for each atom. But ONLY TEMP neighbors
     */
 
     //reset voronoi flag
     voronoiused = 0;
+    
 
     double d, dcut;
     double diffx,diffy,diffz;
@@ -726,7 +740,7 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
     vector<int> nids;
     vector<double> dists, sorted_dists;
 
-    //double prefactor = 1.21;
+        //double prefactor = 1.21;
     double summ;
     double boxvol;
 
@@ -750,7 +764,6 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
         boxvol = boxx*boxy*boxz;
     }
 
-
     //now find the volume per particle
     double guessvol = boxvol/float(nop);
 
@@ -767,7 +780,6 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
     else{
         get_temp_neighbors_brute();
     }
-
     for (int ti=0; ti<nop; ti++){
         if (atoms[ti].temp_neighbors.size() < nns){
             return 0;
@@ -775,32 +787,79 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns){
 
         sort(atoms[ti].temp_neighbors.begin(), atoms[ti].temp_neighbors.end(), by_dist());
 
-        //start with initial routine
-        for(int i=0 ; i<nns; i++){
-            int tj = atoms[ti].temp_neighbors[i].index;
-            process_neighbor(ti, tj);
+        if(assign == 1){
+            //assign the neighbors
+            for(int i=0; i<nns; i++){
+                int tj = atoms[ti].temp_neighbors[i].index;
+                process_neighbor(ti, tj);
+            }
         }
-        finished = 1;
 
-        //now find local cutoffs
-        //only if nns >= 14
-        if (atoms[ti].temp_neighbors.size() > 13){
-            double ssum = 0;
-            for(int i=0 ; i<12; i++){
-                ssum += atoms[ti].temp_neighbors[i].dist;
-            }
-            //process sum
-            atoms[ti].lcutsmall = 0.0833333*1.20710678*ssum;
-            double ssum2 = 0;
-            ssum = 0;
-            for(int i=0 ; i<8; i++){
-                ssum += atoms[ti].temp_neighbors[i].dist;
-            }
-            for(int i=8 ; i<14; i++){
-                ssum2 += atoms[ti].temp_neighbors[i].dist;
-            }
-            atoms[ti].lcutlarge = 1.20710678*0.07142857*(1.1547*ssum + ssum2);
+        finished = 1;            
+    }
 
+
+    return finished;
+
+
+}
+
+int System::get_neighbors_from_temp(int style){
+    /*
+    A new neighbor algorithm that finds a specified number of 
+    neighbors for each atom.
+    */
+
+    int finished = 1;
+    //reset neighbors
+    reset_main_neighbors();
+
+    if (style == 12){
+        for (int ti=0; ti<nop; ti++){
+            if (atoms[ti].temp_neighbors.size() > 11){
+                double ssum = 0;
+                for(int i=0 ; i<12; i++){
+                    ssum += atoms[ti].temp_neighbors[i].dist;
+                }
+                //process sum
+                atoms[ti].lcutsmall = 1.2071*ssum/12;
+                //now assign neighbors based on this
+                for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+                    int tj = atoms[ti].temp_neighbors[i].index;
+                    double dist = atoms[ti].temp_neighbors[i].dist;
+                    if (dist <= atoms[ti].lcutsmall)
+                        process_neighbor(ti, tj);
+                }
+                finished = 1;                                  
+            }
+            else{
+                return 0;
+            }
+        }
+    }
+    else if (style == 14){
+        for (int ti=0; ti<nop; ti++){
+            if (atoms[ti].temp_neighbors.size() > 13){
+                double ssum = 0;
+                for(int i=0 ; i<8; i++){
+                    ssum += 1.1547*atoms[ti].temp_neighbors[i].dist;
+                }
+                for(int i=8 ; i<14; i++){
+                    ssum += atoms[ti].temp_neighbors[i].dist;
+                }
+                atoms[ti].lcutlarge = 1.2071*ssum/14;
+                //now assign neighbors based on this
+                for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+                    int tj = atoms[ti].temp_neighbors[i].index;
+                    double dist = atoms[ti].temp_neighbors[i].dist;
+                    if (dist <= atoms[ti].lcutlarge)
+                        process_neighbor(ti, tj);
+                }
+                finished = 1;                                  
+            }
+            else{
+                return 0;
+            }
         }
     }
 
@@ -817,7 +876,12 @@ void System::store_neighbor_info(){
 
     */    
     int nn;
+
     for (int ti=0; ti<nop; ti++){
+
+        atoms[ti].next_neighbors.clear();
+        atoms[ti].next_neighbor_distances.clear();
+        atoms[ti].next_neighbor_counts.clear();
         
         atoms[ti].next_neighbors.resize(atoms[ti].n_neighbors);
         atoms[ti].next_neighbor_distances.resize(atoms[ti].n_neighbors);
@@ -1755,18 +1819,29 @@ void System::find_average_volume(){
 
 vector<int> System::calculate_acna(){
     
+    //get fourteen neighbors
+    get_neighbors_from_temp(12);
     store_neighbor_info();
     
+    for(int ti=0; ti<nop; ti++){
+        atoms[ti].calculate_adaptive_cna(12);    
+    }
+
+    //we need to check again for unknow structures
+    get_neighbors_from_temp(14);
+    store_neighbor_info();
+
     vector<int> result;
     for(int i=0; i<5; i++){
         result.emplace_back(0);
-    }    
-    
-    for(int ti=0; ti<nop; ti++){
-        atoms[ti].calculate_adaptive_cna();
-        result[atoms[ti].structure] += 1;
     }
 
+    for(int ti=0; ti<nop; ti++){
+        if(atoms[ti].structure == 0)
+            atoms[ti].calculate_adaptive_cna(14);
+
+        result[atoms[ti].structure] += 1;            
+    }
     return result;
 }
 

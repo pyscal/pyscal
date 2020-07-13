@@ -394,7 +394,7 @@ class System(pc.System):
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
                                             voroexp=1, padding=1.2, nlimit=6, cells=False,
-                                                nmax=12):
+                                                nmax=12, assign_neighbor=True):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
@@ -404,7 +404,8 @@ class System(pc.System):
         method : {'cutoff', 'voronoi', 'number'}
             `cutoff` method finds neighbors of an atom within a specified or adaptive cutoff distance from the atom.
             `voronoi` method finds atoms that share a Voronoi polyhedra face with the atom. Default, `cutoff`
-            `number` method finds a specified number of closest neighbors to the given atom.
+            `number` method finds a specified number of closest neighbors to the given atom. Number only populates
+            
 
         cutoff : { float, 'sann', 'adaptive'}
             the cutoff distance to be used for the `cutoff` based neighbor calculation method described above.
@@ -431,6 +432,7 @@ class System(pc.System):
 
         nmax : int, optional
             only used if ``cutoff=number``. The number of closest neighbors to be found for each atom. Default 12
+        
 
         Returns
         -------
@@ -543,7 +545,7 @@ class System(pc.System):
                 raise ValueError("value of threshold should be at least 1.00")
 
             self.usecells =  (len(self.atoms) > 4000)
-            finished = self.get_all_neighbors_bynumber(threshold, nmax)
+            finished = self.get_all_neighbors_bynumber(threshold, nmax, assign_neighbor)
             if not finished:
                 raise RuntimeError("Could not find enough neighbors - try increasing threshold")
 
@@ -1156,7 +1158,7 @@ class System(pc.System):
 
         """
         if calculate_neighbors:
-            self.find_neighbors(method="number", nmax=14)
+            self.find_neighbors(method="number", nmax=14, assign_neighbor=False)
         
         if cutoff is None:
             cna = self.calculate_acna()

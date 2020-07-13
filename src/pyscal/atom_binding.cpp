@@ -412,6 +412,28 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
 
     .def("calculate_adaptive_cna", &Atom::calculate_adaptive_cna, R"mydelimiter(
     )mydelimiter")
+
+    .def_readwrite("common_neighbor_count", &Atom::common_neighbor_count, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common_neighbors", &Atom::common_neighbors, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common_neighbor_bond_count", &Atom::common_neighbor_bond_count, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common_neighbor_bonds", &Atom::common_neighbor_bonds, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("bond_chain_count", &Atom::bond_chain_count, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("lcutsmall", &Atom::lcutsmall, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("lcutlarge", &Atom::lcutlarge, R"mydelimiter(
+    )mydelimiter")
+
     ;
 
 
