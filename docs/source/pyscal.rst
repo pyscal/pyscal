@@ -38,13 +38,6 @@ pyscal.traj\_process module
    :undoc-members:
    :show-inheritance:
 
-pyscal.pickle module
---------------------
-
-.. automodule:: pyscal.pickle
-   :members:
-   :undoc-members:
-   :show-inheritance:
 
 pyscal.misc module
 --------------------

@@ -5,7 +5,6 @@
 
 
 import pyscal.traj_process as ptp
-import pyscal.pickle_object as pp
 import os
 import numpy as np
 import warnings
@@ -75,6 +74,7 @@ class System(pc.System):
 
         self.initialized = True
         self.neighbors_found = False
+        self.neighbor_method = None
         pc.System.__init__(self)
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None, is_triclinic = False):
@@ -393,16 +393,19 @@ class System(pc.System):
 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, filter=None,
-                                            voroexp=1, padding=1.2, nlimit=6, cells=False):
+                                            voroexp=1, padding=1.2, nlimit=6, cells=False,
+                                                nmax=12, assign_neighbor=True):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
 
         Parameters
         ----------
-        method : {'cutoff', 'voronoi'}
+        method : {'cutoff', 'voronoi', 'number'}
             `cutoff` method finds neighbors of an atom within a specified or adaptive cutoff distance from the atom.
             `voronoi` method finds atoms that share a Voronoi polyhedra face with the atom. Default, `cutoff`
+            `number` method finds a specified number of closest neighbors to the given atom. Number only populates
+            
 
         cutoff : { float, 'sann', 'adaptive'}
             the cutoff distance to be used for the `cutoff` based neighbor calculation method described above.
@@ -421,11 +424,15 @@ class System(pc.System):
             Steinhardt parameter values. Default 1.
 
         padding : double, optional
-            only used if ``cutoff=adaptive``. A safe padding value used after an adaptive cutoff is found. Default 1.2.
+            only used if ``cutoff=adaptive`` or ``cutoff=number``. A safe padding value used after an adaptive cutoff is found. Default 1.2.
 
         nlimit : int, optional
             only used if ``cutoff=adaptive``. The number of particles to be considered for the calculation of adaptive cutoff.
             Default 6.
+
+        nmax : int, optional
+            only used if ``cutoff=number``. The number of closest neighbors to be found for each atom. Default 12
+        
 
         Returns
         -------
@@ -468,10 +475,13 @@ class System(pc.System):
         The second approach is using Voronoi polyhedra which also assigns a weight to each neighbor in the ratio of the face area between the two atoms.
         Higher powers of this weight can also be used [3]. The keyword `voroexp`
         can be used to set this weight.
+        
+        If method os `number`, instead of using a cutoff value for finding neighbors, a specified number of closest atoms are
+        found. This number can be set through the argument `nmax`.
 
         .. warning::
 
-            Adaptive cutoff uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
+            Adaptive and number cutoff uses a padding over the intial guessed "neighbor distance". By default it is 2. In case
             of a warning that ``threshold`` is inadequate, this parameter should be further increased. High/low value
             of this parameter will correspond to the time taken for finding neighbors.
 
@@ -529,6 +539,15 @@ class System(pc.System):
                     self.get_all_neighbors_cells()
                 else:
                     self.get_all_neighbors_normal()
+
+        elif method == 'number':
+            if threshold < 1:
+                raise ValueError("value of threshold should be at least 1.00")
+
+            self.usecells =  (len(self.atoms) > 4000)
+            finished = self.get_all_neighbors_bynumber(threshold, nmax, assign_neighbor)
+            if not finished:
+                raise RuntimeError("Could not find enough neighbors - try increasing threshold")
 
         elif method == 'voronoi':
             self.voroexp = int(voroexp)
@@ -816,8 +835,9 @@ class System(pc.System):
 
         Parameters
         ----------
-        condition : callable
-            function which should take an :class:`~Atom` object, and give a True/False output
+        condition : callable or atom property
+            Either function which should take an :class:`~Atom` object, and give a True/False output
+            or an attribute of atom class which has value or 1 or 0.
 
         largest : bool, optional
             If True returns the size of the largest cluster. Default False.
@@ -831,8 +851,11 @@ class System(pc.System):
         Notes
         -----
         This function helps to cluster atoms based on a defined property. This property
-        is defined by the user through the function `condition` which is passed as a parameter.
-        For each atom in the system, the `condition` should give a True/False values.
+        is defined by the user through the argument `condition` which is passed as a parameter.
+        `condition` can be of two types. The first type is a function which takes an 
+        :class:`~Atom` object and should give a True/False value. `condition` can also be an
+        :class:`~Atom` attribute or a value from `custom` values stored in an atom.
+
 
         When clustering, the code loops over each atom and its neighbors. If the
         `condition` is true for both host atom and the neighbor, they are assigned to
@@ -844,26 +867,42 @@ class System(pc.System):
                 #if both atom is solid
                 return (atom1.solid)
 
-        Check examples for more details.
+        The same can be done by passing `"solid"` as the condition argument instead of the above
+        function. Passing a function allows to evaluate complex conditions, but is slower than
+        passing an attribute.
 
         """
         testatom = self.atoms[0]
 
         #test the condition
+        isatomattr = False
+
         try:
             out = condition(testatom)
-            if out not in [True, False]:
+            if out not in [True, False, 0, 1]:
                 raise RuntimeError("The output of condition should be either True or False. Received %s"%str(out))
-        except:
-            raise RuntimeError("condition did not work")
 
+        except:
+            try:
+                out = self.get_custom(testatom, [condition])[0]
+                if out not in [True, False, 0, 1]:
+                    raise RuntimeError("The output of condition should be either True or False. Received %s"%str(out))
+                isatomattr = True        
+            except:
+                raise RuntimeError("condition did not work")
+        
         #now loop
         atoms = self.atoms
-        for atom in atoms:
-            cval = condition(atom)
-            atom.condition = cval
-        self.atoms = atoms
 
+        if isatomattr:
+            for atom in atoms:
+                atom.condition = self.get_custom(atom, [condition])[0]
+        else:
+            for atom in atoms:
+                cval = condition(atom)
+                atom.condition = cval
+        
+        self.atoms = atoms
         self.cfind_clusters_recursive(cutoff)
 
         #done!
@@ -1063,18 +1102,12 @@ class System(pc.System):
             distneighs = []
             distvectors = []
 
-            neighs = atom.neighbors
+            dists = atom.neighbor_distance
+            distneighs = atom.neighbors
+            distvectors = atom.neighbor_vector
 
-            for neigh in neighs:
-                dist, vectors = self.get_distance(atom, atoms[neigh], vector=True)
-                dists.append(dist)
-                distneighs.append(neigh)
-                distvectors.append(vectors)
-
-            args = np.argsort(dists)
-            topargs = np.array(args)
-
-            combos = list(itertools.combinations(topargs, 2))
+            args = range(len(dists))
+            combos = list(itertools.combinations(args, 2))
             costhetas = []
             for combo in combos:
                 vec1 = distvectors[combo[0]]
@@ -1091,9 +1124,223 @@ class System(pc.System):
             atom.chiparams = chivector[0]
             if angles:
                 atom.custom['cosines'] = costhetas
+        self.atoms = atoms
 
+    
+    def calculate_cna(self, cutoff=None, calculate_neighbors=True):
+        """
+        Calculate the Common Neighbor Analysis indices
+
+        Parameters
+        ----------
+        cutoff : float, optional
+            cutoff value to calculate CNA. If not specified,
+            adaptive CNA will be used
+
+        calculate_neighbors : bool, optional
+            If True, calculate neighbors using number method.
+            If False, existing neighbors will be used. Default True.
+            Only used if the cutoff is None.
+
+        Returns
+        -------
+        cna : list of ints
+            list of length 5 with number of atoms that belong to each
+            structure.
+
+        Notes
+        -----
+        Performs the common neighbor analysis [1] and assigns a structure to each atom.
+        If `cutoff` is not specified, adaptive common neighbor analysis is used. The
+        assigned structures can be accessed by :attr:`~pyscal.catom.Atom.structure`.
+        The values assigned for stucture are 0 Unknown, 1 fcc, 2 hcp, 3 bcc, 4 icosahedral.
+
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+
+        """
+        
+        if cutoff is None:
+            if calculate_neighbors:
+                self.find_neighbors(method="number", nmax=14, assign_neighbor=False)
+            cna = self.calculate_acna()
+            return cna
+        else:
+            self.find_neighbors(method="cutoff", cutoff=cutoff)
+            cna = self.calculate_cna()
+            return cna
+
+
+    def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
+        """
+        Calculate the centrosymmetry parameter
+
+        Parameters
+        ----------
+        nmax : int, optional
+            number of neighbors to be considered for centrosymmetry 
+            parameters. Has to be a positive, even integer. Default 12
+
+        calculate_neighbors : bool, optional
+            if True recalculate neighbors using number method, if False
+            neighbor calculation is not done. 
+
+        algorithm : {'ges', 'gvm'}, optional
+            `ges` uses the Greedy Edge Selection algorithm,
+            `gvm` uses Greedy Vertex Matching. Default `ges`.
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+        .. [2] Bulatov, Cai, ISBN:978-0198526148, 2006
+        .. [3] Larsen, arXiv:2003.08879v1, 2020
+        
+        Notes
+        -----
+        Calculate the centrosymmetry parameter for each atom which can be accessed by
+        :attr:`~pyscal.catom.centrosymmetry` attribute. It calculates the degree of inversion
+        symmetry of an atomic environment. Centrosymmetry recalculates the neighbor using
+        the number method as specified in :func:`¬pyscal.core.System.find_neighbors` method. This
+        is the ensure that the required number of neighbors are found for calculation of the parameter.
+        The calculation of neighbors through number method can be suppressed by setting
+        ``calculate_neighbors=False``.
+
+        This method uses two different algorithms, The Greedy Edge Selection (GES) [1] or the
+        Greedy Vertex Matching (GVM) [2] as specified in [3]. GES algorithm is implemented
+        in LAMMPS and Ovito, whereas GVM is used in AtomEye and Atomsk. Please see [3] for
+        a detailed description of the algorithms. The algorithm can be selected using the
+        `algorithm` argument. GVM values are not normalised currently.
+
+        """
+        if not nmax>0:
+            raise ValueError("nmax cannot be negative")
+
+        if not nmax%2 == 0:
+            raise ValueError("nmax has to even integer")
+
+        if calculate_neighbors:
+            self.find_neighbors(method="number", nmax=nmax)
+
+        if algorithm == "ges":
+            self.greedy_edge_selection(nmax)
+        elif algorithm == "gvm":
+            self.greedy_vertex_matching(nmax)
+        else:
+            raise ValueError("unknown algorithm")
+
+
+    def greedy_edge_selection(self, nmax):
+        """
+        Greedy edge selection scheme for centrosymmetry parameters
+
+        Parameters
+        ----------
+        nmax : int
+            number of neighbors to be considered for centrosymmetry 
+            parameters
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+
+        """
+        atoms = self.atoms
+        for atom in atoms:
+            distvectors = atom.neighbor_vector
+
+            #go through all combinations
+            combos = list(itertools.combinations(range(atom.coordination), 2))
+            selected_combos = []
+
+            data = []
+
+            for c, combo in enumerate(combos):
+                distsum = np.array(distvectors[combo[0]]) + np.array(distvectors[combo[1]])
+                distsum = np.sum([x**2 for x in distsum])
+                weight = np.sqrt(distsum)
+                dd = [combo, distsum, weight, c]
+                data.append(dd)
+                
+            #now sort weights
+            data = np.array(data)
+            sorted_data = data[np.argsort(data[:,2])]
+
+            csym = 0
+            for i in range(nmax//2):
+                csym += sorted_data[i][1]
+                selected_combos.append(sorted_data[i][0])
+
+            atom.centrosymmetry = csym
 
         self.atoms = atoms
+
+
+    def greedy_vertex_matching(self, nmax):
+        """
+        Greedy vertex matching scheme for centrosymmetry parameters
+
+        Parameters
+        ----------
+        nmax : int
+            number of neighbors to be considered for centrosymmetry 
+            parameters
+
+        Returns
+        -------
+        None
+
+        References
+        ----------
+        .. [1] Bulatov, Cai, ISBN:978-0198526148, 2006
+        
+        """
+        atoms = self.atoms
+        for atom in atoms:
+            distvectors = atom.neighbor_vector
+            distances = atom.neighbor_distance
+            sorted_distance_args = np.argsort(distances)
+            neighs = atom.neighbors
+            scombos = []
+
+            combos = list(itertools.combinations(range(atom.coordination), 2))
+            combos = np.array(combos)
+
+            data = []
+
+            for c, combo in enumerate(combos):
+                distsum = np.array(distvectors[combo[0]]) + np.array(distvectors[combo[1]])
+                distsum = np.sum([x**2 for x in distsum])
+                weight = np.sqrt(distsum)
+                dd = [combo, distsum, weight, c]
+                data.append(dd)
+
+            data = np.array(data)
+            csym = 0
+            for ind in sorted_distance_args:
+                ndata = data[combos[:,0]==ind]
+                if len(ndata) > 0:
+                    spair = ndata[np.argsort(ndata[:,2])][0]
+                    csym += spair[1]
+                    scombos.append(spair[0])
+                    i1, i2 = spair[0]
+                    arr = (combos[:,0]!=i1)*(combos[:,1]!=i1)*(combos[:,0]!=i2)*(combos[:,1]!=i2)
+                    combos = combos[arr]
+                    data = data[arr]
+                    if len(combos) == 0:
+                        break 
+            atom.centrosymmetry = csym
+
+        self.atoms = atoms
+
 
     def calculate_disorder(self, averaged=False, q=6):
         """
@@ -1245,141 +1492,59 @@ class System(pc.System):
                     count += 1
             return vec/float(count)
 
-
-
-
-
-
-
-
-
-    def prepare_pickle(self):
+    def get_custom(self, atom, customkeys):
         """
-        Prepare the system for pickling and create a picklable system
+        Get a custom attribute from Atom
 
         Parameters
         ----------
-        None
+        atom : Atom object
+
+        customkeys : list of strings
+            the list of keys to be found
 
         Returns
         -------
-        psys : picklable system object
-
-        Notes
-        -----
-        This function prepares the system object for pickling. From
-        a user perspective, the :func:`~pyscal.core.System.to_pickle` method should be used
-        directly.
-
-        See also
-        --------
-        to_file()
+        vals : list
+            array of custom values
 
         """
+        #first option - maybe it appears
+        vals = []
+        for ckey in customkeys:
+            #if the key is there - ignore it
+            if not ckey in atom.custom.keys():
+                #try to get from attribute
+                try:
+                    val = getattr(atom, ckey)
+                    vals.append(val)
 
-        #get the basic system indicators
-        indicators = self.get_indicators()
-        #get box dims and triclinic params if triclinic
-        box = self.box
-        if indicators[6] == 1:
-            rot = self.get_triclinic_params()
-        else:
-            rot = 0
+                except AttributeError:
+                    #since attr failed, check if they are q or aq values
+                    if ckey[0] == 'q':
+                        qkey = ckey[1:]
+                        #try to acess this value
+                        val = atom.get_q(int(qkey))
+                        #add this pair to dict - as string vals
+                        vals.append(val)
 
-        #now finally get atoms
-        atoms = self.atoms
-        #convert them to picklabale atoms
-        patoms = [pp.pickle_atom(atom) for atom in atoms]
+                    elif ckey[:2] == 'aq':
+                        qkey = ckey[2:]
+                        val = atom.get_q(int(qkey), averaged=True)
+                        vals.append(val)
 
-        #create System instance and assign things
-        psys = pp.pickleSystem()
-        psys.indicators = indicators
-        psys.atoms = patoms
-        psys.box = box
-        psys.rot = rot
-
-        return psys
-
-    def to_pickle(self, file):
-        """
-        Save a system to pickle file
-
-        Parameters
-        ----------
-        file : string
-            name of output file
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        This function can be used to save a :class:`~pyscal.core.System` object directly to
-        file. This retains all the calculated quantities of the system,
-        including the atoms and their properties. This can be useful to
-        restart the calculation. The function uses `numpy.save` method
-        to save the information. Hence pickling between different versions
-        of python could lead to issues.
-
-        .. warning::
-
-            Pickling between different versions of numpy or python could be incompatible.
-            Pickling is not secure. You should only unpickle objects that you trust.
-
-        """
-        psys = self.prepare_pickle()
-        np.save(file, psys, allow_pickle=True)
-
-
-    def from_pickle(self, file):
-        """
-        Read the contents of :class:`~pyscal.core.System` object from a
-        pickle file.
-
-        Parameters
-        ----------
-        file : string
-            name of input file
-
-        Returns
-        -------
-        None
-
-        Notes
-        -----
-        This function can be used to set up a system
-        from a file. A :class:`~pyscal.core.System` object needs to be created first.
-
-        Examples
-        --------
-
-        >>> sys = System()
-        >>> sys.from_pickle(filename)
-
-        """
-        if os.path.exists(file):
-            psys = np.load(file, allow_pickle=True).flatten()[0]
-        else:
-            raise IOError("file does not exist")
-        #set up indicators
-        self.set_indicators(psys.indicators)
-        #unpickle atoms
-        self.atoms = [pp.unpickle_atom(atom) for atom in psys.atoms]
-        self.box = psys.box
-
-
-        #if triclinic, get those
-        if psys.indicators[6] == 1:
-            rot = psys.rot
-            rotinv = np.linalg.inv(rot)
-            self.assign_triclinic_params(rot, rotinv)
+                    else:
+                        raise AttributeError("custom key was not found")
+            else:
+                val = atom.custom[ckey]
+                vals.append(val)
+        return vals
 
     def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0):
         """
         Save the system instance to a trajectory file.
 
-        Parameters
+         Parameters
         ----------
         outfile : string
             name of the output file
@@ -1408,44 +1573,13 @@ class System(pc.System):
         if customkeys == None:
             customkeys = []
 
-        def get_custom(atom, customkeys):
-            #first option - maybe it appears
-            vals = []
-            for ckey in customkeys:
-                #if the key is there - ignore it
-                if not ckey in atom.custom.keys():
-                    #try to get from attribute
-                    try:
-                        val = getattr(atom, ckey)
-                        vals.append(val)
-
-                    except AttributeError:
-                        #since attr failed, check if they are q or aq values
-                        if ckey[0] == 'q':
-                            qkey = ckey[1:]
-                            #try to acess this value
-                            val = atom.get_q(int(qkey))
-                            #add this pair to dict - as string vals
-                            vals.append(val)
-
-                        elif ckey[:2] == 'aq':
-                            qkey = ckey[2:]
-                            val = atom.get_q(int(qkey), averaged=True)
-                            vals.append(val)
-
-                        else:
-                            raise AttributeError("custom key was not found")
-                else:
-                    val = atom.custom[ckey]
-                    vals.append(val)
-            return vals
 
 
         boxdims = self.box
         atoms = self.atoms
 
         if len(customkeys) > 0:
-            cvals = [get_custom(atom, customkeys) for atom in atoms]
+            cvals = [self.get_custom(atom, customkeys) for atom in atoms]
 
         #open files for writing
         if compressed:

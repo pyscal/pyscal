@@ -8,8 +8,9 @@
 #include <pybind11/stl.h>
 #include <complex>
 
-//functions for atoms
-//-------------------------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------
+// Constructor, Destructor
+//-------------------------------------------------------
 Atom::Atom( vector<double> pos, int idd, int typ){
 
     posx = pos[0];
@@ -37,6 +38,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
         faceverticenumbers[tn] = -1;
         faceperimeters[tn] = -1.0;
         sij[tn] = -1.0;
+        masks[tn] = -1;
         //edgelengths[tn] = -1.0;
 
     }
@@ -57,7 +59,31 @@ Atom::Atom( vector<double> pos, int idd, int typ){
 
 Atom::~Atom(){ }
 
+//-------------------------------------------------------
+// Basic Atom properties
+//-------------------------------------------------------
 
+
+//aceesss funcs
+vector<double> Atom::gx(){
+    vector<double> pos;
+    pos.emplace_back(posx);
+    pos.emplace_back(posy);
+    pos.emplace_back(posz);
+    return pos;
+}
+
+void Atom::sx(vector<double> rls){
+    posx = rls[0];
+    posy = rls[1];
+    posz = rls[2];
+}
+
+
+
+//-------------------------------------------------------
+// Neighbor related properties
+//-------------------------------------------------------
 vector<int> Atom::gneighbors(){
     vector<int> nn;
     nn.reserve(n_neighbors);
@@ -65,13 +91,6 @@ vector<int> Atom::gneighbors(){
         nn.emplace_back(neighbors[i]);
     }
     return nn;
-}
-
-int Atom::gnneighbors(){
-    return n_neighbors;
-}
-void Atom::snneighbors(int dd){
-
 }
 
 void Atom::sneighdist(vector<double> dd){
@@ -85,6 +104,80 @@ vector<double> Atom::gneighdist(){
   return neighdist;
 }
 
+void Atom::sneighbors(vector<int> nns){
+
+    //first reset all neighbors
+    for (int i = 0;i<MAXNUMBEROFNEIGHBORS;i++){
+        neighbors[i] = NILVALUE;
+        neighbordist[i] = -1.0;
+    }
+
+    //now assign the neighbors
+    for(int i=0; i<nns.size(); i++){
+        neighbors[i] = nns[i];
+        //auto assign weight to 1
+        neighborweight[i] = 1.00;
+    }
+
+    n_neighbors = nns.size();
+    isneighborset = 1;
+
+}
+
+void Atom::sneighborweights(vector<double> nss){
+    for(int i=0; i<nss.size(); i++){
+        neighborweight[i] = nss[i];
+    }
+}
+
+vector<double> Atom::gneighborweights(){
+    vector <double> rqlms;
+    for(int i=0; i<n_neighbors; i++){
+        rqlms.emplace_back(neighborweight[i]);
+    }
+    return rqlms;
+}
+
+void Atom::sdistvecs(vector<vector<double>> nss){
+
+}
+
+vector<vector<double>> Atom::gdistvecs(){
+    vector<vector<double>> m1;
+    vector <double> m2;
+
+    for(int i=0; i<n_neighbors; i++){
+        m2.clear();
+        m2.emplace_back(n_diffx[i]);
+        m2.emplace_back(n_diffy[i]);
+        m2.emplace_back(n_diffz[i]);
+
+        m1.emplace_back(m2);
+    }
+    return m1;
+}
+
+void Atom::slocalangles(vector<vector<double>> nss){
+
+}
+
+vector<vector<double>> Atom::glocalangles(){
+    vector<vector<double>> m1;
+    vector <double> m2;
+
+    for(int i=0; i<n_neighbors; i++){
+        m2.clear();
+        m2.emplace_back(n_phi[i]);
+        m2.emplace_back(n_theta[i]);
+
+        m1.emplace_back(m2);
+    }
+    return m1;
+}
+
+//-------------------------------------------------------
+// Q parameter properties
+//-------------------------------------------------------
 void Atom::ssij(vector<double> dd){
 }
 
@@ -95,42 +188,6 @@ vector<double> Atom::gsij(){
   }
   return ss;
 }
-
-int Atom::gid(){ return id; }
-int Atom::gfrenkelnumber(){ return frenkelnumber; }
-void Atom::sfrenkelnumber(int nn){ frenkelnumber=nn; }
-void Atom::sid(int idd){ id=idd; }
-int Atom::gloc(){ return loc; }
-void Atom::sloc(int idd){ loc=idd; }
-int Atom::gtype(){ return type; }
-void Atom::stype(int idd){ type=idd; }
-double Atom::gvolume(){ return volume; }
-void Atom::svolume(double vv){ volume = vv; }
-double Atom::gcutoff(){ return cutoff; }
-void Atom::scutoff(double cc){ cutoff = cc; }
-double Atom::gasij(){ return avq6q6; }
-void Atom::sasij(double vv){ avq6q6 = vv; }
-double Atom::gavgvolume(){ return avgvolume; }
-void Atom::savgvolume(double vv){ avgvolume = vv; }
-int Atom::gsolid(){ return issolid; }
-void Atom::ssolid(int idd){
-  if (!((idd == 0) || (idd == 1))){
-    throw invalid_argument("surface should be 1 or 0");
-  }
-  issolid=idd; }
-
-bool Atom::gmask(){ return mask; }
-void Atom::smask(bool mm){
-  if (!((mm == true) || (mm == false))){
-    throw invalid_argument("mask should be true or false");
-  }
-  mask=mm;
-}
-
-int Atom::gstructure(){ return structure; }
-void Atom::sstructure(int idd){ structure=idd; }
-void Atom::scondition(int idd){ condition=idd; }
-int Atom::gcondition(){ return condition; }
 
 vector<double> Atom::gallq(){
     vector<double> allq;
@@ -159,56 +216,6 @@ void Atom::sallaq(vector<double> allaq){
         aq[i] = allaq[i];
     }
 }
-
-//aceesss funcs
-vector<double> Atom::gx(){
-    vector<double> pos;
-    pos.emplace_back(posx);
-    pos.emplace_back(posy);
-    pos.emplace_back(posz);
-    return pos;
-}
-
-void Atom::sx(vector<double> rls){
-    posx = rls[0];
-    posy = rls[1];
-    posz = rls[2];
-}
-
-
-//structure properties
-int Atom::gsurface() {return issurface; }
-int Atom::gcluster() {return belongsto; }
-void Atom::ssurface( int val) {
-  if (!((val == 0) || (val == 1))){
-    throw invalid_argument("surface should be 1 or 0");
-  }
-  issurface = val; }
-
-void Atom::scluster( int val) {
-  belongsto = val; }
-
-int Atom::glcluster() {return lcluster; }
-void Atom::slcluster( int val) {
-  if (!((val == 0) || (val == 1))){
-    throw invalid_argument("largest_cluster should be 1 or 0");
-  }
-
-  lcluster = val; }
-
-
-py::dict Atom::gcustom(){
-
-    return custom;
-}
-
-void Atom::scustom(py::dict cc){
-    custom = cc;
-}
-
-
-
-//for q vals
 double Atom::gq(int qq){ return q[qq-2]; }
 void Atom::sq(int qq, double qval){ q[qq-2] = qval; }
 
@@ -283,43 +290,36 @@ void Atom::sq_big(vector<int> qval, vector<double> setvals, bool averaged){
 }
 
 
+vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
 
-
-//functions to set the neighbors for each atoms
-void Atom::sneighbors(vector<int> nns){
-
-    //first reset all neighbors
-    for (int i = 0;i<MAXNUMBEROFNEIGHBORS;i++){
-        neighbors[i] = NILVALUE;
-        neighbordist[i] = -1.0;
+  vector<complex<double>> qlms;
+  qlms.reserve(2*qq+1);
+  if (!averaged){
+    for(int i=0;i<(2*qq+1);i++){
+        complex<double> lmval(realq[qq-2][i], imgq[qq-2][i]);
+        qlms.emplace_back(lmval);
     }
-
-    //now assign the neighbors
-    for(int i=0; i<nns.size(); i++){
-        neighbors[i] = nns[i];
-        //auto assign weight to 1
-        neighborweight[i] = 1.00;
+  }
+  else{
+    for(int i=0;i<(2*qq+1);i++){
+        complex<double> lmval(arealq[qq-2][i], aimgq[qq-2][i]);
+        qlms.emplace_back(lmval);
     }
-
-    n_neighbors = nns.size();
-    isneighborset = 1;
-
+  }
+  return qlms;
 }
 
-void Atom::sneighborweights(vector<double> nss){
-    for(int i=0; i<nss.size(); i++){
-        neighborweight[i] = nss[i];
-    }
-}
 
-vector<double> Atom::gneighborweights(){
-    vector <double> rqlms;
-    for(int i=0; i<n_neighbors; i++){
-        rqlms.emplace_back(neighborweight[i]);
-    }
-    return rqlms;
-}
+//-------------------------------------------------------
+// Solid related properties
+//-------------------------------------------------------
 
+
+
+
+//-------------------------------------------------------
+// Voronoi related properties
+//-------------------------------------------------------
 void Atom::sfacevertices(vector<int> nss){
     for(int i=0; i<nss.size(); i++){
         facevertices[i] = nss[i];
@@ -332,24 +332,6 @@ vector<int> Atom::gfacevertices(){
         rqlms.emplace_back(facevertices[i]);
     }
     return rqlms;
-}
-
-void Atom::svertex_numbers(vector<int> nss){
-    vertex_numbers = nss;
-}
-
-vector<int> Atom::gvertex_numbers(){
-
-    //loop over face vertices
-    return vertex_numbers;
-}
-
-void Atom::svertex_vectors(vector<double> nss){
-    vertex_vectors = nss;
-}
-
-vector<double> Atom::gvertex_vectors(){
-    return vertex_vectors;
 }
 
 void Atom::sfaceperimeters(vector<double> nss){
@@ -392,71 +374,386 @@ void Atom::svorovector(vector<int> voro){
     n6 = voro[3];
 }
 
-double Atom::gangular(){
-    return angular;
-}
-
-void Atom::sangular(double dd){
-    angular = dd;
-}
-
-double Atom::gavgangular(){
-    return avg_angular;
-}
-
-void Atom::savgangular(double dd){
-    avg_angular = dd;
-}
+//-------------------------------------------------------
+// Angle related properties
+//-------------------------------------------------------
 
 
-vector<int> Atom::gchiparams(){
-  return chiparams;
-}
+//-------------------------------------------------------
+// Other order parameters
+//-------------------------------------------------------
 
-void Atom::schiparams(vector<int> nns){
-  chiparams.clear();
-  chiparams = nns;
-}
+void Atom::find_common_neighbors(){
+    
+    common_neighbors.clear();
+    common_neighbor_count.clear();
+    common_neighbors.resize(n_neighbors);
+    common_neighbor_count.resize(n_neighbors);
 
-double Atom::gdisorder(){
-    return disorder;
-}
+    int main_n;
+    int sub_n;
+    int nnc;
 
-void Atom::sdisorder(double dd){
-    disorder = dd;
-}
+    //for each neighbor
+    for(int i=0; i< n_neighbors; i++){
+        //loop over that neighbor
+        common_neighbor_count[i] = 0;
+        nnc = next_neighbor_counts[i]; 
 
-double Atom::gavgdisorder(){
-    return avgdisorder;
-}
+        for(int j=0; j < nnc; j++){
+            main_n = next_neighbors[i][j];
 
-void Atom::savgdisorder(double dd){
-    avgdisorder = dd;
-}
-
-vector<double> Atom::gsro(){
-    return sro;
-}
-
-void Atom::ssro(vector<double> dd){
-    sro = dd;
-}
-
-vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
-
-  vector<complex<double>> qlms;
-  qlms.reserve(2*qq+1);
-  if (!averaged){
-    for(int i=0;i<(2*qq+1);i++){
-        complex<double> lmval(realq[qq-2][i], imgq[qq-2][i]);
-        qlms.emplace_back(lmval);
+            //now loop over self neighbors again
+            for(int k=0; k < n_neighbors; k++){
+                sub_n = neighbors[k];
+                if (main_n == sub_n){
+                    common_neighbor_count[i]++;
+                    common_neighbors[i].emplace_back(k);
+                }                  
+            }
+        }
     }
-  }
-  else{
-    for(int i=0;i<(2*qq+1);i++){
-        complex<double> lmval(arealq[qq-2][i], aimgq[qq-2][i]);
-        qlms.emplace_back(lmval);
+
+}
+
+   
+void Atom::find_bonds_of_common_neighbors(){
+
+    common_neighbor_bonds.clear();
+    common_neighbor_bond_count.clear();
+    common_neighbor_bonds.resize(n_neighbors);
+    common_neighbor_bond_count.resize(n_neighbors);
+
+    int main_n, sub_n;
+    int indexmain, indexsub;
+
+    vector<int> pair;
+    pair.resize(2);
+
+    for(int i=0; i< n_neighbors; i++){
+        //now take the corresponding common neighbors
+        common_neighbor_bond_count[i] = 0;
+        for(int j=0; j<common_neighbor_count[i]; j++){
+            //hcovert it to index
+            indexmain = common_neighbors[i][j];
+            main_n = neighbors[indexmain];
+            //this is to avoid double counting
+            for(int k=j+1; k<common_neighbor_count[i]; k++){
+                //if (j==k) continue;
+                //convert to index
+                indexsub = common_neighbors[i][k];
+
+                //check if they are each others neighbors
+                //as in, if j appears in k's neighbors
+                for(int l=0; l < next_neighbor_counts[indexsub]; l++){
+                    sub_n = next_neighbors[indexsub][l];
+                    if (main_n == sub_n){
+                        common_neighbor_bond_count[i] ++;
+                        pair[0] = main_n;
+                        pair[1] = neighbors[indexsub];
+                        common_neighbor_bonds[i].emplace_back(pair);
+                        break;
+                    }
+                }
+            }
+        }
+    }    
+}
+
+void Atom::find_bond_chains(){
+    
+    bond_chain_count.clear();
+    bond_chain_count.resize(n_neighbors);
+
+    int max_length;
+    int count;
+    vector<int> indicator;
+    vector<int> path;
+    int pathlength, spathlength;
+    int chains;
+    int finished;
+
+    //we need a new algo, which loops over
+    //first loop is always over neighbors
+    for(int n=0; n<n_neighbors; n++){
+        //now - for each neighbor, we have a bond chain
+        //we need a replica array of ones
+        //we need a count which we will reduce
+        //max length of chain
+        max_length = common_neighbor_bond_count[n];
+        //chain number
+        chains = 0;
+        //set the count, which we will reduce
+        count = max_length;
+        //now make array of ones
+        indicator.clear();
+        for(int i=0; i<max_length; i++){
+            indicator.emplace_back(1);
+        }
+        //we are reading - start the first while loop
+        while(true){
+            //clear the path
+            path.clear();
+            pathlength = 0;
+            spathlength = 0;
+            //if no more terms are to be added, break
+            if (count == 0) break;
+            //add first elements to path
+            if (indicator[chains]==0) chains++;
+
+            path.emplace_back(common_neighbor_bonds[n][chains][0]);
+            path.emplace_back(common_neighbor_bonds[n][chains][1]);
+            pathlength++;
+            spathlength+=2;
+            //reduce count and set this term to added
+            count--;
+            indicator[chains] = 0;
+
+            //start the next loop
+            while(true){
+                //set finished to true
+                finished = 1;
+                //now loop over bonds
+                for(int i=0; i<max_length; i++){
+                    //is this term valid?
+                    if(indicator[i]==0) continue;
+                    //otherwise check if it is in path
+                    //loop over path
+                    int rr = spathlength;
+                    
+                    for(int j=0; j<rr; j++){
+                        if((common_neighbor_bonds[n][i][0] == path[j]) or (common_neighbor_bonds[n][i][1] == path[j])){
+                            //add the values
+                            path.emplace_back(common_neighbor_bonds[n][i][0]);
+                            path.emplace_back(common_neighbor_bonds[n][i][1]);
+                            pathlength++;
+                            spathlength+=2;
+                            
+                            finished = 0;
+                            indicator[i] = 0;
+                            count--;
+
+                            break;
+                        }                                
+                    }
+                    
+                }
+                if (finished == 1) break;
+            }
+            if (count <= pathlength) break;
+
+        }
+        bond_chain_count[n] = pathlength;
+
     }
-  }
-  return qlms;
+
+}
+
+
+void Atom::check_adaptive_cna12(){
+
+    int ncn4count, ncn5count, count, count1, count2;
+
+    //start checking for cn 12
+    //------------------------
+    //step 1: apply masks
+    
+    
+    //if there are not enough neighbors, skip
+    if (n_neighbors < 12){
+        structure = 0;
+        return;
+    }
+
+    find_common_neighbors();
+
+    //check if we need to proceed
+    ncn4count=0;
+    ncn5count=0;
+    
+    for(int i=0; i<n_neighbors; i++){
+        
+        if (common_neighbor_count[i] == 4){
+            ncn4count++;
+        }
+        else if (common_neighbor_count[i] == 5){
+            ncn5count++;
+        }
+    }
+
+    //check for fcc and hcp
+    if (ncn4count == 12){
+        find_bonds_of_common_neighbors();
+
+        //now check second index 2 x 12 for both structures - reuse ncn4count
+        count = 0;
+        for(int i=0; i<n_neighbors; i++){
+            
+            if (common_neighbor_bond_count[i] == 2){
+                count++;
+            }
+        }
+        if (count != 12){
+            structure = 0;
+            return;
+        }
+        //all good - progress
+        find_bond_chains();
+
+        //12 x 1 for fcc and 6 x 1, 6 x 2 for hcp
+        count1 = 0;
+        count2 = 0;
+        for(int i=0; i<n_neighbors; i++){
+            
+            if (bond_chain_count[i] == 1){
+                count1 ++;
+            }
+            else if (bond_chain_count[i] == 2){
+                count2 ++;
+            }
+        }
+        if (count1 == 12){
+            structure = 1;
+            return;
+        }
+        else if ((count1==6) && (count2==6)){
+            structure = 2;
+            return;
+        }
+        else{
+            structure = 0;
+            return;
+        }
+    }
+    //check for icosa
+    else if (ncn5count == 12){
+        find_bonds_of_common_neighbors();
+
+        count = 0;
+        for(int i=0; i<n_neighbors; i++){
+            
+            if (common_neighbor_bond_count[i] == 5){
+                count++;
+            }
+        }
+        if (count != 12){
+            structure = 0;
+            return;
+        }
+
+        find_bond_chains();
+
+        count = 0;
+        for(int i=0; i<n_neighbors; i++){
+            
+            if (bond_chain_count[i] == 5){
+                count ++;
+            }
+        }
+        if (count == 12){
+            structure = 4;
+            return;
+        }
+        else{
+            structure = 0;
+            return;
+        }
+
+    }
+    else{
+        structure = 0;
+        return;
+    }
+    
+}
+
+void Atom::check_adaptive_cna14(){
+
+    int count1, count2;
+    //start checking for cn 14
+    //------------------------
+
+    
+    //if there are not enough neighbors, skip
+    if (n_neighbors < 14){
+        structure = 0;
+        return;
+    }
+
+    find_common_neighbors();
+
+    //check if we need to proceed
+    count1=0;
+    count2=0;
+    
+    for(int i=0; i<n_neighbors; i++){
+        
+        if (common_neighbor_count[i] == 6){
+            count1++;
+        }
+        else if (common_neighbor_count[i] == 4){
+            count2++;
+        }
+    }
+
+    if ((count1 == 8) && (count2 == 6)){
+        
+        find_bonds_of_common_neighbors();
+        count1 = 0;
+        count2 = 0;
+
+        for(int i=0; i<n_neighbors; i++){
+            
+            if (common_neighbor_bond_count[i] == 6){
+                count1++;
+            }
+            else if (common_neighbor_bond_count[i] == 4){
+                count2++;
+            }
+        }
+        if ((count1 == 8) && (count2 == 6)){
+            find_bond_chains();
+            count1 = 0;
+            count2 = 0;
+            for(int i=0; i<n_neighbors; i++){
+                
+                if (bond_chain_count[i] == 6){
+                    count1++;
+                }
+                else if (bond_chain_count[i] == 4){
+                    count2++;
+                }
+            }
+            if ((count1 == 8) && (count2 == 6)){
+                structure = 3;
+                return;
+            }            
+            else{
+                structure = 0;
+                return;
+            }
+        }
+        else{
+            structure = 0;
+            return;
+        }
+    }
+    else{
+        structure = 0;
+        return;
+    }
+    
+}
+
+void Atom::calculate_adaptive_cna(int nc){
+    //adaptive cna process
+    //do cna one by one and
+    
+    //try number 12 calc
+    if (nc == 12)
+        check_adaptive_cna12();
+
+    if (nc == 14)
+        check_adaptive_cna14();
+
 }

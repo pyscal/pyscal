@@ -10,81 +10,32 @@
 
 using namespace voro;
 
-///////////////////////////////////////////
-
-///////////////////////////////////////////
-
-/*
-Constructor for the system.
-*/
+//-----------------------------------------------------
+// Constructor, Destructor and Access functions
+//-----------------------------------------------------
 System::System(){
 
     nop = -1;
-    maxclusterid = -1;
-    neighborsfound = 0;
-    qsfound = 0;
-    fileread = 0;
-    filter = 0;
     triclinic = 0;
+    usecells = 0;
+    filter = 0;
+    maxclusterid = -1;
+    
     alpha = 1;
     voronoiused = 0;
     solidq = 6;
     criteria = 0;
-    usecells = 0;
+    
     neighbordistance = 0;
 
 }
 
-/*
-Destructor of the system class
- */
 System::~System(){
-
-    //delete [] atoms;
 }
 
-vector<int> System::get_indicators(){
-
-    vector<int> indicators;
-    indicators.emplace_back(nop);
-    indicators.emplace_back(maxclusterid);
-    indicators.emplace_back(neighborsfound);
-    indicators.emplace_back(qsfound);
-    indicators.emplace_back(fileread);
-    indicators.emplace_back(filter);
-    indicators.emplace_back(triclinic);
-    indicators.emplace_back(alpha);
-    indicators.emplace_back(voronoiused);
-
-    return indicators;
-}
-
-void System::set_indicators(vector<int> indicators){
-
-    nop = indicators[0];
-    maxclusterid = indicators[1];
-    neighborsfound = indicators[2];
-    qsfound = indicators[3];
-    fileread = indicators[4];
-    filter = indicators[5];
-    triclinic = indicators[6];
-    alpha = indicators[7];
-    voronoiused = indicators[8];
-}
-
-/*
-Calculate factorial of a number
- */
-double System::dfactorial(int l,int m){
-
-    double fac = 1.00;
-    for(int i=0;i<2*m;i++){
-        fac*=double(l+m-i);
-    }
-    return (1.00/fac);
-
-}
-
+//-----------------------------------------------------
+// Simulation box related methods
+//-----------------------------------------------------
 void System::assign_triclinic_params(vector<vector<double>> drot, vector<vector<double>> drotinv){
 
     for(int i=0; i<3; i++){
@@ -100,19 +51,14 @@ void System::assign_triclinic_params(vector<vector<double>> drot, vector<vector<
 vector<vector<double>> System::get_triclinic_params(){
 
     vector<vector<double>> drot;
-
     vector<double> dummydrot;
-
     for(int i=0; i<3; i++){
-
         dummydrot.clear();
-
         for(int j=0; j<3; j++){
             dummydrot.emplace_back(rot[i][j]);
         }
         drot.emplace_back(dummydrot);
     }
-
     return drot;
 }
 
@@ -130,58 +76,53 @@ void System::sbox(vector<vector <double>> boxd) {
     boxz = boxd[2][1] - boxd[2][0];
 }
 
-void System::set_reqd_qs(vector <int> qs){
+vector<vector<double>> System::gbox(){
+    vector<vector<double>> qres;
+    vector<double> qd;
 
-    lenqs = qs.size();
-    reqdqs = new int[lenqs];
-    for(int i=0;i<lenqs;i++){
-        reqdqs[i] = qs[i];
+    for(int i=0;i<3;i++){
+        qd.clear();
+        for(int j=0;j<2;j++){
+            qd.emplace_back(boxdims[i][j]);
+        }
+        qres.emplace_back(qd);
     }
-
-    rq_backup = qs;
+    return qres;
 }
 
-
-void System::set_reqd_aqs(vector <int> qs){
-
-    lenaqs = qs.size();
-    reqdaqs = new int[lenaqs];
-    for(int i=0;i<lenaqs;i++){
-        for(int j=0;j<lenqs;j++){
-            if(qs[i]==reqdqs[j]) { reqdaqs[i] = qs[i]; }
+vector<vector<double>> System::gboxvecs(){
+    vector<vector<double>> qres;
+    vector<double> dqres;
+    if (triclinic==1){
+        for(int i=0; i<3; i++){
+            dqres.clear();
+            for(int j=0; j<3; j++){
+                dqres.emplace_back(rot[j][i]);
+            }
+            qres.emplace_back(dqres);
         }
     }
-    //only qvlaues in the normal set will be included in the aq list
-    //check here if its in the qlist
-    //cout<<"corresponding q value should also be set."<<endl;
-
+    else{
+        for(int i=0; i<3; i++){
+            dqres.clear();
+            for(int j=0; j<3; j++){
+                if(i==j){
+                    dqres.emplace_back(boxdims[i][1]-boxdims[i][0]);
+                }
+                else{
+                    dqres.emplace_back(0.0);
+                }
+            }
+            qres.emplace_back(dqres);
+        }
+    }
+    return qres;
 }
 
-void System::read_particle_file(string nn){
 
-    fileread = 1;
-
- }
-
-void System::salpha(int a){
-
-    alpha = a;
-}
-
-int System::galpha(){
-
-    return alpha ;
-}
-
-void System::susecells(int a){
-
-    usecells = a;
-}
-
-int System::gusecells(){
-
-    return usecells ;
-}
+//-----------------------------------------------------
+// Atom related methods
+//-----------------------------------------------------
 //this function allows for handling custom formats of atoms and so on
 void System::set_atoms( vector<Atom> atomitos){
 
@@ -199,8 +140,15 @@ vector<Atom> System::get_atoms( ){
 
 }
 
-//needs two version of the function; one for fast inbuilt calculation.
-//the other for being accessed to the python interface
+Atom System::gatom(int i) { return atoms[i]; }
+void System::satom(Atom atom1) {
+    int idd = atom1.loc;
+    atoms[idd] = atom1;
+}
+
+//----------------------------------------------------
+// Neighbor methods
+//----------------------------------------------------
 
 double System::get_abs_distance(int ti ,int tj,double &diffx ,double &diffy,double &diffz){
 
@@ -406,13 +354,20 @@ void System::reset_all_neighbors(){
     }
 }
 
-void System::sfilter(int fno){
+void System::reset_main_neighbors(){
+    for (int ti = 0;ti<nop;ti++){
 
-    filter = fno;
+        atoms[ti].n_neighbors=0;
+        //atoms[ti].temp_neighbors.clear();
+
+        for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
+
+            atoms[ti].neighbors[tn] = NILVALUE;
+            atoms[ti].neighbordist[tn] = -1.0;
+        }
+    }
 }
-int System::gfilter(){
-  return filter;
-}
+
 
 vector<double> System::get_pairdistances(){
 
@@ -607,7 +562,6 @@ void System::get_all_neighbors_cells(){
         }
     }
 
-    neighborsfound = 1;
 
 }
 
@@ -622,8 +576,6 @@ void System::get_all_neighbors_normal(){
     double d;
     double diffx,diffy,diffz;
     double r,theta,phi;
-
-    if (!fileread) { read_particle_file(inputfile); }
 
     for (int ti=0; ti<nop; ti++){
         for (int tj=ti; tj<nop; tj++){
@@ -666,121 +618,6 @@ void System::get_all_neighbors_normal(){
         }
 
     }
-
-    //mark end of neighbor calc
-    neighborsfound = 1;
-
-}
-
-//add a function to set the cutoff for face area in identification
-//of voronoi polyhedra
-void System::set_face_cutoff(double fcut){
-    face_cutoff = fcut;
-}
-
-//overloaded function; would be called
-//if neighbor method voronoi is selected.
-void System::get_all_neighbors_voronoi(){
-
-    //reset voronoi flag
-    voronoiused = 1;
-
-    double d;
-    double diffx,diffy,diffz;
-    double r,theta,phi;
-    int i;
-    int ti,id,tnx,tny,tnz;
-
-    double rx,ry,rz,tsum, fa, x, y, z, vol;
-    vector<int> neigh,f_vert, vert_nos;
-    vector<double> facearea, v, faceperimeters;
-    voronoicell_neighbor c;
-    vector< vector<double> > nweights;
-    vector< vector<int> > nneighs;
-    vector<int> idss;
-    //vector<int> nvector;
-    double weightsum;
-
-
-    if (!fileread) { read_particle_file(inputfile); }
-
-    //pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
-    pre_container pcon(0.00, boxx, 0.00, boxy, 0.0, boxz, true, true, true);
-    for(int i=0; i<nop; i++){
-        pcon.put(i, atoms[i].posx-boxdims[0][0], atoms[i].posy-boxdims[1][0], atoms[i].posz-boxdims[2][0]);
-    }
-    pcon.guess_optimal(tnx,tny,tnz);
-    //container con(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],tnx,tny,tnz,true,true,true, nop);
-    container con(0.00, boxx, 0.00, boxy, 0.0, boxz, tnx, tny, tnz, true, true, true, nop);
-    pcon.setup(con);
-
-    c_loop_all cl(con);
-    if (cl.start()) do if(con.compute_cell(c,cl)) {
-            ti=cl.pid();
-            c.face_areas(facearea);
-            c.neighbors(neigh);
-            c.face_orders(f_vert);
-            c.face_vertices(vert_nos);
-            c.vertices(x,y,z,v);
-            c.face_perimeters(faceperimeters);
-
-            vol = c.volume();
-            tsum = 0;
-            vector <double> dummyweights;
-            vector <int> dummyneighs;
-
-            //only loop over neighbors
-            weightsum = 0.0;
-            for (int i=0; i<facearea.size(); i++){
-            	weightsum += pow(facearea[i], alpha);
-            }
-
-
-            //assign to nvector
-            atoms[ti].volume = vol;
-            atoms[ti].vertex_vectors = v;
-            atoms[ti].vertex_numbers = vert_nos;
-            atoms[ti].cutoff = cbrt(3*vol/(4*3.141592653589793));
-            //assign to the atom
-            //atoms[ti].vorovector = nvector;
-
-            //only loop over neighbors
-            //weightsum = 0.0;
-            //for (int i=0; i<facearea.size(); i++){
-            //    weightsum += facearea[i];
-            //}
-            for (int tj=0; tj<neigh.size(); tj++){
-
-                //if filter doesnt work continue
-                if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                    continue;
-                }
-
-                atoms[ti].neighbors[tj] = neigh[tj];
-                atoms[ti].n_neighbors += 1;
-                d = get_abs_distance(ti,neigh[tj],diffx,diffy,diffz);
-                atoms[ti].neighbordist[tj] = d;
-                //weight is set to 1.0, unless manually reset
-                atoms[ti].neighborweight[tj] = pow(facearea[tj], alpha)/weightsum;
-                atoms[ti].facevertices[tj] = f_vert[tj];
-                atoms[ti].faceperimeters[tj] = faceperimeters[tj];
-                atoms[ti].n_diffx[tj] = diffx;
-                atoms[ti].n_diffy[tj] = diffy;
-                atoms[ti].n_diffz[tj] = diffz;
-                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                atoms[ti].n_r[tj] = r;
-                atoms[ti].n_phi[tj] = phi;
-                atoms[ti].n_theta[tj] = theta;
-
-            }
-
-    } while (cl.inc());
-
-    //mark end of neighbor calc
-    neighborsfound = 1;
-
-    //now calculate the averged volume
-    find_average_volume();
 
 
 }
@@ -884,6 +721,184 @@ void System::get_temp_neighbors_cells(){
     }
 
 }
+int System::get_all_neighbors_bynumber(double prefactor, int nns, int assign){
+    /*
+    A new neighbor algorithm that finds a specified number of 
+    neighbors for each atom. But ONLY TEMP neighbors
+    */
+
+    //reset voronoi flag
+    voronoiused = 0;
+    
+
+    double d, dcut;
+    double diffx,diffy,diffz;
+    double r,theta,phi;
+    int m, maxneighs, finished;
+    finished = 1;
+
+    vector<int> nids;
+    vector<double> dists, sorted_dists;
+
+        //double prefactor = 1.21;
+    double summ;
+    double boxvol;
+
+    //some guesswork here
+    //find the box volumes
+    if (triclinic==1){
+        double a1, a2, a3, b1, b2, b3, c1, c2, c3;
+        //rot is the cell vectors transposed
+        a1 = rot[0][0];
+        a2 = rot[1][0];
+        a3 = rot[2][0];
+        b1 = rot[0][1];
+        b2 = rot[1][1];
+        b3 = rot[2][1];
+        c1 = rot[0][2];
+        c2 = rot[1][2];
+        c3 = rot[2][2];
+        boxvol = c1*(a2*b3-a3*b2) - c2*(a1*b3-b1*a3) + c3*(a1*b2-a2*b1);
+    }
+    else{
+        boxvol = boxx*boxy*boxz;
+    }
+
+    //now find the volume per particle
+    double guessvol = boxvol/float(nop);
+
+    //guess the side of a cube that is occupied by an atom - this is a guess distance
+    double guessdist = cbrt(guessvol);
+
+    //now add some safe padding - this is the prefactor which we will read in
+    guessdist = prefactor*guessdist;
+    neighbordistance = guessdist;
+
+    if (usecells){
+        get_temp_neighbors_cells();
+    }
+    else{
+        get_temp_neighbors_brute();
+    }
+    for (int ti=0; ti<nop; ti++){
+        if (atoms[ti].temp_neighbors.size() < nns){
+            return 0;
+        }
+
+        sort(atoms[ti].temp_neighbors.begin(), atoms[ti].temp_neighbors.end(), by_dist());
+
+        if(assign == 1){
+            //assign the neighbors
+            for(int i=0; i<nns; i++){
+                int tj = atoms[ti].temp_neighbors[i].index;
+                process_neighbor(ti, tj);
+            }
+        }
+
+        finished = 1;            
+    }
+
+
+    return finished;
+
+
+}
+
+int System::get_neighbors_from_temp(int style){
+    /*
+    A new neighbor algorithm that finds a specified number of 
+    neighbors for each atom.
+    */
+
+    int finished = 1;
+    //reset neighbors
+    reset_main_neighbors();
+
+    if (style == 12){
+        for (int ti=0; ti<nop; ti++){
+            if (atoms[ti].temp_neighbors.size() > 11){
+                double ssum = 0;
+                for(int i=0 ; i<12; i++){
+                    ssum += atoms[ti].temp_neighbors[i].dist;
+                }
+                //process sum
+                atoms[ti].lcutsmall = 1.2071*ssum/12;
+                //now assign neighbors based on this
+                for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+                    int tj = atoms[ti].temp_neighbors[i].index;
+                    double dist = atoms[ti].temp_neighbors[i].dist;
+                    if (dist <= atoms[ti].lcutsmall)
+                        process_neighbor(ti, tj);
+                }
+                finished = 1;                                  
+            }
+            else{
+                return 0;
+            }
+        }
+    }
+    else if (style == 14){
+        for (int ti=0; ti<nop; ti++){
+            if (atoms[ti].temp_neighbors.size() > 13){
+                double ssum = 0;
+                for(int i=0 ; i<8; i++){
+                    ssum += 1.1547*atoms[ti].temp_neighbors[i].dist;
+                }
+                for(int i=8 ; i<14; i++){
+                    ssum += atoms[ti].temp_neighbors[i].dist;
+                }
+                atoms[ti].lcutlarge = 1.2071*ssum/14;
+                //now assign neighbors based on this
+                for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+                    int tj = atoms[ti].temp_neighbors[i].index;
+                    double dist = atoms[ti].temp_neighbors[i].dist;
+                    if (dist <= atoms[ti].lcutlarge)
+                        process_neighbor(ti, tj);
+                }
+                finished = 1;                                  
+            }
+            else{
+                return 0;
+            }
+        }
+    }
+
+
+    return finished;
+
+
+}
+
+
+void System::store_neighbor_info(){
+    /*
+    Method to assign neighbors and next nearest neighbors
+
+    */    
+    int nn;
+
+    for (int ti=0; ti<nop; ti++){
+
+        atoms[ti].next_neighbors.clear();
+        atoms[ti].next_neighbor_distances.clear();
+        atoms[ti].next_neighbor_counts.clear();
+        
+        atoms[ti].next_neighbors.resize(atoms[ti].n_neighbors);
+        atoms[ti].next_neighbor_distances.resize(atoms[ti].n_neighbors);
+        atoms[ti].next_neighbor_counts.resize(atoms[ti].n_neighbors);
+
+        for(int i=0; i<atoms[ti].n_neighbors; i++){
+            nn = atoms[ti].neighbors[i];
+            atoms[ti].next_neighbor_counts[i] = atoms[nn].n_neighbors;
+            for(int j=0; j<atoms[nn].n_neighbors; j++){
+                atoms[ti].next_neighbors[i].emplace_back(atoms[nn].neighbors[j]);
+                atoms[ti].next_neighbor_distances[i].emplace_back(atoms[nn].neighbordist[j]);
+            }
+        }
+    }
+}
+
+
 
 
 int System::get_all_neighbors_sann(double prefactor){
@@ -941,11 +956,6 @@ int System::get_all_neighbors_sann(double prefactor){
     guessdist = prefactor*guessdist;
     neighbordistance = guessdist;
 
-
-    //if file is not read - read it in at this point
-    //we have to work on indicator functions
-    if (!fileread) { read_particle_file(inputfile); }
-
     if (usecells){
         get_temp_neighbors_cells();
     }
@@ -998,8 +1008,7 @@ int System::get_all_neighbors_sann(double prefactor){
 
     }
 
-    //mark end of neighbor calc
-    neighborsfound = 1;
+
     return finished;
 
 
@@ -1045,11 +1054,6 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
     //now add some safe padding - this is the prefactor which we will read in
     guessdist = prefactor*guessdist;
     neighbordistance = guessdist;
-
-    //if file is not read - read it in at this point
-    //we have to work on indicator functions
-    if (!fileread) { read_particle_file(inputfile); }
-
 
     //introduce cell lists here - instead of looping over all neighbors
     //use cells
@@ -1107,9 +1111,50 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
 
     }
 
-    //mark end of neighbor calc
-    neighborsfound = 1;
+
     return 1;
+
+}
+
+void System::set_neighbordistance(double nn) { neighbordistance = nn; }
+
+
+//---------------------------------------------------
+// Methods for q calculation
+//---------------------------------------------------
+double System::dfactorial(int l,int m){
+
+    double fac = 1.00;
+    for(int i=0;i<2*m;i++){
+        fac*=double(l+m-i);
+    }
+    return (1.00/fac);
+}
+
+void System::set_reqd_qs(vector <int> qs){
+
+    lenqs = qs.size();
+    reqdqs = new int[lenqs];
+    for(int i=0;i<lenqs;i++){
+        reqdqs[i] = qs[i];
+    }
+
+    rq_backup = qs;
+}
+
+
+void System::set_reqd_aqs(vector <int> qs){
+
+    lenaqs = qs.size();
+    reqdaqs = new int[lenaqs];
+    for(int i=0;i<lenaqs;i++){
+        for(int j=0;j<lenqs;j++){
+            if(qs[i]==reqdqs[j]) { reqdaqs[i] = qs[i]; }
+        }
+    }
+    //only qvlaues in the normal set will be included in the aq list
+    //check here if its in the qlist
+    //cout<<"corresponding q value should also be set."<<endl;
 
 }
 
@@ -1236,10 +1281,6 @@ void System::calculate_q(vector <int> qs){
         }
     }
 
-    //now check if neighbors are found
-    if (!neighborsfound){
-        get_all_neighbors_normal();
-    }
 
     //note that the qvals will be in -2 pos
     //q2 will be in q0 pos and so on
@@ -1287,7 +1328,6 @@ void System::calculate_q(vector <int> qs){
 
     }
 
-    qsfound = 1;
 }
 
 
@@ -1344,6 +1384,26 @@ void System::calculate_aq(vector <int> qs){
         }
 
     }
+}
+
+vector<double> System::gqvals(int qq){
+    vector<double> qres;
+    qres.reserve(nop);
+    for(int i=0;i<nop;i++){
+        qres.emplace_back(atoms[i].q[qq-2]);
+    }
+
+    return qres;
+}
+
+vector<double> System::gaqvals(int qq){
+    vector<double> qres;
+    qres.reserve(nop);
+    for(int i=0;i<nop;i++){
+        qres.emplace_back(atoms[i].aq[qq-2]);
+    }
+
+    return qres;
 }
 
 void System::calculate_disorder(){
@@ -1410,23 +1470,9 @@ void System::find_average_disorder(){
         atoms[ti].avgdisorder = vv;
     }
 }
-
-void System::find_average_volume(){
-    double vv;
-    int nn;
-
-    for (int ti= 0;ti<nop;ti++){
-        nn = atoms[ti].n_neighbors;
-        vv = atoms[ti].volume;
-        for (int ci = 0;ci<nn;ci++){
-            vv += atoms[atoms[ti].neighbors[ci]].volume;
-        }
-        vv = vv/(double(nn+1));
-        atoms[ti].avgvolume = vv;
-    }
-}
-
-
+//-----------------------------------------------------
+// Solids and Clustering methods
+//-----------------------------------------------------
 //also has to be overloaded - could be a useful function
 double System::get_number_from_bond(int ti,int tj){
 
@@ -1639,116 +1685,187 @@ void System::get_largest_cluster_atoms(){
         }
 }
 
-
-
-//access functions for system
-//------------------------------------------------------------------------------------------------------------------------
-//void System::set_inputfile(string nn) { inputfile = nn; }
-void System::set_neighbordistance(double nn) { neighbordistance = nn; }
 void System::set_nucsize_parameters(double n1, double n2, double n3 ) { minfrenkel = n1; threshold = n2; avgthreshold = n3; }
-Atom System::gatom(int i) { return atoms[i]; }
-void System::satom(Atom atom1) {
-    int idd = atom1.loc;
-    atoms[idd] = atom1;
+
+//-----------------------------------------------------
+// Voronoi based methods
+//-----------------------------------------------------
+void System::set_face_cutoff(double fcut){
+    face_cutoff = fcut;
 }
 
-//add function to return nop
-int System::gnop() { return nop; }
-void System::snop( int n) {  }
-//int System::gnop() { return nop; }
-//add function to pack and return the whole set of atoms
+//overloaded function; would be called
+//if neighbor method voronoi is selected.
+void System::get_all_neighbors_voronoi(){
 
-//a small function which can be used to set the value of solidq
-//incase it needs to be overwritten for the calculation of solid atoms
-int System::gsolidq() { return solidq; }
-void System::ssolidq( int n) { solidq = n; }
-//access function for criteria
-int System::gcriteria() { return criteria; }
-void System::scriteria( int n) { criteria = n; }
+    //reset voronoi flag
+    voronoiused = 1;
 
-int System::glargestclusterid() { return maxclusterid; }
-void System::slargestclusterid(int idd) { }
+    double d;
+    double diffx,diffy,diffz;
+    double r,theta,phi;
+    int i;
+    int ti,id,tnx,tny,tnz;
 
-vector<double> System::gqvals(int qq){
-    vector<double> qres;
-    qres.reserve(nop);
-    for(int i=0;i<nop;i++){
-        qres.emplace_back(atoms[i].q[qq-2]);
+    double rx,ry,rz,tsum, fa, x, y, z, vol;
+    vector<int> neigh,f_vert, vert_nos;
+    vector<double> facearea, v, faceperimeters;
+    voronoicell_neighbor c;
+    vector< vector<double> > nweights;
+    vector< vector<int> > nneighs;
+    vector<int> idss;
+    //vector<int> nvector;
+    double weightsum;
+
+
+    //pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
+    pre_container pcon(0.00, boxx, 0.00, boxy, 0.0, boxz, true, true, true);
+    for(int i=0; i<nop; i++){
+        pcon.put(i, atoms[i].posx-boxdims[0][0], atoms[i].posy-boxdims[1][0], atoms[i].posz-boxdims[2][0]);
     }
+    pcon.guess_optimal(tnx,tny,tnz);
+    //container con(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],tnx,tny,tnz,true,true,true, nop);
+    container con(0.00, boxx, 0.00, boxy, 0.0, boxz, tnx, tny, tnz, true, true, true, nop);
+    pcon.setup(con);
 
-    return qres;
-}
+    c_loop_all cl(con);
+    if (cl.start()) do if(con.compute_cell(c,cl)) {
+            ti=cl.pid();
+            c.face_areas(facearea);
+            c.neighbors(neigh);
+            c.face_orders(f_vert);
+            c.face_vertices(vert_nos);
+            c.vertices(x,y,z,v);
+            c.face_perimeters(faceperimeters);
 
-vector<double> System::gaqvals(int qq){
-    vector<double> qres;
-    qres.reserve(nop);
-    for(int i=0;i<nop;i++){
-        qres.emplace_back(atoms[i].aq[qq-2]);
-    }
+            vol = c.volume();
+            tsum = 0;
+            vector <double> dummyweights;
+            vector <int> dummyneighs;
 
-    return qres;
-}
-/*
-vector<double> System::gbox(){
-    vector<double> qres;
-    qres.reserve(3);
-    qres.emplace_back(boxx);
-    qres.emplace_back(boxy);
-    qres.emplace_back(boxz);
-    return qres;
-}
-*/
-vector<vector<double>> System::gboxvecs(){
-    vector<vector<double>> qres;
-    vector<double> dqres;
-    if (triclinic==1){
-        for(int i=0; i<3; i++){
-            dqres.clear();
-            for(int j=0; j<3; j++){
-                dqres.emplace_back(rot[j][i]);
+            //only loop over neighbors
+            weightsum = 0.0;
+            for (int i=0; i<facearea.size(); i++){
+                weightsum += pow(facearea[i], alpha);
             }
-            qres.emplace_back(dqres);
-        }
-    }
-    else{
-        for(int i=0; i<3; i++){
-            dqres.clear();
-            for(int j=0; j<3; j++){
-                if(i==j){
-                    dqres.emplace_back(boxdims[i][1]-boxdims[i][0]);
+
+
+            //assign to nvector
+            atoms[ti].volume = vol;
+            atoms[ti].vertex_vectors = v;
+            atoms[ti].vertex_numbers = vert_nos;
+            atoms[ti].cutoff = cbrt(3*vol/(4*3.141592653589793));
+            //assign to the atom
+            //atoms[ti].vorovector = nvector;
+
+            //only loop over neighbors
+            //weightsum = 0.0;
+            //for (int i=0; i<facearea.size(); i++){
+            //    weightsum += facearea[i];
+            //}
+            for (int tj=0; tj<neigh.size(); tj++){
+
+                //if filter doesnt work continue
+                if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                    continue;
                 }
-                else{
-                    dqres.emplace_back(0.0);
-                }
+
+                atoms[ti].neighbors[tj] = neigh[tj];
+                atoms[ti].n_neighbors += 1;
+                d = get_abs_distance(ti,neigh[tj],diffx,diffy,diffz);
+                atoms[ti].neighbordist[tj] = d;
+                //weight is set to 1.0, unless manually reset
+                atoms[ti].neighborweight[tj] = pow(facearea[tj], alpha)/weightsum;
+                atoms[ti].facevertices[tj] = f_vert[tj];
+                atoms[ti].faceperimeters[tj] = faceperimeters[tj];
+                atoms[ti].n_diffx[tj] = diffx;
+                atoms[ti].n_diffy[tj] = diffy;
+                atoms[ti].n_diffz[tj] = diffz;
+                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                atoms[ti].n_r[tj] = r;
+                atoms[ti].n_phi[tj] = phi;
+                atoms[ti].n_theta[tj] = theta;
+
             }
-            qres.emplace_back(dqres);
-        }
-    }
-    return qres;
+
+    } while (cl.inc());
+
+
+    //now calculate the averged volume
+    find_average_volume();
+
+
 }
 
-vector<vector<double>> System::gbox(){
-    vector<vector<double>> qres;
-    vector<double> qd;
 
-    for(int i=0;i<3;i++){
-        qd.clear();
-        for(int j=0;j<2;j++){
-            qd.emplace_back(boxdims[i][j]);
+void System::find_average_volume(){
+    double vv;
+    int nn;
+
+    for (int ti= 0;ti<nop;ti++){
+        nn = atoms[ti].n_neighbors;
+        vv = atoms[ti].volume;
+        for (int ci = 0;ci<nn;ci++){
+            vv += atoms[atoms[ti].neighbors[ci]].volume;
         }
-        qres.emplace_back(qd);
+        vv = vv/(double(nn+1));
+        atoms[ti].avgvolume = vv;
     }
-    return qres;
 }
-/*
-vector<double> System::gboxdims(){
-    vector<double> qres;
-    qres.reserve(6);
-    for(int i=0;i<3;i++){
-        for(int j=0;j<2;j++){
-            qres.emplace_back(boxdims[i][j]);
-        }
+
+//-------------------------------------------------------
+// Other order parameters
+//-------------------------------------------------------
+
+vector<int> System::calculate_acna(){
+    
+    //get fourteen neighbors
+    get_neighbors_from_temp(12);
+    store_neighbor_info();
+    
+    for(int ti=0; ti<nop; ti++){
+        atoms[ti].calculate_adaptive_cna(12);    
     }
-    return qres;
+
+    //we need to check again for unknow structures
+    get_neighbors_from_temp(14);
+    store_neighbor_info();
+
+    vector<int> result;
+    for(int i=0; i<5; i++){
+        result.emplace_back(0);
+    }
+
+    for(int ti=0; ti<nop; ti++){
+        if(atoms[ti].structure == 0)
+            atoms[ti].calculate_adaptive_cna(14);
+
+        result[atoms[ti].structure] += 1;            
+    }
+    return result;
 }
-*/
+
+vector<int> System::calculate_cna(){
+    
+    //get fourteen neighbors
+    store_neighbor_info();
+    
+    for(int ti=0; ti<nop; ti++){
+        atoms[ti].calculate_adaptive_cna(12);    
+    }
+
+
+    vector<int> result;
+    for(int i=0; i<5; i++){
+        result.emplace_back(0);
+    }
+
+    for(int ti=0; ti<nop; ti++){
+        if(atoms[ti].structure == 0)
+            atoms[ti].calculate_adaptive_cna(14);
+
+        result[atoms[ti].structure] += 1;            
+    }
+    return result;
+}
+

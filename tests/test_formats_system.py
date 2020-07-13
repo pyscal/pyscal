@@ -30,6 +30,23 @@ def test_lammps_dump():
     filtered_atoms = [ atom for atom in atoms if atom.id == 204]
     assert filtered_atoms[0].pos == [-0.10301, -6.35752, -6.44787]
 
+def test_neighbors_number():
+    atoms, box = pcs.make_crystal(structure="fcc", repetitions=(3,3,3), lattice_constant=4.00)
+    sys = pc.System()
+    sys.atoms = atoms
+    sys.box = box
+
+    sys.find_neighbors(method="number", nmax=8)
+    atoms = sys.atoms
+    nns = np.mean([atom.coordination for atom in atoms])
+    assert nns == 8
+
+    sys.find_neighbors(method="number", nmax=12)
+    atoms = sys.atoms
+    nns = np.mean([atom.coordination for atom in atoms])
+    assert nns == 12
+
+
 def test_scaled():
     sys = pc.System()
     sys.read_inputfile('tests/conf.bcc.scaled.dump')
