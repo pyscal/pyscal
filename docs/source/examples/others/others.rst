@@ -3,4 +3,4 @@ Other examples
 
 .. toctree::
 
-    pickling
+    
