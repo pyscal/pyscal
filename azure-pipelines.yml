@@ -110,7 +110,7 @@ jobs:
     - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
       displayName: Add conda to PATH
 
-   - bash: |
+    - bash: |
         conda create --yes --quiet python=$(python.version) --name conenv
         source activate conenv
         conda config --set always_yes yes --set changeps1 no
