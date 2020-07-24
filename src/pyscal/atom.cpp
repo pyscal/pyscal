@@ -522,7 +522,7 @@ void Atom::find_bond_chains(){
                     int rr = spathlength;
                     
                     for(int j=0; j<rr; j++){
-                        if((common_neighbor_bonds[n][i][0] == path[j]) or (common_neighbor_bonds[n][i][1] == path[j])){
+                        if((common_neighbor_bonds[n][i][0] == path[j]) || (common_neighbor_bonds[n][i][1] == path[j])){
                             //add the values
                             path.emplace_back(common_neighbor_bonds[n][i][0]);
                             path.emplace_back(common_neighbor_bonds[n][i][1]);
