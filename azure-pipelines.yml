@@ -5,6 +5,7 @@
 variables:
   linux: 'ubuntu-18.04'
   mac: 'macos-10.15'
+  windows: 'vs2017-win2016'
 
 #do not include branches as of now
 #trigger:
@@ -68,6 +69,46 @@ jobs:
 
     - bash: sudo chown -R $USER $CONDA
       displayName: Take ownership of conda installation
+
+    - bash: |
+        conda create --yes --quiet python=$(python.version) --name conenv
+        source activate conenv
+        conda config --set always_yes yes --set changeps1 no
+        conda config --add channels conda-forge
+        conda install -c conda-forge libiconv
+        conda install -c anaconda setuptools
+        conda update --yes conda
+        conda install -q conda-build
+      displayName: Setup Anaconda Environment
+
+    - bash: |
+        source activate conenv
+        conda install -c conda-forge --file requirements_dev.txt
+        pip install -e .
+      displayName: Install package
+
+    - bash: |
+        source activate conenv
+        pytest --cov-report term-missing --cov=pyscal tests/
+        codecov
+      displayName: Run tests
+
+
+- job: 'Windows'
+  pool:
+    vmImage: $(windows)
+
+  strategy:
+    matrix:
+      Python37:
+        python.version: '3.7'
+      Python36:
+        python.version: '3.6'
+    maxParallel: 4
+
+  steps:
+    - powershell: Write-Host "##vso[task.prependpath]$env:CONDA\Scripts"
+      displayName: Add conda to PATH
 
     - bash: |
         conda create --yes --quiet python=$(python.version) --name conenv
