@@ -809,7 +809,8 @@ double Atom::trapezoid_integration()
 
         xend = entropy_integrand(rstart + nsteps*h);
         integral = (h/2.00)*(xstart + 2.00*summ + xend);
-        integral = -2.00*PI*rho*kb*integral;
+        //cout<<xstart<<endl;
+        integral = -1.*rho*kb*integral;
         entropy = integral;
 }
 
