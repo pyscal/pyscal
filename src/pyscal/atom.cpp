@@ -28,6 +28,8 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     n_neighbors = 0;
     lcluster = 0;
     head = -1;
+    entropy = 0;
+    avg_entropy = 0;
 
 
     for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){
@@ -807,6 +809,7 @@ double Atom::trapezoid_integration()
 
         xend = entropy_integrand(rstart + nsteps*h);
         integral = (h/2.00)*(xstart + 2.00*summ + xend);
-        return integral;
+        integral = -2.00*PI*rho*kb*integral;
+        entropy = integral;
 }
 

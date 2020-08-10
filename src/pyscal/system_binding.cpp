@@ -104,6 +104,8 @@ PYBIND11_MODULE(csystem, m) {
         //-------------------------------------------------------
         .def("calculate_acna",&System::calculate_acna)
         .def("calculate_cna",&System::calculate_cna)
+        .def("entropy",&System::entropy)
+        .def("average_entropy",&System::average_entropy)
         ;
 
 

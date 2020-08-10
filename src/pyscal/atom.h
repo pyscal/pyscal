@@ -234,9 +234,13 @@ class Atom{
         double rstart;
         double rstop;
         double h;
+        double kb;
         double gmr(double);
         double entropy_integrand(double);
         double trapezoid_integration();
+        //results
+        double entropy;
+        double avg_entropy;
 
 
 };
