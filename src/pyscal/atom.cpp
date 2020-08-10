@@ -758,7 +758,7 @@ void Atom::calculate_adaptive_cna(int nc){
 
 }
 
-double Atom::gmr(int i, double r, double sigma, double rho)
+double Atom::gmr(double r)
 {
         double g = 0.00;
         double rij,r2;
@@ -769,57 +769,44 @@ double Atom::gmr(int i, double r, double sigma, double rho)
 
         for(int i=0; i<n_neighbors; i++)
         {
-                rij = neighbourdist[i];
+                rij = neighbordist[i];
                 r2 = (r-rij)*(r-rij);
                 g+=exp((-1.00*r2)/(2.00*sigma2));
         }
 
-        return factor*gmr;
+        return factor*g;
 }
 
 //function which is to be integrated
-double Atom::entropy_integrand(int i, double r)
+double Atom::entropy_integrand(double r)
 {
-        double g = gmr(i,r);
+        double g = gmr(r);
         return ((g*log(g)-g +1.00)*r*r);
 }
 
 
-double Atom::trapezoid_integration(int i ,double rstart,double rstop, double h)
+double Atom::trapezoid_integration()
 {
 
         int nsteps = (rstop - rstart)/h;
-        intv = new double[nsteps];
-        double se,so;
-        se=so=0.00;
+        double summ;
+        double xstart, xend;
+        summ=0.00;
         double rloop;
         double integral;
 
-        for(int j=0;j<nsteps;j++)
+        xstart = entropy_integrand(rstart);
+
+        for(int j=1; j<nsteps-1; j++)
         {
 
                 rloop = rstart + j*h;
-                intv[j] = entropy_integrand(i,rloop);
-
-                if (j%2==0) so+=intv[j];
-                else se+=intv[j];
+                summ += entropy_integrand(rloop);
 
         }
 
-        integral = (h/3.00)*(intv[0]+intv[nsteps-1]+4.00*so+2.00*se);
+        xend = entropy_integrand(rstart + nsteps*h);
+        integral = (h/2.00)*(xstart + 2.00*summ + xend);
         return integral;
 }
 
-void Atom::calculate_ss(double rho, double kb, double rm, double h)
-{
-    double factor=-2.00*PI*rho*kb;
-    double start,stop,h;
-    double ival;
-
-    start = 0.00001;
-    stop = rm;
-
-    ival = trapezoid_integration(i,start,stop, h);
-    ss = factor*ival;
- 
-}

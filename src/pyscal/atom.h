@@ -229,7 +229,14 @@ class Atom{
         void check_adaptive_cna14();
         void calculate_adaptive_cna(int);
 
-        double trapezoid_integration(int, double, double, double);
+        double sigma;
+        double rho;
+        double rstart;
+        double rstop;
+        double h;
+        double gmr(double);
+        double entropy_integrand(double);
+        double trapezoid_integration();
 
 
 };
