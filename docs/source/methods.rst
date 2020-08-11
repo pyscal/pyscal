@@ -8,3 +8,4 @@ Methods implemented in pyscal
     methods/angularmethods/angularmethods
     methods/voronoiparameters/voronoiparameters
     methods/centrosymmetry/centrosymmetry_parameter
+    methods/entropy_parameters/entropy_parameters
