@@ -17,4 +17,5 @@ can be downloaded from `here <https://pyscal.readthedocs.io/en/latest/download.h
    examples/steinhardtparameters/steinhardtparameters
    examples/angularparams/angularparams
    examples/voronoi/voronoi
+   examples/entropy/entropy_params
    examples/others/others
