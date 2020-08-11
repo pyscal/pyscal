@@ -9,3 +9,4 @@ dist/
 .cache
 docs/html/*
 docs/doctrees/*
+.ipynb_check*
