@@ -7,8 +7,8 @@ You can try some examples provided with pyscal using `Binder <https://mybinder.o
 
 Supported operating systems
 ---------------------------
-pyscal can be installed on both Linux and Mac OS based systems. For Windows systems, we recommend using Bash on Windows. Please check `this <https://lammps.sandia.gov/doc/Howto_bash.html>`_ tutorial
-on how to set up Bash on Windows.
+pyscal can be installed on Linux, Mac OS and Windows based systems. 
+
 
 Installation using `conda <https://anaconda.org>`_
 --------------------------------------------------
@@ -22,7 +22,7 @@ pyscal can be installed directly using `Conda <https://docs.conda.io/en/latest/>
 
 This is the recommended way to install if you have an `Anaconda <https://www.anaconda.com/>`_ distribution.
 
-The above command installs the `latest release version <https://github.com/srmnitc/pyscal/releases>`_ of pyscal.
+The above command installs the `latest release version <https://github.com/srmnitc/pyscal/releases>`_ of pyscal and works on all three operating systems.
 
 pyscal is no longer maintained for Python 2.
 
@@ -39,6 +39,14 @@ pyscal can be installed using the following steps-
 
     Pyscal can be installed system-wide using ``python setup.py install``.
 
+Installation using pip
+----------------------
+
+pyscal is not available on pip directly. However pyscal can be installed using pip by
+
+.. code::console
+
+    pip install git+https://github.com/srmnitc/pyscal
 
 Installation from the repository
 --------------------------------

@@ -1540,11 +1540,66 @@ class System(pc.System):
                 vals.append(val)
         return vals
 
+    def calculate_entropy(self, rm, sigma=0.2, rstart=0.00001, h=0.0001,
+                   M=12, N=6, ra=None, averaged=False):
+        """
+        Calculate the entropy parameter for each atom
+        
+        Parameters
+        ----------
+        rm : float
+            cutoff distance for integration of entropy parameter in distance units
+
+        sigma : float
+            broadening parameter
+
+        rstart : float, optional
+            minimum limit for integration, default 0.00001
+
+        h : float, optional
+            width for trapezoidal integration, default 0.0001
+
+        averaged : bool, optional
+            if True find the averaged entropy parameters
+            default False
+
+        ra : float, optional
+            cutoff length for switching function 
+
+        M : int, optional
+            power for switching function, default 12
+
+        N : int, optional
+            power for switching function, default 6
+
+        Returns
+        -------
+        None
+        The entropy parameters can be accessed by :attr:`~pyscal.catom.entropy`
+        and :attr:`~pyscal.catom.avg_entropy`.
+
+        Notes
+        -----
+        See here (add link) for a description of entropy parameters
+        
+        """
+        #get kb
+        kb = 1.00
+
+        #calculate rho
+        box = self.box
+        rho = len(self.atoms)/((box[0][1]-box[0][0])*(box[1][1]-box[1][0])*(box[2][1]-box[2][0]))
+        self.entropy(sigma, rho, rstart, rm, h, kb)
+
+        if averaged:
+            self.average_entropy(ra, M, N)
+
+
     def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0):
         """
         Save the system instance to a trajectory file.
 
-         Parameters
+        Parameters
         ----------
         outfile : string
             name of the output file

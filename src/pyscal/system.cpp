@@ -1869,3 +1869,49 @@ vector<int> System::calculate_cna(){
     return result;
 }
 
+
+//Methods for entropy
+double System::switching_fn(double rij, double ra, int M, int N){
+
+    double num = 1.0 - pow((rij/ra), N);
+    double denum = 1.0 - pow((rij/ra), M);
+    return num/denum;
+}
+
+void System::average_entropy(double ra, int M, int N){
+
+    double frij;
+    double frijsum = 0.0;
+    double entfrijsum = 0.0;
+
+    for(int i=0; i<nop; i++){
+        
+        frijsum = 0.0;
+        entfrijsum = 0.0;
+
+        for(int j=0; j<atoms[i].n_neighbors; j++){
+            frij = switching_fn(atoms[i].neighbordist[j], ra, M, N);
+            frijsum += frij;
+            entfrijsum += atoms[atoms[i].neighbors[j]].entropy*frij;
+        }
+
+        atoms[i].avg_entropy = (entfrijsum + atoms[i].entropy)/(frijsum + 1.0);
+    }
+}
+
+
+void System::entropy(double sigma, double rho, double rstart, double rstop, double h, double kb){
+
+    for(int i=0; i<nop; i++){
+        
+        atoms[i].sigma = sigma;
+        atoms[i].rho = rho;
+        atoms[i].rstart = rstart;
+        atoms[i].rstop = rstop;
+        atoms[i].h = h;
+        atoms[i].kb = kb;
+
+        atoms[i].trapezoid_integration();
+    }
+}
+

@@ -28,6 +28,8 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     n_neighbors = 0;
     lcluster = 0;
     head = -1;
+    entropy = 0;
+    avg_entropy = 0;
 
 
     for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){
@@ -757,3 +759,58 @@ void Atom::calculate_adaptive_cna(int nc){
         check_adaptive_cna14();
 
 }
+
+double Atom::gmr(double r)
+{
+        double g = 0.00;
+        double rij,r2;
+        double sigma2 = sigma*sigma;
+        double frho = 4.00*PI*rho*r*r;
+        double fsigma = sqrt(2.00*PI*sigma2);
+        double factor = (1.00/frho)*(1.00/fsigma);
+
+        for(int i=0; i<n_neighbors; i++)
+        {
+                rij = neighbordist[i];
+                r2 = (r-rij)*(r-rij);
+                g+=exp((-1.00*r2)/(2.00*sigma2));
+        }
+
+        return factor*g;
+}
+
+//function which is to be integrated
+double Atom::entropy_integrand(double r)
+{
+        double g = gmr(r);
+        return ((g*log(g)-g +1.00)*r*r);
+}
+
+
+double Atom::trapezoid_integration()
+{
+
+        int nsteps = (rstop - rstart)/h;
+        double summ;
+        double xstart, xend;
+        summ=0.00;
+        double rloop;
+        double integral;
+
+        xstart = entropy_integrand(rstart);
+
+        for(int j=1; j<nsteps-1; j++)
+        {
+
+                rloop = rstart + j*h;
+                summ += entropy_integrand(rloop);
+
+        }
+
+        xend = entropy_integrand(rstart + nsteps*h);
+        integral = (h/2.00)*(xstart + 2.00*summ + xend);
+        //cout<<xstart<<endl;
+        integral = -1.*rho*kb*integral;
+        entropy = integral;
+}
+
