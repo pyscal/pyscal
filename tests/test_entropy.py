@@ -13,5 +13,5 @@ def test_entropy():
 	atoms = sys.atoms
 	solid_entropy = [atom.entropy for atom in atoms]
 	solid_avg_entropy = [atom.avg_entropy for atom in atoms]
-	assert np.abs(np.mean(solid_entropy) + 3.47) < 0.001
-	assert np.abs(np.mean(solid_avg_entropy) + 3.47) < 0.001
+	assert np.abs(np.mean(solid_entropy) + 3.47249) < 0.001
+	assert np.abs(np.mean(solid_avg_entropy) + 3.47254) < 0.001
