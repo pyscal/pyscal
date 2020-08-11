@@ -42,7 +42,7 @@ function is given by,
 
 Entropy parameters can be calculated in pyscal using the following code,
 
-.. code:: ipython3
+.. code:: python
 
     import pyscal.core as pc
     sys = pc.System()
