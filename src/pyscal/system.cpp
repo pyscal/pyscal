@@ -1339,7 +1339,8 @@ void System::calculate_aq(vector <int> qs){
     double realti,imgti;
     //double realYLM,imgYLM;
     int q;
-    double summ, weightsum;
+    double summ;
+    int nns;
 
     //if (!qsfound) { calculate_q(qs); }
     //note that the qvals will be in -2 pos
@@ -1358,19 +1359,19 @@ void System::calculate_aq(vector <int> qs){
             for (int mi = 0;mi < 2*q+1;mi++){
                 realti = atoms[ti].realq[q-2][mi];
                 imgti = atoms[ti].imgq[q-2][mi];
-                weightsum = 1.00;
+                nns = 0;
                 for (int ci = 0;ci<nn;ci++){
-
+                    if (atoms[ti].condition != atoms[atoms[ti].neighbors[ci]].condition) continue; 
                     realti += atoms[atoms[ti].neighbors[ci]].realq[q-2][mi];
                     imgti += atoms[atoms[ti].neighbors[ci]].imgq[q-2][mi];
-                    weightsum += atoms[ti].neighborweight[ci];
+                    nns += 1;
                 }
 
             //realti = realti/weightsum;
             //imgti = realti/weightsum;
 
-            realti = realti/(double(nn+1));
-            imgti = imgti/(double(nn+1));
+            realti = realti/(double(nns+1));
+            imgti = imgti/(double(nns+1));
 
             atoms[ti].arealq[q-2][mi] = realti;
             atoms[ti].aimgq[q-2][mi] = imgti;
