@@ -671,7 +671,7 @@ class System(pc.System):
         self.atoms = atoms
 
 
-    def calculate_q(self, q, averaged = False, only_averaged=False):
+    def calculate_q(self, q, averaged = False, only_averaged=False, condition=None, clear_condition=False):
         """
         Find the Steinhardt parameter q_l for all atoms.
 
@@ -686,6 +686,13 @@ class System(pc.System):
         only_averaged : bool, optional
             If True, only calculate the averaged part. default False
 
+        condition : callable or atom property
+            Either function which should take an :class:`~Atom` object, and give a True/False output
+            or an attribute of atom class which has value or 1 or 0.
+
+        clear_condition: bool, optional
+            clear the `condition` variable for all atoms
+
         Returns
         -------
         None
@@ -698,12 +705,29 @@ class System(pc.System):
         the averaged versions of the bond order parameter [2] is returned. If only the averaged
         versions need to be calculated, `only_averaged` keyword can be set to False. 
 
+        The neighbors over which the q values are calculated can also be filtered. This is done 
+        through the argument `condition` which is passed as a parameter.
+        `condition` can be of two types. The first type is a function which takes an 
+        :class:`~Atom` object and should give a True/False value. `condition` can also be an
+        :class:`~Atom` attribute or a value from `custom` values stored in an atom. See
+        :func:`~pyscal.core.System.cluster_atoms` for more details. If the
+        `condition` is equal for both host atom and the neighbor, the neighbor is considered for
+        calculation of q parameters. This is slightly different from :func:`~pyscal.core.System.cluster_atoms`
+        where the condition has to be True for both atoms.  `condition` is only cleared when neighbors are 
+        recalculated. Additionally, the keyword `clear_condition` can also be used to clear the condition
+        and reset it to 0. By default, `condition` is applied to both unaveraged and averaged q parameter
+        calculation. If `condition` is needed for only averaged q parameters, this function can be called
+        twice, initially without `condition` and `averaged=False`, and then with a condition specified
+        and `averaged=True`. This way, the `condition` will only be applied to the averaged q calculation.  
+
         References
         ----------
         .. [1] Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983
         .. [2] Lechner, W, Dellago, C, J Chem Phys, 2013
 
         """
+
+
         if isinstance(q, int):
             qq = [q]
         else:
@@ -712,6 +736,44 @@ class System(pc.System):
         for ql in qq:
             if not ql in range(2,13):
                 raise ValueError("value of q should be between 2 and 13")
+
+        #test the condition
+        if condition is not None:
+
+            testatom = self.atoms[0]
+            isatomattr = False
+
+            try:
+                out = condition(testatom)
+                if out not in [True, False, 0, 1]:
+                    raise RuntimeError("The output of condition should be either True or False. Received %s"%str(out))
+
+            except:
+                try:
+                    out = self.get_custom(testatom, [condition])[0]
+                    if out not in [True, False, 0, 1]:
+                        raise RuntimeError("The output of condition should be either True or False. Received %s"%str(out))
+                    isatomattr = True        
+                except:
+                    raise RuntimeError("condition did not work")
+            
+            #now loop
+            atoms = self.atoms
+
+            if isatomattr:
+                for atom in atoms:
+                    atom.condition = self.get_custom(atom, [condition])[0]
+            else:
+                for atom in atoms:
+                    cval = condition(atom)
+                    atom.condition = cval
+            self.atoms = atoms
+
+        if clear_condition:
+            atoms = self.atoms
+            for atom in atoms:
+                atom.condition = 0
+            self.atoms = atoms
 
         if not only_averaged:
             self.ccalculate_q(qq)

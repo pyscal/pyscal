@@ -345,6 +345,7 @@ void System::reset_all_neighbors(){
 
         atoms[ti].n_neighbors=0;
         atoms[ti].temp_neighbors.clear();
+        atoms[ti].condition = 0;
 
         for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
 
@@ -358,6 +359,7 @@ void System::reset_main_neighbors(){
     for (int ti = 0;ti<nop;ti++){
 
         atoms[ti].n_neighbors=0;
+        atoms[ti].condition = 0;
         //atoms[ti].temp_neighbors.clear();
 
         for (int tn = 0;tn<MAXNUMBEROFNEIGHBORS;tn++){
@@ -1300,7 +1302,7 @@ void System::calculate_q(vector <int> qs){
                 imgti = 0.0;
                 weightsum = 0;
                 for (int ci = 0;ci<nn;ci++){
-
+                    if (atoms[ti].condition != atoms[atoms[ti].neighbors[ci]].condition) continue;
                     QLM(q,mi,atoms[ti].n_theta[ci],atoms[ti].n_phi[ci],realYLM, imgYLM);
                     realti += atoms[ti].neighborweight[ci]*realYLM;
                     imgti += atoms[ti].neighborweight[ci]*imgYLM;
