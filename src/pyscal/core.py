@@ -671,7 +671,7 @@ class System(pc.System):
         self.atoms = atoms
 
 
-    def calculate_q(self, q, averaged = False):
+    def calculate_q(self, q, averaged = False, only_averaged=False):
         """
         Find the Steinhardt parameter q_l for all atoms.
 
@@ -683,6 +683,9 @@ class System(pc.System):
         averaged : bool, optional
             If True, return the averaged q values, default False
 
+        only_averaged : bool, optional
+            If True, only calculate the averaged part. default False
+
         Returns
         -------
         None
@@ -692,7 +695,8 @@ class System(pc.System):
         Enables calculation of the Steinhardt parameters [1] q from 2-12. The type of
         q values depend on the method used to calculate neighbors. See the description
         :func:`~pyscal.core.System.find_neighbors` for more details. If the keyword `average` is set to True,
-        the averaged versions of the bond order parameter [2] is returned.
+        the averaged versions of the bond order parameter [2] is returned. If only the averaged
+        versions need to be calculated, `only_averaged` keyword can be set to False. 
 
         References
         ----------
@@ -709,9 +713,10 @@ class System(pc.System):
             if not ql in range(2,13):
                 raise ValueError("value of q should be between 2 and 13")
 
-        self.ccalculate_q(qq)
+        if not only_averaged:
+            self.ccalculate_q(qq)
 
-        if averaged:
+        if averaged or only_averaged:
             self.ccalculate_aq(qq)
 
 

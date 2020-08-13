@@ -1358,7 +1358,7 @@ void System::calculate_aq(vector <int> qs){
             for (int mi = 0;mi < 2*q+1;mi++){
                 realti = atoms[ti].realq[q-2][mi];
                 imgti = atoms[ti].imgq[q-2][mi];
-                weightsum = 0;
+                weightsum = 1.00;
                 for (int ci = 0;ci<nn;ci++){
 
                     realti += atoms[atoms[ti].neighbors[ci]].realq[q-2][mi];
@@ -1366,8 +1366,8 @@ void System::calculate_aq(vector <int> qs){
                     weightsum += atoms[ti].neighborweight[ci];
                 }
 
-            //realti = realti/(1.0+weightsum);
-            //realti = realti/(1.0+weightsum);
+            //realti = realti/weightsum;
+            //imgti = realti/weightsum;
 
             realti = realti/(double(nn+1));
             imgti = imgti/(double(nn+1));
