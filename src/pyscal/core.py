@@ -905,7 +905,7 @@ class System(pc.System):
             def ccondition(atom):
                 return atom.solid
 
-            lc = self.cluster_atoms(ccondition, largest=True, new_algo=new_algo, cutoff=cutoff)
+            lc = self.cluster_atoms(ccondition, largest=True, cutoff=cutoff)
             return lc
 
 
