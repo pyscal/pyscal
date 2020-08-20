@@ -782,7 +782,8 @@ class System(pc.System):
             self.ccalculate_aq(qq)
 
 
-    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, cluster=True, q=6, new_algo=False, cutoff=0):
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, 
+                          cluster=True, q=6, cutoff=0, right=True):
         """
         Distinguish solid and liquid atoms in the system.
 
@@ -808,6 +809,14 @@ class System(pc.System):
         q : int, optional
             The Steinhardt parameter value over which the bonds have to be calculated.
             Default 6.
+        
+        cutoff : double, optional
+            Separate value used for cluster classification. If not specified, cutoff used
+            for finding neighbors is used.
+
+        right: bool, optional
+            If true, greater than comparison is to be used for finding solid particles. 
+            default True.
 
         Returns
         -------
@@ -835,7 +844,11 @@ class System(pc.System):
         .. math::  \langle s_{ij} \\rangle > avgthreshold
 
         also needs to be satisfied. In case another q value has to be used for calculation of S_ij, it can be
-        set used the `q` attribute.
+        set used the `q` attribute. In the above formulations, `>` comparison for `threshold` and `avgthreshold`
+        can be changed to `<` by setting the keyword `right` to False.
+
+        If `cluster` is True, a clustering is done for all solid particles. See :func:`~pyscal.csystem.find_clusters`
+        for more details. 
 
 
         References
@@ -896,7 +909,7 @@ class System(pc.System):
             return lc
 
 
-    def cluster_atoms(self, condition, largest = True, new_algo = False, cutoff=0):
+    def cluster_atoms(self, condition, largest = True, cutoff=0):
         """
         Cluster atoms based on a property
 
@@ -908,6 +921,10 @@ class System(pc.System):
 
         largest : bool, optional
             If True returns the size of the largest cluster. Default False.
+
+        cutoff : float, optional
+            If specified, use this cutoff for calculation of clusters. By default uses the cutoff
+            used for neighbor calculation.
 
         Returns
         -------

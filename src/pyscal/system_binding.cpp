@@ -85,6 +85,7 @@ PYBIND11_MODULE(csystem, m) {
         .def_readwrite("solidq", &System::solidq)
         .def("set_nucsize_parameters",&System::set_nucsize_parameters)
         .def_readwrite("criteria", &System::criteria)
+        .def_readwrite("comparecriteria", &System::comparecriteria)
         .def("get_number_from_bond", (double (System::*) (Atom, Atom))  &System::get_number_from_bond)
         .def("calculate_frenkelnumbers",&System::calculate_frenkel_numbers)
         .def("cfind_clusters",&System::find_clusters)

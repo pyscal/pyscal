@@ -132,6 +132,7 @@ class System{
         int maxclusterid;
         int solidq;
         int criteria;
+        int comparecriteria;
         void find_solid_atoms();
         void find_clusters(double);
         void harvest_cluster(const int, const int);

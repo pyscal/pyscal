@@ -25,6 +25,7 @@ System::System(){
     voronoiused = 0;
     solidq = 6;
     criteria = 0;
+    comparecriteria = 0;
     
     neighbordistance = 0;
 
@@ -1536,7 +1537,11 @@ void System::calculate_frenkel_numbers(){
 
             scalar = get_number_from_bond(ti,atoms[ti].neighbors[c]);
             atoms[ti].sij[c] = scalar;
-            if (scalar > threshold) frenkelcons += 1;
+            if (comparecriteria == 0)
+                if (scalar > threshold) frenkelcons += 1;
+            else
+                if (scalar < threshold) frenkelcons += 1;
+            
             atoms[ti].avq6q6 += scalar;
         }
 
@@ -1552,13 +1557,19 @@ void System::find_solid_atoms(){
     int tfrac;
     if (criteria == 0){
         for (int ti= 0;ti<nop;ti++){
-          atoms[ti].issolid = ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > avgthreshold) );
+          if (comparecriteria == 0)
+            atoms[ti].issolid = ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 > avgthreshold) );
+          else
+            atoms[ti].issolid = ( (atoms[ti].frenkelnumber > minfrenkel) && (atoms[ti].avq6q6 < avgthreshold) );
         }
     }
     else if (criteria == 1){
         for (int ti= 0;ti<nop;ti++){
             tfrac = ((atoms[ti].frenkelnumber/double(atoms[ti].n_neighbors)) > minfrenkel);
-            atoms[ti].issolid = (tfrac && (atoms[ti].avq6q6 > avgthreshold));
+            if (comparecriteria == 0)
+                atoms[ti].issolid = (tfrac && (atoms[ti].avq6q6 > avgthreshold));
+            else
+                atoms[ti].issolid = (tfrac && (atoms[ti].avq6q6 < avgthreshold));
         }
     }
 
