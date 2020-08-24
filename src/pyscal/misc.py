@@ -84,8 +84,24 @@ def compare_atomic_env(infile, atomtype=2, precision=2, format="poscar", print_r
         else:
             return np.array([vvx, vrx, vvc])
 
+def filter_dist(atom, precision=1):
+    """
+    Filter distances for a single atom
+    """
+    ndist = np.array(atom.neighbor_distance)
+    ndist = np.trunc(ndist*10**precision)/(10**precision)
+    dists, counts = np.unique(ndist, return_counts=True)
+    if dists[0] != 0.00:
+        nns = counts[0]
+    else:
+        nns = counts[1]
+    if nns == 4:
+        return True
+    else:
+        return False
 
-def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_system=False, direct_coordinates=True):
+def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_system=False, 
+                                direct_coordinates=True, precision=1):
     """
     Check for tetrahedral voids in the system
 
@@ -109,6 +125,10 @@ def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_s
     direct_coordinates: bool, optional
         if True, results are provided in direct coordinates
         default False
+
+    precision: int, optional
+        the number of digits to check for distances.
+        default 1
     
     Returns
     -------
@@ -118,6 +138,7 @@ def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_s
     sys : system object, returns only if return_sys is True
 
     """
+
     sys = pc.System()
     sys.read_inputfile(infile, format=format)
     sys.find_neighbors(method="voronoi")
@@ -134,20 +155,22 @@ def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_s
     boxz = box[2][1] - box[2][0]
 
     for atom in atoms:
-        if atom.vorovector == [0, 4, 4, 0]:
-            volumes.append(atom.volume)
-            if direct_coordinates:
-                p = atom.pos
-                pos.append([p[0]/boxx, p[1]/boxy, p[2]/boxz])
-            else:
-                pos.append(atom.pos)
-            types.append(atom.type)
+        if atom.vorovector[1] == 4:
+            distcheck = filter_dist(atom, precision=precision)
+            if distcheck:
+                volumes.append(atom.volume)
+                if direct_coordinates:
+                    p = atom.pos
+                    pos.append([p[0]/boxx, p[1]/boxy, p[2]/boxz])
+                else:
+                    pos.append(atom.pos)
+                types.append(atom.type)
 
     if print_results:
         if len(volumes) > 0:
             print("%d atoms found in tetrahedral position"%len(volumes))
             for i in range(len(volumes)):
-                print("%d  volume %f type %d at %f, %f, %f"%(i, volumes[i], types[i], pos[i][0], pos[i][1], pos[i][2]))
+                print("%d  volume %f type %d at %f, %f, %f"%(i+1, volumes[i], types[i], pos[i][0], pos[i][1], pos[i][2]))
         else:
             print("no atoms found in tetrahedral position")
 
