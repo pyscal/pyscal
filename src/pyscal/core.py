@@ -493,6 +493,9 @@ class System(pc.System):
 
         """
         #first reset all neighbors
+        if len(self.atoms) < 20:
+            warnings.warn("Very less number of atoms, results maybe wrong. See https://github.com/srmnitc/pyscal/issues/63 ")
+
         self.reset_allneighbors()
         self.filter = 0
 
