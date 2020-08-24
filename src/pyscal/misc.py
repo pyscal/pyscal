@@ -83,3 +83,75 @@ def compare_atomic_env(infile, atomtype=2, precision=2, format="poscar", print_r
             return np.array([vvx, vrx, vvc]), sys
         else:
             return np.array([vvx, vrx, vvc])
+
+
+def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_system=False, direct_coordinates=True):
+    """
+    Check for tetrahedral voids in the system
+
+    Parameters
+    ----------
+    infile : string
+        name of the input file
+
+    format : string
+        format of the input file, optional
+        default poscar
+
+    print_results: bool, optional
+        if True, print the results. If False, return the data
+        instead. default True
+
+    return_system: bool, optional
+        if True, return the system object.
+        default False
+
+    direct_coordinates: bool, optional
+        if True, results are provided in direct coordinates
+        default False
+    
+    Returns
+    -------
+    types : list of atom types
+    volumes : list of atom volumes
+    pos : list of atom positions
+    sys : system object, returns only if return_sys is True
+
+    """
+    sys = pc.System()
+    sys.read_inputfile(infile, format=format)
+    sys.find_neighbors(method="voronoi")
+    sys.calculate_vorovector()
+    atoms = sys.atoms
+
+    volumes = []
+    pos = []
+    types = []
+
+    box = sys.box
+    boxx = box[0][1] - box[0][0]
+    boxy = box[1][1] - box[1][0]
+    boxz = box[2][1] - box[2][0]
+
+    for atom in atoms:
+        if atom.vorovector == [0, 4, 4, 0]:
+            volumes.append(atom.volume)
+            if direct_coordinates:
+                p = atom.pos
+                pos.append([p[0]/boxx, p[1]/boxy, p[2]/boxz])
+            else:
+                pos.append(atom.pos)
+            types.append(atom.type)
+
+    if print_results:
+        if len(volumes) > 0:
+            print("%d atoms found in tetrahedral position"%len(volumes))
+            for i in range(len(volumes)):
+                print("%d  volume %f type %d at %f, %f, %f"%(i, volumes[i], types[i], pos[i][0], pos[i][1], pos[i][2]))
+        else:
+            print("no atoms found in tetrahedral position")
+
+    if return_system:
+        return types, volumes, pos, sys
+    else:
+        return types, volumes, pos
