@@ -84,24 +84,9 @@ def compare_atomic_env(infile, atomtype=2, precision=2, format="poscar", print_r
         else:
             return np.array([vvx, vrx, vvc])
 
-def filter_dist(atom, precision=1):
-    """
-    Filter distances for a single atom
-    """
-    ndist = np.array(atom.neighbor_distance)
-    ndist = np.trunc(ndist*10**precision)/(10**precision)
-    dists, counts = np.unique(ndist, return_counts=True)
-    if dists[0] != 0.00:
-        nns = counts[0]
-    else:
-        nns = counts[1]
-    if nns == 4:
-        return True
-    else:
-        return False
 
 def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_system=False, 
-                                direct_coordinates=True, precision=1):
+                                direct_coordinates=True, precision=0.1):
     """
     Check for tetrahedral voids in the system
 
@@ -154,10 +139,21 @@ def find_tetrahedral_voids(infile, format="poscar", print_results=True, return_s
     boxy = box[1][1] - box[1][0]
     boxz = box[2][1] - box[2][0]
 
+    if len(atoms) < 21:
+        warnings.warn("Very less number of atoms, results maybe wrong. See https://github.com/srmnitc/pyscal/issues/63 ")
+
     for atom in atoms:
         if atom.vorovector[1] == 4:
-            distcheck = filter_dist(atom, precision=precision)
-            if distcheck:
+            #first to prevent small cells we need to filter
+            neighs = np.unique(atom.neighbors)
+            dists = np.array([sys.get_distance(atom, atoms[x]) for x in neighs])
+            mindist = dists[np.argsort(dists)][0]
+            mindistcount = 0
+            for i in range(len(dists)):
+                if mindist*(1.0-precision) <= dists[i] <= mindist*(1.0+precision):
+                    mindistcount += 1
+
+            if mindistcount == 4:
                 volumes.append(atom.volume)
                 if direct_coordinates:
                     p = atom.pos
