@@ -5,6 +5,7 @@
 
 
 import pyscal.traj_process as ptp
+import pyscal.routines as routines
 import os
 import numpy as np
 import warnings
@@ -12,6 +13,7 @@ import pyscal.csystem as pc
 from pyscal.catom import Atom
 import itertools
 from ase.io import write
+import uuid
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -1779,3 +1781,21 @@ class System(pc.System):
 
         else:
             raise ValueError("Unknown file format")            
+
+
+    def calculate_energy(self, species=None, pair_style=None, 
+                                        pair_coeff=None, mass=1.0):
+
+        outfile = os.path.join(os.getcwd(), str(uuid.uuid4().hex))
+        aseobject = self.to_file(outfile, format='lammps-data', species=species)
+
+        indict = routines.get_energy(outfile, species=species,
+            pair_style=pair_style, pair_coeff=pair_coeff,
+            mass=1.0)
+
+        atoms = sys.atoms
+    
+        for atom in atoms:
+            atom.energy = indict[str(atom.id)]
+
+        sys.atoms = atoms
