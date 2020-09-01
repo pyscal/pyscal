@@ -30,6 +30,8 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     head = -1;
     entropy = 0;
     avg_entropy = 0;
+    energy = 0;
+    avg_energy = 0;
 
 
     for (int tn = 0; tn<MAXNUMBEROFNEIGHBORS; tn++){

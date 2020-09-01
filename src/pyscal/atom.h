@@ -241,6 +241,9 @@ class Atom{
         //results
         double entropy;
         double avg_entropy;
+        double energy;
+        double avg_energy;
+
 
 
 };
