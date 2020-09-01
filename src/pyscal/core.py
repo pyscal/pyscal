@@ -1789,13 +1789,16 @@ class System(pc.System):
         outfile = os.path.join(os.getcwd(), str(uuid.uuid4().hex))
         aseobject = self.to_file(outfile, format='lammps-data', species=species)
 
-        indict = routines.get_energy(outfile, species=species,
+        indict = routines.get_energy_atom(outfile, species=species,
             pair_style=pair_style, pair_coeff=pair_coeff,
             mass=1.0)
 
-        atoms = sys.atoms
+        atoms = self.atoms
     
         for atom in atoms:
             atom.energy = indict[str(atom.id)]
 
-        sys.atoms = atoms
+        self.atoms = atoms
+
+        #clean up
+        os.remove(outfile)
