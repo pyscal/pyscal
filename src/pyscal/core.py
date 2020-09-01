@@ -1783,9 +1783,36 @@ class System(pc.System):
             raise ValueError("Unknown file format")            
 
 
-    def calculate_energy(self, species=None, pair_style=None, 
+    def calculate_energy(self, species='Au', pair_style=None, 
                                         pair_coeff=None, mass=1.0):
+        """
+        Calculate the potential energy of atom using LAMMPS
 
+        Parameters
+        ----------
+        species : str
+            Name of atomic species
+
+        pair_style : str
+            lammps pair style
+
+        pair_coeff : str
+            lammps pair coeff
+
+        mass : float
+            mass of the atoms
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Calculates the potential energy per atom using the given potential
+        through LAMMPS. More documentation coming up...
+
+        Values can be accessed through :attr:`pyscal.catom.Atom.energy`
+        """
         outfile = os.path.join(os.getcwd(), str(uuid.uuid4().hex))
         aseobject = self.to_file(outfile, format='lammps-data', species=species)
 
