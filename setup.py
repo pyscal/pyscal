@@ -92,7 +92,7 @@ setup(
     zip_safe=False,
     download_url = 'https://github.com/srmnitc/pyscal/archive/2.3.4.tar.gz',
     url = 'https://github.com/srmnitc/pyscal',
-    install_requires=['numpy'],
+    install_requires=['numpy', 'ase'],
     classifiers=[
         'Programming Language :: Python :: 3'
     ]

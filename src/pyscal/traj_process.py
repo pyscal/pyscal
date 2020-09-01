@@ -12,6 +12,7 @@ this module.
 import numpy as np
 import gzip
 import pyscal.catom as pca
+from ase import Atom, Atoms
 
 #new function to wrap over mdtraj objects
 def read_mdtraj(mdobject, check_triclinic=False, box_vectors=False):
@@ -148,7 +149,7 @@ def convert_to_ase(sys, species=None):
     #we only do a local import of ASE, this is not super nice
     #we can change this later depending on if ASE is to be treated
     #as a full dependency
-    from ase import Atom, Atoms
+    
 
     atoms = sys.atoms
     #get element strings

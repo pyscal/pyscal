@@ -11,6 +11,7 @@ import warnings
 import pyscal.csystem as pc
 from pyscal.catom import Atom
 import itertools
+from ase.io import write
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -1682,7 +1683,7 @@ class System(pc.System):
             self.average_entropy(ra, M, N)
 
 
-    def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0):
+    def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0, species=None):
         """
         Save the system instance to a trajectory file.
 
@@ -1691,7 +1692,7 @@ class System(pc.System):
         outfile : string
             name of the output file
 
-        format : string, optional
+        format : string, {'lammps-dump', 'lammps-data', 'poscar'}
             format of the output file, default `lammps-dump`
             Currently only `lammps-dump` format is supported.
 
@@ -1704,6 +1705,10 @@ class System(pc.System):
         timestep : int, optional
             timestep to be written to file. default 0
 
+        species : None, optional
+            species of the atoms. Required if any format other than 'lammps-dump' is used. Required
+            for convertion to ase object.
+
         Returns
         -------
         None
@@ -1712,52 +1717,65 @@ class System(pc.System):
         -----
 
         """
-        if customkeys == None:
-            customkeys = []
+        if format=='lammps-dump':
+            if customkeys == None:
+                customkeys = []
 
 
 
-        boxdims = self.box
-        atoms = self.atoms
+            boxdims = self.box
+            atoms = self.atoms
 
-        if len(customkeys) > 0:
-            cvals = [self.get_custom(atom, customkeys) for atom in atoms]
-
-        #open files for writing
-        if compressed:
-            gz = gzip.open(outfile,'w')
-            dump = io.BufferedReader(gz)
-        else:
-            gz = open(outfile,'w')
-            dump = gz
-
-        #now write
-        dump.write("ITEM: TIMESTEP\n")
-        dump.write("%d\n" % timestep)
-        dump.write("ITEM: NUMBER OF ATOMS\n")
-        dump.write("%d\n" % len(atoms))
-        dump.write("ITEM: BOX BOUNDS\n")
-        dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
-        dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
-        dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
-
-        #now write header
-        if len(customkeys) > 0:
-            ckey = " ".join(customkeys)
-            title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
-        else:
-            title_str = "ITEM: ATOMS id type x y z\n"
-
-        dump.write(title_str)
-
-        for cc, atom in enumerate(atoms):
-            pos = atom.pos
             if len(customkeys) > 0:
-                cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-                atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
+                cvals = [self.get_custom(atom, customkeys) for atom in atoms]
+
+            #open files for writing
+            if compressed:
+                gz = gzip.open(outfile,'w')
+                dump = io.BufferedReader(gz)
             else:
-                atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
+                gz = open(outfile,'w')
+                dump = gz
 
-            dump.write(atomline)
+            #now write
+            dump.write("ITEM: TIMESTEP\n")
+            dump.write("%d\n" % timestep)
+            dump.write("ITEM: NUMBER OF ATOMS\n")
+            dump.write("%d\n" % len(atoms))
+            dump.write("ITEM: BOX BOUNDS\n")
+            dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
+            dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
+            dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
 
-        dump.close()
+            #now write header
+            if len(customkeys) > 0:
+                ckey = " ".join(customkeys)
+                title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
+            else:
+                title_str = "ITEM: ATOMS id type x y z\n"
+
+            dump.write(title_str)
+
+            for cc, atom in enumerate(atoms):
+                pos = atom.pos
+                if len(customkeys) > 0:
+                    cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
+                    atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
+                else:
+                    atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
+
+                dump.write(atomline)
+
+            dump.close()
+
+        elif format=='lammps-data':
+            #convert to ase
+            aseobject = ptp.convert_to_ase(self, species=species)
+            write(outfile, aseobject, format='lammps-data')
+
+        elif format=='poscar':
+            aseobject = ptp.convert_to_ase(self, species=species)
+            write(outfile, aseobject, format='vasp')
+
+        else:
+            raise ValueError("Unknown file format")            
