@@ -143,8 +143,13 @@ def convert_to_ase(sys, species=None):
     and species name. For example, if `species` is `['Au', 'Ge']`, all atoms
     of type 1 are assigned as Au and those of type 2 are assigned as Ge.
     Note that ase is required to run this method.
-     
+
     """
+    #we only do a local import of ASE, this is not super nice
+    #we can change this later depending on if ASE is to be treated
+    #as a full dependency
+    from ase import Atom, Atoms
+
     atoms = sys.atoms
     #get element strings
     if 'species' not in atoms[0].custom.keys():
