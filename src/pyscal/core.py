@@ -582,6 +582,7 @@ class System(pc.System):
 
         """
         self.reset_allneighbors()
+        self.neighbors_found = False
 
     def calculate_vorovector(self, edge_cutoff=0.05, area_cutoff=0.01, edge_length=False):
         """
@@ -1795,7 +1796,8 @@ class System(pc.System):
 
 
     def calculate_energy(self, species='Au', pair_style=None, 
-                                        pair_coeff=None, mass=1.0):
+                                        pair_coeff=None, mass=1.0,
+                                        average=False):
         """
         Calculate the potential energy of atom using LAMMPS
 
@@ -1813,6 +1815,11 @@ class System(pc.System):
         mass : float
             mass of the atoms
 
+        average : bool, optional
+            Average the energy over neighbors if True
+            default False.
+
+
         Returns
         -------
         None
@@ -1823,6 +1830,12 @@ class System(pc.System):
         through LAMMPS. More documentation coming up...
 
         Values can be accessed through :attr:`pyscal.catom.Atom.energy`
+        Averaged values can be accessed through :attr:`pyscal.catom.Atom.avg_energy`
+
+        If `averaged` is True, the energy is averaged over the neighbors of an
+        atom. If neighbors were calculated before calling this method, those neighbors
+        are used for averaging. Otherwise neighbors are calculated on the fly
+        with an adaptive cutoff method.
         """
         outfile = os.path.join(os.getcwd(), str(uuid.uuid4().hex))
         aseobject = self.to_file(outfile, format='lammps-data', species=species)
@@ -1836,7 +1849,16 @@ class System(pc.System):
         for atom in atoms:
             atom.energy = indict[str(atom.id)]
 
-        self.atoms = atoms
-
         #clean up
         os.remove(outfile)
+
+        if averaged:
+            if not self.neighbors_found:
+                self.find_neighbors(method="cutoff", cutoff=0)
+
+        for atom in atoms:
+            neteng = np.sum([atoms[x].energy for x in atom.neighbors])
+            atom.avg_energy = (neteng + atom.energy)/(len(atom.neighbors) + 1.)
+            
+        self.atoms = atoms
+
