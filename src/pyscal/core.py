@@ -170,7 +170,7 @@ class System(pc.System):
 
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
-                        rot = box.T
+                        rot = np.array(box).T
                         rotinv = np.linalg.inv(rot)
                         self.assign_triclinic_params(rot, rotinv)
                 else:
@@ -186,7 +186,7 @@ class System(pc.System):
                 self.box = boxdims
 
                 if triclinic:
-                    rot = box.T
+                    rot = np.array(box).T
                     rotinv = np.linalg.inv(rot)
                     self.assign_triclinic_params(rot, rotinv)
             else:
@@ -199,7 +199,7 @@ class System(pc.System):
                 self.atoms = atoms
                 self.box = boxdims
                 if is_triclinic:
-                    rot = box.T
+                    rot = np.array(box).T
                     rotinv = np.linalg.inv(rot)
                     self.assign_triclinic_params(rot, rotinv)
             else:
@@ -210,7 +210,7 @@ class System(pc.System):
             self.atoms = atoms
             self.box = boxdims
             if is_triclinic:
-                rot = box.T
+                rot = np.array(box).T
                 rotinv = np.linalg.inv(rot)
                 self.assign_triclinic_params(rot, rotinv)
 
@@ -219,7 +219,7 @@ class System(pc.System):
             self.atoms = atoms
             self.box = boxdims
             if is_triclinic:
-                rot = box.T
+                rot = np.array(box).T
                 rotinv = np.linalg.inv(rot)
                 self.assign_triclinic_params(rot, rotinv)
 

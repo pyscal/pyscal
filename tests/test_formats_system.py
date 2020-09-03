@@ -73,3 +73,13 @@ def test_poscar():
 
     #now check coordinates of first atom
     assert atoms[0].pos == [0.020389021322710754, 8.8981229427339, 0.0005978263145216028]
+
+
+def test_others():
+    sys = pc.System()
+    sys.read_inputfile('tests/bcc.prim.dat', is_triclinic=True)
+    sys.to_file('tests/prim1', format="poscar", species=['Fe'])
+
+    #try reading in
+    sys = pc.System()
+    sys.read_inputfile('tests/prim1', format="poscar", is_triclinic=True)

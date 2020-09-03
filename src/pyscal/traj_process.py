@@ -281,12 +281,14 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
     if customlength > 0:
         customread = True
 
-
+    nblock = 0
     for count, line in enumerate(f):
+        print(count, line)
         if not paramsread:
             #atom numer is at line 3
             if count == 3:
                 natoms = int(line.strip())
+                nblock = natoms+9
             #box dims in lines 5,6,7
             elif count == 5:
                 raw = line.strip().split()
@@ -328,6 +330,8 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
 
         else:
+            if count == nblock:
+                break
             raw = line.strip().split()
             idd = int(raw[headerdict["id"]])
             typ = int(raw[headerdict["type"]])
