@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pyscal.core as pc
 import pyscal.crystal_structures as pcs
+import pyscal.traj_process as ptp
 from ase.build import bulk
 
 def test_lammps_dump():
@@ -92,3 +93,25 @@ def test_others():
     ase = bulk('Cu', 'fcc', a=3.6, cubic=True).repeat((3,3,3))
     sys = pc.System()
     sys.read_inputfile(ase, format="ase")
+
+def test_poscar_write():
+    sys = pc.System()
+    sys.read_inputfile('tests/POSCAR', format='poscar')
+    atoms = sys.atoms
+    assert len(atoms) == 42
+
+    ptp.write_poscar(sys, 'tests/POSCARtest')
+    sys = pc.System()
+    sys.read_inputfile('tests/POSCARtest', format='poscar')
+    atoms = sys.atoms
+    assert len(atoms) == 42
+    #now assert atoms of different types
+    type1 = len([atom for atom in atoms if atom.type == 1])
+    type2 = len([atom for atom in atoms if atom.type == 2])
+    type3 = len([atom for atom in atoms if atom.type == 3])
+    assert type1 == 38
+    assert type2 == 2
+    assert type3 == 2
+
+    #now test the coorfinates of the atom
+    assert sys.box == [[0.0, 18.768662916], [0.0, 8.9728430088], [0.0, 2.83746]]
