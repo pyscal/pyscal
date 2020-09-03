@@ -36,7 +36,7 @@ def get_energy_atom(outfile, species=None, pair_style=None, pair_coeff=None, mas
     if (pair_coeff is None):
         raise ValueError("pair coeff has to be provided")
 
-    lmp.command('read_data n1.dump')
+    lmp.command('read_data %s'%outfile)
     lmp.command('pair_style %s'%pair_style)
     lmp.command('pair_coeff %s'%pair_coeff)
     lmp.command("mass * %f"%95)
