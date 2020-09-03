@@ -283,7 +283,7 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
     nblock = 0
     for count, line in enumerate(f):
-        print(count, line)
+        #print(count, line)
         if not paramsread:
             #atom numer is at line 3
             if count == 3:

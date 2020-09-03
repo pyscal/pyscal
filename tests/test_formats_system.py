@@ -83,3 +83,4 @@ def test_others():
     #try reading in
     sys = pc.System()
     sys.read_inputfile('tests/prim1', format="poscar", is_triclinic=True)
+    #aseobj = ptp.con
