@@ -1027,47 +1027,6 @@ class System(pc.System):
         """
         self.calculate_frenkelnumbers()
 
-    def find_clusters(self, recursive = True, largest = True):
-        """
-        Find the clusters of all atoms in the system.
-
-        Parameters
-        ----------
-        recursive : Bool, optional
-            If True, use a recursive clustering algorithm, otherwise use an id based clustering.
-            The difference in values between two methods can be upto 3 particles. Default True.
-
-        largest : Bool, optional
-            If True, return the number of particles in the largest cluster. Default True.
-
-        Returns
-        -------
-        cluster : int
-            The size of the largest cluster in the system. Only returned if `largest` is set to True.
-
-        Notes
-        -----
-        Go through all the atoms in the system and cluster them together based on the `issolid` parameter of the atom.
-        To cluster based on any user defined criteria, you can use `set_solid` method of `Atom` to explicitely
-        set the `issolid` value.
-
-        .. warning::
-
-            This function is deprecated and will be removed in a future release. Please use
-            :func:`~System.cluster_atoms` instead.
-
-        """
-        warnings.simplefilter('always', DeprecationWarning)
-        warnings.warn("This function is deprecated - use cluster_atoms instead", DeprecationWarning)
-
-        if recursive:
-            self.cfind_clusters_recursive()
-        else:
-            self.cfind_clusters()
-
-        if largest:
-            cluster = self.find_largest_cluster()
-            return cluster
 
     def find_largestcluster(self):
         """

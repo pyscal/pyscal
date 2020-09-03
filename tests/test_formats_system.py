@@ -3,6 +3,7 @@ import os
 import numpy as np
 import pyscal.core as pc
 import pyscal.crystal_structures as pcs
+from ase.build import bulk
 
 def test_lammps_dump():
     sys = pc.System()
@@ -84,3 +85,10 @@ def test_others():
     sys = pc.System()
     sys.read_inputfile('tests/prim1', format="poscar", is_triclinic=True)
     #aseobj = ptp.con
+    ase = bulk('Cu', 'fcc', a=3.6).repeat((3,3,3))
+    sys = pc.System()
+    sys.read_inputfile(ase, format="ase", is_triclinic=True)
+
+    ase = bulk('Cu', 'fcc', a=3.6, cubic=True).repeat((3,3,3))
+    sys = pc.System()
+    sys.read_inputfile(ase, format="ase")
