@@ -1805,7 +1805,7 @@ class System(pc.System):
 
     def calculate_energy(self, species='Au', pair_style=None, 
                                         pair_coeff=None, mass=1.0,
-                                        average=False):
+                                        averaged=False):
         """
         Calculate the potential energy of atom using LAMMPS
 
@@ -1823,7 +1823,7 @@ class System(pc.System):
         mass : float
             mass of the atoms
 
-        average : bool, optional
+        averaged : bool, optional
             Average the energy over neighbors if True
             default False.
 
