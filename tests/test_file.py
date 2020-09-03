@@ -47,3 +47,8 @@ def test_file_system():
     atoms = sys5.atoms
     assert int(atoms[0].custom['velocity']) == 12
     assert int(atoms[1].custom['velocity']) == 24
+
+    sys6 = pc.System()
+    sys6.read_inputfile('tests/tjkf.dat')
+    sys6.to_file('tests/poscar_1', format="poscar", species=['Mo'])
+    sys6.to_file('tests/data_1', format="lammps-data", species=['Mo'])
