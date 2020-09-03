@@ -3,7 +3,7 @@ Installation
 
 Trying pyscal
 ----------------
-You can try some examples provided with pyscal using `Binder <https://mybinder.org/>`_  without installing the package. Please use `this link <https://mybinder.org/v2/gh/srmnitc/pyscal/master?filepath=examples%2F>`_ to try the package.
+You can try some examples provided with pyscal using `Binder <https://mybinder.org/>`_  without installing the package. Please use `this link <https://mybinder.org/v2/gh/srmnitc/pyscal/master?urlpath=lab>`_ to try the package.
 
 Supported operating systems
 ---------------------------

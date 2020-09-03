@@ -11,7 +11,7 @@
     :width: 50%
 
 .. image:: https://mybinder.org/badge_logo.svg
-   :target: https://mybinder.org/v2/gh/srmnitc/pybop/master?filepath=examples%2F
+   :target: https://mybinder.org/v2/gh/srmnitc/pyscal/master?urlpath=lab
    :width: 13 %
 
 .. image:: https://anaconda.org/pyscal/pyscal/badges/installer/conda.svg
