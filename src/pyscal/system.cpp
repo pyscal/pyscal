@@ -1930,6 +1930,9 @@ void System::entropy(double sigma, double rho, double rstart, double rstop, doub
     for(int i=0; i<nop; i++){
         
         atoms[i].sigma = sigma;
+        if (rho == 0){
+            rho = atoms[i].n_neighbors/(4.1887902047863905*pow(atoms[i].cutoff,3));
+        }
         atoms[i].rho = rho;
         atoms[i].rstart = rstart;
         atoms[i].rstop = rstop;

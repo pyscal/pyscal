@@ -1631,8 +1631,9 @@ class System(pc.System):
                 vals.append(val)
         return vals
 
-    def calculate_entropy(self, rm, sigma=0.2, rstart=0.001, h=0.001,
-                   M=12, N=6, ra=None, averaged=False, switching_function=False):
+    def calculate_entropy(self, rm, sigma=0.2, rstart=0.001, h=0.001, local=False,
+                   M=12, N=6, ra=None, averaged=False, 
+                    switching_function=False):
         """
         Calculate the entropy parameter for each atom
         
@@ -1649,6 +1650,10 @@ class System(pc.System):
 
         h : float, optional
             width for trapezoidal integration, default 0.0001
+
+        local : bool, optional
+            if True, use the local density instead of global density
+            default False
 
         averaged : bool, optional
             if True find the averaged entropy parameters
@@ -1674,13 +1679,16 @@ class System(pc.System):
         Returns
         -------
         None
-        The entropy parameters can be accessed by :attr:`~pyscal.catom.entropy`
-        and :attr:`~pyscal.catom.avg_entropy`.
+
 
         Notes
         -----
-        See here (add link) for a description of entropy parameters
-        
+        The entropy parameters can be accessed by :attr:`~pyscal.catom.entropy`
+        and :attr:`~pyscal.catom.avg_entropy`. For a complete description of the entropy
+        parameter, see `the documentation <http://pyscal.com/en/latest/methods/entropy_parameters/entropy_parameters.html>`_
+
+        The `local` keyword can be used to use a local density instead of the global one.
+        This method will only work with neighbor methods that use a cutoff.    
         """
         #get kb
         kb = 1.00
@@ -1859,6 +1867,6 @@ class System(pc.System):
         for atom in atoms:
             neteng = np.sum([atoms[x].energy for x in atom.neighbors])
             atom.avg_energy = (neteng + atom.energy)/(len(atom.neighbors) + 1.)
-            
+
         self.atoms = atoms
 
