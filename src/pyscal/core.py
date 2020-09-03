@@ -14,6 +14,8 @@ from pyscal.catom import Atom
 import itertools
 from ase.io import write
 import uuid
+import gzip
+import io
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -1753,8 +1755,8 @@ class System(pc.System):
 
             #open files for writing
             if compressed:
-                gz = gzip.open(outfile,'w')
-                dump = io.BufferedReader(gz)
+                gz = gzip.open(outfile,'wt')
+                dump = gz
             else:
                 gz = open(outfile,'w')
                 dump = gz

@@ -13,6 +13,8 @@ import numpy as np
 import gzip
 import pyscal.catom as pca
 from ase import Atom, Atoms
+import gzip
+import io
 
 #new function to wrap over mdtraj objects
 def read_mdtraj(mdobject, check_triclinic=False, box_vectors=False):

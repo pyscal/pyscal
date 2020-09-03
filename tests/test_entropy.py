@@ -9,9 +9,19 @@ def test_entropy():
 	sys.read_inputfile("tests/conf.fcc.Al.dump")
 	sys.find_neighbors(method="cutoff", cutoff=0)
 	lat = (sys.box[0][1]-sys.box[0][0])/5
-	sys.calculate_entropy(1.4*lat, ra=0.9*lat, averaged=True)
+	sys.calculate_entropy(1.4*lat, ra=0.9*lat, averaged=True,
+		switching_function=True)
 	atoms = sys.atoms
 	solid_entropy = [atom.entropy for atom in atoms]
 	solid_avg_entropy = [atom.avg_entropy for atom in atoms]
-	assert np.abs(np.mean(solid_entropy) + 3.47249) < 0.001
-	assert np.abs(np.mean(solid_avg_entropy) + 3.47254) < 0.001
+	#assert np.mean(solid_entropy) == 2
+	assert np.abs(np.mean(solid_entropy) + 3.471) < 0.001
+	assert np.abs(np.mean(solid_avg_entropy) + 3.471) < 0.001
+
+	sys.calculate_entropy(1.4*lat, averaged=True)
+	atoms = sys.atoms
+	solid_entropy = [atom.entropy for atom in atoms]
+	solid_avg_entropy = [atom.avg_entropy for atom in atoms]
+	#assert np.mean(solid_entropy) == 2
+	assert np.abs(np.mean(solid_entropy) + 3.471) < 0.001
+	assert np.abs(np.mean(solid_avg_entropy) + 3.471) < 0.001
