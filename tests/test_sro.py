@@ -18,3 +18,7 @@ def test_sro():
     sro = atoms[4].sro
     assert np.round(sro[0], decimals=2) == -0.33
     assert sro[1] == 1.0
+
+    sys.find_neighbors(method='cutoff', cutoff=4.5)
+    sro = sys.calculate_sro(reference_type=1, average=True, shells=1)
+    assert np.round(sro[0], decimals=2) == -0.07

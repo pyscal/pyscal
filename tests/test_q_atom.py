@@ -33,3 +33,17 @@ def test_q_4():
     assert np.round(atoms[0].get_q(4, averaged=True), decimals=2) == 0.23
     assert np.round(atoms[0].get_q(6), decimals=2) == 0.46
     assert np.round(atoms[0].get_q(6, averaged=True), decimals=2) == 0.46
+
+
+def test_q_access():
+    atoms, boxdims = pcs.make_crystal('bcc', repetitions = [4, 4, 4])
+    sys = pc.System()
+    sys.atoms = atoms
+    sys.box = boxdims
+    #sys.get_neighbors(method = 'voronoi')
+    sys.find_neighbors(method = 'cutoff', cutoff=0.9)
+    sys.calculate_q([4, 6], averaged=True)
+    atoms = sys.atoms
+
+    assert np.round(sys.get_custom(atoms[1], ["aq4"]), decimals=2)[0] == 0.51
+    assert np.round(sys.get_custom(atoms[1], ["q4"]), decimals=2)[0] == 0.51  

@@ -426,6 +426,15 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         Value of averaged entropy parameter.
     )mydelimiter")
 
+    .def_readwrite("energy", &Atom::energy, R"mydelimiter(
+        *Float*.
+        Value of energy.
+    )mydelimiter")
+
+    .def_readwrite("avg_energy", &Atom::avg_energy, R"mydelimiter(
+        *Float*.
+        Value of averaged energy.
+    )mydelimiter")
 
     ;
 

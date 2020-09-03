@@ -18,4 +18,5 @@ can be downloaded from `here <https://pyscal.readthedocs.io/en/latest/download.h
    examples/angularparams/angularparams
    examples/voronoi/voronoi
    examples/entropy/entropy_params
+   examples/energy/calculate_energy
    examples/others/others

@@ -5,12 +5,17 @@
 
 
 import pyscal.traj_process as ptp
+import pyscal.routines as routines
 import os
 import numpy as np
 import warnings
 import pyscal.csystem as pc
 from pyscal.catom import Atom
 import itertools
+from ase.io import write
+import uuid
+import gzip
+import io
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -165,7 +170,7 @@ class System(pc.System):
 
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
-                        rot = box.T
+                        rot = np.array(box).T
                         rotinv = np.linalg.inv(rot)
                         self.assign_triclinic_params(rot, rotinv)
                 else:
@@ -181,7 +186,7 @@ class System(pc.System):
                 self.box = boxdims
 
                 if triclinic:
-                    rot = box.T
+                    rot = np.array(box).T
                     rotinv = np.linalg.inv(rot)
                     self.assign_triclinic_params(rot, rotinv)
             else:
@@ -194,7 +199,7 @@ class System(pc.System):
                 self.atoms = atoms
                 self.box = boxdims
                 if is_triclinic:
-                    rot = box.T
+                    rot = np.array(box).T
                     rotinv = np.linalg.inv(rot)
                     self.assign_triclinic_params(rot, rotinv)
             else:
@@ -205,7 +210,7 @@ class System(pc.System):
             self.atoms = atoms
             self.box = boxdims
             if is_triclinic:
-                rot = box.T
+                rot = np.array(box).T
                 rotinv = np.linalg.inv(rot)
                 self.assign_triclinic_params(rot, rotinv)
 
@@ -214,7 +219,7 @@ class System(pc.System):
             self.atoms = atoms
             self.box = boxdims
             if is_triclinic:
-                rot = box.T
+                rot = np.array(box).T
                 rotinv = np.linalg.inv(rot)
                 self.assign_triclinic_params(rot, rotinv)
 
@@ -579,6 +584,7 @@ class System(pc.System):
 
         """
         self.reset_allneighbors()
+        self.neighbors_found = False
 
     def calculate_vorovector(self, edge_cutoff=0.05, area_cutoff=0.01, edge_length=False):
         """
@@ -1021,47 +1027,6 @@ class System(pc.System):
         """
         self.calculate_frenkelnumbers()
 
-    def find_clusters(self, recursive = True, largest = True):
-        """
-        Find the clusters of all atoms in the system.
-
-        Parameters
-        ----------
-        recursive : Bool, optional
-            If True, use a recursive clustering algorithm, otherwise use an id based clustering.
-            The difference in values between two methods can be upto 3 particles. Default True.
-
-        largest : Bool, optional
-            If True, return the number of particles in the largest cluster. Default True.
-
-        Returns
-        -------
-        cluster : int
-            The size of the largest cluster in the system. Only returned if `largest` is set to True.
-
-        Notes
-        -----
-        Go through all the atoms in the system and cluster them together based on the `issolid` parameter of the atom.
-        To cluster based on any user defined criteria, you can use `set_solid` method of `Atom` to explicitely
-        set the `issolid` value.
-
-        .. warning::
-
-            This function is deprecated and will be removed in a future release. Please use
-            :func:`~System.cluster_atoms` instead.
-
-        """
-        warnings.simplefilter('always', DeprecationWarning)
-        warnings.warn("This function is deprecated - use cluster_atoms instead", DeprecationWarning)
-
-        if recursive:
-            self.cfind_clusters_recursive()
-        else:
-            self.cfind_clusters()
-
-        if largest:
-            cluster = self.find_largest_cluster()
-            return cluster
 
     def find_largestcluster(self):
         """
@@ -1627,8 +1592,9 @@ class System(pc.System):
                 vals.append(val)
         return vals
 
-    def calculate_entropy(self, rm, sigma=0.2, rstart=0.00001, h=0.0001,
-                   M=12, N=6, ra=None, averaged=False):
+    def calculate_entropy(self, rm, sigma=0.2, rstart=0.001, h=0.001, local=False,
+                   M=12, N=6, ra=None, averaged=False, 
+                    switching_function=False):
         """
         Calculate the entropy parameter for each atom
         
@@ -1646,29 +1612,44 @@ class System(pc.System):
         h : float, optional
             width for trapezoidal integration, default 0.0001
 
+        local : bool, optional
+            if True, use the local density instead of global density
+            default False
+
         averaged : bool, optional
             if True find the averaged entropy parameters
             default False
 
+        switching_function : bool, optional
+            if True, use the switching function to average, otherwise do a simple average
+            over the neighbors.
+            Default False
+
         ra : float, optional
-            cutoff length for switching function 
+            cutoff length for switching function
+            used only if `switching_function` is True 
 
         M : int, optional
             power for switching function, default 12
+            used only if `switching_function` is True
 
         N : int, optional
             power for switching function, default 6
+            used only if `switching_function` is True
 
         Returns
         -------
         None
-        The entropy parameters can be accessed by :attr:`~pyscal.catom.entropy`
-        and :attr:`~pyscal.catom.avg_entropy`.
+
 
         Notes
         -----
-        See here (add link) for a description of entropy parameters
-        
+        The entropy parameters can be accessed by :attr:`~pyscal.catom.entropy`
+        and :attr:`~pyscal.catom.avg_entropy`. For a complete description of the entropy
+        parameter, see `the documentation <http://pyscal.com/en/latest/methods/entropy_parameters/entropy_parameters.html>`_
+
+        The `local` keyword can be used to use a local density instead of the global one.
+        This method will only work with neighbor methods that use a cutoff.    
         """
         #get kb
         kb = 1.00
@@ -1679,10 +1660,13 @@ class System(pc.System):
         self.entropy(sigma, rho, rstart, rm, h, kb)
 
         if averaged:
-            self.average_entropy(ra, M, N)
+            if switching_function:
+                self.average_entropy_switch(ra, M, N)
+            else:
+                self.average_entropy()
 
 
-    def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0):
+    def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0, species=None):
         """
         Save the system instance to a trajectory file.
 
@@ -1691,7 +1675,7 @@ class System(pc.System):
         outfile : string
             name of the output file
 
-        format : string, optional
+        format : string, {'lammps-dump', 'lammps-data', 'poscar'}
             format of the output file, default `lammps-dump`
             Currently only `lammps-dump` format is supported.
 
@@ -1704,6 +1688,10 @@ class System(pc.System):
         timestep : int, optional
             timestep to be written to file. default 0
 
+        species : None, optional
+            species of the atoms. Required if any format other than 'lammps-dump' is used. Required
+            for convertion to ase object.
+
         Returns
         -------
         None
@@ -1712,52 +1700,134 @@ class System(pc.System):
         -----
 
         """
-        if customkeys == None:
-            customkeys = []
+        if format=='lammps-dump':
+            if customkeys == None:
+                customkeys = []
 
 
 
-        boxdims = self.box
-        atoms = self.atoms
+            boxdims = self.box
+            atoms = self.atoms
 
-        if len(customkeys) > 0:
-            cvals = [self.get_custom(atom, customkeys) for atom in atoms]
-
-        #open files for writing
-        if compressed:
-            gz = gzip.open(outfile,'w')
-            dump = io.BufferedReader(gz)
-        else:
-            gz = open(outfile,'w')
-            dump = gz
-
-        #now write
-        dump.write("ITEM: TIMESTEP\n")
-        dump.write("%d\n" % timestep)
-        dump.write("ITEM: NUMBER OF ATOMS\n")
-        dump.write("%d\n" % len(atoms))
-        dump.write("ITEM: BOX BOUNDS\n")
-        dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
-        dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
-        dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
-
-        #now write header
-        if len(customkeys) > 0:
-            ckey = " ".join(customkeys)
-            title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
-        else:
-            title_str = "ITEM: ATOMS id type x y z\n"
-
-        dump.write(title_str)
-
-        for cc, atom in enumerate(atoms):
-            pos = atom.pos
             if len(customkeys) > 0:
-                cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-                atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
+                cvals = [self.get_custom(atom, customkeys) for atom in atoms]
+
+            #open files for writing
+            if compressed:
+                gz = gzip.open(outfile,'wt')
+                dump = gz
             else:
-                atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
+                gz = open(outfile,'w')
+                dump = gz
 
-            dump.write(atomline)
+            #now write
+            dump.write("ITEM: TIMESTEP\n")
+            dump.write("%d\n" % timestep)
+            dump.write("ITEM: NUMBER OF ATOMS\n")
+            dump.write("%d\n" % len(atoms))
+            dump.write("ITEM: BOX BOUNDS\n")
+            dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
+            dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
+            dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
 
-        dump.close()
+            #now write header
+            if len(customkeys) > 0:
+                ckey = " ".join(customkeys)
+                title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
+            else:
+                title_str = "ITEM: ATOMS id type x y z\n"
+
+            dump.write(title_str)
+
+            for cc, atom in enumerate(atoms):
+                pos = atom.pos
+                if len(customkeys) > 0:
+                    cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
+                    atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
+                else:
+                    atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
+
+                dump.write(atomline)
+
+            dump.close()
+
+        elif format=='lammps-data':
+            #convert to ase
+            aseobject = ptp.convert_to_ase(self, species=species)
+            write(outfile, aseobject, format='lammps-data')
+
+        elif format=='poscar':
+            aseobject = ptp.convert_to_ase(self, species=species)
+            write(outfile, aseobject, format='vasp')
+
+        else:
+            raise ValueError("Unknown file format")            
+
+
+    def calculate_energy(self, species='Au', pair_style=None, 
+                                        pair_coeff=None, mass=1.0,
+                                        averaged=False):
+        """
+        Calculate the potential energy of atom using LAMMPS
+
+        Parameters
+        ----------
+        species : str
+            Name of atomic species
+
+        pair_style : str
+            lammps pair style
+
+        pair_coeff : str
+            lammps pair coeff
+
+        mass : float
+            mass of the atoms
+
+        averaged : bool, optional
+            Average the energy over neighbors if True
+            default False.
+
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Calculates the potential energy per atom using the given potential
+        through LAMMPS. More documentation coming up...
+
+        Values can be accessed through :attr:`pyscal.catom.Atom.energy`
+        Averaged values can be accessed through :attr:`pyscal.catom.Atom.avg_energy`
+
+        If `averaged` is True, the energy is averaged over the neighbors of an
+        atom. If neighbors were calculated before calling this method, those neighbors
+        are used for averaging. Otherwise neighbors are calculated on the fly
+        with an adaptive cutoff method.
+        """
+        outfile = os.path.join(os.getcwd(), str(uuid.uuid4().hex))
+        aseobject = self.to_file(outfile, format='lammps-data', species=species)
+
+        indict = routines.get_energy_atom(outfile, species=species,
+            pair_style=pair_style, pair_coeff=pair_coeff,
+            mass=1.0)
+
+        atoms = self.atoms
+    
+        for atom in atoms:
+            atom.energy = indict[str(atom.id)]
+
+        #clean up
+        os.remove(outfile)
+
+        if averaged:
+            if not self.neighbors_found:
+                self.find_neighbors(method="cutoff", cutoff=0)
+
+        for atom in atoms:
+            neteng = np.sum([atoms[x].energy for x in atom.neighbors])
+            atom.avg_energy = (neteng + atom.energy)/(len(atom.neighbors) + 1.)
+
+        self.atoms = atoms
+

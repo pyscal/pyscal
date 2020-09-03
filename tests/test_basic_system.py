@@ -12,6 +12,7 @@ def test_basic_system():
     #assert sys.get_box() == [[0,1],[0,1],[0,1]]
     #sys.read_inputfile("conf.dump")
     #del sys
+    pc.test()
 
 
 #@profile

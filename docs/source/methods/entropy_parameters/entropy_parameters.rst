@@ -22,8 +22,13 @@ radial distribution function centered on atom :math:`i`,
 :math:`r_{ij}` is the interatomic distance between atom :math:`i` and
 its neighbors :math:`j` and :math:`\sigma` is a broadening parameter.
 
-The averaged version of entropy parameters :math:`\bar{s}_s^i` can also
-be calculated using the following expression,
+The averaged version of entropy parameters :math:`\bar{s}_s^i` can be calculated in two ways, either using a simple averaging over the neighbors given by,
+
+.. math::
+  
+   \bar{s}_s^i = \frac{\sum_j s_s^j + s_s^i}{N + 1}
+
+or using a switching function as described below,   
 
 .. math::
 
@@ -49,14 +54,18 @@ Entropy parameters can be calculated in pyscal using the following code,
     sys.read_inputfile('conf.dump')
     sys.find_neighbors(method="cutoff", cutoff=0)
     lattice_constant=4.00
-    sys.calculate_entropy(1.4*lattice_constant, ra=0.9*lattice_constant, averaged=True)
+    sys.calculate_entropy(1.4*lattice_constant, averaged=True)
     atoms = sys.atoms
     entropy = [atom.entropy for atom in atoms]
     average_entropy = [atom.avg_entropy for atom in atoms]
 
-The values of :math:`r_m` and :math:`r_a` are provided in units of
+The value of :math:`r_m` is provided in units of
 lattice constant. Further parameters shown above, such as :math:`\sigma`
-can be specified using the various keyword arguments.
+can be specified using the various keyword arguments. The above code does a simple averaging over neighbors. The switching function can be used by,
+
+.. code:: python
+
+    sys.calculate_entropy(1.4*lattice_constant, ra=0.9*lattice_constant, switching_function=True, averaged=True)
 
 In pyscal, a slightly different version of :math:`s_s^i` is calculated.
 This is given by,

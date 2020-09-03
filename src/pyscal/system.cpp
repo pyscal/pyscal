@@ -1892,7 +1892,18 @@ double System::switching_fn(double rij, double ra, int M, int N){
     return num/denum;
 }
 
-void System::average_entropy(double ra, int M, int N){
+void System::average_entropy(){
+    double entsum;
+    for(int i=0; i<nop; i++){
+        entsum = atoms[i].entropy;
+        for(int j=0; j<atoms[i].n_neighbors; j++){
+            entsum += atoms[atoms[i].neighbors[j]].entropy;
+        }
+        atoms[i].avg_entropy = entsum/(double(atoms[i].n_neighbors + 1));
+    }
+}
+
+void System::average_entropy_switch(double ra, int M, int N){
 
     double frij;
     double frijsum = 0.0;
@@ -1919,6 +1930,9 @@ void System::entropy(double sigma, double rho, double rstart, double rstop, doub
     for(int i=0; i<nop; i++){
         
         atoms[i].sigma = sigma;
+        if (rho == 0){
+            rho = atoms[i].n_neighbors/(4.1887902047863905*pow(atoms[i].cutoff,3));
+        }
         atoms[i].rho = rho;
         atoms[i].rstart = rstart;
         atoms[i].rstop = rstop;
