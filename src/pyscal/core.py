@@ -1627,8 +1627,8 @@ class System(pc.System):
                 vals.append(val)
         return vals
 
-    def calculate_entropy(self, rm, sigma=0.2, rstart=0.00001, h=0.0001,
-                   M=12, N=6, ra=None, averaged=False):
+    def calculate_entropy(self, rm, sigma=0.2, rstart=0.001, h=0.001,
+                   M=12, N=6, ra=None, averaged=False, switching_function=False):
         """
         Calculate the entropy parameter for each atom
         
@@ -1650,14 +1650,22 @@ class System(pc.System):
             if True find the averaged entropy parameters
             default False
 
+        switching_function : bool, optional
+            if True, use the switching function to average, otherwise do a simple average
+            over the neighbors.
+            Default False
+
         ra : float, optional
-            cutoff length for switching function 
+            cutoff length for switching function
+            used only if `switching_function` is True 
 
         M : int, optional
             power for switching function, default 12
+            used only if `switching_function` is True
 
         N : int, optional
             power for switching function, default 6
+            used only if `switching_function` is True
 
         Returns
         -------
@@ -1679,7 +1687,10 @@ class System(pc.System):
         self.entropy(sigma, rho, rstart, rm, h, kb)
 
         if averaged:
-            self.average_entropy(ra, M, N)
+            if switching_function:
+                self.average_entropy_switch(ra, M, N)
+            else:
+                self.average_entropy()
 
 
     def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0):
