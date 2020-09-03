@@ -3,6 +3,18 @@
     "file-browser-filebrowser:cwd": {
       "path": ""
     },
+    "dask-dashboard-launcher:individual-progress": {
+      "data": {
+        "route": "individual-progress",
+        "label": "Progress"
+      }
+    },
+    "dask-dashboard-launcher:individual-task-stream": {
+      "data": {
+        "route": "individual-task-stream",
+        "label": "Task Stream"
+      }
+    },
     "layout-restorer:data": {
       "main": {
         "dock": {
@@ -71,6 +83,10 @@
         "factory": "Markdown Preview"
       }
     },
+    "dask-dashboard-launcher": {
+      "url": "DASK_DASHBOARD_URL",
+      "cluster": ""
+    }
   },
   "metadata": {
     "id": "/lab"
