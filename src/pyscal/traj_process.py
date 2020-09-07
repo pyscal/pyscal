@@ -55,7 +55,7 @@ def read_mdtraj(mdobject, check_triclinic=False, box_vectors=False):
     for count, position in enumerate(positions):
         atom = pca.Atom()
         atom.pos = list(position)
-        atom.id = count
+        atom.id = count+1
         atom.type = typedict[chems[count]]
         atom.loc = count
 
@@ -108,7 +108,7 @@ def read_ase(aseobject, check_triclinic=False, box_vectors=False):
     for count, position in enumerate(positions):
         atom = pca.Atom()
         atom.pos = list(position)
-        atom.id = count
+        atom.id = (count+1)
         atom.type = typedict[chems[count]]
         atom.loc = count
 
