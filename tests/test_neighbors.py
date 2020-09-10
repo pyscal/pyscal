@@ -76,3 +76,32 @@ def test_neighbors_system_filter():
     #any atom should have 8 neighbors
     atoms = sys.atoms
     assert atoms[0].coordination == 6
+
+
+def test_neighbors_diamond():
+    atoms, box = pcs.make_crystal(structure="diamond", lattice_constant=5.67, repetitions=(6,6,6))
+    sys = pc.System()
+    sys.atoms = atoms
+    sys.box = box
+    sys.find_diamond_neighbors()
+    sys.calculate_q([4,6], averaged=True)
+    assert (np.mean(sys.get_qvals(4))-0.19094065395649326) < 1E-5
+    assert (np.mean(sys.get_qvals(6))-0.5745242597140696) < 1E-5
+
+    atoms, box = pcs.make_crystal(structure="fcc", lattice_constant=4.07, repetitions=(6,6,6))
+    sys = pc.System()
+    sys.atoms = atoms
+    sys.box = box
+    sys.find_neighbors(method="cutoff", cutoff=0)
+    sys.calculate_q([4,6], averaged=True)
+    assert (np.mean(sys.get_qvals(4))-0.19094065395649326) < 1E-5
+    assert (np.mean(sys.get_qvals(6))-0.5745242597140696) < 1E-5
+
+    atoms, box = pcs.make_crystal(structure="fcc", lattice_constant=4.07, repetitions=(6,6,6))
+    sys = pc.System()
+    sys.atoms = atoms
+    sys.box = box
+    sys.find_diamond_neighbors()
+    sys.calculate_q([4,6], averaged=True)
+    assert (np.mean(sys.get_qvals(4))-0.210287193019979) < 1E-5
+    assert (np.mean(sys.get_qvals(6))-0.2350776015575979) < 1E-5    
