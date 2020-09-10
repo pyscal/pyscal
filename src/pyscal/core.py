@@ -563,7 +563,33 @@ class System(pc.System):
 
         self.neighbors_found = True
 
+    def find_diamond_neighbors(self):
+        """
+        Find underlying fcc lattice in diamond
 
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        This method finds in the underlying fcc/hcp lattice in diamond. It works
+        by the method described in `this publication <http://dx.doi.org/10.1016/j.cpc.2016.04.001>`_ .
+        For each atom, 4 atoms closest to it are identified. The neighbors of the its neighbors
+        are further identified and the common neighbors shared with the host atom are selected.
+        These atom will fall in the underlying fcc lattice for cubic diamond or hcp lattice
+        for hexagonal lattice.
+        
+        If neighbors are previously calculated, they are reset when this method is used.
+
+        """
+        self.reset_neighbors()
+        self.find_neighbors(method="number", nmax=4, assign_neighbor=False)
+        self.get_diamond_neighbors()
 
     def reset_neighbors(self):
         """

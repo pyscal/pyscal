@@ -95,6 +95,7 @@ class System{
         void get_temp_neighbors_cells();
         void get_temp_neighbors_brute();
         void store_neighbor_info();
+        void get_diamond_neighbors();
 
         //---------------------------------------------------
         // Methods for q calculation

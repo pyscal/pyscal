@@ -807,6 +807,26 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns, int assign){
 
 }
 
+void System::get_diamond_neighbors(){
+    /*
+    Get the neighbors in diamond lattice which is part of the
+    underlying fcc cell.
+    */
+    for (int ti=0; ti<nop; ti++){
+        for(int j=0 ; j<atoms[ti].temp_neighbors.size(); j++){
+            int tj = atoms[ti].temp_neighbors[j].index;
+            //loop over the neighbors
+            for(int k=0 ; k<atoms[tj].temp_neighbors.size(); k++){
+                int tk = atoms[tj].temp_neighbors[k].index;
+                //now make sure its not the same atom
+                if (ti == tk) continue;
+                //process the neighbors
+                process_neighbor(ti, tk);
+            }
+        }
+    }
+}
+
 int System::get_neighbors_from_temp(int style){
     /*
     A new neighbor algorithm that finds a specified number of 
