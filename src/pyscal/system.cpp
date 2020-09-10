@@ -813,11 +813,14 @@ void System::get_diamond_neighbors(){
     underlying fcc cell.
     */
     for (int ti=0; ti<nop; ti++){
-        for(int j=0 ; j<atoms[ti].temp_neighbors.size(); j++){
+        //cout<<"ti = "<<ti<<endl;
+        for(int j=0 ; j<4; j++){
             int tj = atoms[ti].temp_neighbors[j].index;
+            //cout<<"tj = "<<tj<<endl;
             //loop over the neighbors
-            for(int k=0 ; k<atoms[tj].temp_neighbors.size(); k++){
+            for(int k=0 ; k<4; k++){
                 int tk = atoms[tj].temp_neighbors[k].index;
+                //cout<<"tk = "<<tk<<endl;
                 //now make sure its not the same atom
                 if (ti == tk) continue;
                 //process the neighbors
