@@ -943,6 +943,29 @@ class System(pc.System):
             lc = self.cluster_atoms(ccondition, largest=True, cutoff=cutoff)
             return lc
 
+    def set_atom_cutoff(self, factor=1.00):
+        """
+        Set cutoff for each atom
+
+        Parameters
+        ----------
+        factor : float, optional
+            factor for multiplication of cutoff value.
+            default 1
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Assign cutoffs for each atom based on the nearest
+        neighbor distance. The cutoff assigned is the average nearest
+        neighbor distance multiplied by `factor`.
+
+        """
+        self.cset_atom_cutoff(factor)
+        
 
     def cluster_atoms(self, condition, largest = True, cutoff=0):
         """

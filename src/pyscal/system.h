@@ -96,6 +96,7 @@ class System{
         void get_temp_neighbors_brute();
         void store_neighbor_info();
         void get_diamond_neighbors();
+        void set_atom_cutoff(double);
 
         //---------------------------------------------------
         // Methods for q calculation

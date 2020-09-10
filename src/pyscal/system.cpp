@@ -830,6 +830,25 @@ void System::get_diamond_neighbors(){
     }
 }
 
+void System::set_atom_cutoff(double factor){
+    /*
+    Reassign atom cutoff
+    */
+    int nn;
+    double sum;
+    double avgdist;
+
+    for (int ti=0; ti<nop; ti++){
+        nn = atoms[ti].n_neighbors;
+        sum = 0;
+        for (int j=0; j<nn; j++){
+            sum += atoms[ti].neighbordistance[j];
+        }
+        avgdist = sum/(double(nn));
+        atoms[ti].cutoff = factor*avgdist;
+    }
+}
+
 int System::get_neighbors_from_temp(int style){
     /*
     A new neighbor algorithm that finds a specified number of 
