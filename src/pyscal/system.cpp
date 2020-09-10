@@ -842,7 +842,7 @@ void System::set_atom_cutoff(double factor){
         nn = atoms[ti].n_neighbors;
         sum = 0;
         for (int j=0; j<nn; j++){
-            sum += atoms[ti].neighbordistance[j];
+            sum += atoms[ti].neighbordist[j];
         }
         avgdist = sum/(double(nn));
         atoms[ti].cutoff = factor*avgdist;
