@@ -83,6 +83,7 @@ class Atom{
         int id;
         int loc;
         double posx,posy,posz;
+        int ghost;
         vector<double> gx();
         void sx(vector<double>);
 
