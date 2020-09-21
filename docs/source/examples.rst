@@ -19,4 +19,5 @@ can be downloaded from `here <https://pyscal.readthedocs.io/en/latest/download.h
    examples/voronoi/voronoi
    examples/entropy/entropy_params
    examples/energy/calculate_energy
+   examples/trajectories/trajectories
    examples/others/others
