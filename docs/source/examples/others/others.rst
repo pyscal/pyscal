@@ -3,6 +3,6 @@ Other examples
 
 .. toctree::
 	
-	calculate_sro
+	short_range/calculate_sro
 
     

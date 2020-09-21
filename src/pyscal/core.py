@@ -80,6 +80,8 @@ class System(pc.System):
         self.initialized = True
         self.neighbors_found = False
         self.neighbor_method = None
+        self.ghosts_created = False
+        self.actual_box = None
         pc.System.__init__(self)
 
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None, is_triclinic = False):
@@ -1879,4 +1881,56 @@ class System(pc.System):
             atom.avg_energy = (neteng + atom.energy)/(len(atom.neighbors) + 1.)
 
         self.atoms = atoms
+
+
+    def repeat(self, reps, ghost=False):
+        """
+        Replicate simulation cell
+        
+        Parameters
+        ----------
+        reps : list of ints of size 3
+            repetitions in each direction
+
+        ghost : bool, optional
+            If True, assign the new atoms as ghost instead of actual atoms
+        """
+        box = self.box        
+        boxdims = []
+        for i in range(3):
+            boxdims.append(box[i][1] - box[i][0])
+
+        for i in range(3):
+            box[i][0] = box[i][0]-reps[i]*boxdims[i]
+            box[i][1] = box[i][1]+reps[i]*boxdims[i]
+
+        atoms = self.atoms
+
+        newatoms = []
+        idstart = len(atoms) + 1
+
+        for i in range(-reps[0], reps[0]+1):
+            for j in range(-reps[1], reps[1]+1):
+                for k in range(-reps[2], reps[2]+1):
+                    if (i==j==k==0):
+                        continue
+                    for atom in atoms:
+                        pos = atom.pos
+                        pos[0] = pos[0] + i*boxdims[0]
+                        pos[1] = pos[1] + j*boxdims[1]
+                        pos[2] = pos[2] + k*boxdims[2]
+                        a = Atom()
+                        a.pos = pos
+                        a.id = idstart
+                        idstart += 1
+                        a.type = atom.type
+                        if ghost:
+                            a.ghost = 1
+                        newatoms.append(a)
+
+        self.box = box
+        self.actual_box = box
+        self.ghosts_created = True
+        completeatoms = atoms + newatoms
+        self.atoms = completeatoms                
 

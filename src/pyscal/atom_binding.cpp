@@ -110,6 +110,11 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         int specifying type of the atom.
     )mydelimiter")
 
+    .def_readwrite("ghost", &Atom::ghost, R"mydelimiter(
+        *int*.
+        int specifying ghost status of the atom.
+    )mydelimiter")
+
     .def_readwrite("custom", &Atom::custom, R"mydelimiter(
         *dict*.
         dictionary specfying custom values for an atom. The module only stores the id, type and

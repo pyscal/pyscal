@@ -25,6 +25,7 @@
 11. [Entropy parameter](examples/11_entropy_parameter.ipynb) : Use a measure of entropy to distinguish solid and liquid.
 12. [Calculation of energy](examples/12_calculating_energy.ipynb) : Use pyscal in combination with LAMMPS to calculate energy of atoms.
 13. [Structural identification using entropy and enthalpy](examples/13_combining_energy_enthalpy.ipynb) : Combine entropy and energy methods to identify crystal structures.
+14. [Working with lammps trajectories](examples/03_01_Steinhardts_parameters_for_lammps.ipynb) : Reading in a lammps trajectory, calculating Steinhardt's parameter for slices and various cluster properties.
 
 
 
