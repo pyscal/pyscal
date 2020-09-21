@@ -393,18 +393,10 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
     #adjust for scled coordinates
     if scaled:
-        if triclinic:
-            for atom in atoms:
-                dist = atom.pos
-                ndist = dist[0]*box[0] + dist[1]*box[1] + dist[2]*box[2]
-                atom.pos = ndist
-        else:
-            for atom in atoms:
-                dist = atom.pos
-                ndist = [dist[0]*(boxdims[0][1]-boxdims[0][0]),
-                         dist[1]*(boxdims[1][1]-boxdims[1][0]),
-                         dist[2]*(boxdims[2][1]-boxdims[2][0])]
-                atom.pos = ndist
+        for atom in atoms:
+            dist = atom.pos
+            ndist = dist[0]*box[0] + dist[1]*box[1] + dist[2]*box[2]
+            atom.pos = ndist
 
     if box_vectors and check_triclinic:
         return atoms, boxdims, box, triclinic
