@@ -790,7 +790,7 @@ double Atom::entropy_integrand(double r)
 }
 
 
-double Atom::trapezoid_integration()
+void Atom::trapezoid_integration()
 {
 
         int nsteps = (rstop - rstart)/h;
