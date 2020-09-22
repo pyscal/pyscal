@@ -1,0 +1,46 @@
+name: pyscal-testing
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.6, 3.7]
+
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup conda
+      uses: s-weigand/setup-conda@v1
+      with:
+        update-conda: true
+        python-version: ${{ matrix.python-version }}
+        conda-channels: anaconda, conda-forge
+    
+    - name: Install requirements
+      run: |
+        conda --version
+        which python
+        conda config --set always_yes yes --set changeps1 no
+        conda install -c conda-forge --file requirements_dev.txt
+        pip install -e .
+
+    - name: run tests
+      run: |
+        pip install pytest
+        pip install pytest-cov
+        pytest --cov-report=xml --cov=pyscal tests/
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: coverage.xml
+        name: codecov-umbrella
+        fail_ci_if_error: true
+    
