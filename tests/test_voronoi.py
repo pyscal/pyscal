@@ -16,5 +16,5 @@ def test_voro_props():
     sys.calculate_vorovector()
     atoms = sys.atoms
     atom = atoms[0]
-    v = atom.vorovector
+    #v = atom.vorovector
     #assert v == [0,6,0,8]
