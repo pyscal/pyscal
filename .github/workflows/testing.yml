@@ -35,12 +35,12 @@ jobs:
       run: |
         pip install pytest
         pip install pytest-cov
-        pytest --cov-report xml:cov.xml -cov=pyscal tests/
+        pytest --cov-report=xml --cov=pyscal tests/
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
-        file: cov.xml
+        file: coverage.xml
         name: codecov-umbrella
         fail_ci_if_error: true
     
