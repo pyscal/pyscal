@@ -35,7 +35,7 @@ jobs:
       run: |
         pip install pytest
         pip install pytest-cov
-        pytest --cov=pyscal --cov-report=xml
+        pytest --cov-report=xml term-missing --cov=pyscal tests/
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
