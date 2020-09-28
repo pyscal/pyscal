@@ -489,9 +489,13 @@ def read_poscar(infile, compressed = False, box_vectors = False):
         atom_start = nlev+2
 
     if cord_system in ['Cartesian', 'cartesian']:
-        xhigh = 1
-        yhigh = 1
-        zhigh = 1
+        xscale = 1
+        yscale = 1
+        zscale = 1
+    else:
+        xscale = xhigh
+        yscale = yhigh
+        zscale = zhigh
 
     species = 1
     count = 0
@@ -504,9 +508,9 @@ def read_poscar(infile, compressed = False, box_vectors = False):
         if (count<cum_list[species-1]):
             raw = np.array(data[i].strip().split()[:3]).astype(float)
             typ = species
-            x = float(raw[0])*xhigh
-            y = float(raw[1])*yhigh
-            z = float(raw[2])*zhigh
+            x = float(raw[0])*xscale
+            y = float(raw[1])*yscale
+            z = float(raw[2])*zscale
             #if x,y,z are out of the box, they need to be put in
             if (x < xlow):
                 x = x + (xhigh - xlow)
