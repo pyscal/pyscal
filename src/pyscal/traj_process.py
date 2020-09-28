@@ -480,7 +480,7 @@ def read_poscar(infile, compressed = False, box_vectors = False):
     zhigh = scaling_factor*zvector[2]
     boxdims = [[xlow, xhigh],[ylow, yhigh],[zlow, zhigh]]
 
-    if (data[nlev+1].strip().split()[0]=='s' or data[nlev+1].strip().split()[0]=='S'):
+    if (data[nlev+1].strip().split()[0][0]=='s' or data[nlev+1].strip().split()[0][0]=='S'):
         selective_dynamics=True
         cord_system=data[nlev+2].strip()
         atom_start = nlev+3
