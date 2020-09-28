@@ -67,6 +67,8 @@ PYBIND11_MODULE(csystem, m) {
         .def("reset_allneighbors", &System::reset_all_neighbors)
         .def("get_pairdistances",&System::get_pairdistances)
         .def("store_neighbor_info",&System::store_neighbor_info)
+        .def("get_diamond_neighbors",&System::get_diamond_neighbors)
+        .def("cset_atom_cutoff",&System::set_atom_cutoff)
 
         //---------------------------------------------------
         // Methods for q calculation

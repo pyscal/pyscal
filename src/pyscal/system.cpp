@@ -406,18 +406,14 @@ void System::set_up_cells(){
       nx = boxx/neighbordistance;
       ny = boxy/neighbordistance;
       nz = boxz/neighbordistance;
-
       //now use this to find length of cell in each direction
       double lx = boxx/nx;
       double ly = boxy/ny;
       double lz = boxz/nz;
-
       //find the total number of cells
       total_cells = nx*ny*nz;
-
       //create a vector of cells
       cells = new cell[total_cells];
-
       //now run over and for each cell create its neighbor cells
       //all neighbor cells are also added
       for(int i=0; i<nx; i++){
@@ -438,7 +434,6 @@ void System::set_up_cells(){
            }
          }
       }
-
       int cx, cy, cz;
       double dx, dy, dz;
       int ind;
@@ -453,11 +448,11 @@ void System::set_up_cells(){
 
           //now apply boxdims
           if (dx < 0) dx+=boxx;
-          else if (dx > boxx) dx-=boxx;
+          else if (dx >= boxx) dx-=boxx;
           if (dy < 0) dy+=boxy;
-          else if (dy > boxy) dy-=boxy;
+          else if (dy >= boxy) dy-=boxy;
           if (dz < 0) dz+=boxz;
-          else if (dz > boxz) dz-=boxz;
+          else if (dz >= boxz) dz-=boxz;
 
           //now find c vals
           cx = dx/lx;
@@ -466,13 +461,11 @@ void System::set_up_cells(){
 
           //now get cell index
           ind = cell_index(cx, cy, cz);
-
           //got cell index
           //now add the atom to the corresponding cells
           cells[ind].members.emplace_back(ti);
 
       }
-
       //end of loop - all cells, the member atoms and neighboring cells are added
 }
 
@@ -501,7 +494,6 @@ void System::get_all_neighbors_cells(){
     double diffx,diffy,diffz;
     double r,theta,phi;
     int ti, tj;
-
     //first create cells
     set_up_cells();
     int maincell, subcell;
@@ -528,7 +520,6 @@ void System::get_all_neighbors_cells(){
                             continue;
                         }
                         //process_neighbor(ti, tj);
-
                         atoms[ti].neighbors[atoms[ti].n_neighbors] = tj;
                         atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
                         //weight is set to 1.0, unless manually reset
@@ -589,7 +580,6 @@ void System::get_all_neighbors_normal(){
                     continue;
                 }
                 //process_neighbor(ti, tj);
-
                 atoms[ti].neighbors[atoms[ti].n_neighbors] = tj;
                 atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
                 //weight is set to 1.0, unless manually reset
@@ -805,6 +795,48 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns, int assign){
     return finished;
 
 
+}
+
+void System::get_diamond_neighbors(){
+    /*
+    Get the neighbors in diamond lattice which is part of the
+    underlying fcc cell.
+    */
+    for (int ti=0; ti<nop; ti++){
+        //cout<<"ti = "<<ti<<endl;
+        for(int j=0 ; j<4; j++){
+            int tj = atoms[ti].temp_neighbors[j].index;
+            //cout<<"tj = "<<tj<<endl;
+            //loop over the neighbors
+            for(int k=0 ; k<4; k++){
+                int tk = atoms[tj].temp_neighbors[k].index;
+                //cout<<"tk = "<<tk<<endl;
+                //now make sure its not the same atom
+                if (ti == tk) continue;
+                //process the neighbors
+                process_neighbor(ti, tk);
+            }
+        }
+    }
+}
+
+void System::set_atom_cutoff(double factor){
+    /*
+    Reassign atom cutoff
+    */
+    int nn;
+    double sum;
+    double avgdist;
+
+    for (int ti=0; ti<nop; ti++){
+        nn = atoms[ti].n_neighbors;
+        sum = 0;
+        for (int j=0; j<nn; j++){
+            sum += atoms[ti].neighbordist[j];
+        }
+        avgdist = sum/(double(nn));
+        atoms[ti].cutoff = factor*avgdist;
+    }
 }
 
 int System::get_neighbors_from_temp(int style){

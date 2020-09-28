@@ -18,6 +18,7 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     posz = pos[2];
     id = idd;
     type = typ;
+    ghost = 0;
 
     //assign other values - the default ones
     belongsto = -1;
@@ -789,7 +790,7 @@ double Atom::entropy_integrand(double r)
 }
 
 
-double Atom::trapezoid_integration()
+void Atom::trapezoid_integration()
 {
 
         int nsteps = (rstop - rstart)/h;

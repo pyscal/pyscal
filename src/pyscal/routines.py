@@ -39,7 +39,7 @@ def get_energy_atom(outfile, species=None, pair_style=None, pair_coeff=None, mas
     lmp.command('read_data %s'%outfile)
     lmp.command('pair_style %s'%pair_style)
     lmp.command('pair_coeff %s'%pair_coeff)
-    lmp.command("mass * %f"%95)
+    lmp.command("mass * %f"%mass)
 
     lmp.command("compute 1 all pe/atom")
     lmp.command("run 0")

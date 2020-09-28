@@ -83,6 +83,7 @@ class Atom{
         int id;
         int loc;
         double posx,posy,posz;
+        int ghost;
         vector<double> gx();
         void sx(vector<double>);
 
@@ -237,7 +238,7 @@ class Atom{
         double kb;
         double gmr(double);
         double entropy_integrand(double);
-        double trapezoid_integration();
+        void trapezoid_integration();
         //results
         double entropy;
         double avg_entropy;
