@@ -1897,29 +1897,20 @@ class System(pc.System):
             If True, assign the new atoms as ghost instead of actual atoms
         """
         box = self.box        
-        boxdims = []
-        for i in range(3):
-            boxdims.append(box[i][1] - box[i][0])
-
-        for i in range(3):
-            box[i][0] = box[i][0]-reps[i]*boxdims[i]
-            box[i][1] = box[i][1]+reps[i]*boxdims[i]
 
         atoms = self.atoms
 
         newatoms = []
         idstart = len(atoms) + 1
 
-        for i in range(-reps[0], reps[0]+1):
-            for j in range(-reps[1], reps[1]+1):
-                for k in range(-reps[2], reps[2]+1):
+        for i in range(0, reps[0]):
+            for j in range(0, reps[1]):
+                for k in range(0, reps[2]):
                     if (i==j==k==0):
                         continue
                     for atom in atoms:
-                        pos = atom.pos
-                        pos[0] = pos[0] + i*boxdims[0]
-                        pos[1] = pos[1] + j*boxdims[1]
-                        pos[2] = pos[2] + k*boxdims[2]
+                        pos = np.array(atom.pos)
+                        pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
                         a = Atom()
                         a.pos = pos
                         a.id = idstart
@@ -1930,8 +1921,10 @@ class System(pc.System):
                         newatoms.append(a)
 
         if scale_box:
+            box[0] = reps[0]*np.array(box[0])
+            box[1] = reps[1]*np.array(box[1])
+            box[2] = reps[2]*np.array(box[2])
             self.box = box
-            self.actual_box = box
         if ghost:
             self.ghosts_created = True
         completeatoms = atoms + newatoms
