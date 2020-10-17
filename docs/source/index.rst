@@ -63,38 +63,8 @@ Highlights
 Getting started
 ---------------
 
-.. toctree::
+For general documentation and examples see `here <https://pyscal.org>`_ .
 
-    gettingstarted
-
-Download
---------
-
-.. toctree::
-
-    download
-
-Examples
---------
-
-.. toctree::
-
-    examples
-
-
-Methods implemented in pyscal
------------------------------
-
-.. toctree::
-
-    methods
-
-News and updates
-----------------
-
-.. toctree::
-
-    news
 
 pyscal reference
 ----------------
@@ -103,27 +73,3 @@ pyscal reference
 
     modules
 
-
-Support, contributing and extending
------------------------------------
-
-.. toctree::
-
-    extending
-    helpandsupport
-    common_issues
-
-Credits
--------
-
-.. toctree::
-
-    citing
-    acknowledgements
-
-License
--------
-
-.. toctree::
-
-    license
