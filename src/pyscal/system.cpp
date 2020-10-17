@@ -65,16 +65,25 @@ vector<vector<double>> System::get_triclinic_params(){
 
 void System::sbox(vector<vector <double>> boxd) {
 
-    boxdims[0][0] = boxd[0][0];
-    boxdims[0][1] = boxd[0][1];
-    boxdims[1][0] = boxd[1][0];
-    boxdims[1][1] = boxd[1][1];
-    boxdims[2][0] = boxd[2][0];
-    boxdims[2][1] = boxd[2][1];
+    //this method will be redone to get a 3x3 box
+    //always. They will be then translated to the
+    //corresponding other boxes
+    double isum;
 
-    boxx = boxd[0][1] - boxd[0][0];
-    boxy = boxd[1][1] - boxd[1][0];
-    boxz = boxd[2][1] - boxd[2][0];
+    for(int i=0; i<3; i++){
+        isum = 0;
+        for(int j=0; j<3; j++){
+            box[i][j] = boxd[i][j];
+            isum += boxd[i][j]*boxd[i][j];
+        }
+        boxdims[i][0] = 0;
+        boxdims[i][1] = sqrt(isum);
+
+    }
+
+    boxx = boxdims[0][1] - boxdims[0][0];
+    boxy = boxdims[1][1] - boxdims[1][0];
+    boxz = boxdims[2][1] - boxdims[2][0];
 }
 
 vector<vector<double>> System::gbox(){
@@ -83,8 +92,8 @@ vector<vector<double>> System::gbox(){
 
     for(int i=0;i<3;i++){
         qd.clear();
-        for(int j=0;j<2;j++){
-            qd.emplace_back(boxdims[i][j]);
+        for(int j=0;j<3;j++){
+            qd.emplace_back(box[i][j]);
         }
         qres.emplace_back(qd);
     }

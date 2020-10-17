@@ -43,6 +43,7 @@ class System{
         int triclinic;
         double boxx, boxy, boxz;
         double boxdims[3][2];
+        double box[3][3];
         void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
         vector<vector<double>> get_triclinic_params();
         vector<vector<double>> gboxvecs();
