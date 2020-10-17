@@ -312,7 +312,7 @@ class System(pc.System):
         r = bin_edges[:-1]
 
         #get box density
-        boxvecs = self.get_boxvecs()
+        boxvecs = self.box
         vol = np.dot(np.cross(boxvecs[0], boxvecs[1]), boxvecs[2])
         natoms = self.nop
         rho = natoms/vol
@@ -1707,7 +1707,8 @@ class System(pc.System):
 
         #calculate rho
         box = self.box
-        rho = len(self.atoms)/((box[0][1]-box[0][0])*(box[1][1]-box[1][0])*(box[2][1]-box[2][0]))
+        vol = np.dot(np.cross(box[0], box[1]), box[2])
+        rho = len(self.atoms)/vol
         self.entropy(sigma, rho, rstart, rm, h, kb)
 
         if averaged:
@@ -1777,9 +1778,9 @@ class System(pc.System):
             dump.write("ITEM: NUMBER OF ATOMS\n")
             dump.write("%d\n" % len(atoms))
             dump.write("ITEM: BOX BOUNDS\n")
-            dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
-            dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
-            dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
+            dump.write("%f %f\n" % (0, boxdims[0][0]))
+            dump.write("%f %f\n" % (0, boxdims[1][1]))
+            dump.write("%f %f\n" % (0, boxdims[2][2]))
 
             #now write header
             if len(customkeys) > 0:

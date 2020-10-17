@@ -169,7 +169,7 @@ def convert_to_ase(sys, species=None):
                     break
         specieskey = "".join(species)
       
-    cell = sys.get_boxvecs()
+    cell = sys.box
     pbc = [1, 1, 1]
 
     #create ASE Atoms and assign everything
