@@ -83,7 +83,6 @@ class Atom{
         int id;
         int loc;
         double posx,posy,posz;
-        int ghost;
         vector<double> gx();
         void sx(vector<double>);
 
@@ -93,6 +92,10 @@ class Atom{
 
         //mask for calculations to exclude atoms
         bool mask;
+
+        //ghost properties
+        int ghost;
+
   
         //-------------------------------------------------------
         // Neighbor related properties
@@ -112,6 +115,21 @@ class Atom{
         double cutoff;
         int n_neighbors;
         int isneighborset;
+
+        //same set of neighbor properties for ghosts
+        int ghostneighbors[MAXNUMBEROFNEIGHBORS];
+        int ghostmasks[MAXNUMBEROFNEIGHBORS];
+        double ghostneighbordist[MAXNUMBEROFNEIGHBORS];
+        double ghostneighborweight[MAXNUMBEROFNEIGHBORS];
+        double ghostn_diffx[MAXNUMBEROFNEIGHBORS];
+        double ghostn_diffy[MAXNUMBEROFNEIGHBORS];
+        double ghostn_diffz[MAXNUMBEROFNEIGHBORS];
+        double ghostn_r[MAXNUMBEROFNEIGHBORS];
+        double ghostn_phi[MAXNUMBEROFNEIGHBORS];
+        double ghostn_theta[MAXNUMBEROFNEIGHBORS];
+        vector<datom> ghosttemp_neighbors;
+
+
         //function to set neighbors
         void sneighdist(vector<double>);
         vector<double> gneighdist();

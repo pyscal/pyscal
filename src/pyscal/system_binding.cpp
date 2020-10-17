@@ -45,6 +45,8 @@ PYBIND11_MODULE(csystem, m) {
         // Atom related methods
         //-----------------------------------------------------
         .def_property("atoms", &System::get_atoms, &System::set_atoms)
+        .def_property("ghost_atoms", &System::get_ghostatoms, &System::set_ghostatoms)
+
         //.def_readwrite("atoms", &System::atoms)
         .def("cget_atom",  &System::gatom)
         .def("cset_atom", &System::satom)

@@ -1927,6 +1927,8 @@ class System(pc.System):
             self.box = box
         if ghost:
             self.ghosts_created = True
-        completeatoms = atoms + newatoms
-        self.atoms = completeatoms                
+            self.ghost_atoms = newatoms
+        else:
+            completeatoms = atoms + newatoms
+            self.atoms = completeatoms                
 

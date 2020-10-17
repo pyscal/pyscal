@@ -15,7 +15,8 @@ using namespace voro;
 //-----------------------------------------------------
 System::System(){
 
-    nop = -1;
+    nop = 0;
+    gnop = 0;
     triclinic = 0;
     usecells = 0;
     filter = 0;
@@ -118,6 +119,22 @@ void System::set_atoms( vector<Atom> atomitos){
 //this function allows for handling custom formats of atoms and so on
 vector<Atom> System::get_atoms( ){
     return atoms;
+
+}
+
+void System::set_ghostatoms( vector<Atom> atomitos){
+
+    ghost_atoms.clear();
+    gnop = atomitos.size();
+    ghost_atoms.reserve(gnop);
+    ghost_atoms.assign(atomitos.begin(), atomitos.end());
+
+}
+
+
+//this function allows for handling custom formats of atoms and so on
+vector<Atom> System::get_ghostatoms( ){
+    return ghost_atoms;
 
 }
 

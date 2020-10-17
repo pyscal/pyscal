@@ -34,6 +34,7 @@ class System{
         System();
         ~System();
         int nop;
+        int gnop;
 
         //-----------------------------------------------------
         // Simulation box related methods
@@ -53,10 +54,13 @@ class System{
         // Atom related methods
         //-----------------------------------------------------
         vector<Atom> atoms;
+        vector<Atom> ghost_atoms;
         void assign_particles( vector<Atom>);
         void read_particle_file(string);    // TBDep
         void set_atoms( vector<Atom>);
         vector<Atom> get_atoms();
+        void set_ghostatoms( vector<Atom>);
+        vector<Atom> get_ghostatoms();
         Atom gatom(int);
         void satom(Atom);
 
