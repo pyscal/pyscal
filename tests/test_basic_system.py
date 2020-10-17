@@ -23,8 +23,7 @@ def test_system_read():
     assert len(atoms) == 500
 
     #check box
-    assert sys.box == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
-
+    assert sys.box == [[18.85618, 0.0, 0.0], [0.0, 18.86225, 0.0], [0.0, 0.0, 19.01117]]
     #check few atoms
     filtered_atoms = [ atom for atom in atoms if atom.id == 204]
     assert filtered_atoms[0].pos == [-0.10301, -6.35752, -6.44787]
@@ -36,7 +35,7 @@ def test_system_read():
     assert len(atoms) == 500
 
     #check box
-    assert sys.box == [[-7.66608, 11.1901],[-7.66915, 11.1931],[-7.74357, 11.2676]]
+    assert sys.box == [[18.85618, 0.0, 0.0], [0.0, 18.86225, 0.0], [0.0, 0.0, 19.01117]]
 
     #check few atoms
     filtered_atoms = [ atom for atom in atoms if atom.id == 204]

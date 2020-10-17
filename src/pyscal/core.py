@@ -166,7 +166,7 @@ class System(pc.System):
 
                 #now if file exists
                 if os.path.exists(filename):
-                    atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                    atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
                     self.atoms = atoms
                     self.box = box
 
@@ -183,7 +183,7 @@ class System(pc.System):
                     os.remove(file)
 
             elif os.path.exists(filename):
-                atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
                 self.atoms = atoms
                 self.box = box
 
@@ -197,7 +197,7 @@ class System(pc.System):
 
         elif format == 'poscar':
             if os.path.exists(filename):
-                atoms, box = ptp.read_poscar(filename, compressed=compressed, box_vectors = True)
+                atoms, box = ptp.read_poscar(filename, compressed=compressed)
                 self.atoms = atoms
                 self.box = box
                 if is_triclinic:
@@ -208,7 +208,7 @@ class System(pc.System):
                 raise IOError("input file %s not found"%filename)
 
         elif format == 'ase':
-            atoms, box = ptp.read_ase(filename, box_vectors = True)
+            atoms, box = ptp.read_ase(filename)
             self.atoms = atoms
             self.box = box
             if is_triclinic:
@@ -217,7 +217,7 @@ class System(pc.System):
                 self.assign_triclinic_params(rot, rotinv)
 
         elif format == 'mdtraj':
-            atoms, box = ptp.read_mdtraj(filename, box_vectors = True)
+            atoms, box = ptp.read_mdtraj(filename)
             self.atoms = atoms
             self.box = box
             if is_triclinic:

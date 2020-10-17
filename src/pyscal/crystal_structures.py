@@ -185,7 +185,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     xh = nx*lattice_constant*xfact
     yh = ny*lattice_constant*yfact
     zh = nz*lattice_constant*zfact
-    boxdims = [[0, xh], [0, yh], [0, zh]]
+    box = [[xh, 0, 0], [0, yh, 0], [0, 0, zh]]
 
     #create structure
     for i in range(1, nx+1):
@@ -208,4 +208,4 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                     atoms.append(atom)
                     co += 1
 
-    return atoms, boxdims
+    return atoms, box
