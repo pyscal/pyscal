@@ -46,10 +46,8 @@ class System{
         double box[3][3];
         void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
         vector<vector<double>> get_triclinic_params();
-        vector<vector<double>> gboxvecs();
         void sbox(vector<vector<double>>);
         vector<vector<double>> gbox();
-        vector<double> gboxdims();
 
         //-----------------------------------------------------
         // Atom related methods

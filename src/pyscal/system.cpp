@@ -100,35 +100,6 @@ vector<vector<double>> System::gbox(){
     return qres;
 }
 
-vector<vector<double>> System::gboxvecs(){
-    vector<vector<double>> qres;
-    vector<double> dqres;
-    if (triclinic==1){
-        for(int i=0; i<3; i++){
-            dqres.clear();
-            for(int j=0; j<3; j++){
-                dqres.emplace_back(rot[j][i]);
-            }
-            qres.emplace_back(dqres);
-        }
-    }
-    else{
-        for(int i=0; i<3; i++){
-            dqres.clear();
-            for(int j=0; j<3; j++){
-                if(i==j){
-                    dqres.emplace_back(boxdims[i][1]-boxdims[i][0]);
-                }
-                else{
-                    dqres.emplace_back(0.0);
-                }
-            }
-            qres.emplace_back(dqres);
-        }
-    }
-    return qres;
-}
-
 
 //-----------------------------------------------------
 // Atom related methods
