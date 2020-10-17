@@ -166,9 +166,9 @@ class System(pc.System):
 
                 #now if file exists
                 if os.path.exists(filename):
-                    atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                    atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
                     self.atoms = atoms
-                    self.box = boxdims
+                    self.box = box
 
                     if triclinic:
                         #we have to input rotation matrix and the inverse rotation matrix
@@ -183,9 +183,9 @@ class System(pc.System):
                     os.remove(file)
 
             elif os.path.exists(filename):
-                atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
+                atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
                 self.atoms = atoms
-                self.box = boxdims
+                self.box = box
 
                 if triclinic:
                     rot = np.array(box).T
@@ -197,9 +197,9 @@ class System(pc.System):
 
         elif format == 'poscar':
             if os.path.exists(filename):
-                atoms, boxdims, box = ptp.read_poscar(filename, compressed=compressed, box_vectors = True)
+                atoms, box = ptp.read_poscar(filename, compressed=compressed, box_vectors = True)
                 self.atoms = atoms
-                self.box = boxdims
+                self.box = box
                 if is_triclinic:
                     rot = np.array(box).T
                     rotinv = np.linalg.inv(rot)
@@ -208,18 +208,18 @@ class System(pc.System):
                 raise IOError("input file %s not found"%filename)
 
         elif format == 'ase':
-            atoms, boxdims, box = ptp.read_ase(filename, box_vectors = True)
+            atoms, box = ptp.read_ase(filename, box_vectors = True)
             self.atoms = atoms
-            self.box = boxdims
+            self.box = box
             if is_triclinic:
                 rot = np.array(box).T
                 rotinv = np.linalg.inv(rot)
                 self.assign_triclinic_params(rot, rotinv)
 
         elif format == 'mdtraj':
-            atoms, boxdims, box = ptp.read_mdtraj(filename, box_vectors = True)
+            atoms, box = ptp.read_mdtraj(filename, box_vectors = True)
             self.atoms = atoms
-            self.box = boxdims
+            self.box = box
             if is_triclinic:
                 rot = np.array(box).T
                 rotinv = np.linalg.inv(rot)
