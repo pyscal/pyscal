@@ -1883,7 +1883,7 @@ class System(pc.System):
         self.atoms = atoms
 
 
-    def repeat(self, reps, ghost=False):
+    def repeat(self, reps, ghost=False, scale_box=True):
         """
         Replicate simulation cell
         
@@ -1928,9 +1928,11 @@ class System(pc.System):
                             a.ghost = 1
                         newatoms.append(a)
 
-        self.box = box
-        self.actual_box = box
-        self.ghosts_created = True
+        if scale_box:
+            self.box = box
+            self.actual_box = box
+        if ghost:
+            self.ghosts_created = True
         completeatoms = atoms + newatoms
         self.atoms = completeatoms                
 
