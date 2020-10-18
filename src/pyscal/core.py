@@ -84,6 +84,25 @@ class System(pc.System):
         self.actual_box = None
         pc.System.__init__(self)
 
+    @property
+    def box(self):
+        """
+        Wrap for inbuilt box
+        """
+        if self.actual_box is not None:
+            return self.actual_box
+        else:
+            return self._box
+
+    @box.setter
+    def box(self, userbox):
+        """
+        Box setter 
+        """
+        self._box = userbox
+
+
+
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None, is_triclinic = False):
         """
 
@@ -166,15 +185,7 @@ class System(pc.System):
 
                 #now if file exists
                 if os.path.exists(filename):
-                    atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
-                    self.atoms = atoms
-                    self.box = boxdims
-
-                    if triclinic:
-                        #we have to input rotation matrix and the inverse rotation matrix
-                        rot = np.array(box).T
-                        rotinv = np.linalg.inv(rot)
-                        self.assign_triclinic_params(rot, rotinv)
+                    atoms, box, is_triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
                 else:
                     raise IOError("input file %s not found"%filename)
 
@@ -183,50 +194,37 @@ class System(pc.System):
                     os.remove(file)
 
             elif os.path.exists(filename):
-                atoms, boxdims, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, box_vectors=True, customkeys=customkeys)
-                self.atoms = atoms
-                self.box = boxdims
-
-                if triclinic:
-                    rot = np.array(box).T
-                    rotinv = np.linalg.inv(rot)
-                    self.assign_triclinic_params(rot, rotinv)
+                atoms, box, is_triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
             else:
                 raise IOError("input file %s not found"%filename)
 
 
         elif format == 'poscar':
             if os.path.exists(filename):
-                atoms, boxdims, box = ptp.read_poscar(filename, compressed=compressed, box_vectors = True)
-                self.atoms = atoms
-                self.box = boxdims
-                if is_triclinic:
-                    rot = np.array(box).T
-                    rotinv = np.linalg.inv(rot)
-                    self.assign_triclinic_params(rot, rotinv)
+                atoms, box = ptp.read_poscar(filename, compressed=compressed)
             else:
                 raise IOError("input file %s not found"%filename)
 
         elif format == 'ase':
-            atoms, boxdims, box = ptp.read_ase(filename, box_vectors = True)
-            self.atoms = atoms
-            self.box = boxdims
-            if is_triclinic:
-                rot = np.array(box).T
-                rotinv = np.linalg.inv(rot)
-                self.assign_triclinic_params(rot, rotinv)
+            atoms, box = ptp.read_ase(filename)
 
         elif format == 'mdtraj':
-            atoms, boxdims, box = ptp.read_mdtraj(filename, box_vectors = True)
-            self.atoms = atoms
-            self.box = boxdims
-            if is_triclinic:
-                rot = np.array(box).T
-                rotinv = np.linalg.inv(rot)
-                self.assign_triclinic_params(rot, rotinv)
+            atoms, box = ptp.read_mdtraj(filename)
 
         else:
             raise TypeError("format recieved an unknown option %s"%format)
+
+        self.atoms = atoms
+        self.box = box
+
+        if is_triclinic:
+            #we have to input rotation matrix and the inverse rotation matrix
+            rot = np.array(box).T
+            rotinv = np.linalg.inv(rot)
+            self.assign_triclinic_params(rot, rotinv)
+
+        if(len(atoms) < 20):
+            self.repeat((3, 3, 3), ghost=True, scale_box=True)
 
     def get_atom(self, index):
         """
@@ -312,7 +310,7 @@ class System(pc.System):
         r = bin_edges[:-1]
 
         #get box density
-        boxvecs = self.get_boxvecs()
+        boxvecs = self.box
         vol = np.dot(np.cross(boxvecs[0], boxvecs[1]), boxvecs[2])
         natoms = self.nop
         rho = natoms/vol
@@ -500,8 +498,8 @@ class System(pc.System):
 
         """
         #first reset all neighbors
-        if len(self.atoms) < 20:
-            warnings.warn("Very less number of atoms, results maybe wrong. See https://github.com/srmnitc/pyscal/issues/63 ")
+        if(self.natoms < 20):
+            self.repeat((3, 3, 3), ghost=True, scale_box=True)
 
         self.reset_allneighbors()
         self.filter = 0
@@ -939,10 +937,7 @@ class System(pc.System):
         self.find_solid_atoms()
 
         if cluster:
-            def ccondition(atom):
-                return atom.solid
-
-            lc = self.cluster_atoms(ccondition, largest=True, cutoff=cutoff)
+            lc = self.cluster_atoms("solid", largest=True, cutoff=cutoff)
             return lc
 
     def set_atom_cutoff(self, factor=1.00):
@@ -1016,7 +1011,7 @@ class System(pc.System):
         passing an attribute.
 
         """
-        testatom = self.atoms[0]
+        testatom = self.get_atom(0)
 
         #test the condition
         isatomattr = False
@@ -1707,7 +1702,8 @@ class System(pc.System):
 
         #calculate rho
         box = self.box
-        rho = len(self.atoms)/((box[0][1]-box[0][0])*(box[1][1]-box[1][0])*(box[2][1]-box[2][0]))
+        vol = np.dot(np.cross(box[0], box[1]), box[2])
+        rho = len(self.atoms)/vol
         self.entropy(sigma, rho, rstart, rm, h, kb)
 
         if averaged:
@@ -1777,9 +1773,9 @@ class System(pc.System):
             dump.write("ITEM: NUMBER OF ATOMS\n")
             dump.write("%d\n" % len(atoms))
             dump.write("ITEM: BOX BOUNDS\n")
-            dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
-            dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
-            dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
+            dump.write("%f %f\n" % (0, boxdims[0][0]))
+            dump.write("%f %f\n" % (0, boxdims[1][1]))
+            dump.write("%f %f\n" % (0, boxdims[2][2]))
 
             #now write header
             if len(customkeys) > 0:
@@ -1883,7 +1879,7 @@ class System(pc.System):
         self.atoms = atoms
 
 
-    def repeat(self, reps, ghost=False):
+    def repeat(self, reps, ghost=False, scale_box=True):
         """
         Replicate simulation cell
         
@@ -1895,30 +1891,23 @@ class System(pc.System):
         ghost : bool, optional
             If True, assign the new atoms as ghost instead of actual atoms
         """
+        
         box = self.box        
-        boxdims = []
-        for i in range(3):
-            boxdims.append(box[i][1] - box[i][0])
-
-        for i in range(3):
-            box[i][0] = box[i][0]-reps[i]*boxdims[i]
-            box[i][1] = box[i][1]+reps[i]*boxdims[i]
+        self.actual_box = box.copy()
 
         atoms = self.atoms
 
         newatoms = []
         idstart = len(atoms) + 1
 
-        for i in range(-reps[0], reps[0]+1):
-            for j in range(-reps[1], reps[1]+1):
-                for k in range(-reps[2], reps[2]+1):
+        for i in range(0, reps[0]):
+            for j in range(0, reps[1]):
+                for k in range(0, reps[2]):
                     if (i==j==k==0):
                         continue
                     for atom in atoms:
-                        pos = atom.pos
-                        pos[0] = pos[0] + i*boxdims[0]
-                        pos[1] = pos[1] + j*boxdims[1]
-                        pos[2] = pos[2] + k*boxdims[2]
+                        pos = np.array(atom.pos)
+                        pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
                         a = Atom()
                         a.pos = pos
                         a.id = idstart
@@ -1928,9 +1917,15 @@ class System(pc.System):
                             a.ghost = 1
                         newatoms.append(a)
 
-        self.box = box
-        self.actual_box = box
-        self.ghosts_created = True
+        if scale_box:
+            box[0] = reps[0]*np.array(box[0])
+            box[1] = reps[1]*np.array(box[1])
+            box[2] = reps[2]*np.array(box[2])
+            self.box = box
+        if ghost:
+            self.ghosts_created = True
+
         completeatoms = atoms + newatoms
+        #print(len(completeatoms))
         self.atoms = completeatoms                
 

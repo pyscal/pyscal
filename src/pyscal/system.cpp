@@ -15,7 +15,9 @@ using namespace voro;
 //-----------------------------------------------------
 System::System(){
 
-    nop = -1;
+    nop = 0;
+    ghost_nop = 0;
+    real_nop = 0;
     triclinic = 0;
     usecells = 0;
     filter = 0;
@@ -28,6 +30,13 @@ System::System(){
     comparecriteria = 0;
     
     neighbordistance = 0;
+
+    //set box with zeros
+    for(int i=0; i<3; i++){
+        for(int j=0; j<3; j++){
+            box[i][j] = 0.0;
+        }
+    }
 
 }
 
@@ -65,16 +74,25 @@ vector<vector<double>> System::get_triclinic_params(){
 
 void System::sbox(vector<vector <double>> boxd) {
 
-    boxdims[0][0] = boxd[0][0];
-    boxdims[0][1] = boxd[0][1];
-    boxdims[1][0] = boxd[1][0];
-    boxdims[1][1] = boxd[1][1];
-    boxdims[2][0] = boxd[2][0];
-    boxdims[2][1] = boxd[2][1];
+    //this method will be redone to get a 3x3 box
+    //always. They will be then translated to the
+    //corresponding other boxes
+    double isum;
 
-    boxx = boxd[0][1] - boxd[0][0];
-    boxy = boxd[1][1] - boxd[1][0];
-    boxz = boxd[2][1] - boxd[2][0];
+    for(int i=0; i<3; i++){
+        isum = 0;
+        for(int j=0; j<3; j++){
+            box[i][j] = boxd[i][j];
+            isum += boxd[i][j]*boxd[i][j];
+        }
+        boxdims[i][0] = 0;
+        boxdims[i][1] = sqrt(isum);
+
+    }
+
+    boxx = boxdims[0][1] - boxdims[0][0];
+    boxy = boxdims[1][1] - boxdims[1][0];
+    boxz = boxdims[2][1] - boxdims[2][0];
 }
 
 vector<vector<double>> System::gbox(){
@@ -83,39 +101,10 @@ vector<vector<double>> System::gbox(){
 
     for(int i=0;i<3;i++){
         qd.clear();
-        for(int j=0;j<2;j++){
-            qd.emplace_back(boxdims[i][j]);
+        for(int j=0;j<3;j++){
+            qd.emplace_back(box[i][j]);
         }
         qres.emplace_back(qd);
-    }
-    return qres;
-}
-
-vector<vector<double>> System::gboxvecs(){
-    vector<vector<double>> qres;
-    vector<double> dqres;
-    if (triclinic==1){
-        for(int i=0; i<3; i++){
-            dqres.clear();
-            for(int j=0; j<3; j++){
-                dqres.emplace_back(rot[j][i]);
-            }
-            qres.emplace_back(dqres);
-        }
-    }
-    else{
-        for(int i=0; i<3; i++){
-            dqres.clear();
-            for(int j=0; j<3; j++){
-                if(i==j){
-                    dqres.emplace_back(boxdims[i][1]-boxdims[i][0]);
-                }
-                else{
-                    dqres.emplace_back(0.0);
-                }
-            }
-            qres.emplace_back(dqres);
-        }
     }
     return qres;
 }
@@ -132,14 +121,38 @@ void System::set_atoms( vector<Atom> atomitos){
     atoms.reserve(nop);
     atoms.assign(atomitos.begin(), atomitos.end());
 
+    //now assign ghost and real atoms
+    int tg = 0;
+    int tl = 0;
+
+    for(int i=0; i<nop; i++){
+        if(atoms[i].ghost==0){
+            tl++;
+        }
+        else{
+            tg++;
+        }
+    }
+
+    ghost_nop = tg;
+    real_nop = tl;
+    cout<<"Assigned real "<<tl<<" ghost "<<tg<<endl;
+    cout<<nop<<endl;
+
 }
 
 
 //this function allows for handling custom formats of atoms and so on
 vector<Atom> System::get_atoms( ){
-    return atoms;
+    //here, we have to filter ghost atoms
+    vector<Atom> retatoms;
+    for(int i=0; i<real_nop; i++){
+        retatoms.emplace_back(atoms[i]);
+    }
+    return retatoms;
 
 }
+
 
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) {
@@ -574,6 +587,7 @@ void System::get_all_neighbors_normal(){
     for (int ti=0; ti<nop; ti++){
         for (int tj=ti; tj<nop; tj++){
             if(ti==tj) { continue; }
+
             d = get_abs_distance(ti,tj,diffx,diffy,diffz);
             if (d < neighbordistance){
                 if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
@@ -1424,8 +1438,8 @@ void System::calculate_aq(vector <int> qs){
 
 vector<double> System::gqvals(int qq){
     vector<double> qres;
-    qres.reserve(nop);
-    for(int i=0;i<nop;i++){
+    qres.reserve(real_nop);
+    for(int i=0;i<real_nop;i++){
         qres.emplace_back(atoms[i].q[qq-2]);
     }
 
@@ -1434,8 +1448,8 @@ vector<double> System::gqvals(int qq){
 
 vector<double> System::gaqvals(int qq){
     vector<double> qres;
-    qres.reserve(nop);
-    for(int i=0;i<nop;i++){
+    qres.reserve(real_nop);
+    for(int i=0;i<real_nop;i++){
         qres.emplace_back(atoms[i].aq[qq-2]);
     }
 
@@ -1609,24 +1623,27 @@ void System::find_solid_atoms(){
 
 
 void System::find_clusters(double clustercutoff){
+        //Clustering methods should only run over real atoms
         if (clustercutoff != 0){
-          for(int ti=0; ti<nop;ti++){
+          for(int ti=0; ti<real_nop;ti++){
               atoms[ti].cutoff = clustercutoff;
           }
         }
-        for(int ti=0; ti<nop;ti++){
+        for(int ti=0; ti<real_nop;ti++){
             atoms[ti].belongsto = -1;
         }
 
-        for (int ti= 0;ti<nop;ti++){
+        for (int ti= 0;ti<real_nop;ti++){
 
             if (!atoms[ti].condition) continue;
+            if (atoms[ti].ghost) continue;
 
             if (atoms[ti].belongsto==-1) {atoms[ti].belongsto = atoms[ti].id; }
             for (int c = 0;c<atoms[ti].n_neighbors;c++){
 
                 if(!atoms[atoms[ti].neighbors[c]].condition) continue;
                 if(!(atoms[ti].neighbordist[atoms[ti].neighbors[c]] <= atoms[ti].cutoff)) continue;
+                if (atoms[atoms[ti].neighbors[c]].ghost) continue;
                 if (atoms[atoms[ti].neighbors[c]].belongsto==-1){
                     atoms[atoms[ti].neighbors[c]].belongsto = atoms[ti].belongsto;
                 }
@@ -1644,6 +1661,7 @@ void System::harvest_cluster(const int ti, const int clusterindex){
     int neigh;
     for(int i=0; i<atoms[ti].n_neighbors; i++){
         neigh = atoms[ti].neighbors[i];
+        if (atoms[neigh].ghost) continue;
         if(!atoms[neigh].condition) continue;
         if(!(atoms[ti].neighbordist[i] <= atoms[ti].cutoff)) continue;
         if (atoms[neigh].belongsto==-1){
@@ -1665,12 +1683,13 @@ void System::find_clusters_recursive(double clustercutoff){
     clusterindex = 0;
 
     //reset belongsto indices
-    for(int ti=0; ti<nop;ti++){
+    for(int ti=0; ti<real_nop;ti++){
         atoms[ti].belongsto = -1;
     }
 
-    for (int ti= 0;ti<nop;ti++){
+    for (int ti= 0;ti<real_nop;ti++){
         if (!atoms[ti].condition) continue;
+        if (atoms[ti].ghost) continue;
         if (atoms[ti].belongsto==-1){
             clusterindex += 1;
             atoms[ti].belongsto = clusterindex;
@@ -1685,18 +1704,18 @@ void System::find_clusters_recursive(double clustercutoff){
 int System::largest_cluster(){
 
         int *freq = new int[nop];
-        for(int ti=0;ti<nop;ti++){
+        for(int ti=0;ti<real_nop;ti++){
             freq[ti] = 0;
         }
 
-        for (int ti= 0;ti<nop;ti++)
+        for (int ti= 0;ti<real_nop;ti++)
         {
             if (atoms[ti].belongsto==-1) continue;
             freq[atoms[ti].belongsto-1]++;
         }
 
         int max=0;
-        for (int ti= 0;ti<nop;ti++)
+        for (int ti= 0;ti<real_nop;ti++)
         {
             if (freq[ti]>max){
                 max=freq[ti];
@@ -1711,7 +1730,7 @@ int System::largest_cluster(){
 }
 
 void System::get_largest_cluster_atoms(){
-        for(int ti=0; ti<nop; ti++){
+        for(int ti=0; ti<real_nop; ti++){
             atoms[ti].issurface = 1;
             atoms[ti].lcluster = 0;
             //if its in same cluster as max cluster assign it as one
@@ -1722,6 +1741,7 @@ void System::get_largest_cluster_atoms(){
             if(atoms[ti].issolid == 1){
                 atoms[ti].issurface = 0;
                 for(int tj=0; tj<atoms[ti].n_neighbors; tj++){
+                    if (atoms[atoms[ti].neighbors[tj]].ghost) continue;
                     if(atoms[atoms[ti].neighbors[tj]].issolid == 0){
                         atoms[ti].issurface = 1;
                         break;
@@ -1882,7 +1902,7 @@ vector<int> System::calculate_acna(){
         result.emplace_back(0);
     }
 
-    for(int ti=0; ti<nop; ti++){
+    for(int ti=0; ti<real_nop; ti++){
         if(atoms[ti].structure == 0)
             atoms[ti].calculate_adaptive_cna(14);
 
@@ -1906,7 +1926,7 @@ vector<int> System::calculate_cna(){
         result.emplace_back(0);
     }
 
-    for(int ti=0; ti<nop; ti++){
+    for(int ti=0; ti<real_nop; ti++){
         if(atoms[ti].structure == 0)
             atoms[ti].calculate_adaptive_cna(14);
 

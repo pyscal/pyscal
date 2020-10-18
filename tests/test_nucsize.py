@@ -28,7 +28,7 @@ def test_cluster_cutoff():
 
 def test_system_nucsize_fraction():
     #create some atoms
-    atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2])
+    atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2], lattice_constant=3.20)
     sys = pc.System()
     sys.atoms = atoms
     sys.box = boxdims

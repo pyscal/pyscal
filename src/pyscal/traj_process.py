@@ -17,7 +17,7 @@ import gzip
 import io
 
 #new function to wrap over mdtraj objects
-def read_mdtraj(mdobject, check_triclinic=False, box_vectors=False):
+def read_mdtraj(mdobject, check_triclinic=False):
     """
     Function to read from an MDTraj atoms objects
 
@@ -29,9 +29,6 @@ def read_mdtraj(mdobject, check_triclinic=False, box_vectors=False):
     triclinic : bool, optional
         True if the configuration is triclinic
 
-    box_vectors : bool, optional
-        If true, return the full box vectors along with `boxdims` which gives upper and lower bounds.
-        default False.
     """
     #We have to process atoms and atomic objects from ase
     #Known issues lammps -dump modified format
@@ -41,7 +38,6 @@ def read_mdtraj(mdobject, check_triclinic=False, box_vectors=False):
     c = np.array(mdobject.unitcell_vectors[0][2])
 
     box = np.array([a, b, c])
-    boxdims = np.array([[0, np.sqrt(np.sum(a**2))],[0, np.sqrt(np.sum(b**2))],[0, np.sqrt(np.sum(c**2))]])
 
     #box and box dims are set. Now handle atoms
     chems = np.array([atom.name for atom in mdobject.topology.atoms])
@@ -63,14 +59,11 @@ def read_mdtraj(mdobject, check_triclinic=False, box_vectors=False):
         atom.custom = customdict
         atoms.append(atom)
 
-    if box_vectors:
-        return atoms, boxdims, box
-    else:
-        return atoms, box
+    return atoms, box
 
 
 #new function to wrap over ase objects
-def read_ase(aseobject, check_triclinic=False, box_vectors=False):
+def read_ase(aseobject, check_triclinic=False):
     """
     Function to read from a ASE atoms objects
 
@@ -82,9 +75,6 @@ def read_ase(aseobject, check_triclinic=False, box_vectors=False):
     triclinic : bool, optional
         True if the configuration is triclinic
 
-    box_vectors : bool, optional
-        If true, return the full box vectors along with `boxdims` which gives upper and lower bounds.
-        default False.
     """
     #We have to process atoms and atomic objects from ase
     #Known issues lammps -dump modified format
@@ -94,7 +84,6 @@ def read_ase(aseobject, check_triclinic=False, box_vectors=False):
     c = np.array(aseobject.cell[2])
 
     box = np.array([a, b, c])
-    boxdims = np.array([[0, np.sqrt(np.sum(a**2))],[0, np.sqrt(np.sum(b**2))],[0, np.sqrt(np.sum(c**2))]])
 
     #box and box dims are set. Now handle atoms
     chems = np.array(aseobject.get_chemical_symbols())
@@ -116,10 +105,7 @@ def read_ase(aseobject, check_triclinic=False, box_vectors=False):
         atom.custom = customdict
         atoms.append(atom)
 
-    if box_vectors:
-        return atoms, boxdims, box
-    else:
-        return atoms, box
+    return atoms, box
 
 def convert_to_ase(sys, species=None):
     """
@@ -183,7 +169,7 @@ def convert_to_ase(sys, species=None):
                     break
         specieskey = "".join(species)
       
-    cell = sys.get_boxvecs()
+    cell = sys.box
     pbc = [1, 1, 1]
 
     #create ASE Atoms and assign everything
@@ -200,7 +186,7 @@ def convert_to_ase(sys, species=None):
     return aseobject
 
 #functions that are not wrapped from C++
-def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vectors=False, customkeys=None):
+def read_lammps_dump(infile, compressed = False, check_triclinic=False, customkeys=None):
     """
     Function to read a lammps dump file format - single time slice.
 
@@ -215,10 +201,6 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
     check_triclinic : bool, optional
         If true check if the sim box is triclinic. Default False.
-
-    box_vectors : bool, optional
-        If true, return the full box vectors along with `boxdims` which gives upper and lower bounds.
-        default False.
 
     customkeys : list of strings, optional
         A list of extra keywords to read from trajectory file.
@@ -386,10 +368,8 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
 
         #finally change boxdims - to triclinic box size
         box = np.array([a, b, c])
-        boxdims = np.array([[0, np.sqrt(np.sum(a**2))],[0, np.sqrt(np.sum(b**2))],[0, np.sqrt(np.sum(c**2))]])
     else:
         box = np.array([[boxx[1]-boxx[0], 0, 0],[0, boxy[1]-boxy[0], 0],[0, 0, boxz[1]-boxz[0]]])
-        boxdims = np.array([[boxx[0], boxx[1]],[boxy[0], boxy[1]],[boxz[0], boxz[1]]])
 
     #adjust for scled coordinates
     if scaled:
@@ -398,18 +378,12 @@ def read_lammps_dump(infile, compressed = False, check_triclinic=False, box_vect
             ndist = dist[0]*box[0] + dist[1]*box[1] + dist[2]*box[2]
             atom.pos = ndist
 
-    if box_vectors and check_triclinic:
-        return atoms, boxdims, box, triclinic
-
-    elif box_vectors:
-        return atoms, boxdims, box
-
-    elif check_triclinic:
-        return atoms, boxdims, triclinic
+    if check_triclinic:
+        return atoms, box, triclinic
     else:
-        return atoms, boxdims
+        return atoms, box
 
-def read_poscar(infile, compressed = False, box_vectors = False):
+def read_poscar(infile, compressed = False):
     """
     Function to read a POSCAR format.
 
@@ -478,7 +452,6 @@ def read_poscar(infile, compressed = False, box_vectors = False):
     yhigh = scaling_factor*yvector[1]
     zlow = 0
     zhigh = scaling_factor*zvector[2]
-    boxdims = [[xlow, xhigh],[ylow, yhigh],[zlow, zhigh]]
 
     if (data[nlev+1].strip().split()[0][0]=='s' or data[nlev+1].strip().split()[0][0]=='S'):
         selective_dynamics=True
@@ -538,10 +511,7 @@ def read_poscar(infile, compressed = False, box_vectors = False):
         else:
             species+=1
 
-    if box_vectors:
-        return atoms, boxdims, boxvecs
-    else:
-        return atoms, boxdims
+    return atoms, boxvecs
 
 def write_poscar(sys, outfile, comments="pyscal"):
     """
@@ -561,7 +531,7 @@ def write_poscar(sys, outfile, comments="pyscal"):
     fout.write("   1.00000000000000\n")
 
     #write box
-    vecs = sys.get_boxvecs()
+    vecs = sys.box
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[0][0], vecs[0][1], vecs[0][2]))
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[1][0], vecs[1][1], vecs[1][2]))
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[2][0], vecs[2][1], vecs[2][2]))
@@ -626,7 +596,12 @@ def write_structure(sys, outfile, format = 'lammps-dump', compressed = False, cu
     None
 
     """
-    boxdims = sys.box
+    box = sys.box
+    boxdims = []
+    boxdims.append([0, box[0][0]])
+    boxdims.append([0, box[1][1]])
+    boxdims.append([0, box[2][2]])
+
     atoms = sys.atoms
 
     #open files for writing

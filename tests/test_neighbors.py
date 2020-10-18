@@ -47,7 +47,7 @@ def test_neighbors_system():
 
 def test_neighbors_system_filter():
     #create some atoms
-    atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2])
+    atoms, boxdims = pcs.make_crystal('bcc', repetitions = [5, 5, 5])
     sys = pc.System()
     sys.atoms = atoms
     sys.box = boxdims

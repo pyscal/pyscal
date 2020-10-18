@@ -34,6 +34,8 @@ class System{
         System();
         ~System();
         int nop;
+        int ghost_nop;
+        int real_nop;
 
         //-----------------------------------------------------
         // Simulation box related methods
@@ -43,12 +45,11 @@ class System{
         int triclinic;
         double boxx, boxy, boxz;
         double boxdims[3][2];
+        double box[3][3];
         void assign_triclinic_params(vector<vector<double>>, vector<vector<double>>);
         vector<vector<double>> get_triclinic_params();
-        vector<vector<double>> gboxvecs();
         void sbox(vector<vector<double>>);
         vector<vector<double>> gbox();
-        vector<double> gboxdims();
 
         //-----------------------------------------------------
         // Atom related methods

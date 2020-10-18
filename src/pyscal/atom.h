@@ -18,7 +18,7 @@ using namespace std;
 
 
 const double PI = 3.141592653589793;
-const int MAXNUMBEROFNEIGHBORS = 100;
+const int MAXNUMBEROFNEIGHBORS = 300;
 const int NILVALUE = 333333;
 
 //create a structure for sorting
@@ -83,7 +83,6 @@ class Atom{
         int id;
         int loc;
         double posx,posy,posz;
-        int ghost;
         vector<double> gx();
         void sx(vector<double>);
 
@@ -93,6 +92,10 @@ class Atom{
 
         //mask for calculations to exclude atoms
         bool mask;
+
+        //ghost properties
+        int ghost;
+
   
         //-------------------------------------------------------
         // Neighbor related properties
@@ -112,6 +115,7 @@ class Atom{
         double cutoff;
         int n_neighbors;
         int isneighborset;
+
         //function to set neighbors
         void sneighdist(vector<double>);
         vector<double> gneighdist();
