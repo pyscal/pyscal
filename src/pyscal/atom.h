@@ -116,20 +116,6 @@ class Atom{
         int n_neighbors;
         int isneighborset;
 
-        //same set of neighbor properties for ghosts
-        int ghostneighbors[MAXNUMBEROFNEIGHBORS];
-        int ghostmasks[MAXNUMBEROFNEIGHBORS];
-        double ghostneighbordist[MAXNUMBEROFNEIGHBORS];
-        double ghostneighborweight[MAXNUMBEROFNEIGHBORS];
-        double ghostn_diffx[MAXNUMBEROFNEIGHBORS];
-        double ghostn_diffy[MAXNUMBEROFNEIGHBORS];
-        double ghostn_diffz[MAXNUMBEROFNEIGHBORS];
-        double ghostn_r[MAXNUMBEROFNEIGHBORS];
-        double ghostn_phi[MAXNUMBEROFNEIGHBORS];
-        double ghostn_theta[MAXNUMBEROFNEIGHBORS];
-        vector<datom> ghosttemp_neighbors;
-
-
         //function to set neighbors
         void sneighdist(vector<double>);
         vector<double> gneighdist();

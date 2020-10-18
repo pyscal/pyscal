@@ -16,7 +16,8 @@ using namespace voro;
 System::System(){
 
     nop = 0;
-    gnop = 0;
+    ghost_nop = 0;
+    real_nop = 0;
     triclinic = 0;
     usecells = 0;
     filter = 0;
@@ -113,30 +114,36 @@ void System::set_atoms( vector<Atom> atomitos){
     atoms.reserve(nop);
     atoms.assign(atomitos.begin(), atomitos.end());
 
+    //now assign ghost and real atoms
+    int tg = 0;
+    int tl = 0;
+
+    for(int i=0; i<nop; i++){
+        if(atoms[i].ghost==0){
+            tl++;
+        }
+        else{
+            tg++;
+        }
+    }
+
+    ghost_nop = tg;
+    real_nop = tl;
+
 }
 
 
 //this function allows for handling custom formats of atoms and so on
 vector<Atom> System::get_atoms( ){
-    return atoms;
+    //here, we have to filter ghost atoms
+    vector<Atom> retatoms;
+    for(int i=0; i<real_nop; i++){
+        retatoms.emplace_back(atoms[i]);
+    }
+    return retatoms;
 
 }
 
-void System::set_ghostatoms( vector<Atom> atomitos){
-
-    ghost_atoms.clear();
-    gnop = atomitos.size();
-    ghost_atoms.reserve(gnop);
-    ghost_atoms.assign(atomitos.begin(), atomitos.end());
-
-}
-
-
-//this function allows for handling custom formats of atoms and so on
-vector<Atom> System::get_ghostatoms( ){
-    return ghost_atoms;
-
-}
 
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) {
