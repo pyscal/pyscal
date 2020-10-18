@@ -479,8 +479,6 @@ class System(pc.System):
 
         """
         #first reset all neighbors
-        if len(self.atoms) < 20:
-            warnings.warn("Very less number of atoms, results maybe wrong. See https://github.com/srmnitc/pyscal/issues/63 ")
 
         self.reset_allneighbors()
         self.filter = 0
@@ -1906,7 +1904,7 @@ class System(pc.System):
             self.box = box
         if ghost:
             self.ghosts_created = True
-        else:
-            completeatoms = atoms + newatoms
-            self.atoms = completeatoms                
+
+        completeatoms = atoms + newatoms
+        self.atoms = completeatoms                
 

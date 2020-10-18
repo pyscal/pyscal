@@ -32,6 +32,7 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------        
         .def(py::init< >())
         .def_readonly("nop", &System::real_nop)
+        .def_readonly("ntotal", &System::nop)
         .def_readonly("natoms", &System::real_nop)
 
         //-----------------------------------------------------
