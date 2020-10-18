@@ -84,6 +84,25 @@ class System(pc.System):
         self.actual_box = None
         pc.System.__init__(self)
 
+    @property
+    def box(self):
+        """
+        Wrap for inbuilt box
+        """
+        if self.actual_box is not None:
+            return self.actual_box
+        else:
+            return self._box
+
+    @box.setter
+    def box(self, userbox):
+        """
+        Box setter 
+        """
+        self._box = userbox
+
+
+
     def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None, is_triclinic = False):
         """
 
@@ -205,7 +224,7 @@ class System(pc.System):
             self.assign_triclinic_params(rot, rotinv)
 
         if(len(atoms) < 20):
-            self.repeat((3, 3, 3), ghost=True, scale_box=False)
+            self.repeat((3, 3, 3), ghost=True, scale_box=True)
 
     def get_atom(self, index):
         """
@@ -1875,7 +1894,9 @@ class System(pc.System):
         ghost : bool, optional
             If True, assign the new atoms as ghost instead of actual atoms
         """
+        
         box = self.box        
+        self.actual_box = box.copy()
 
         atoms = self.atoms
 
@@ -1908,6 +1929,6 @@ class System(pc.System):
             self.ghosts_created = True
 
         completeatoms = atoms + newatoms
-        print(len(completeatoms))
+        #print(len(completeatoms))
         self.atoms = completeatoms                
 

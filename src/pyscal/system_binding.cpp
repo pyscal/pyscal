@@ -38,7 +38,7 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         // Simulation box related methods
         //-----------------------------------------------------
-        .def_property("box", &System::gbox, &System::sbox )
+        .def_property("_box", &System::gbox, &System::sbox )
         .def("assign_triclinic_params",&System::assign_triclinic_params)
         .def("get_triclinic_params",&System::get_triclinic_params)
         .def_readwrite("triclinic", &System::triclinic)
