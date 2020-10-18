@@ -18,7 +18,7 @@ using namespace std;
 
 
 const double PI = 3.141592653589793;
-const int MAXNUMBEROFNEIGHBORS = 100;
+const int MAXNUMBEROFNEIGHBORS = 300;
 const int NILVALUE = 333333;
 
 //create a structure for sorting

@@ -937,10 +937,7 @@ class System(pc.System):
         self.find_solid_atoms()
 
         if cluster:
-            def ccondition(atom):
-                return atom.solid
-
-            lc = self.cluster_atoms(ccondition, largest=True, cutoff=cutoff)
+            lc = self.cluster_atoms("solid", largest=True, cutoff=cutoff)
             return lc
 
     def set_atom_cutoff(self, factor=1.00):
@@ -1014,7 +1011,7 @@ class System(pc.System):
         passing an attribute.
 
         """
-        testatom = self.atoms[0]
+        testatom = self.get_atom(0)
 
         #test the condition
         isatomattr = False
