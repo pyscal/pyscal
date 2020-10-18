@@ -166,15 +166,7 @@ class System(pc.System):
 
                 #now if file exists
                 if os.path.exists(filename):
-                    atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
-                    self.atoms = atoms
-                    self.box = box
-
-                    if triclinic:
-                        #we have to input rotation matrix and the inverse rotation matrix
-                        rot = np.array(box).T
-                        rotinv = np.linalg.inv(rot)
-                        self.assign_triclinic_params(rot, rotinv)
+                    atoms, box, is_triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
                 else:
                     raise IOError("input file %s not found"%filename)
 
@@ -183,14 +175,7 @@ class System(pc.System):
                     os.remove(file)
 
             elif os.path.exists(filename):
-                atoms, box, triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
-                self.atoms = atoms
-                self.box = box
-
-                if triclinic:
-                    rot = np.array(box).T
-                    rotinv = np.linalg.inv(rot)
-                    self.assign_triclinic_params(rot, rotinv)
+                atoms, box, is_triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
             else:
                 raise IOError("input file %s not found"%filename)
 
@@ -198,36 +183,26 @@ class System(pc.System):
         elif format == 'poscar':
             if os.path.exists(filename):
                 atoms, box = ptp.read_poscar(filename, compressed=compressed)
-                self.atoms = atoms
-                self.box = box
-                if is_triclinic:
-                    rot = np.array(box).T
-                    rotinv = np.linalg.inv(rot)
-                    self.assign_triclinic_params(rot, rotinv)
             else:
                 raise IOError("input file %s not found"%filename)
 
         elif format == 'ase':
             atoms, box = ptp.read_ase(filename)
-            self.atoms = atoms
-            self.box = box
-            if is_triclinic:
-                rot = np.array(box).T
-                rotinv = np.linalg.inv(rot)
-                self.assign_triclinic_params(rot, rotinv)
 
         elif format == 'mdtraj':
             atoms, box = ptp.read_mdtraj(filename)
-            self.atoms = atoms
-            self.box = box
-            if is_triclinic:
-                rot = np.array(box).T
-                rotinv = np.linalg.inv(rot)
-                self.assign_triclinic_params(rot, rotinv)
 
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 
+        self.atoms = atoms
+        self.box = box
+
+        if is_triclinic:
+            #we have to input rotation matrix and the inverse rotation matrix
+            rot = np.array(box).T
+            rotinv = np.linalg.inv(rot)
+            self.assign_triclinic_params(rot, rotinv)
 
         if(len(atoms) < 20):
             self.repeat((3, 3, 3), ghost=True, scale_box=False)
