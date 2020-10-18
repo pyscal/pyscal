@@ -31,6 +31,13 @@ System::System(){
     
     neighbordistance = 0;
 
+    //set box with zeros
+    for(int i=0; i<3; i++){
+        for(int j=0; j<3; j++){
+            box[i][j] = 0.0;
+        }
+    }
+
 }
 
 System::~System(){
@@ -129,6 +136,8 @@ void System::set_atoms( vector<Atom> atomitos){
 
     ghost_nop = tg;
     real_nop = tl;
+    cout<<"Assigned real "<<tl<<" ghost "<<tg<<endl;
+    cout<<nop<<endl;
 
 }
 
@@ -578,6 +587,7 @@ void System::get_all_neighbors_normal(){
     for (int ti=0; ti<nop; ti++){
         for (int tj=ti; tj<nop; tj++){
             if(ti==tj) { continue; }
+
             d = get_abs_distance(ti,tj,diffx,diffy,diffz);
             if (d < neighbordistance){
                 if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){

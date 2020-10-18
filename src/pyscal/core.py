@@ -479,6 +479,8 @@ class System(pc.System):
 
         """
         #first reset all neighbors
+        if(self.natoms < 20):
+            self.repeat((3, 3, 3), ghost=True, scale_box=True)
 
         self.reset_allneighbors()
         self.filter = 0
@@ -1906,5 +1908,6 @@ class System(pc.System):
             self.ghosts_created = True
 
         completeatoms = atoms + newatoms
+        print(len(completeatoms))
         self.atoms = completeatoms                
 
