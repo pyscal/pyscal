@@ -228,6 +228,10 @@ class System(pc.System):
         else:
             raise TypeError("format recieved an unknown option %s"%format)
 
+
+        if(len(atoms) < 20):
+            self.repeat((3, 3, 3), ghost=True, scale_box=False)
+
     def get_atom(self, index):
         """
 
