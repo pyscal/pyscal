@@ -482,6 +482,28 @@ void System::set_up_cells(){
       //end of loop - all cells, the member atoms and neighboring cells are added
 }
 
+vector<double> System::remap_atom(vector<double> pos){
+    //remap atom position into the box
+    //now apply boxdims
+    double dx = pos[0];
+    double dy = pos[1];
+    double dz = pos[2];
+
+    if (dx < 0) dx+=boxx;
+    else if (dx >= boxx) dx-=boxx;
+    if (dy < 0) dy+=boxy;
+    else if (dy >= boxy) dy-=boxy;
+    if (dz < 0) dz+=boxz;
+    else if (dz >= boxz) dz-=boxz;
+
+    vector<double> rpos;
+    rpos.emplace_back(dx);
+    rpos.emplace_back(dy);
+    rpos.emplace_back(dz);
+    return rpos;
+
+}
+
 vector<int> System::cell_periodic(int i, int j, int k){
     vector<int> ci;
     //apply periodic conditions

@@ -42,6 +42,7 @@ PYBIND11_MODULE(csystem, m) {
         .def("assign_triclinic_params",&System::assign_triclinic_params)
         .def("get_triclinic_params",&System::get_triclinic_params)
         .def_readwrite("triclinic", &System::triclinic)
+        .def("remap_atom", &System::remap_atom)
 
         //-----------------------------------------------------
         // Atom related methods

@@ -50,6 +50,7 @@ class System{
         vector<vector<double>> get_triclinic_params();
         void sbox(vector<vector<double>>);
         vector<vector<double>> gbox();
+        vector<double> remap_atom(vector<double>);
 
         //-----------------------------------------------------
         // Atom related methods
