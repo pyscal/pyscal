@@ -1316,6 +1316,7 @@ void System::calculate_q(vector <int> qs){
     double summ;
 
     //first make space in atoms for the number of qs needed - assign with null values
+    /*
     for(int ti=0;ti<nop;ti++){
         for(int tj=0;tj<11;tj++){
 
@@ -1329,7 +1330,7 @@ void System::calculate_q(vector <int> qs){
             }
         }
     }
-
+    */
 
     //note that the qvals will be in -2 pos
     //q2 will be in q0 pos and so on
