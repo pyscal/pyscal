@@ -16,6 +16,7 @@ from ase.io import write
 import uuid
 import gzip
 import io
+import pyscal.visualization as pv
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -1927,5 +1928,30 @@ class System(pc.System):
 
         completeatoms = atoms + newatoms
         #print(len(completeatoms))
-        self.atoms = completeatoms                
+        self.atoms = completeatoms
+
+
+    def show(self, colorby=None, filterby=None):
+        """
+        Plot the system
+
+        Parameters
+        ----------
+        sys : System object
+
+        colorby : string, optional
+            property over which the atoms are to be colored. It can be any
+            attributed of Atom, a custom attribute,  or calculated q values which can be accessed
+            as `qx` or `aqx` where x stands for the q number.
+
+        filterby : string, optional
+            property over which the atoms are to be filtered before plotting.
+            It can be any attribute of atom, or a custom value of atom. It should provide
+            a True or False value.
+
+        Returns
+        -------
+        None  
+        """
+        pv.plot_system(self, colorby=colorby, filterby=filterby)                
 
