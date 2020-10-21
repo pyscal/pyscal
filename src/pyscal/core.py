@@ -104,7 +104,7 @@ class System(pc.System):
 
 
 
-    def read_inputfile(self, filename, format="lammps-dump", frame=-1, compressed = False, customkeys=None, is_triclinic = False):
+    def read_inputfile(self, filename, format="lammps-dump", compressed = False, customkeys=None, is_triclinic = False):
         """
 
         Read input file that contains the information of system configuration.
@@ -119,14 +119,6 @@ class System(pc.System):
 
         compressed : bool, optional
             If True, force to read a `gz` compressed format, default False.
-
-        frame : int
-            If the trajectory contains more than one time step, the slice can be specified
-            using the `frame` option.
-
-            .. note::
-
-                works only with `lammps-dump` format.
 
         customkeys : list
             A list containing names of headers of extra data that needs to be read in from the
@@ -167,54 +159,9 @@ class System(pc.System):
 
 
         """
-        if customkeys == None:
-            customkeys = []
-
-        if format == 'lammps-dump':
-            #check customkeys and assign a variable
-            customread = (len(customkeys) > 0)
-
-            if frame != -1:
-                #split the traj and returns set of filenames
-                filenames = ptp.split_traj_lammps_dump(filename, compressed=compressed)
-
-                #reassign filename
-                try:
-                    filename = filenames[frame]
-                except:
-                    raise IOError("frame %d is not found in the trajectory"%frame)
-
-                #now if file exists
-                if os.path.exists(filename):
-                    atoms, box, is_triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
-                else:
-                    raise IOError("input file %s not found"%filename)
-
-                #now remove filenames
-                for file in filenames:
-                    os.remove(file)
-
-            elif os.path.exists(filename):
-                atoms, box, is_triclinic = ptp.read_lammps_dump(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
-            else:
-                raise IOError("input file %s not found"%filename)
-
-
-        elif format == 'poscar':
-            if os.path.exists(filename):
-                atoms, box = ptp.read_poscar(filename, compressed=compressed)
-            else:
-                raise IOError("input file %s not found"%filename)
-
-        elif format == 'ase':
-            atoms, box = ptp.read_ase(filename)
-
-        elif format == 'mdtraj':
-            atoms, box = ptp.read_mdtraj(filename)
-
-        else:
-            raise TypeError("format recieved an unknown option %s"%format)
-
+        atoms, box, is_triclinic = ptp.read_file(filename, format=format, 
+                                    compressed=compressed, customkeys=customkeys,
+                                        is_triclinic=is_triclinic)
         self.atoms = atoms
         self.box = box
 
