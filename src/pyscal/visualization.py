@@ -10,22 +10,22 @@ import ipywidgets as widgets
 import itertools
 
 def create_box_plot(box, origin=[0,0,0]):
-	"""
-	Create traces which correspond to the simulation cell
+    """
+    Create traces which correspond to the simulation cell
 
-	Parameters
-	----------
-	box : list
-		dimensions of the simulation box
+    Parameters
+    ----------
+    box : list
+        dimensions of the simulation box
 
-	origin : list, optional
-		Origin of the simulation box. Default [0, 0, 0]
+    origin : list, optional
+        Origin of the simulation box. Default [0, 0, 0]
 
-	Returns
-	-------
-	traces : list of Scatter3d objects
+    Returns
+    -------
+    traces : list of Scatter3d objects
 
-	"""
+    """
     box = np.array(box)
     origin = np.array(origin)
     combos = list(itertools.combinations(range(3), 2))
@@ -53,33 +53,33 @@ def create_box_plot(box, origin=[0,0,0]):
 
 
 def plot_3d(pos, color=None, radius=17, 
-			colorscale='Spectral', opacity=1.0, 
-			traces=None, cmap_title=None):
-	"""
-	Plot the atoms along with the simulation box
+            colorscale='Spectral', opacity=1.0, 
+            traces=None, cmap_title=None):
+    """
+    Plot the atoms along with the simulation box
 
-	Parameters
-	----------
-	pos : list of positions
-		list of atomic positions
+    Parameters
+    ----------
+    pos : list of positions
+        list of atomic positions
 
-	color : list
-		list of colors to use for plotting
+    color : list
+        list of colors to use for plotting
 
-	radius : int, optional
-		radius of plotted atom objects
+    radius : int, optional
+        radius of plotted atom objects
 
-	colorscale : string, optional
-		color map for coloring atoms
+    colorscale : string, optional
+        color map for coloring atoms
 
-	opacity : float, optional
-		opacity of atoms
+    opacity : float, optional
+        opacity of atoms
 
-	traces : box plot objects
+    traces : box plot objects
 
-	cmap_title : string
-		title of cmap 
-	"""
+    cmap_title : string
+        title of cmap 
+    """
     data=go.Scatter3d(
         x=pos[:,0],
         y=pos[:,1],
@@ -124,27 +124,27 @@ def plot_3d(pos, color=None, radius=17,
     fig.show()
 
 def plot_system(sys, colorby=None, filterby=None):
-	"""
-	Plot the system
+    """
+    Plot the system
 
-	Parameters
-	----------
-	sys : System object
+    Parameters
+    ----------
+    sys : System object
 
-	colorby : string, optional
-		property over which the atoms are to be colored. It can be any
-		attributed of Atom, a custom attribute,  or calculated q values which can be accessed
-		as `qx` or `aqx` where x stands for the q number.
+    colorby : string, optional
+        property over which the atoms are to be colored. It can be any
+        attributed of Atom, a custom attribute,  or calculated q values which can be accessed
+        as `qx` or `aqx` where x stands for the q number.
 
-	filterby : string, optional
-		property over which the atoms are to be filtered before plotting.
-		It can be any attribute of atom, or a custom value of atom. It should provide
-		a True or False value.
+    filterby : string, optional
+        property over which the atoms are to be filtered before plotting.
+        It can be any attribute of atom, or a custom value of atom. It should provide
+        a True or False value.
 
-	Returns
-	-------
-	None  
-	"""
+    Returns
+    -------
+    None  
+    """
     atoms = sys.atoms
     positions = []
     colors = []
@@ -161,12 +161,18 @@ def plot_system(sys, colorby=None, filterby=None):
             colors.append(cx)
         else:
             colors.append(1)
+    colors = np.array(colors).astype(float)
     
     boxtraces = create_box_plot(sys.box)
     
+    if colorby is None:
+        ctitle = ""
+    else:
+        ctitle = colorby
+
     radius = widgets.FloatSlider(min=1, max=30, step=1)
     widgets.interact_manual.opts['manual_name'] = 'Render plot'
     im = widgets.interact_manual(plot_3d, radius=radius, 
-    	pos=widgets.fixed(np.array(positions)), cmap_title=colorby,
+        pos=widgets.fixed(np.array(positions)), cmap_title=widgets.fixed(ctitle),
         color=widgets.fixed(colors), opacity=widgets.fixed(1.0), 
         traces=widgets.fixed(boxtraces), description="test")
