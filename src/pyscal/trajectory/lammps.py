@@ -203,7 +203,8 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
     else:
         return atoms, box
 
-def write_snap(sys, outfile, format = 'lammps-dump', compressed = False, customkey=None, customvals=None, timestep=0):
+def write_snap(sys, outfile, compressed = False, 
+    customkeys=None, customvals=None, timestep=0):
     """
     Write the state of the system to a trajectory file.
 
@@ -214,10 +215,6 @@ def write_snap(sys, outfile, format = 'lammps-dump', compressed = False, customk
 
     outfile : string
         name of the output file
-
-    format : string, optional
-        the format of the output file, as of now only `lammps-dump` format
-        is supported.
 
     compressed : bool, default false
         write a `.gz` format
@@ -237,18 +234,23 @@ def write_snap(sys, outfile, format = 'lammps-dump', compressed = False, customk
     None
 
     """
+    if customkeys == None:
+        customkeys = []
+
     box = sys.box
-    boxdims = []
-    boxdims.append([0, box[0][0]])
-    boxdims.append([0, box[1][1]])
-    boxdims.append([0, box[2][2]])
+    boxx = np.sqrt(np.sum(box[0]**2))
+    boxy = np.sqrt(np.sum(box[1]**2))
+    boxz = np.sqrt(np.sum(box[2]**2))
 
     atoms = sys.atoms
 
+    if len(customkeys) > 0:
+        cvals = [sys.get_custom(atom, customkeys) for atom in atoms]
+
     #open files for writing
     if compressed:
-        gz = gzip.open(outfile,'w')
-        dump = io.BufferedReader(gz)
+        gz = gzip.open(outfile,'wt')
+        dump = gz
     else:
         gz = open(outfile,'w')
         dump = gz
@@ -258,60 +260,32 @@ def write_snap(sys, outfile, format = 'lammps-dump', compressed = False, customk
     dump.write("%d\n" % timestep)
     dump.write("ITEM: NUMBER OF ATOMS\n")
     dump.write("%d\n" % len(atoms))
-    dump.write("ITEM: BOX BOUNDS pp pp pp\n")
-    dump.write("%f %f\n" % (boxdims[0][0], boxdims[0][1]))
-    dump.write("%f %f\n" % (boxdims[1][0], boxdims[1][1]))
-    dump.write("%f %f\n" % (boxdims[2][0], boxdims[2][1]))
-
-
-    #check customkey and its values
-    #if single value, make it into array
-    writecustom = False
-
-    if customkey != None:
-        if not isinstance(customkey, list) or  isinstance(customkey, np.ndarray):
-            customkey = [str(customkey)]
-            customvals = np.array([customvals])
-        else:
-            ccdummy = [str(x) for x in customkey]
-            customkey = ccdummy
-
-        #verify lengths
-        if not len(customkey) == len(customvals):
-            #print(cust)
-            #raise TypeError("length of customkey and customvals should be same. lengths %d and %d not compatible"%(len(customkey), len(customvals)))
-            raise TypeError(customkey, customvals)
-
-        #now verify the lengths of customkey
-        for count, c in enumerate(customkey):
-            if not len(customvals[count]) == len(atoms):
-                raise TypeError("Length of customvals should be equal to number of atoms. lengths %d and %d not compatible"%(len(customvals[count]), len(atoms)))
-
-        #if everything works - change writecustom
-        writecustom = True
+    dump.write("ITEM: BOX BOUNDS\n")
+    dump.write("%f %f\n" % (0, boxx))
+    dump.write("%f %f\n" % (0, boxy))
+    dump.write("%f %f\n" % (0, boxz))
 
     #now write header
-    if writecustom:
-        ckey = " ".join(customkey)
+    if len(customkeys) > 0:
+        ckey = " ".join(customkeys)
         title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
     else:
         title_str = "ITEM: ATOMS id type x y z\n"
 
-    #write it out
     dump.write(title_str)
 
     for cc, atom in enumerate(atoms):
         pos = atom.pos
-
-        if writecustom:
-            cvals = " ".join(np.array(customvals)[:, cc].astype(str))
-            atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cvals)
+        if len(customkeys) > 0:
+            cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
+            atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
         else:
             atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
 
         dump.write(atomline)
 
     dump.close()
+
 
 def split_snaps(infile, compressed = False):
     """
@@ -387,4 +361,4 @@ def split_snaps(infile, compressed = False):
     return snaps
 
 def convert_snap(**kwargs):
-	raise NotImplementedError("convert method for mdtraj is not implemented")
+    raise NotImplementedError("convert method for mdtraj is not implemented")

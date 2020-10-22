@@ -185,7 +185,7 @@ def write_snap(sys, outfile, comments="pyscal"):
     fout.close()
 
 def split_snaps(**kwargs):
-	raise NotImplementedError("split method for mdtraj is not implemented")
+    raise NotImplementedError("split method for mdtraj is not implemented")
 
 def convert_snap(**kwargs):
-	raise NotImplementedError("convert method for mdtraj is not implemented")
+    raise NotImplementedError("convert method for mdtraj is not implemented")

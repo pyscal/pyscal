@@ -25,9 +25,9 @@ DATA_ITEMS = ('box_size', 'vir_size', 'pres_size',
               'x_size', 'v_size', 'f_size')
 
 def read_snap(filename):
-	"""
-	Read a trr file
-	"""
+    """
+    Read a trr file
+    """
     with GroTrrReader(filename) as trrfile:
         for count, frame in enumerate(trrfile):
             data = trrfile.get_data()
@@ -45,8 +45,8 @@ def read_snap(filename):
     return atoms, box
 
 
-def write_snap(filename):
-	raise NotImplementedError("write method for mdtraj is not implemented")
+def write_snap(sys, outfile):
+    raise NotImplementedError("write method for mdtraj is not implemented")
 
 def split_snaps(infile, compressed = False):
     snaps = []
@@ -73,7 +73,7 @@ def split_snaps(infile, compressed = False):
     return snaps 
 
 def convert_snap(**kwargs):
-	raise NotImplementedError("convert method for mdtraj is not implemented")
+    raise NotImplementedError("convert method for mdtraj is not implemented")
 
 
 def swap_integer(integer):

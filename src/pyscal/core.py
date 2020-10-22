@@ -1661,7 +1661,8 @@ class System(pc.System):
                 self.average_entropy()
 
 
-    def to_file(self, outfile, format='lammps-dump', customkeys=None, compressed=False, timestep=0, species=None):
+    def to_file(self, outfile, format='lammps-dump', customkeys=None, 
+                compressed=False, timestep=0, species=None):
         """
         Save the system instance to a trajectory file.
 
@@ -1693,70 +1694,26 @@ class System(pc.System):
 
         Notes
         -----
+        `to_file` method can handle a number of file formats. The most customizable format is the
+        `lammps-dump` which can take a custom options using customkeys and customvals. customkeys
+        will be the header written to the dump file. It can be any Atom attribute, any property
+        stored in custom variable of the Atom, or calculated q values which can be given by `q4`,
+        `aq4` etc. External values can also be provided using `customvals` option. `customvals` array
+        should be of the same length as the number of atoms in the system.
 
+        For all other formats, ASE is used to write out the file, and hence the `species` keyword
+        needs to be specified. If initially, an ASE object was used to create the System, `species`
+        keyword will already be saved, and need not be specified. In other cases, `species` should
+        be a list of atomic species in the System. For example `["Cu"]` or `["Cu", "Al"]`, depending
+        on the number of species in the System. In the above case, atoms of type 1 will be mapped to
+        Cu and of type 2 will be mapped to Al. For a complete list of formats that ASE can handle,
+        see `here <https://wiki.fysik.dtu.dk/ase/ase/io/io.html>`_ . 
         """
-        if format=='lammps-dump':
-            if customkeys == None:
-                customkeys = []
+        
+        ptp.write_file(self, outfile, format = format,
+            compressed = compressed, customkeys = customkeys, customvals = customvals,
+            timestep = timestep, species = species)
 
-
-
-            boxdims = self.box
-            atoms = self.atoms
-
-            if len(customkeys) > 0:
-                cvals = [self.get_custom(atom, customkeys) for atom in atoms]
-
-            #open files for writing
-            if compressed:
-                gz = gzip.open(outfile,'wt')
-                dump = gz
-            else:
-                gz = open(outfile,'w')
-                dump = gz
-
-            #now write
-            dump.write("ITEM: TIMESTEP\n")
-            dump.write("%d\n" % timestep)
-            dump.write("ITEM: NUMBER OF ATOMS\n")
-            dump.write("%d\n" % len(atoms))
-            dump.write("ITEM: BOX BOUNDS\n")
-            dump.write("%f %f\n" % (0, boxdims[0][0]))
-            dump.write("%f %f\n" % (0, boxdims[1][1]))
-            dump.write("%f %f\n" % (0, boxdims[2][2]))
-
-            #now write header
-            if len(customkeys) > 0:
-                ckey = " ".join(customkeys)
-                title_str = "ITEM: ATOMS id type x y z %s\n"% ckey
-            else:
-                title_str = "ITEM: ATOMS id type x y z\n"
-
-            dump.write(title_str)
-
-            for cc, atom in enumerate(atoms):
-                pos = atom.pos
-                if len(customkeys) > 0:
-                    cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-                    atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
-                else:
-                    atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
-
-                dump.write(atomline)
-
-            dump.close()
-
-        elif format=='lammps-data':
-            #convert to ase
-            aseobject = ptp.convert_to_ase(self, species=species)
-            write(outfile, aseobject, format='lammps-data')
-
-        elif format=='poscar':
-            aseobject = ptp.convert_to_ase(self, species=species)
-            write(outfile, aseobject, format='vasp')
-
-        else:
-            raise ValueError("Unknown file format")            
 
 
     def calculate_energy(self, species='Au', pair_style=None, 

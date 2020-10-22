@@ -51,11 +51,11 @@ def read_snap(aseobject, check_triclinic=False):
     return atoms, box
 
 def write_snap(**kwargs):
-	raise NotImplementedError("write method for mdtraj is not implemented")
+    raise NotImplementedError("write method for mdtraj is not implemented")
 
 def split_snaps(**kwargs):
-	raise NotImplementedError("split method for mdtraj is not implemented")
-	
+    raise NotImplementedError("split method for mdtraj is not implemented")
+    
 def convert_snap(sys, species=None):
     """
     Convert a given pyscal structure to ase object
