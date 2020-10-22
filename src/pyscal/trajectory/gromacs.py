@@ -9,7 +9,7 @@ from ase import Atom, Atoms
 import gzip
 import io
 import struct
-
+import os
 
 GROMACS_MAGIC = 1993
 DIM = 3

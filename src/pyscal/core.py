@@ -1661,7 +1661,7 @@ class System(pc.System):
                 self.average_entropy()
 
 
-    def to_file(self, outfile, format='lammps-dump', customkeys=None, 
+    def to_file(self, outfile, format='lammps-dump', customkeys=None, customvals=None,
                 compressed=False, timestep=0, species=None):
         """
         Save the system instance to a trajectory file.
@@ -1677,6 +1677,10 @@ class System(pc.System):
 
         customkeys : list of strings, optional
             a list of extra atom wise values to be written in the output file.
+
+        customvals : list or list of lists, optional
+            If `customkey` is specified, `customvals` take an array of the same length
+            as number of atoms, which contains the values to be written out.
 
         compressed : bool, optional
             If true, the output is written as a compressed file.
@@ -1709,7 +1713,7 @@ class System(pc.System):
         Cu and of type 2 will be mapped to Al. For a complete list of formats that ASE can handle,
         see `here <https://wiki.fysik.dtu.dk/ase/ase/io/io.html>`_ . 
         """
-        
+
         ptp.write_file(self, outfile, format = format,
             compressed = compressed, customkeys = customkeys, customvals = customvals,
             timestep = timestep, species = species)

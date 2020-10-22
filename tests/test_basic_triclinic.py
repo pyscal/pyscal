@@ -21,7 +21,7 @@ def test_triclinic_frames():
 
     os.system("cat tests/conf.primitive.bcc.supercell.dump tests/conf.primitive.bcc.supercell.dump > tests/bcc.prim.dat")
     sys3 = pc.System()
-    sys3.read_inputfile("tests/bcc.prim.dat", frame=1)
+    sys3.read_inputfile("tests/bcc.prim.dat")
     sys3.find_neighbors(method = 'cutoff', cutoff=0.9)
     atoms = sys3.atoms
     neighs = atoms[0].neighbors

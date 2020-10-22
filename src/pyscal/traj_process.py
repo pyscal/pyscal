@@ -15,6 +15,7 @@ import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
+import os
 from ase.io import write
 import pyscal.trajectory.ase as ptase
 import pyscal.trajectory.lammps as ptlammps

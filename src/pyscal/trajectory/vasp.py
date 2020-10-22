@@ -4,7 +4,7 @@ import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
-
+import os
 
 def read_snap(infile, compressed = False):
     """

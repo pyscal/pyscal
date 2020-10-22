@@ -4,6 +4,7 @@ import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
+import os
 
 #new function to wrap over mdtraj objects
 def read_snap(mdobject, check_triclinic=False):

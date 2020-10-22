@@ -4,6 +4,7 @@ import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
+import os
 
 #functions that are not wrapped from C++
 def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None):
