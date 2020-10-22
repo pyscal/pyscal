@@ -100,7 +100,7 @@ def test_poscar_write():
     atoms = sys.atoms
     assert len(atoms) == 42
 
-    ptp.write_poscar(sys, 'tests/POSCARtest')
+    ptp.write_file(sys, 'tests/POSCARtest', format="poscar")
     sys = pc.System()
     sys.read_inputfile('tests/POSCARtest', format='poscar')
     atoms = sys.atoms

@@ -28,6 +28,9 @@ def read_snap(filename):
     """
     Read a trr file
     """
+    if not os.path.exists(filename):
+        raise FileNotFoundError("Filename %s not found"%filename)
+
     with GroTrrReader(filename) as trrfile:
         for count, frame in enumerate(trrfile):
             data = trrfile.get_data()

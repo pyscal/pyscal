@@ -62,6 +62,9 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
     >>> atoms, box = read_lammps_dump('conf.d', compressed=True)
 
     """
+    if not os.path.exists(infile):
+        raise FileNotFoundError("Filename %s not found"%infile)
+
     if customkeys == None:
         customkeys = []
 

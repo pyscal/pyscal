@@ -35,6 +35,8 @@ def read_snap(infile, compressed = False):
     >>> atoms, box = read_poscar('POSCAR.dat', compressed=True)
 
     """
+    if not os.path.exists(infile):
+        raise FileNotFoundError("Filename %s not found"%infile)
 
     raw = infile.split('.')
     if raw[-1] == 'gz' or  compressed:

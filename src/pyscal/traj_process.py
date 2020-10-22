@@ -16,7 +16,8 @@ from ase import Atom, Atoms
 import gzip
 import io
 import os
-from ase.io import write
+import warnings
+from ase.io import write, read
 import pyscal.trajectory.ase as ptase
 import pyscal.trajectory.lammps as ptlammps
 import pyscal.trajectory.mdtraj as ptmdtraj
@@ -51,8 +52,6 @@ def read_file(filename, format="lammps-dump",
     -------
     None
     """
-    if not os.path.exists(filename):
-        raise FileNotFoundError("Filename %s not found"%filename)
 
     if customkeys == None:
         customkeys = []
@@ -67,7 +66,13 @@ def read_file(filename, format="lammps-dump",
     elif format == 'poscar':
         atoms, box = ptvasp.read_snap(filename, compressed=compressed)
     else:
-        raise TypeError("format recieved an unknown option %s"%format)
+        try:
+            #try to use ASE backend
+            aseobject = read(filename, format=format)
+            atoms, box = ptase.read_snap(aseobject)
+            warnings.info("Using ase backend to read file")
+        except:
+            raise TypeError("format recieved an unknown option %s"%format)
 
     return atoms, box, is_triclinic        
 
@@ -119,14 +124,16 @@ def write_file(sys, outfile, format="lammps-dump", compressed = False,
         write(outfile, aseobject, format='lammps-data')
     
     elif format == 'poscar':
-        aseobject = ptase.convert_snap(sys, species=species)
-        write(outfile, aseobject, format='vasp')
+        ptvasp.write_snap(sys, outfile)
+        #aseobject = ptase.convert_snap(sys, species=species)
+        #write(outfile, aseobject, format='vasp')
 
     else:
         #try a write using ase
         try:
             aseobject = ptase.convert_snap(sys, species=species)
             write(outfile, aseobject, format=format)
+            warnings.info("Using ase backend to write file")
         except:
             raise TypeError("format recieved an unknown option %s"%format)
 
@@ -158,6 +165,8 @@ def split_trajectory(infile, format='lammps-dump', compressed=False):
     This is a wrapper function around `split_traj_lammps_dump` function.
 
     """
+    if not os.path.exists(infile):
+        raise FileNotFoundError("Filename %s not found"%infile)
 
     snaps = []
 
