@@ -14,7 +14,7 @@ def test_create_multislice_dump():
     sys.atoms = atoms
     sys.box = boxdims
 
-    ptp.write_structure(sys, "tests/bcc1.dump")
+    ptp.write_file(sys, "tests/bcc1.dump")
 
     atoms2, boxdims2 = pcs.make_crystal('bcc', repetitions=[6,6,6])
     #modify the coordinates of one atom
@@ -27,28 +27,13 @@ def test_create_multislice_dump():
     sys2.atoms = atoms2
     sys2.box = boxdims2
 
-    ptp.write_structure(sys2, "tests/bcc2.dump")
-
-    #now merge the two dump files
-    os.system("cat tests/bcc1.dump tests/bcc2.dump > tests/bcc3.dat")
-    #os.remove("tests/bcc1.dump")
-    #os.remove("tests/bcc2.dump")
-
-    #now this file should have info of both - read it in
-    sys3 = pc.System()
-    sys3.read_inputfile("tests/bcc3.dat", frame=1)
-    atoms = sys3.atoms
-    assert len(atoms) == 432
-    assert atoms[0].pos == [0.01,0,0]
-
-    #now this file should have info of both - read it in
-    sys4 = pc.System()
-    sys4.read_inputfile("tests/bcc3.dat", frame=0)
-    atoms = sys4.atoms
-    assert atoms[0].pos == [0.0,0,0]
+    ptp.write_file(sys2, "tests/bcc2.dump")
 
     #now cleanup
-    os.remove("tests/bcc3.dat")
+    if os.path.exists("tests/bcc1.dat"):
+        os.remove("tests/bcc1.dat")
+    if os.path.exists("tests/bcc2.dat"):
+        os.remove("tests/bcc2.dat")
 
 def test_customvals_dump():
     """
@@ -61,9 +46,9 @@ def test_customvals_dump():
 
 
     #test for multiple customvals
-    customks = 'one'
-    customvs = [1,1]
-    ptp.write_structure(sys, "tests/bcc4.dump", customkey=customks, customvals=customvs)
+    customks = ['one']
+    customvs = [[1],[1]]
+    ptp.write_file(sys, "tests/bcc4.dump", customkeys=customks, customvals=customvs)
 
     #now read this file
     lines = []
@@ -87,7 +72,7 @@ def test_customvals_dump():
     #test for multiple customvals
     customks = ['one', 'two']
     customvs = [[1,1], [2,2]]
-    ptp.write_structure(sys, "tests/bcc4.dump", customkey=customks, customvals=customvs)
+    ptp.write_file(sys, "tests/bcc4.dump", customkeys=customks, customvals=customvs)
 
     #now read this file
     lines = []
@@ -101,8 +86,8 @@ def test_customvals_dump():
 
     #now verify
     assert last1line[-1] == '2'
-    assert last1line[-2] == '1'
-    assert last2line[-1] == '2'
+    assert last1line[-2] == '2'
+    assert last2line[-1] == '1'
     assert last2line[-2] == '1'
     assert last3line[-1] == 'two'
     assert last3line[-2] == 'one'

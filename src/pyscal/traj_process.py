@@ -119,13 +119,13 @@ def write_file(sys, outfile, format="lammps-dump", compressed = False,
         write(outfile, aseobject, format='lammps-data')
     
     elif format == 'poscar':
-        aseobject = ptase.convert_to_ase(sys, species=species)
+        aseobject = ptase.convert_snap(sys, species=species)
         write(outfile, aseobject, format='vasp')
 
     else:
         #try a write using ase
         try:
-            aseobject = ptase.convert_to_ase(sys, species=species)
+            aseobject = ptase.convert_snap(sys, species=species)
             write(outfile, aseobject, format=format)
         except:
             raise TypeError("format recieved an unknown option %s"%format)

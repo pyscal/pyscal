@@ -226,6 +226,7 @@ def write_snap(sys, outfile, compressed = False,
     customvals : list or list of lists, optional
         If `customkey` is specified, `customvals` take an array of the same length
         as number of atoms, which contains the values to be written out.
+        shape: natoms x ncustomkeys
     
     timestep: int, optional
         Specify the timestep value, default 0
@@ -239,14 +240,23 @@ def write_snap(sys, outfile, compressed = False,
         customkeys = []
 
     box = sys.box
-    boxx = np.sqrt(np.sum(box[0]**2))
-    boxy = np.sqrt(np.sum(box[1]**2))
-    boxz = np.sqrt(np.sum(box[2]**2))
+    boxx = np.sqrt(np.sum(np.array(box[0])**2))
+    boxy = np.sqrt(np.sum(np.array(box[1])**2))
+    boxz = np.sqrt(np.sum(np.array(box[2])**2))
 
     atoms = sys.atoms
 
     if len(customkeys) > 0:
-        cvals = [sys.get_custom(atom, customkeys) for atom in atoms]
+        if customvals is None:
+            cvals = [sys.get_custom(atom, customkeys) for atom in atoms]
+        else:
+            #first check if dim is equal to keys dim
+            shape = np.array(customvals).shape
+            rqdshape = (len(atoms), len(customkeys))
+            if shape != rqdshape:
+                raise ValueError("Customvals should be of shape natoms x ncustomkeys. Found %d-%d, should be %d-%d"%(shape[0], 
+                    shape[1], rqdshape[0], rqdshape[1]))
+            cvals = customvals
 
     #open files for writing
     if compressed:
