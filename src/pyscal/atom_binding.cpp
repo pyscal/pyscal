@@ -441,6 +441,12 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         Value of averaged energy.
     )mydelimiter")
 
+    .def_readwrite("lcutsmall", &Atom::lcutsmall, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("lcutlarge", &Atom::lcutlarge, R"mydelimiter(
+    )mydelimiter")
+
     ;
 
 
