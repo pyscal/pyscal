@@ -934,7 +934,7 @@ int System::get_acna_neighbors(int style){
                 //process sum
                 atoms[ti].cutoff = 1.207*ssum/12.00;
                 //now assign neighbors based on this
-                for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+                for(int i=0 ; i<12; i++){
                     int tj = atoms[ti].temp_neighbors[i].index;
                     dist = atoms[ti].temp_neighbors[i].dist;
                     if (dist <= atoms[ti].cutoff)
@@ -959,7 +959,7 @@ int System::get_acna_neighbors(int style){
                 }
                 atoms[ti].cutoff = 1.207*ssum/14.00;
                 //now assign neighbors based on this
-                for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+                for(int i=0 ; i<14; i++){
                     int tj = atoms[ti].temp_neighbors[i].index;
                     dist = atoms[ti].temp_neighbors[i].dist;
                     if (dist <= atoms[ti].cutoff)
@@ -2113,9 +2113,6 @@ void System::cna_identify_fcc(int style){
     int n1, n2, n3;
     int n421, n422, n555;
 
-    //neighbor method is same
-    get_all_neighbors_bynumber(3, 12, 0);
-
     //get cna neighbors
     if (style == 1){
         get_cna_neighbors(1);
@@ -2187,15 +2184,12 @@ void System::cna_identify_bcc(int style){
     int n1, n2, n3;
     int n444, n666;
 
-    //neighbor method is same
-    get_all_neighbors_bynumber(3, 14, 0);
-
     //get cna neighbors
     if (style == 1){
-        get_cna_neighbors(1);
+        get_cna_neighbors(2);
     }
     else if (style == 2){
-        get_acna_neighbors(1);
+        get_acna_neighbors(2);
     }
 
     //resetting structures should be done in core.py
@@ -2244,6 +2238,9 @@ vector<int> System::calculate_cna(int style){
     */
     //reset structures
     reset_structure();
+
+    //neighbor method is same
+    get_all_neighbors_bynumber(3, 14, 0);
 
     //create array for result
     vector<int> analyis;
