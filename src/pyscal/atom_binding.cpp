@@ -435,6 +435,15 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         Value of averaged energy.
     )mydelimiter")
 
+    //-------------------------------------------------------
+    // CNA parameters
+    //-------------------------------------------------------
+    .def_readwrite("cn", &Atom::cn, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("cn_counts", &Atom::cn_counts, R"mydelimiter(
+    )mydelimiter")
+
     ;
 
 

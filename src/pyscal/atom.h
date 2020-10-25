@@ -204,6 +204,12 @@ class Atom{
         double angular;
         double avg_angular;
         vector<int> chiparams;
+        
+        //-------------------------------------------------------
+        // CNA properties
+        //-------------------------------------------------------
+        vector<int> cn_counts;
+        vector<vector<int>> cn;
 
         //-------------------------------------------------------
         // Other order parameters

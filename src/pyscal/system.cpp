@@ -886,7 +886,7 @@ int System::get_cna_neighbors(int style, double lat){
     */
     int finished = 1;
     reset_main_neighbors();
-    double factor;
+    double factor, dist;
 
     if (style == 1){
         factor = 0.854;
@@ -1944,7 +1944,40 @@ void System::find_average_volume(){
 //-------------------------------------------------------
 // CNA Methods
 //-------------------------------------------------------
-void find_common_neighbors()
+void System::find_common_neighbors(int ti){
+    /*
+    Find common neighbors for an atom
+    */
+    double d, dx, dy, dz;
+
+    vector<int> counts;
+    for(int i=0; i<atoms[ti].n_neighbors; i++){
+        counts.emplace_back(0);
+    }
+
+    //resize arrays
+    //atoms[ti].cn_counts.clear();
+    atoms[ti].cn.clear();
+    //atoms[ti].cn_counts.resize(atoms[ti].n_neighbors);
+    atoms[ti].cn.resize(atoms[ti].n_neighbors);
+
+    //now start loop
+    for(int j=0; j<atoms[ti].n_neighbors; j++){
+        for(int k=0; k<atoms[ti].n_neighbors; k++){
+            d = get_abs_distance(atoms[ti].neighbors[j], atoms[ti].neighbors[k], dx, dy, dz);
+            if (d <= atoms[atoms[ti].neighbors[j]].cutoff){
+                if (d <= atoms[atoms[ti].neighbors[k]].cutoff){
+                    counts[j]+=1;
+                    counts[k]+=1;
+                    atoms[ti].cn[j].emplace_back(atoms[ti].neighbors[k]);
+                    atoms[ti].cn[k].emplace_back(atoms[ti].neighbors[j]);
+                }
+            }
+        }
+    }
+
+    atoms[ti].cn_counts = counts;
+}
 
 
 //-------------------------------------------------------
