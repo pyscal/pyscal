@@ -210,6 +210,8 @@ class Atom{
         //-------------------------------------------------------
         vector<int> cn_counts;
         vector<vector<int>> cn;
+        vector<int> cb_counts;
+        vector<vector<int>> cb;
 
         //-------------------------------------------------------
         // Other order parameters

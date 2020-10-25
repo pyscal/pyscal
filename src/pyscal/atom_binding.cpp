@@ -444,6 +444,12 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     .def_readwrite("cn_counts", &Atom::cn_counts, R"mydelimiter(
     )mydelimiter")
 
+    .def_readwrite("cb", &Atom::cb, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("cb_counts", &Atom::cb_counts, R"mydelimiter(
+    )mydelimiter")
+
     ;
 
 

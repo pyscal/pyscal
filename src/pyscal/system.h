@@ -159,6 +159,7 @@ class System{
         // Other order parameters
         //-------------------------------------------------------
         void find_common_neighbors(int);
+        void find_bonded_common_neighbors(int);
 
         double switching_fn(double, double, int, int);
         void average_entropy();

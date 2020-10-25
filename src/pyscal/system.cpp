@@ -1963,7 +1963,7 @@ void System::find_common_neighbors(int ti){
 
     //now start loop
     for(int j=0; j<atoms[ti].n_neighbors; j++){
-        for(int k=0; k<atoms[ti].n_neighbors; k++){
+        for(int k=j+1; k<atoms[ti].n_neighbors; k++){
             d = get_abs_distance(atoms[ti].neighbors[j], atoms[ti].neighbors[k], dx, dy, dz);
             if (d <= atoms[atoms[ti].neighbors[j]].cutoff){
                 if (d <= atoms[atoms[ti].neighbors[k]].cutoff){
@@ -1979,6 +1979,36 @@ void System::find_common_neighbors(int ti){
     atoms[ti].cn_counts = counts;
 }
 
+void System::find_bonded_common_neighbors(int ti){
+    /*
+    Find bonded atoms among common neighbors
+    */
+    double dist, dx, dy, dz;
+    vector<int> counts;
+    for(int i=0; i<atoms[ti].n_neighbors; i++){
+        counts.emplace_back(0);
+    }
+    
+    atoms[ti].cb_counts.clear();
+    atoms[ti].cb.clear();
+    atoms[ti].cb.resize(atoms[ti].n_neighbors);
+
+    for(int c=0; c<atoms[ti].n_neighbors; c++){
+        for(int j=0; j<atoms[ti].cn_counts[c]; j++){
+            for(int k=j+1; k<atoms[ti].cn_counts[c]; k++){
+                dist = get_abs_distance(atoms[ti].cn[c][j], atoms[ti].cn[c][k], dx, dy, dz);
+                if (dist <= atoms[atoms[ti].cn[c][j]].cutoff){
+                    if (dist <= atoms[atoms[ti].cn[c][k]].cutoff){
+                        counts[c] += 1;
+                        atoms[ti].cb[c].emplace_back(atoms[ti].cn[c][j]);
+                        atoms[ti].cb[c].emplace_back(atoms[ti].cn[c][k]);
+                    }
+                }
+            }
+        }    
+    }
+    atoms[ti].cb_counts = counts;
+}
 
 //-------------------------------------------------------
 // Other order parameters

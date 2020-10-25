@@ -73,7 +73,6 @@ PYBIND11_MODULE(csystem, m) {
         .def("cset_atom_cutoff",&System::set_atom_cutoff)
         .def("get_acna_neighbors",&System::get_acna_neighbors)
         .def("get_cna_neighbors",&System::get_cna_neighbors)
-        .def("find_common_neighbors",&System::find_common_neighbors)
 
         //---------------------------------------------------
         // Methods for q calculation
@@ -106,6 +105,12 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         .def_readwrite("voroexp", &System::alpha)
         .def("find_average_volume",&System::find_average_volume)
+
+        //-------------------------------------------------------
+        // CNA parameters
+        //-------------------------------------------------------
+        .def("find_common_neighbors",&System::find_common_neighbors)
+        .def("find_bonded_common_neighbors",&System::find_bonded_common_neighbors)
 
         //-------------------------------------------------------
         // Other order parameters
