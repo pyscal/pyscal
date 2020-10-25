@@ -111,6 +111,7 @@ PYBIND11_MODULE(csystem, m) {
         //-------------------------------------------------------
         .def("find_common_neighbors",&System::find_common_neighbors)
         .def("find_bonded_common_neighbors",&System::find_bonded_common_neighbors)
+        .def("find_longest_chain",&System::find_longest_chain)
 
         //-------------------------------------------------------
         // Other order parameters

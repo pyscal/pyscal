@@ -1985,6 +1985,8 @@ void System::find_bonded_common_neighbors(int ti){
     */
     double dist, dx, dy, dz;
     vector<int> counts;
+    vector<int> pairs;
+
     for(int i=0; i<atoms[ti].n_neighbors; i++){
         counts.emplace_back(0);
     }
@@ -2000,14 +2002,86 @@ void System::find_bonded_common_neighbors(int ti){
                 if (dist <= atoms[atoms[ti].cn[c][j]].cutoff){
                     if (dist <= atoms[atoms[ti].cn[c][k]].cutoff){
                         counts[c] += 1;
-                        atoms[ti].cb[c].emplace_back(atoms[ti].cn[c][j]);
-                        atoms[ti].cb[c].emplace_back(atoms[ti].cn[c][k]);
+                        pairs.clear();
+                        pairs.emplace_back(atoms[ti].cn[c][j]);
+                        pairs.emplace_back(atoms[ti].cn[c][k]);
+                        atoms[ti].cb[c].emplace_back(pairs);
                     }
                 }
             }
         }    
     }
     atoms[ti].cb_counts = counts;
+}
+
+void System::connect(int& success, int& start, int& stop, int& b0, int& b1){
+    /*
+    Connect links to form the longest chain
+    */
+    success = 1;
+    if(start == b0){
+        start = b1;
+    }
+    else if (start == b1){
+        start = b0;
+    }
+    else if (stop == b0){
+        stop = b1;
+    }
+    else if (stop == b1){
+        stop = b0;
+    }
+    else{
+        success = 0;    
+    }
+}
+
+void System::find_longest_chain(int ti){
+    /*
+    Find longest chain of connected atoms
+    */
+    vector<int> lengths;
+    vector<int> done;
+    int success, length, start, stop, change, maxx;
+
+    atoms[ti].chains.clear();
+
+    for(int i=0; i<atoms[ti].n_neighbors; i++){
+        lengths.clear();
+        for(int j=0; j<atoms[ti].cb_counts[i]; j++){
+            length = 1;
+            start = atoms[ti].cb[i][j][0];
+            stop = atoms[ti].cb[i][j][1];
+            
+            //create zeros array
+            done.clear();
+            for(int k=0; k<atoms[ti].cb_counts[i]; k++){
+                done.emplace_back(0);
+            }
+            change = 1;
+            while(change){
+                change = 0;
+                for(int k=0; k<atoms[ti].cb_counts[i]; k++){
+                    if(j==k) continue;
+                    if(done[k] == 0){
+                        connect(success, start, stop, atoms[ti].cb[i][k][0], atoms[ti].cb[i][k][1]);
+                        if(success){
+                            length += 1;
+                            change = 1;
+                            done[k] = 1;
+                        }
+                    }
+                }
+                lengths.emplace_back(length);
+            }
+        }
+        for(int k=0; k<lengths.size(); k++){
+            if(lengths[k]>maxx){
+                maxx = lengths[k];
+            }
+        }
+        atoms[ti].chains.emplace_back(maxx);
+    }
 }
 
 //-------------------------------------------------------

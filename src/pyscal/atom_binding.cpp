@@ -450,6 +450,9 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     .def_readwrite("cb_counts", &Atom::cb_counts, R"mydelimiter(
     )mydelimiter")
 
+    .def_readwrite("chains", &Atom::chains, R"mydelimiter(
+    )mydelimiter")
+
     ;
 
 

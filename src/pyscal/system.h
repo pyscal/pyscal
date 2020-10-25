@@ -160,6 +160,8 @@ class System{
         //-------------------------------------------------------
         void find_common_neighbors(int);
         void find_bonded_common_neighbors(int);
+        void connect(int&, int&, int&, int&, int&);
+        void find_longest_chain(int);
 
         double switching_fn(double, double, int, int);
         void average_entropy();
