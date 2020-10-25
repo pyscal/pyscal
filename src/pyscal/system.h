@@ -51,6 +51,7 @@ class System{
         void sbox(vector<vector<double>>);
         vector<vector<double>> gbox();
         vector<double> remap_atom(vector<double>);
+        double lattice_constant;
 
         //-----------------------------------------------------
         // Atom related methods
@@ -78,7 +79,7 @@ class System{
         int get_all_neighbors_sann(double);
         int get_all_neighbors_bynumber(double, int, int);
         int get_acna_neighbors(int);
-        int get_cna_neighbors(int, double);
+        int get_cna_neighbors(int);
         int get_all_neighbors_adaptive(double, int, double);
         void get_all_neighbors_voronoi();
         void reset_all_neighbors();
@@ -162,6 +163,10 @@ class System{
         void find_bonded_common_neighbors(int);
         void connect(int&, int&, int&, int&, int&);
         void find_longest_chain(int);
+        void reset_structure();
+        void cna_identify_fcc(int);
+        void cna_identify_bcc(int);
+        vector<int> calculate_cna(int);
 
         double switching_fn(double, double, int, int);
         void average_entropy();

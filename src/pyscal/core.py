@@ -1226,26 +1226,21 @@ class System(pc.System):
         self.atoms = atoms
 
     
-    def calculate_cna(self, cutoff=None, calculate_neighbors=True):
+    def calculate_cna(self, lattice_constant=None):
         """
         Calculate the Common Neighbor Analysis indices
 
         Parameters
         ----------
-        cutoff : float, optional
-            cutoff value to calculate CNA. If not specified,
-            adaptive CNA will be used
-
-        calculate_neighbors : bool, optional
-            If True, calculate neighbors using number method.
-            If False, existing neighbors will be used. Default True.
-            Only used if the cutoff is None.
+        lattice_constant : float, optional
+            lattice constant to calculate cutoff value for
+            traditional CNA calculation. If not specified,
+            adaptive CNA will be used.
 
         Returns
         -------
-        cna : list of ints
-            list of length 5 with number of atoms that belong to each
-            structure.
+        cna : dict
+            dict of structures
 
         Notes
         -----
@@ -1259,8 +1254,20 @@ class System(pc.System):
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
 
         """
-        pass
+        if lattice_constant is not None:
+            self.lattice_constant = lattice_constant
+            st = self.ccalculate_cna(1)
+        else:
+            st = self.ccalculate_cna(2)
         
+        structures = {}
+        structures["other"] = st[0]
+        structures["fcc"] = st[1]
+        structures["hcp"] = st[2]
+        structures["bcc"] = st[3]
+        structures["ico"] = st[4]
+
+        return structures 
 
 
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):

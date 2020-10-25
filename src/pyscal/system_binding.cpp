@@ -42,6 +42,7 @@ PYBIND11_MODULE(csystem, m) {
         .def("assign_triclinic_params",&System::assign_triclinic_params)
         .def("get_triclinic_params",&System::get_triclinic_params)
         .def_readwrite("triclinic", &System::triclinic)
+        .def_readwrite("lattice_constant", &System::lattice_constant)
         .def("remap_atom", &System::remap_atom)
 
         //-----------------------------------------------------
@@ -112,6 +113,8 @@ PYBIND11_MODULE(csystem, m) {
         .def("find_common_neighbors",&System::find_common_neighbors)
         .def("find_bonded_common_neighbors",&System::find_bonded_common_neighbors)
         .def("find_longest_chain",&System::find_longest_chain)
+        .def("reset_structure",&System::reset_structure)
+        .def("ccalculate_cna",&System::calculate_cna)
 
         //-------------------------------------------------------
         // Other order parameters

@@ -875,7 +875,7 @@ void System::set_atom_cutoff(double factor){
     }
 }
 
-int System::get_cna_neighbors(int style, double lat){
+int System::get_cna_neighbors(int style){
     /*
     Get neighbors for CNA method
 
@@ -896,7 +896,7 @@ int System::get_cna_neighbors(int style, double lat){
     }
 
     for (int ti=0; ti<nop; ti++){
-        atoms[ti].cutoff = factor*lat;
+        atoms[ti].cutoff = factor*lattice_constant;
         for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
             int tj = atoms[ti].temp_neighbors[i].index;
             dist = atoms[ti].temp_neighbors[i].dist;
@@ -2075,6 +2075,7 @@ void System::find_longest_chain(int ti){
                 lengths.emplace_back(length);
             }
         }
+        maxx = 0;
         for(int k=0; k<lengths.size(); k++){
             if(lengths[k]>maxx){
                 maxx = lengths[k];
@@ -2082,6 +2083,184 @@ void System::find_longest_chain(int ti){
         }
         atoms[ti].chains.emplace_back(maxx);
     }
+}
+
+void System::reset_structure(){
+    /*
+    Reset structure variable of the atoms
+    */
+    for(int ti=0; ti<nop; ti++){
+        atoms[ti].structure = 0;
+    }
+}
+
+void System::cna_identify_fcc(int style){
+    /*
+    Identify fcc atoms in the systems
+
+    There are two types of possible styles
+
+    style 1: CNA method
+    style 2: ACNA method
+
+    The pairs we have to identify are
+    
+    n421
+    n422
+    n555
+    
+    */
+    int n1, n2, n3;
+    int n421, n422, n555;
+
+    //neighbor method is same
+    get_all_neighbors_bynumber(3, 12, 0);
+
+    //get cna neighbors
+    if (style == 1){
+        get_cna_neighbors(1);
+    }
+    else if (style == 2){
+        get_acna_neighbors(1);
+    }
+
+    //resetting structures should be done in core.py
+    for(int ti=0; ti<nop; ti++){
+        //only do if atom structure is 0
+        n421 = 0;
+        n422 = 0;
+        n555 = 0;
+
+        if(atoms[ti].structure == 0){
+            //first condition is to check if there 
+            //12 neighbors, if not reject 
+            if(atoms[ti].n_neighbors == 12){
+                find_common_neighbors(ti);
+                find_bonded_common_neighbors(ti);
+                find_longest_chain(ti);
+
+                for(int tj=0; tj<atoms[ti].n_neighbors; tj++){
+                    n1 = atoms[ti].cn_counts[tj];
+                    n2 = atoms[ti].cb_counts[tj];
+                    n3 = atoms[ti].chains[tj];
+                    if((n1 == 4) && (n2 == 2)){
+                        if(n3 == 1){
+                            n421++;
+                        }
+                        else if(n3 == 2){
+                            n422++;
+                        }
+                    }
+                    if((n1 == 5) && (n2 == 5) && (n3 == 5)){
+                        n555++;
+                    }
+                }                            
+            }
+            if(n421 == 12){
+                atoms[ti].structure = 1;
+            }
+            else if ((n421 == 6) && (n422 == 6)){
+                atoms[ti].structure = 2;
+            }
+            else if (n555 == 12){
+                atoms[ti].structure = 4;
+            }
+        }
+    }
+}
+
+
+void System::cna_identify_bcc(int style){
+    /*
+    Identify bcc atoms in the systems
+
+    There are two types of possible styles
+
+    style 1: CNA method
+    style 2: ACNA method
+
+    The pairs we have to identify are
+    
+    n444
+    n666
+    */
+    int n1, n2, n3;
+    int n444, n666;
+
+    //neighbor method is same
+    get_all_neighbors_bynumber(3, 14, 0);
+
+    //get cna neighbors
+    if (style == 1){
+        get_cna_neighbors(1);
+    }
+    else if (style == 2){
+        get_acna_neighbors(1);
+    }
+
+    //resetting structures should be done in core.py
+    for(int ti=0; ti<nop; ti++){
+        n444 = 0;
+        n666 = 0;
+
+        //only do if structure is 0
+        if(atoms[ti].structure == 0){
+            //first check for 14 neighbors
+            if(atoms[ti].n_neighbors == 14){
+                
+                find_common_neighbors(ti);
+                find_bonded_common_neighbors(ti);
+                find_longest_chain(ti);
+
+                for(int tj=0; tj<atoms[ti].n_neighbors; tj++){
+                    n1 = atoms[ti].cn_counts[tj];
+                    n2 = atoms[ti].cb_counts[tj];
+                    n3 = atoms[ti].chains[tj];
+
+                    if((n1 == 4) && (n2 == 4) && (n3 == 4)){
+                        n444++;
+                    }
+                    else if((n1 == 6) && (n2 == 6) && (n3 == 6)){
+                        n666++;
+                    }
+                }
+            }
+            if ((n444 == 6) && (n666 == 8)){
+                atoms[ti].structure = 3;
+            }
+        }        
+    }    
+}
+
+//final high level method
+vector<int> System::calculate_cna(int style){
+    /*
+    Carry out common neighbor analyis
+
+    There are two types of possible styles
+
+    style 1: CNA method
+    style 2: ACNA method
+    */
+    //reset structures
+    reset_structure();
+
+    //create array for result
+    vector<int> analyis;
+    for(int i=0; i<5; i++){
+        analyis.emplace_back(0);
+    }
+
+    //start analysis : first fcc
+    cna_identify_fcc(style);
+    //then bcc
+    cna_identify_bcc(style);
+    //now loop and add to arry
+    for(int ti=0; ti<nop; ti++){
+        analyis[atoms[ti].structure] += 1;
+    }
+
+    return analyis;
 }
 
 //-------------------------------------------------------
