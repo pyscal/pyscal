@@ -77,7 +77,8 @@ class System{
         void process_neighbor(int, int);
         int get_all_neighbors_sann(double);
         int get_all_neighbors_bynumber(double, int, int);
-        int get_neighbors_from_temp(int);
+        int get_acna_neighbors(int);
+        int get_cna_neighbors(int, double);
         int get_all_neighbors_adaptive(double, int, double);
         void get_all_neighbors_voronoi();
         void reset_all_neighbors();

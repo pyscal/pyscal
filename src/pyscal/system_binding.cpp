@@ -71,7 +71,8 @@ PYBIND11_MODULE(csystem, m) {
         .def("store_neighbor_info",&System::store_neighbor_info)
         .def("get_diamond_neighbors",&System::get_diamond_neighbors)
         .def("cset_atom_cutoff",&System::set_atom_cutoff)
-        .def("get_neighbors_from_temp",&System::get_neighbors_from_temp)
+        .def("get_acna_neighbors",&System::get_acna_neighbors)
+        .def("get_cna_neighbors",&System::get_cna_neighbors)
 
         //---------------------------------------------------
         // Methods for q calculation

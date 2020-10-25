@@ -875,13 +875,45 @@ void System::set_atom_cutoff(double factor){
     }
 }
 
-int System::get_neighbors_from_temp(int style){
+int System::get_cna_neighbors(int style, double lat){
+    /*
+    Get neighbors for CNA method
+
+    There are two styles available:
+    
+    Style 1: For FCC like structures (HCP/ICO)
+    Style 2: For BCC structure    
+    */
+    int finished = 1;
+    reset_main_neighbors();
+    double factor;
+
+    if (style == 1){
+        factor = 0.854;
+    }
+    else if (style == 2){
+        factor = 1.207;
+    }
+
+    for (int ti=0; ti<nop; ti++){
+        atoms[ti].cutoff = factor*lat;
+        for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+            int tj = atoms[ti].temp_neighbors[i].index;
+            dist = atoms[ti].temp_neighbors[i].dist;
+            if (dist <= atoms[ti].cutoff)
+                process_neighbor(ti, tj);
+        }
+    }
+
+}
+
+int System::get_acna_neighbors(int style){
     /*
     A new neighbor algorithm that finds a specified number of 
     neighbors for each atom.
 
     There are two styles available:
-
+    
     Style 1: For FCC like structures (HCP/ICO)
     Style 2: For BCC structure
     */
@@ -1910,11 +1942,14 @@ void System::find_average_volume(){
 }
 
 //-------------------------------------------------------
+// CNA Methods
+//-------------------------------------------------------
+void find_common_neighbors()
+
+
+//-------------------------------------------------------
 // Other order parameters
 //-------------------------------------------------------
-
-
-
 
 //Methods for entropy
 double System::switching_fn(double rij, double ra, int M, int N){
