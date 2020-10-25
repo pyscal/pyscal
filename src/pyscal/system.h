@@ -158,8 +158,6 @@ class System{
         //-------------------------------------------------------
         // Other order parameters
         //-------------------------------------------------------
-        vector<int> calculate_acna();
-        vector<int> calculate_cna();
         void find_common_neighbors(int);
 
         double switching_fn(double, double, int, int);

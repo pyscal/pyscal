@@ -1259,16 +1259,8 @@ class System(pc.System):
         .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
 
         """
+        pass
         
-        if cutoff is None:
-            if calculate_neighbors:
-                self.find_neighbors(method="number", nmax=14, assign_neighbor=False)
-            cna = self.calculate_acna()
-            return cna
-        else:
-            self.find_neighbors(method="cutoff", cutoff=cutoff)
-            cna = self.calculate_cna()
-            return cna
 
 
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
