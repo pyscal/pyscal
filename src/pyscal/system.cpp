@@ -879,13 +879,20 @@ int System::get_neighbors_from_temp(int style){
     /*
     A new neighbor algorithm that finds a specified number of 
     neighbors for each atom.
+
+    There are two styles available:
+
+    Style 1: For FCC like structures (HCP/ICO)
+    Style 2: For BCC structure
     */
 
     int finished = 1;
+    double dist;
+
     //reset neighbors
     reset_main_neighbors();
 
-    if (style == 12){
+    if (style == 1){ 
         for (int ti=0; ti<nop; ti++){
             if (atoms[ti].temp_neighbors.size() > 11){
                 double ssum = 0;
@@ -893,12 +900,12 @@ int System::get_neighbors_from_temp(int style){
                     ssum += atoms[ti].temp_neighbors[i].dist;
                 }
                 //process sum
-                atoms[ti].lcutsmall = 1.2071*ssum/12;
+                atoms[ti].cutoff = 1.207*ssum/12.00;
                 //now assign neighbors based on this
                 for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
                     int tj = atoms[ti].temp_neighbors[i].index;
-                    double dist = atoms[ti].temp_neighbors[i].dist;
-                    if (dist <= atoms[ti].lcutsmall)
+                    dist = atoms[ti].temp_neighbors[i].dist;
+                    if (dist <= atoms[ti].cutoff)
                         process_neighbor(ti, tj);
                 }
                 finished = 1;                                  
@@ -908,7 +915,7 @@ int System::get_neighbors_from_temp(int style){
             }
         }
     }
-    else if (style == 14){
+    else if (style == 2){
         for (int ti=0; ti<nop; ti++){
             if (atoms[ti].temp_neighbors.size() > 13){
                 double ssum = 0;
@@ -918,12 +925,12 @@ int System::get_neighbors_from_temp(int style){
                 for(int i=8 ; i<14; i++){
                     ssum += atoms[ti].temp_neighbors[i].dist;
                 }
-                atoms[ti].lcutlarge = 1.2071*ssum/14;
+                atoms[ti].cutoff = 1.207*ssum/14.00;
                 //now assign neighbors based on this
                 for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
                     int tj = atoms[ti].temp_neighbors[i].index;
-                    double dist = atoms[ti].temp_neighbors[i].dist;
-                    if (dist <= atoms[ti].lcutlarge)
+                    dist = atoms[ti].temp_neighbors[i].dist;
+                    if (dist <= atoms[ti].cutoff)
                         process_neighbor(ti, tj);
                 }
                 finished = 1;                                  
@@ -1906,57 +1913,7 @@ void System::find_average_volume(){
 // Other order parameters
 //-------------------------------------------------------
 
-vector<int> System::calculate_acna(){
-    
-    //get fourteen neighbors
-    get_neighbors_from_temp(12);
-    store_neighbor_info();
-    
-    for(int ti=0; ti<nop; ti++){
-        atoms[ti].calculate_adaptive_cna(12);    
-    }
 
-    //we need to check again for unknow structures
-    get_neighbors_from_temp(14);
-    store_neighbor_info();
-
-    vector<int> result;
-    for(int i=0; i<5; i++){
-        result.emplace_back(0);
-    }
-
-    for(int ti=0; ti<real_nop; ti++){
-        if(atoms[ti].structure == 0)
-            atoms[ti].calculate_adaptive_cna(14);
-
-        result[atoms[ti].structure] += 1;            
-    }
-    return result;
-}
-
-vector<int> System::calculate_cna(){
-    
-    //get fourteen neighbors
-    store_neighbor_info();
-    
-    for(int ti=0; ti<nop; ti++){
-        atoms[ti].calculate_adaptive_cna(12);    
-    }
-
-
-    vector<int> result;
-    for(int i=0; i<5; i++){
-        result.emplace_back(0);
-    }
-
-    for(int ti=0; ti<real_nop; ti++){
-        if(atoms[ti].structure == 0)
-            atoms[ti].calculate_adaptive_cna(14);
-
-        result[atoms[ti].structure] += 1;            
-    }
-    return result;
-}
 
 
 //Methods for entropy
