@@ -136,8 +136,8 @@ void System::set_atoms( vector<Atom> atomitos){
 
     ghost_nop = tg;
     real_nop = tl;
-    cout<<"Assigned real "<<tl<<" ghost "<<tg<<endl;
-    cout<<nop<<endl;
+    //cout<<"Assigned real "<<tl<<" ghost "<<tg<<endl;
+    //cout<<nop<<endl;
 
 }
 
