@@ -77,6 +77,37 @@ pyscal can be built from the repository by-
 
 complete documentation with examples available `here <https://pyscal.com/>`_.
 
+Building the documentation
+--------------------------
+
+Install documentation requirements
+
+.. code:: console
+    
+    cd docs
+    pip install -r requirements.txt
+
+
+Build API reference
+
+.. code:: console
+
+    cd docs
+    make html
+
+The built docs will be available in `docs/html`
+
+Building complete documentation including examples
+
+.. code:: console
+
+    git clone https://github.com/srmnitc/pyscal-webpage.git
+    cd pyscal-webpage
+    pip install -r requirements.txt
+    jupyter-book build pyscal/
+
+The built pages will be available in `pyscal-webpage/pyscal/_build/html`
+
 
 Citing the work
 ---------------
