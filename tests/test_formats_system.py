@@ -77,16 +77,16 @@ def test_poscar():
 
 def test_others():
     sys = pc.System()
-    sys.read_inputfile('tests/bcc.prim.dat', is_triclinic=True)
+    sys.read_inputfile('tests/bcc.prim.dat')
     sys.to_file('tests/prim1', format="poscar", species=['Fe'])
 
     #try reading in
     sys = pc.System()
-    sys.read_inputfile('tests/prim1', format="poscar", is_triclinic=True)
+    sys.read_inputfile('tests/prim1', format="poscar")
     #aseobj = ptp.con
     ase = bulk('Cu', 'fcc', a=3.6).repeat((3,3,3))
     sys = pc.System()
-    sys.read_inputfile(ase, format="ase", is_triclinic=True)
+    sys.read_inputfile(ase, format="ase")
 
     ase = bulk('Cu', 'fcc', a=3.6, cubic=True).repeat((3,3,3))
     sys = pc.System()

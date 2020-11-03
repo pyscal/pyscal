@@ -25,7 +25,7 @@ import pyscal.trajectory.vasp as ptvasp
 
 
 def read_file(filename, format="lammps-dump",
-    compressed = False, customkeys=None, is_triclinic = False):
+    compressed = False, customkeys=None):
     """
     Read input file
 
@@ -43,10 +43,6 @@ def read_file(filename, format="lammps-dump",
     customkeys : list
         A list containing names of headers of extra data that needs to be read in from the
         input file.
-
-    is_triclinc : bool, optional
-        Only used in the case of `format='ase'`. If the read ase object is triclinic, this
-        options should be set to True.
 
     Returns
     -------
@@ -74,7 +70,7 @@ def read_file(filename, format="lammps-dump",
         except:
             raise TypeError("format recieved an unknown option %s"%format)
 
-    return atoms, box, is_triclinic        
+    return atoms, box       
 
 def write_file(sys, outfile, format="lammps-dump", compressed = False, 
     customkeys=None, customvals=None, timestep=0, species=None):

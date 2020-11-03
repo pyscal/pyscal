@@ -100,11 +100,25 @@ class System(pc.System):
         """
         Box setter 
         """
+        #we should automatically check for triclinic cells here
+        summ = 0
+        for i in range(3):
+            box1 = np.array(userbox[i-1])
+            box2 = np.array(userbox[i])
+            summ += np.dot(box1, box2)/(np.linalg.norm(box1)*np.linalg.norm(box2))
+
+        #check if the summ is zero
+        if np.abs(summ) > 0:
+            #this is a triclinic box
+            rot = np.array(userbox).T
+            rotinv = np.linalg.inv(rot)
+            self.assign_triclinic_params(rot, rotinv)
+
         self._box = userbox
 
 
 
-    def read_inputfile(self, filename, format="lammps-dump", compressed = False, customkeys=None, is_triclinic = False):
+    def read_inputfile(self, filename, format="lammps-dump", compressed = False, customkeys=None):
         """
 
         Read input file that contains the information of system configuration.
@@ -124,10 +138,6 @@ class System(pc.System):
             A list containing names of headers of extra data that needs to be read in from the
             input file.
 
-        is_triclinc : bool, optional
-            Only used in the case of `format='ase'`. If the read ase object is triclinic, this
-            options should be set to True.
-
         Returns
         -------
         None
@@ -146,12 +156,7 @@ class System(pc.System):
         `compressed` keyword is not required if a file ends with `.gz` extension, it is
         automatically treated as a compressed file.
 
-        `frame` keyword allows to read in a particular slice from a long trajectory. If all slices
-        need to analysed, this is a very inefficient way. For handling multiple time slices,
-        the :func:`~pyscal.traj_process` module offers a better set of tools.
-
-        Triclinic simulation boxes can also be read in for `lammps-dump`. No special keyword is
-        necessary.
+        Triclinic simulation boxes can also be read in.
 
         If `custom_keys` are provided, this extra information is read in from input files if
         available. This information is not passed to the C++ instance of atom, and is stored
@@ -159,21 +164,14 @@ class System(pc.System):
 
 
         """
-        atoms, box, is_triclinic = ptp.read_file(filename, format=format, 
+        atoms, box = ptp.read_file(filename, format=format, 
                                     compressed=compressed, customkeys=customkeys,
-                                        is_triclinic=is_triclinic)
+                                        )
         self.atoms = atoms
         self.box = box
 
         if(len(atoms) < 20):
             self.repeat((3, 3, 3), ghost=True, scale_box=True)
-
-        if is_triclinic:
-            #we have to input rotation matrix and the inverse rotation matrix
-            #print(self._box)
-            rot = np.array(self._box).T
-            rotinv = np.linalg.inv(rot)
-            self.assign_triclinic_params(rot, rotinv)
 
 
     def get_atom(self, index):
