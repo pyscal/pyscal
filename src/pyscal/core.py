@@ -165,14 +165,16 @@ class System(pc.System):
         self.atoms = atoms
         self.box = box
 
+        if(len(atoms) < 20):
+            self.repeat((3, 3, 3), ghost=True, scale_box=True)
+
         if is_triclinic:
             #we have to input rotation matrix and the inverse rotation matrix
-            rot = np.array(box).T
+            #print(self._box)
+            rot = np.array(self._box).T
             rotinv = np.linalg.inv(rot)
             self.assign_triclinic_params(rot, rotinv)
 
-        if(len(atoms) < 20):
-            self.repeat((3, 3, 3), ghost=True, scale_box=True)
 
     def get_atom(self, index):
         """
