@@ -124,7 +124,7 @@ def write_file(sys, outfile, format="lammps-dump", compressed = False,
         write(outfile, aseobject, format='lammps-data')
     
     elif format == 'poscar':
-        ptvasp.write_snap(sys, outfile)
+        ptvasp.write_snap(sys, outfile, species=species)
         #aseobject = ptase.convert_snap(sys, species=species)
         #write(outfile, aseobject, format='vasp')
 
