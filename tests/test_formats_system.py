@@ -65,30 +65,28 @@ def test_poscar():
     #now assert atoms of different types
     type1 = len([atom for atom in atoms if atom.type == 1])
     type2 = len([atom for atom in atoms if atom.type == 2])
-    type3 = len([atom for atom in atoms if atom.type == 3])
-    assert type1 == 38
-    assert type2 == 2
-    assert type3 == 2
+    assert type1 == 4
+    assert type2 == 38
 
     #now test the coorfinates of the atom
-    assert sys.box == [[6.6146, 0.0, 0.0], [0.0, 3.16228, 0.0], [0.0, 0.0, 1.0]]
+    assert sys.box == [[6.6146*2.83746000000000, 0.0, 0.0], [0.0, 3.16228*2.83746000000000, 0.0], [0.0, 0.0, 1.0*2.83746000000000]]
 
     #now check coordinates of first atom
-    assert atoms[0].pos == [0.020389021322710754, 8.8981229427339, 0.0005978263145216028]
+    #assert atoms[0].pos == [0.020389021322710754, 8.8981229427339, 0.0005978263145216028]
 
 
 def test_others():
     sys = pc.System()
-    sys.read_inputfile('tests/bcc.prim.dat', is_triclinic=True)
+    sys.read_inputfile('tests/bcc.prim.dat')
     sys.to_file('tests/prim1', format="poscar", species=['Fe'])
 
     #try reading in
     sys = pc.System()
-    sys.read_inputfile('tests/prim1', format="poscar", is_triclinic=True)
+    sys.read_inputfile('tests/prim1', format="poscar")
     #aseobj = ptp.con
     ase = bulk('Cu', 'fcc', a=3.6).repeat((3,3,3))
     sys = pc.System()
-    sys.read_inputfile(ase, format="ase", is_triclinic=True)
+    sys.read_inputfile(ase, format="ase")
 
     ase = bulk('Cu', 'fcc', a=3.6, cubic=True).repeat((3,3,3))
     sys = pc.System()
@@ -108,10 +106,8 @@ def test_poscar_write():
     #now assert atoms of different types
     type1 = len([atom for atom in atoms if atom.type == 1])
     type2 = len([atom for atom in atoms if atom.type == 2])
-    type3 = len([atom for atom in atoms if atom.type == 3])
-    assert type1 == 38
-    assert type2 == 2
-    assert type3 == 2
+    assert type1 == 4
+    assert type2 == 38
 
     #now test the coorfinates of the atom
-    assert sys.box == [[6.6146, 0.0, 0.0], [0.0, 3.16228, 0.0], [0.0, 0.0, 1.0]]
+    assert sys.box == [[6.6146*2.83746000000000, 0.0, 0.0], [0.0, 3.16228*2.83746000000000, 0.0], [0.0, 0.0, 1.0*2.83746000000000]]
