@@ -13,7 +13,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
 
     Parameters
     ----------
-    structure : {'bcc', 'fcc', 'hcp', 'diamond' or 'l12'}
+    structure : {'sc', 'bcc', 'fcc', 'hcp', 'diamond', 'a15' or 'l12'}
         type of the crystal structure
 
     lattice_constant : float, optional
@@ -56,8 +56,23 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
 
     #if noise > 0.1:
     #    warnings.warn("Value of noise is rather high. Atom positions might overlap")
+    if structure == 'sc':
 
-    if structure == 'bcc':
+        coord_no = 1
+        atomtype = [1,]
+
+        natoms = coord_no*nx*ny*nz
+
+        xfact = 1.
+        yfact = 1.
+        zfact = 1.
+
+        unitcellx = np.zeros(coord_no)
+        unitcelly = np.zeros(coord_no)
+        unitcellz = np.zeros(coord_no)
+
+
+    elif structure == 'bcc':
 
         coord_no = 2
         atomtype = [1, 1]
@@ -155,6 +170,43 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         unitcelly[7]=0.75*lattice_constant
         unitcellz[7]=0.75*lattice_constant
 
+    elif structure == 'a15':
+
+        coord_no = 8
+        atomtype = [1, 1, 1, 1, 1, 1, 1, 1]
+
+        natoms = coord_no*nx*ny*nz
+
+        xfact = 1.
+        yfact = 1.
+        zfact = 1.
+
+        unitcellx = np.zeros(coord_no)
+        unitcelly = np.zeros(coord_no)
+        unitcellz = np.zeros(coord_no)
+        unitcellx[1] = 0.50*lattice_constant
+        unitcelly[1] = 0.50*lattice_constant
+        unitcellz[1] = 0.50*lattice_constant
+        unitcellx[2] = 0.25*lattice_constant
+        unitcelly[2] = 0.50*lattice_constant
+        unitcellz[2] = 0.00*lattice_constant
+        unitcellx[3] = 0.75*lattice_constant
+        unitcelly[3] = 0.50*lattice_constant
+        unitcellz[3] = 0.00*lattice_constant
+        unitcellx[4] = 0.00*lattice_constant
+        unitcelly[4] = 0.25*lattice_constant
+        unitcellz[4] = 0.50*lattice_constant
+        unitcellx[5] = 0.00*lattice_constant
+        unitcelly[5] = 0.75*lattice_constant
+        unitcellz[5] = 0.50*lattice_constant
+        unitcellx[6] = 0.50*lattice_constant
+        unitcelly[6] = 0.00*lattice_constant
+        unitcellz[6] = 0.25*lattice_constant
+        unitcellx[7] = 0.50*lattice_constant
+        unitcelly[7] = 0.00*lattice_constant
+        unitcellz[7] = 0.75*lattice_constant
+
+
     elif structure == 'l12':
 
         coord_no = 4
@@ -175,6 +227,24 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         unitcellz[2] = 0.5*lattice_constant
         unitcellx[3] = 0.5*lattice_constant
         unitcelly[3] = 0.5*lattice_constant
+
+    elif structure == 'b2':
+
+        coord_no = 2
+        atomtype = [1, 2]
+
+        natoms = coord_no*nx*ny*nz
+
+        xfact = 1.
+        yfact = 1.
+        zfact = 1.
+
+        unitcellx = np.zeros(coord_no)
+        unitcelly = np.zeros(coord_no)
+        unitcellz = np.zeros(coord_no)
+        unitcellx[1] = 0.5*lattice_constant
+        unitcelly[1] = 0.5*lattice_constant
+        unitcellz[1] = 0.5*lattice_constant
 
     else:
         raise ValueError("Unknown crystal structure")
