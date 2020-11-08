@@ -105,6 +105,11 @@ PYBIND11_MODULE(csystem, m) {
         .def("find_average_volume",&System::find_average_volume)
 
         //-------------------------------------------------------
+        // CNA parameters
+        //-------------------------------------------------------
+        .def_readwrite("lattice_constant", &System::lattice_constant)
+
+        //-------------------------------------------------------
         // Other order parameters
         //-------------------------------------------------------
         .def("entropy",&System::entropy)

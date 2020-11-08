@@ -155,6 +155,13 @@ class System{
         void set_face_cutoff(double);
 
         //-------------------------------------------------------
+        // CNA parameters
+        //-------------------------------------------------------
+        double lattice_constant;
+        int get_cna_neighbors(int);
+        int get_acna_neighbors(int);
+
+        //-------------------------------------------------------
         // Other order parameters
         //-------------------------------------------------------
         double switching_fn(double, double, int, int);
