@@ -403,6 +403,15 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     )mydelimiter")
 
     //-------------------------------------------------------
+    // CNA parameters
+    //-------------------------------------------------------
+    .def_readwrite("cna", &Atom::cna, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common", &Atom::common, R"mydelimiter(
+    )mydelimiter")
+
+    //-------------------------------------------------------
     // Other order parameters
     //-------------------------------------------------------
     .def_readwrite("sro", &Atom::sro, R"mydelimiter(
