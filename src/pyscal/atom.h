@@ -210,6 +210,7 @@ class Atom{
         //-------------------------------------------------------
         vector<vector<int>> cna;
         vector<vector<int>> common;
+        vector<vector<int>> bonds;
 
         //-------------------------------------------------------
         // Other order parameters

@@ -411,6 +411,9 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     .def_readwrite("common", &Atom::common, R"mydelimiter(
     )mydelimiter")
 
+    .def_readwrite("bonds", &Atom::bonds, R"mydelimiter(
+    )mydelimiter")
+
     //-------------------------------------------------------
     // Other order parameters
     //-------------------------------------------------------
