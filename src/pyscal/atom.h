@@ -211,28 +211,10 @@ class Atom{
         vector<double> sro;
         double centrosymmetry;
 
-        vector<int> common_neighbor_count;
-        vector<vector<int>> common_neighbors;
-        void find_common_neighbors();
-        vector<int> common_neighbor_bond_count;
-        vector<vector<vector<int>>> common_neighbor_bonds;
-        void find_bonds_of_common_neighbors();
-        vector<int> bond_chain_count;
-        void find_bond_chains();
         //these are the cutoffs for cna
         double lcutsmall;
         double lcutlarge;
         int lneigh;
-
-        //cna vector
-        int cna1;
-        int cna2;
-        int cna3;
-        int cna4;
-
-        void check_adaptive_cna12();
-        void check_adaptive_cna14();
-        void calculate_adaptive_cna(int);
 
         double sigma;
         double rho;

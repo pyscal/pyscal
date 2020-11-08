@@ -415,12 +415,6 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         The value of centrosymmetry parameter.
     )mydelimiter")
 
-    .def("calculate_adaptive_cna", &Atom::calculate_adaptive_cna, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("common_neighbor_count", &Atom::common_neighbor_count, R"mydelimiter(
-    )mydelimiter")
-
     .def_readwrite("entropy", &Atom::entropy, R"mydelimiter(
         *Float*.
         Value of entropy parameter.

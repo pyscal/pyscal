@@ -1208,15 +1208,9 @@ class System(pc.System):
         """
         
         if cutoff is None:
-            if calculate_neighbors:
-                self.find_neighbors(method="number", nmax=14, assign_neighbor=False)
-            cna = self.calculate_acna()
-            return cna
+            pass
         else:
-            self.find_neighbors(method="cutoff", cutoff=cutoff)
-            cna = self.calculate_cna()
-            return cna
-
+            pass
 
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """

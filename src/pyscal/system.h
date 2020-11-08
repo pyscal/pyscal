@@ -157,8 +157,6 @@ class System{
         //-------------------------------------------------------
         // Other order parameters
         //-------------------------------------------------------
-        vector<int> calculate_acna();
-        vector<int> calculate_cna();
         double switching_fn(double, double, int, int);
         void average_entropy();
         void average_entropy_switch(double, int, int);

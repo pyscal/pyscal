@@ -1906,59 +1906,6 @@ void System::find_average_volume(){
 // Other order parameters
 //-------------------------------------------------------
 
-vector<int> System::calculate_acna(){
-    
-    //get fourteen neighbors
-    get_neighbors_from_temp(12);
-    store_neighbor_info();
-    
-    for(int ti=0; ti<nop; ti++){
-        atoms[ti].calculate_adaptive_cna(12);    
-    }
-
-    //we need to check again for unknow structures
-    get_neighbors_from_temp(14);
-    store_neighbor_info();
-
-    vector<int> result;
-    for(int i=0; i<5; i++){
-        result.emplace_back(0);
-    }
-
-    for(int ti=0; ti<real_nop; ti++){
-        if(atoms[ti].structure == 0)
-            atoms[ti].calculate_adaptive_cna(14);
-
-        result[atoms[ti].structure] += 1;            
-    }
-    return result;
-}
-
-vector<int> System::calculate_cna(){
-    
-    //get fourteen neighbors
-    store_neighbor_info();
-    
-    for(int ti=0; ti<nop; ti++){
-        atoms[ti].calculate_adaptive_cna(12);    
-    }
-
-
-    vector<int> result;
-    for(int i=0; i<5; i++){
-        result.emplace_back(0);
-    }
-
-    for(int ti=0; ti<real_nop; ti++){
-        if(atoms[ti].structure == 0)
-            atoms[ti].calculate_adaptive_cna(14);
-
-        result[atoms[ti].structure] += 1;            
-    }
-    return result;
-}
-
-
 //Methods for entropy
 double System::switching_fn(double rij, double ra, int M, int N){
 
