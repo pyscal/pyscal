@@ -97,7 +97,6 @@ class System{
         void get_temp_neighbors_cells();
         void get_temp_neighbors_brute();
         void store_neighbor_info();
-        void get_diamond_neighbors();
         void set_atom_cutoff(double);
 
         //---------------------------------------------------
@@ -158,10 +157,13 @@ class System{
         // CNA parameters
         //-------------------------------------------------------
         double lattice_constant;
+        void get_diamond_neighbors();
         int get_cna_neighbors(int);
         int get_acna_neighbors(int);
         void get_common_neighbors(int);
         void get_common_bonds(int);
+        void identify_cn12();
+        void identify_cn14();
         vector<int> calculate_cna(int);
 
         //-------------------------------------------------------

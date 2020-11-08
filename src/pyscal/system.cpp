@@ -833,29 +833,6 @@ int System::get_all_neighbors_bynumber(double prefactor, int nns, int assign){
 
 }
 
-void System::get_diamond_neighbors(){
-    /*
-    Get the neighbors in diamond lattice which is part of the
-    underlying fcc cell.
-    */
-    for (int ti=0; ti<nop; ti++){
-        //cout<<"ti = "<<ti<<endl;
-        for(int j=0 ; j<4; j++){
-            int tj = atoms[ti].temp_neighbors[j].index;
-            //cout<<"tj = "<<tj<<endl;
-            //loop over the neighbors
-            for(int k=0 ; k<4; k++){
-                int tk = atoms[tj].temp_neighbors[k].index;
-                //cout<<"tk = "<<tk<<endl;
-                //now make sure its not the same atom
-                if (ti == tk) continue;
-                //process the neighbors
-                process_neighbor(ti, tk);
-            }
-        }
-    }
-}
-
 void System::set_atom_cutoff(double factor){
     /*
     Reassign atom cutoff
@@ -1905,6 +1882,35 @@ void System::find_average_volume(){
 //-------------------------------------------------------
 // CNA parameters
 //-------------------------------------------------------
+void System::get_diamond_neighbors(){
+    /*
+    Get the neighbors in diamond lattice which is part of the
+    underlying fcc cell.
+
+    Also store the first and second nearest neighbors for
+    latest identification.
+    */
+    for (int ti=0; ti<nop; ti++){
+        //cout<<"ti = "<<ti<<endl;
+        atoms[ti].nn1.clear();
+        
+        //start loop
+        for(int j=0 ; j<4; j++){
+            int tj = atoms[ti].temp_neighbors[j].index;
+            //cout<<"tj = "<<tj<<endl;
+            //loop over the neighbors
+            atoms[ti].nn1.emplace_back(tj);
+            for(int k=0 ; k<4; k++){
+                int tk = atoms[tj].temp_neighbors[k].index;
+                //cout<<"tk = "<<tk<<endl;
+                //now make sure its not the same atom
+                if (ti == tk) continue;
+                //process the neighbors
+                process_neighbor(ti, tk);
+            }
+        }
+    }
+}
 
 int System::get_cna_neighbors(int style){
     /*
@@ -2085,42 +2091,10 @@ void System::get_common_bonds(int ti){
     }
 }
 
-vector<int> System::calculate_cna(int method){
-    /*
-    Calculate CNA or ACNA
-    
-    Args
-    ----
-    method : 1 if CNA
-             2 if ACNA
-    */
+void System::identify_cn12(){
+
     int c1, c2, c3, c4;
-    int nfcc, nhcp, nico, nbcc1, nbcc2;
-
-    //create array for result
-    vector<int> analyis;
-    for(int i=0; i<5; i++){
-        analyis.emplace_back(0);
-    }
-
-    //assign structures to 0
-    for(int i=0; i<nop; i++){
-        atoms[i].structure = 0;
-    }
-    
-    //first get lump neighbors
-    //neighbor method is same
-    get_all_neighbors_bynumber(3, 14, 0);
-
-    //first we start by checking for 12 CN 
-    //CNA method
-    if(method==1){
-        get_cna_neighbors(1);
-    }
-    //ACNA method
-    else if (method==2){
-        get_acna_neighbors(1);
-    }
+    int nfcc, nhcp, nico;
 
     //now we start
     for(int ti=0; ti<nop; ti++){
@@ -2160,16 +2134,12 @@ vector<int> System::calculate_cna(int method){
             }
         }
     }
+}
 
-    //now we start by checking for 14 CN 
-    //CNA method
-    if(method==1){
-        get_cna_neighbors(2);
-    }
-    //ACNA method
-    else if (method==2){
-        get_acna_neighbors(2);
-    }
+void System::identify_cn14(){
+    
+    int c1, c2, c3, c4;
+    int nbcc1, nbcc2;
 
     for(int ti=0; ti<nop; ti++){
         if(atoms[ti].structure==0){
@@ -2196,8 +2166,60 @@ vector<int> System::calculate_cna(int method){
                 atoms[ti].structure = 3;   
             }
         }
+    }    
+}
+
+vector<int> System::calculate_cna(int method){
+    /*
+    Calculate CNA or ACNA
+    
+    Args
+    ----
+    method : 1 if CNA
+             2 if ACNA
+    */
+
+    //create array for result
+    vector<int> analyis;
+    for(int i=0; i<5; i++){
+        analyis.emplace_back(0);
     }
 
+    //assign structures to 0
+    for(int i=0; i<nop; i++){
+        atoms[i].structure = 0;
+    }
+    
+    //first get lump neighbors
+    //neighbor method is same
+    get_all_neighbors_bynumber(3, 14, 0);
+
+    //first we start by checking for 12 CN 
+    //CNA method
+    if(method==1){
+        get_cna_neighbors(1);
+    }
+    //ACNA method
+    else if (method==2){
+        get_acna_neighbors(1);
+    }
+
+    //call here
+    identify_cn12();
+
+    //now we start by checking for 14 CN 
+    //CNA method
+    if(method==1){
+        get_cna_neighbors(2);
+    }
+    //ACNA method
+    else if (method==2){
+        get_acna_neighbors(2);
+    }
+
+    //call here
+    identify_cn14();
+    
     //gather results
     for(int ti=0; ti<nop; ti++){
         analyis[atoms[ti].structure] += 1;
