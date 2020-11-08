@@ -108,7 +108,7 @@ PYBIND11_MODULE(csystem, m) {
         // CNA parameters
         //-------------------------------------------------------
         .def_readwrite("lattice_constant", &System::lattice_constant)
-        .def("calculate_cna",&System::calculate_cna)
+        .def("ccalculate_cna",&System::calculate_cna)
 
         //-------------------------------------------------------
         // Other order parameters

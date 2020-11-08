@@ -1917,17 +1917,20 @@ int System::get_cna_neighbors(int style){
     int finished = 1;
     reset_main_neighbors();
     double factor, dist;
+    int ncount;
 
     if (style == 1){
         factor = 0.854;
+        ncount = 12;
     }
     else if (style == 2){
         factor = 1.207;
+        ncount = 14;
     }
 
     for (int ti=0; ti<nop; ti++){
         atoms[ti].cutoff = factor*lattice_constant;
-        for(int i=0 ; i<atoms[ti].temp_neighbors.size(); i++){
+        for(int i=0 ; i<ncount; i++){
             int tj = atoms[ti].temp_neighbors[i].index;
             //dist = atoms[ti].temp_neighbors[i].dist;
             //if (dist <= atoms[ti].cutoff)
@@ -2027,9 +2030,9 @@ void System::get_common_neighbors(int ti){
     //now start loop
     for(int i=0; i<atoms[ti].n_neighbors-1; i++){
         m = atoms[ti].neighbors[i];
-        for(int j=i+1, j<atoms[ti].n_neighbors; j++){
+        for(int j=i+1; j<atoms[ti].n_neighbors; j++){
             n = atoms[ti].neighbors[j];
-            d = sys.get_abs_distance(m, n, dx, dy, dz);
+            d = get_abs_distance(m, n, dx, dy, dz);
             if (d <= atoms[ti].cutoff){
                 atoms[ti].cna[i][0]++;
                 atoms[ti].common[i].emplace_back(n);
@@ -2056,14 +2059,14 @@ void System::get_common_bonds(int ti){
     for(int k=0; k<atoms[ti].n_neighbors; k++){
         //clear bonds first
         for(int l=0; l<atoms[ti].cna[k][0]; l++){
-            bonds[k].emplace_back(0);
+            atoms[ti].bonds[k].emplace_back(0);
         }
         //now start proper loop
         for(int l=0; l<atoms[ti].cna[k][0]-1; l++){
             for(int m=l+1; m<atoms[ti].cna[k][0]; m++){
                 c1 = atoms[ti].common[k][l];
                 c2 = atoms[ti].common[k][m];
-                d = sys.get_abs_distance(c1, c2, dx, dy, dz);
+                d = get_abs_distance(c1, c2, dx, dy, dz);
                 if(d <= atoms[ti].cutoff){
                     atoms[ti].cna[k][1]++;
                     atoms[ti].bonds[k][l]++;
@@ -2071,16 +2074,15 @@ void System::get_common_bonds(int ti){
                 }
             }
         }
+        maxbonds = 0;
+        minbonds = 8;
+        for(int l=0; l<atoms[ti].cna[k][0]; l++){
+            maxbonds = max(atoms[ti].bonds[k][l], maxbonds);
+            minbonds = min(atoms[ti].bonds[k][l], minbonds);
+        }
+        atoms[ti].cna[k][2] = maxbonds;
+        atoms[ti].cna[k][3] = minbonds;    
     }
-
-    maxbonds = 0;
-    minbonds = 8;
-    for(int l=0; l<atoms[ti].cna[k][0]; l++){
-        maxbonds = MAX(atoms[ti].bonds[k][l], maxbonds);
-        minbonds = MIN(atoms[ti].bonds[k][l], minbonds);
-    }
-    atoms[ti].cna[k][2] = maxbonds;
-    atoms[ti].cna[k][3] = minbonds;
 }
 
 vector<int> System::calculate_cna(int method){
@@ -2093,7 +2095,7 @@ vector<int> System::calculate_cna(int method){
              2 if ACNA
     */
     int c1, c2, c3, c4;
-    int nfcc, nhcp, niso, nbcc1, nbcc2;
+    int nfcc, nhcp, nico, nbcc1, nbcc2;
 
     //create array for result
     vector<int> analyis;
@@ -2103,7 +2105,7 @@ vector<int> System::calculate_cna(int method){
 
     //assign structures to 0
     for(int i=0; i<nop; i++){
-        atoms[ti].structure = 0;
+        atoms[i].structure = 0;
     }
     
     //first get lump neighbors

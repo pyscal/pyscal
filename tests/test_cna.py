@@ -10,16 +10,16 @@ def test_cna_cutoff():
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box
-    vec = sys.calculate_cna(cutoff=0.8536*4.1)
-    assert vec[1] == 7*7*7*4
+    res = sys.calculate_cna(lattice_constant=4.00)
+    assert res["fcc"] == 7*7*7*4
 
 def test_cna_a1():
     atoms, box = pcs.make_crystal(structure="fcc", repetitions=(7,7,7), lattice_constant=4.00, noise=0.01)
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box
-    vec = sys.calculate_cna(cutoff=None)
-    assert vec[1] == 7*7*7*4
+    res = sys.calculate_cna(lattice_constant=None)
+    assert res["fcc"] == 7*7*7*4
 
 #now test adaptive
 def test_cna_adaptive():
@@ -27,7 +27,7 @@ def test_cna_adaptive():
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box
-    sys.calculate_cna(cutoff=None)
+    sys.calculate_cna(lattice_constant=None)
     atoms = sys.atoms
     assert atoms[0].structure == 1
 
@@ -35,7 +35,7 @@ def test_cna_adaptive():
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box
-    sys.calculate_cna(cutoff=None)
+    sys.calculate_cna(lattice_constant=None)
     atoms = sys.atoms
     assert atoms[0].structure == 2
 
@@ -43,6 +43,6 @@ def test_cna_adaptive():
     sys = pc.System()
     sys.atoms = atoms
     sys.box = box
-    sys.calculate_cna(cutoff=None)
+    sys.calculate_cna(lattice_constant=None)
     atoms = sys.atoms
     assert atoms[0].structure == 3
