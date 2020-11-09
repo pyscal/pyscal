@@ -262,12 +262,15 @@ def write_snap(sys, outfile, compressed = False,
             cvals = customvals
 
     #open files for writing
-    if compressed:
-        gz = gzip.open(outfile,'wt')
-        dump = gz
+    if isinstance(outfile, io.IOBase):
+        dump = outfile
     else:
-        gz = open(outfile,'w')
-        dump = gz
+        if compressed:
+            gz = gzip.open(outfile,'wt')
+            dump = gz
+        else:
+            gz = open(outfile,'w')
+            dump = gz
 
     #now write
     dump.write("ITEM: TIMESTEP\n")
@@ -298,7 +301,8 @@ def write_snap(sys, outfile, compressed = False,
 
         dump.write(atomline)
 
-    dump.close()
+    if not isinstance(outfile, io.IOBase):
+        dump.close()
 
 
 def split_snaps(infile, compressed = False):
