@@ -1216,10 +1216,14 @@ class System(pc.System):
 
         return st
 
-    def identify_diamond(self, keep_structure=True):
+    def identify_diamond(self, find_neighbors=True, keep_structure=True):
         """
         Identify diamond structure
         """
+        if find_neighbors:
+            self.reset_neighbors()
+            self.find_neighbors(method="number", nmax=4, assign_neighbor=False)
+        
         if keep_structure:
             res = self.cidentify_diamond_structure(0)
         else:

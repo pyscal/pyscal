@@ -1893,14 +1893,12 @@ void System::get_diamond_neighbors(){
     reset_main_neighbors();
     for (int ti=0; ti<nop; ti++){
         //cout<<"ti = "<<ti<<endl;
-        atoms[ti].nn1.clear();
-        
         //start loop
         for(int j=0 ; j<4; j++){
             int tj = atoms[ti].temp_neighbors[j].index;
             //cout<<"tj = "<<tj<<endl;
             //loop over the neighbors
-            atoms[ti].nn1.emplace_back(tj);
+            atoms[ti].nn1[j] = tj;
             for(int k=0 ; k<4; k++){
                 int tk = atoms[tj].temp_neighbors[k].index;
                 //cout<<"tk = "<<tk<<endl;
@@ -2160,7 +2158,7 @@ void System::identify_cn14(){
     }    
 }
 
-vector<int> System::identify_diamond_structure(int findneighbor){
+vector<int> System::identify_diamond_structure(int keepstructure){
     /*
     Calculate diamond structure
 
@@ -2179,8 +2177,7 @@ vector<int> System::identify_diamond_structure(int findneighbor){
         analyis.emplace_back(0);
     }
 
-    if(findneighbor){
-        get_all_neighbors_bynumber(3, 4, 0);
+    if(!keepstructure){
         for(int i=0; i<nop; i++){
             atoms[i].structure = 0;
         }
@@ -2212,6 +2209,19 @@ void System::identify_cndia(){
     //now get diamond neighbors
     get_diamond_neighbors();
 
+    //calculate cutoffs
+    for (int ti=0; ti<nop; ti++){
+        if (atoms[ti].n_neighbors > 11){
+            double ssum = 0;
+            for(int i=0 ; i<12; i++){
+                ssum += atoms[ti].neighbordist[i];
+            }
+            //process sum
+            atoms[ti].cutoff = 1.207*ssum/12.00;
+            //now assign neighbors based on this
+        }
+    }
+
     //now calculate cna signature for each atom and assign
     //structures - but only check 12 signature
     identify_cn12();
@@ -2221,17 +2231,17 @@ void System::identify_cndia(){
         if(atoms[ti].structure == 1){
             //this is cubic diamond
             atoms[ti].structure = 5;
-            for(int i=0; i<atoms[ti].nn1.size(); i++){
+            for(int i=0; i<4; i++){
                 n = atoms[ti].nn1[i];
                 //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
                     atoms[n].structure = 6;
                 }
             }
             for(int i=0; i<atoms[ti].n_neighbors; i++){
                 n = atoms[ti].neighbors[i];
                 //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
                     atoms[n].structure = 7;
                 }
             }
@@ -2239,17 +2249,17 @@ void System::identify_cndia(){
         else if(atoms[ti].structure == 2){
             //this is cubic diamond
             atoms[ti].structure = 8;
-            for(int i=0; i<atoms[ti].nn1.size(); i++){
+            for(int i=0; i<4; i++){
                 n = atoms[ti].nn1[i];
                 //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
                     atoms[n].structure = 9;
                 }
             }
             for(int i=0; i<atoms[ti].n_neighbors; i++){
                 n = atoms[ti].neighbors[i];
                 //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
                     atoms[n].structure = 10;
                 }
             }
