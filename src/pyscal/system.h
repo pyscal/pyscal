@@ -160,8 +160,8 @@ class System{
         void get_diamond_neighbors();
         void calculate_diamond_structure();
         void identify_cndia();
-        int get_cna_neighbors(int);
-        int get_acna_neighbors(int);
+        void get_cna_neighbors(int);
+        void get_acna_neighbors(int);
         void get_common_neighbors(int);
         void get_common_bonds(int);
         void identify_cn12();

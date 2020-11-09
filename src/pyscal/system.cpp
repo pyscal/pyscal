@@ -1913,7 +1913,7 @@ void System::get_diamond_neighbors(){
     }
 }
 
-int System::get_cna_neighbors(int style){
+void System::get_cna_neighbors(int style){
     /*
     Get neighbors for CNA method
     There are two styles available:
@@ -1946,7 +1946,7 @@ int System::get_cna_neighbors(int style){
     }
 }
 
-int System::get_acna_neighbors(int style){
+void System::get_acna_neighbors(int style){
     /*
     A new neighbor algorithm that finds a specified number of 
     neighbors for each atom.
