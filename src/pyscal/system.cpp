@@ -1890,6 +1890,7 @@ void System::get_diamond_neighbors(){
     Also store the first and second nearest neighbors for
     latest identification.
     */
+    reset_main_neighbors();
     for (int ti=0; ti<nop; ti++){
         //cout<<"ti = "<<ti<<endl;
         atoms[ti].nn1.clear();
@@ -2169,6 +2170,86 @@ void System::identify_cn14(){
     }    
 }
 
+void System::calculate_diamond_structure(){
+    /*
+    Calculate diamond structure
+
+    Assign structure numbers
+    ------------------------
+    6 : Cubic diamond (CD)
+    7 : 1NN of CD
+    8 : 2NN of CD
+    9 : Hexagonal diamond (HD)
+    10: 1NN of HD
+    11: 2NN of HD
+    */
+    //first get lump neighbors
+    get_all_neighbors_bynumber(3, 4, 0);
+
+    identify_cndia();    
+}
+
+void System::identify_cndia(){
+    /*
+    Identify diamond structure
+
+    Assign structure numbers
+    ------------------------
+    6 : Cubic diamond (CD)
+    7 : 1NN of CD
+    8 : 2NN of CD
+    9 : Hexagonal diamond (HD)
+    10: 1NN of HD
+    11: 2NN of HD
+    */
+    //now get diamond neighbors
+    get_diamond_neighbors();
+
+    //now calculate cna signature for each atom and assign
+    //structures - but only check 12 signature
+    identify_cn12();
+    int n;
+    //now for each atom
+    for(int ti=0; ti<nop; ti++){
+        if(atoms[ti].structure == 1){
+            //this is cubic diamond
+            atoms[ti].structure = 6;
+            for(int i=0; i<atoms[ti].nn1.size(); i++){
+                n = atoms[ti].nn1[i];
+                //only assign if structure is not 1 or 2#
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                    atoms[n].structure = 7;
+                }
+            }
+            for(int i=0; i<atoms[ti].n_neighbors; i++){
+                n = atoms[ti].neighbors[i];
+                //only assign if structure is not 1 or 2#
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                    atoms[n].structure = 8;
+                }
+            }
+        }
+        else if(atoms[ti].structure == 2){
+            //this is cubic diamond
+            atoms[ti].structure = 9;
+            for(int i=0; i<atoms[ti].nn1.size(); i++){
+                n = atoms[ti].nn1[i];
+                //only assign if structure is not 1 or 2#
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                    atoms[n].structure = 10;
+                }
+            }
+            for(int i=0; i<atoms[ti].n_neighbors; i++){
+                n = atoms[ti].neighbors[i];
+                //only assign if structure is not 1 or 2#
+                if((atoms[n].structure != 1) && (atoms[n].structure != 2)){
+                    atoms[n].structure = 11;
+                }
+            }
+        }
+    }
+}
+
 vector<int> System::calculate_cna(int method){
     /*
     Calculate CNA or ACNA
@@ -2219,7 +2300,7 @@ vector<int> System::calculate_cna(int method){
 
     //call here
     identify_cn14();
-    
+
     //gather results
     for(int ti=0; ti<nop; ti++){
         analyis[atoms[ti].structure] += 1;
