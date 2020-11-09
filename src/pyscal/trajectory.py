@@ -49,8 +49,13 @@ class Trajectory:
         """
         Allow for slice indexing
         """
-        sys = self.get_block_as_system(blockno)
-        return sys
+        if isinstance(blockno, slice):
+            blocklist = blockno.indices(self.nblocks)
+            sys = [self.get_block_as_system(x) for x in blocklist]
+            return sys
+        else:
+            sys = self.get_block_as_system(blockno)
+            return sys
 
     def get_natoms(self):
         """
@@ -123,7 +128,7 @@ class Trajectory:
                 _ = next(fout)
             data = [next(fout).decode("utf-8") for x in range(start, stop)]
         return data
-        
+
     def get_block_as_system(self, blockno):
         """
         Get block as pyscal system
