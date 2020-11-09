@@ -6,7 +6,7 @@ import gzip
 import io
 import os
 from ase.io import write, read
-import pyscal.trajectory.ase as ptase
+import pyscal.formats.ase as ptase
 
 def read_snap(infile, compressed = False):
     """
