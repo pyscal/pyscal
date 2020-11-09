@@ -109,6 +109,7 @@ PYBIND11_MODULE(csystem, m) {
         .def_readwrite("lattice_constant", &System::lattice_constant)
         .def("ccalculate_cna",&System::calculate_cna)
         .def("get_diamond_neighbors",&System::get_diamond_neighbors)
+        .def("cidentify_diamond_structure",&System::identify_diamond_structure)
 
         //-------------------------------------------------------
         // Other order parameters

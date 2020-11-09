@@ -1216,6 +1216,30 @@ class System(pc.System):
 
         return st
 
+    def identify_diamond(self, keep_structure=True):
+        """
+        Identify diamond structure
+        """
+        if keep_structure:
+            res = self.cidentify_diamond_structure(0)
+        else:
+            res = self.cidentify_diamond_structure(1)
+
+        st = {}
+        st["others"] = res[0]
+        st["fcc"] = res[1]
+        st["hcp"] = res[2]
+        st["bcc"] = res[3]
+        st["ico"] = res[4]
+        st["cubic diamond"] = res[5]
+        st["cubic diamond 1NN"] = res[6]
+        st["cubic diamond 2NN"] = res[7]
+        st["hex diamond"] = res[8]
+        st["hex diamond 1NN"] = res[9]
+        st["hex diamond 2NN"] = res[10]
+
+        return st
+
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """
         Calculate the centrosymmetry parameter

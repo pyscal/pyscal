@@ -158,7 +158,7 @@ class System{
         //-------------------------------------------------------
         double lattice_constant;
         void get_diamond_neighbors();
-        void calculate_diamond_structure();
+        vector<int> identify_diamond_structure(int);
         void identify_cndia();
         void get_cna_neighbors(int);
         void get_acna_neighbors(int);
