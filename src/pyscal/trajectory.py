@@ -11,13 +11,15 @@ class Timeslice:
         """
         self.trajectory = trajectory
         self.blocklist = blocklist
+        self.trajectories = [trajectory]
+        self.blocklists = [blocklist]
 
     def __repr__(self):
         """
         String of the class
         """
         return "Trajectory slice %d-%d with %d atoms"%(self.blocklist[0], 
-            self.blocklist[1], self.trajectory.natoms)
+            self.blocklist[-1], self.trajectory.natoms)
 
     def to_system(self):
         """
@@ -33,7 +35,11 @@ class Timeslice:
         sys : System
             pyscal System
         """
-        sys = [self.trajectory.get_block_as_system(x) for x in self.blocklist]
+        sys = []
+        for count, traj in enumerate(self.trajectories):
+            for x in self.blocklists[count]:
+                s = self.trajectories[count].get_block_as_system(x)
+                sys.append(s)
         return sys
 
     def to_file(self, outfile):
@@ -51,10 +57,11 @@ class Timeslice:
 
         """
         fout = open(outfile, "w")
-        for x in self.blocklist:
-            data = self.trajectory.get_block(x)
-            for line in data:
-                fout.write(line)
+        for count, traj in enumerate(self.trajectories):
+            for x in self.blocklists[count]:
+                data = self.trajectories[count].get_block(x)
+                for line in data:
+                    fout.write(line)
         fout.close()
 
 
@@ -97,7 +104,7 @@ class Trajectory:
         Allow for slice indexing
         """
         if isinstance(blockno, slice):
-            blocklist = blockno.indices(self.nblocks)
+            blocklist = range(*blockno.indices(self.nblocks))
             timeslice = Timeslice(self, blocklist)
             return timeslice
         else:
@@ -176,3 +183,22 @@ class Trajectory:
                 _ = next(fout)
             data = [next(fout).decode("utf-8") for x in range(start, stop)]
         return data
+
+    def get_block_as_system(self, blockno):
+        """
+        Get block as pyscal system
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+        Returns
+        -------
+        sys : System
+            pyscal System
+        """
+        #convert to system and return
+        data = self.get_block(blockno)
+
+        sys = pc.System()
+        sys.read_inputfile(data, customkeys=self.customkeys)
+        return sys
