@@ -17,8 +17,45 @@ class Timeslice:
         String of the class
         """
         return "Trajectory slice %d-%d with %d atoms"%(self.blocklist[0], 
-            self.blocklist[-1], self.trajectory.natoms)
+            self.blocklist[1], self.trajectory.natoms)
 
+    def to_system(self):
+        """
+        Get block as pyscal system
+
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+
+        Returns
+        -------
+        sys : System
+            pyscal System
+        """
+        sys = [self.trajectory.get_block_as_system(x) for x in self.blocklist]
+        return sys
+
+    def to_file(self, outfile):
+        """
+        Get block as outputfile
+
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+
+        Returns
+        -------
+        None
+
+        """
+        fout = open(outfile, "w")
+        for x in self.blocklist:
+            data = self.trajectory.get_block(x)
+            for line in data:
+                fout.write(line)
+        fout.close()
 
 
 class Trajectory:
@@ -139,43 +176,3 @@ class Trajectory:
                 _ = next(fout)
             data = [next(fout).decode("utf-8") for x in range(start, stop)]
         return data
-
-    def get_block_as_system(self, blockno):
-        """
-        Get block as pyscal system
-
-        Parameters
-        ----------
-        blockno : int
-            number of the block to be read, starts from 0
-
-        Returns
-        -------
-        sys : System
-            pyscal System
-        """
-        #convert to system and return
-        data = self.get_block(blockno)
-
-        sys = pc.System()
-        sys.read_inputfile(data, customkeys=self.customkeys)
-        return sys
-
-    def get_block_as_file(self, blockno, outfile, format="lammps-dump"):
-        """
-        Get block as outputfile
-
-        Parameters
-        ----------
-        blockno : int
-            number of the block to be read, starts from 0
-
-        Returns
-        -------
-        None
-
-        """
-        #convert to system and return
-        sys = self.get_block_as_system(blockno)
-        sys.to_file(outfile, customkeys=self.customkeys, format=format)
-
