@@ -18,10 +18,36 @@ class Timeslice:
         """
         String of the class
         """
-        return "Trajectory slice %d-%d with %d atoms"%(self.blocklist[0], 
-            self.blocklist[-1], self.trajectory.natoms)
+        blockstring = ["%d-%d"%(x[0], x[-1]) for x in self.blocklists]
+        blockstring = "/".join(blockstring)
 
-    def to_system(self):
+        data = "Trajectory slice\n %s\n natoms=%d\n"%(blockstring, self.trajectory.natoms)
+        return data
+
+    def __add__(self, ntraj):
+        """
+        Add a method for summing
+        """
+        for traj in ntraj.trajectories:
+            self.trajectories.append(traj)
+
+        for block in ntraj.blocklists:
+            self.blocklists.append(block)
+
+        return self
+
+
+    def __radd__(self, ntraj):
+        """
+        Reverse add method
+        """
+        if ntraj == 0:
+            return self
+        else:
+            return self.__add__(ntraj)
+
+
+    def to_system(self, customkeys=None):
         """
         Get block as pyscal system
 
@@ -38,7 +64,7 @@ class Timeslice:
         sys = []
         for count, traj in enumerate(self.trajectories):
             for x in self.blocklists[count]:
-                s = self.trajectories[count].get_block_as_system(x)
+                s = self.trajectories[count].get_block_as_system(x, customkeys=customkeys)
                 sys.append(s)
         return sys
 
@@ -69,7 +95,7 @@ class Trajectory:
     """
     A Trajectory class for LAMMPS
     """
-    def __init__(self, filename, customkeys=None):
+    def __init__(self, filename):
         """
         Initiaze the class
 
@@ -89,7 +115,7 @@ class Trajectory:
         self.natoms = 0
         self.blocksize = 0
         self.nblocks = 0
-        self.customkeys = customkeys
+
         self.get_natoms()
         self.get_nblocks()
         
@@ -184,7 +210,7 @@ class Trajectory:
             data = [next(fout).decode("utf-8") for x in range(start, stop)]
         return data
 
-    def get_block_as_system(self, blockno):
+    def get_block_as_system(self, blockno, customkeys=None):
         """
         Get block as pyscal system
         Parameters
@@ -200,5 +226,5 @@ class Trajectory:
         data = self.get_block(blockno)
 
         sys = pc.System()
-        sys.read_inputfile(data, customkeys=self.customkeys)
+        sys.read_inputfile(data, customkeys=customkeys)
         return sys
