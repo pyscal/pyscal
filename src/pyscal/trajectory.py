@@ -168,7 +168,16 @@ class Trajectory:
         nlines : int
             number of lines
         """
-        nlines = sum(1 for i in open(self.filename, 'rb'))
+        line_offset = []
+        offset = 0
+        nlines = 0
+        for line in open(self.filename, 'rb'):
+            line_offset.append(offset)
+            offset += len(line)
+            nlines += 1
+        
+        self.nlines = nlines
+        self.line_offset = line_offset
         return nlines
     
     def get_nblocks(self):
@@ -187,7 +196,7 @@ class Trajectory:
         nlines = self.get_nlines()
         self.blocksize = self.natoms+9
         self.nblocks = nlines//self.blocksize
-        self.straylines = lines - self.nblocks*self.blocksize
+        self.straylines = nlines - self.nblocks*self.blocksize
 
     def get_block(self, blockno):
         """
@@ -205,11 +214,15 @@ class Trajectory:
         """
         start = blockno*self.blocksize
         stop = (blockno+1)*self.blocksize
-        #now we can get the lines quickly
-        with open(self.filename, "rb") as fout:
-            for i in range(start):
-                _ = next(fout)
-            data = [next(fout).decode("utf-8") for x in range(start, stop)]
+
+        fin = open(self.filename, "rb")
+        fin.seek(0)
+        fin.seek(self.line_offset[start])
+
+        data = []
+        for i in range(self.blocksize):
+            line = fin.readline().decode("utf-8")
+            data.append(line)
         return data
 
     def get_block_as_system(self, blockno, customkeys=None):
@@ -251,34 +264,20 @@ class Trajectory:
         #get start and stop lines
         start = xl*self.blocksize
         stop = (xl+1)*self.blocksize
-
-        args = np.argsort(start)
-        sortedstart = start[args]
-        sortedstop = stop[args]
         
         #check if things need to be reversed
         reverse = False
+        args = np.argsort(start)
         if (args[0]!=0):
             reverse = True
 
         if reverse:
             #open file
-            firstline = 0
-            with open(self.filename, "rb") as fin:
-                for count, i in enumerate(start):
-                    secondline = sortedstart[count]
-                    thirdline = sortedstop[count]
-                    #discard lines
-                    for j in range(firstline, secondline):
-                        _ = next(fin)
-                    #now write the rest
-                    for j in range(secondline, thirdline):
-                        line = next(fin).decode("utf-8")
-                        fout.write(line)
-                    #we have to seek back to beginning of the file
-                    fout.seek(0)
-                    #now we have to reset the variables
-                    firstline = sortedstop[count]
+            #convert lines to start from end
+            for x in xl:
+                data = self.get_block(x)
+                for line in data:
+                    fout.write(line)
         else:
             firstline = 0
             with open(self.filename, "rb") as fin:
