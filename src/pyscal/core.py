@@ -11,6 +11,7 @@ import numpy as np
 import warnings
 import pyscal.csystem as pc
 from pyscal.catom import Atom
+from pyscal.trajectory import Trajectory
 import itertools
 from ase.io import write
 import uuid
