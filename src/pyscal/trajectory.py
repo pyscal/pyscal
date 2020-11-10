@@ -1,5 +1,6 @@
 import os
 import pyscal.core as pc
+import numpy as np
 
 class Timeslice:
     """
@@ -82,12 +83,12 @@ class Timeslice:
         None
 
         """
-        fout = open(outfile, "w")
+        if os.path.exists(outfile):
+            os.remove(outfile)
+
+        fout = open(outfile, "a")
         for count, traj in enumerate(self.trajectories):
-            for x in self.blocklists[count]:
-                data = self.trajectories[count].get_block(x)
-                for line in data:
-                    fout.write(line)
+            self.trajectories[count].get_blocks_to_file(fout, self.blocklists[count])
         fout.close()
 
 
@@ -186,6 +187,7 @@ class Trajectory:
         nlines = self.get_nlines()
         self.blocksize = self.natoms+9
         self.nblocks = nlines//self.blocksize
+        self.straylines = lines - self.nblocks*self.blocksize
 
     def get_block(self, blockno):
         """
@@ -228,3 +230,67 @@ class Trajectory:
         sys = pc.System()
         sys.read_inputfile(data, customkeys=customkeys)
         return sys
+
+    def get_blocks_to_file(self, fout, blocklist):
+        """
+        Get a series of blocks from the file as raw data
+
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+
+        Returns
+        -------
+        data : list
+            list of strings containing data
+        """
+        xl = [x for x in blocklist]
+        xl = np.array(xl)
+        
+        #get start and stop lines
+        start = xl*self.blocksize
+        stop = (xl+1)*self.blocksize
+
+        args = np.argsort(start)
+        sortedstart = start[args]
+        sortedstop = stop[args]
+        
+        #check if things need to be reversed
+        reverse = False
+        if (args[0]!=0):
+            reverse = True
+
+        if reverse:
+            #open file
+            firstline = 0
+            with open(self.filename, "rb") as fin:
+                for count, i in enumerate(start):
+                    secondline = sortedstart[count]
+                    thirdline = sortedstop[count]
+                    #discard lines
+                    for j in range(firstline, secondline):
+                        _ = next(fin)
+                    #now write the rest
+                    for j in range(secondline, thirdline):
+                        line = next(fin).decode("utf-8")
+                        fout.write(line)
+                    #we have to seek back to beginning of the file
+                    fout.seek(0)
+                    #now we have to reset the variables
+                    firstline = sortedstop[count]
+        else:
+            firstline = 0
+            with open(self.filename, "rb") as fin:
+                for count, i in enumerate(start):
+                    secondline = start[count]
+                    thirdline = stop[count]
+                    #discard lines
+                    for j in range(firstline, secondline):
+                        _ = next(fin)
+                    #now write the rest
+                    for j in range(secondline, thirdline):
+                        line = next(fin).decode("utf-8")
+                        fout.write(line)
+                    #now we have to reset the variables
+                    firstline = stop[count]
