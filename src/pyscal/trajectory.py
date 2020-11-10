@@ -5,11 +5,21 @@ class Timeslice:
     """
     Timeslice containing info about a single time slice
     """
-    def __init__(self, data):
+    def __init__(self, trajectory, blocklist):
         """
         Initialize instance with data
         """
-        pass
+        self.trajectory = trajectory
+        self.blocklist = blocklist
+
+    def __repr__(self):
+        """
+        String of the class
+        """
+        return "Trajectory slice %d-%d with %d atoms"%(self.blocklist[0], 
+            self.blocklist[-1], self.trajectory.natoms)
+
+
 
 class Trajectory:
     """
@@ -51,11 +61,12 @@ class Trajectory:
         """
         if isinstance(blockno, slice):
             blocklist = blockno.indices(self.nblocks)
-            sys = [self.get_block_as_system(x) for x in blocklist]
-            return sys
+            timeslice = Timeslice(self, blocklist)
+            return timeslice
         else:
-            sys = self.get_block_as_system(blockno)
-            return sys
+            blocklist = [blockno]
+            timeslice = Timeslice(self, blocklist)
+            return timeslice
 
     def get_natoms(self):
         """
