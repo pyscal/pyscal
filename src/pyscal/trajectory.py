@@ -257,7 +257,7 @@ class Trajectory:
         """
         data = self.get_block(blockno)
         box =  np.loadtxt(data[5:8])
-        columns = np.loadtxt(data[9:-1])
+        columns = np.loadtxt(data[9:])
         header = np.loadtxt(data[8:9], dtype=str)[2:]
         outdict = {}
         outdict["box"] = box
@@ -285,13 +285,85 @@ class Trajectory:
         self.data[blockno] = None
         self.loadlist[blockno] = False        
 
-    def get_block_as_system(self, blockno, customkeys=None):
+    def convert_data_to_lines(self, blockno):
         """
-        Get block as pyscal system
+        Create lines from loaded data
+        
         Parameters
         ----------
         blockno : int
             number of the block to be read, starts from 0
+        
+        Returns
+        -------
+        data : list of strs
+            list of lines
+        """
+        dd = self.data[blockno]
+
+        data = []
+        data.append("ITEM: TIMESTEP\n")
+        data.append("".join([str(0), os.linesep]))
+        data.append("ITEM: NUMBER OF ATOMS\n")
+        data.append("".join([str(self.natoms), os.linesep]))
+        data.append("ITEM: BOX BOUNDS pp pp pp\n")
+        for b in dd["box"]:
+            dstr = " ".join(b.astype(str))
+            data.append("".join([dstr, os.linesep]))
+
+        xf = []
+        xd = []
+        xfkeys = []
+        xdkeys = []
+        for key, val in dd["atoms"].items():
+            if key in ["id", "type"]:
+                val.astype(int)
+                xd.append(val)
+                xdkeys.append(key)
+            else:
+                xf.append(val)
+                xfkeys.append(key)
+
+        xdstrs = []
+        if len(xd)>0:
+            for i in range(len(xd[0])):
+                substr = []
+                for j in range(len(xdkeys)):
+                    substr.append("%d"%xd[j][i])
+                xdstrs.append(" ".join(substr))
+
+        xdheader = " ".join(xdkeys)
+        xdheader = " ".join(["ITEM: ATOMS", xdheader])
+
+        xfstrs = []
+        xf = np.array(xf)
+        if len(xf)>0:
+            for i in range(len(xf[0])):
+                dstr = " ".join((xf[:,i]).astype(str))
+                xfstrs.append("".join([dstr, os.linesep]))
+
+        xfheader = " ".join(xfkeys)
+        mainheader = " ".join([xdheader, xfheader])
+        mainheader = "".join([mainheader, os.linesep])
+
+        data.append(mainheader)
+
+        for i in range(len(xfstrs)):
+            valstr = " ".join([xdstrs[i], xfstrs[i]])
+            #valstr = "".join([valstr, os.linesep])
+            data.append(valstr)
+
+        return data        
+
+    def get_block_as_system(self, blockno, customkeys=None):
+        """
+        Get block as pyscal system
+        
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+        
         Returns
         -------
         sys : System
@@ -320,36 +392,13 @@ class Trajectory:
         """
         xl = [x for x in blocklist]
         xl = np.array(xl)
-        
-        #get start and stop lines
-        start = xl*self.blocksize
-        stop = (xl+1)*self.blocksize
-        
-        #check if things need to be reversed
-        reverse = False
-        args = np.argsort(start)
-        if (args[0]!=0):
-            reverse = True
-
-        if reverse:
-            #open file
-            #convert lines to start from end
-            for x in xl:
+                
+        #open file
+        #convert lines to start from end
+        for x in xl:
+            if self.loadlist[x]:
+                data = self.convert_data_to_lines(x)
+            else:
                 data = self.get_block(x)
-                for line in data:
-                    fout.write(line)
-        else:
-            firstline = 0
-            with open(self.filename, "rb") as fin:
-                for count, i in enumerate(start):
-                    secondline = start[count]
-                    thirdline = stop[count]
-                    #discard lines
-                    for j in range(firstline, secondline):
-                        _ = next(fin)
-                    #now write the rest
-                    for j in range(secondline, thirdline):
-                        line = next(fin).decode("utf-8")
-                        fout.write(line)
-                    #now we have to reset the variables
-                    firstline = stop[count]
+            for line in data:
+                fout.write(line)
