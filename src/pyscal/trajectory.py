@@ -69,24 +69,26 @@ class Timeslice:
                 sys.append(s)
         return sys
 
-    def to_file(self, outfile):
+    def to_file(self, outfile, mode="w"):
         """
         Get block as outputfile
 
         Parameters
         ----------
-        blockno : int
-            number of the block to be read, starts from 0
+        outfile : string
+            name of output file
 
+        mode : string
+            write mode to be used, optional
+            default "w" write
+            also can be "a" to append.
+        
         Returns
         -------
         None
 
         """
-        if os.path.exists(outfile):
-            os.remove(outfile)
-
-        fout = open(outfile, "a")
+        fout = open(outfile, mode)
         for count, traj in enumerate(self.trajectories):
             self.trajectories[count].get_blocks_to_file(fout, self.blocklists[count])
         fout.close()
@@ -116,6 +118,8 @@ class Trajectory:
         self.natoms = 0
         self.blocksize = 0
         self.nblocks = 0
+        self.loadlist = None
+        self.data = None
 
         self.get_natoms()
         self.get_nblocks()
@@ -197,6 +201,9 @@ class Trajectory:
         self.blocksize = self.natoms+9
         self.nblocks = nlines//self.blocksize
         self.straylines = nlines - self.nblocks*self.blocksize
+        #set load list to False
+        self.loadlist = [False for x in range(self.nblocks)]
+        self.data = [None for x in range(self.nblocks)]
 
     def get_block(self, blockno):
         """
@@ -224,6 +231,59 @@ class Trajectory:
             line = fin.readline().decode("utf-8")
             data.append(line)
         return data
+
+    def load(self, blockno):
+        """
+        Load the data of a block into memory as a dictionary
+        of numpy arrays
+
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        When the data of a block is loaded, it is accessible
+        through `Trajectory.data[x]`. This data can then be
+        modified. When the block is written out, the modified
+        data is written instead of existing one. But, loaded
+        data is kept in memory until unloaded using `unload`
+        method.
+        """
+        data = self.get_block(blockno)
+        box =  np.loadtxt(data[5:8])
+        columns = np.loadtxt(data[9:-1])
+        header = np.loadtxt(data[8:9], dtype=str)[2:]
+        outdict = {}
+        outdict["box"] = box
+        outdict["atoms"] = {}
+        for count, h in enumerate(header):
+            outdict["atoms"][h] = columns[:,count]        
+
+        self.data[blockno] = outdict
+        self.loadlist[blockno] = True
+
+    def unload(self, blockno):
+        """
+        Unload the data that is loaded to memory using
+        `load` method
+
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+
+        Returns
+        -------
+        None        
+        """
+        self.data[blockno] = None
+        self.loadlist[blockno] = False        
 
     def get_block_as_system(self, blockno, customkeys=None):
         """
