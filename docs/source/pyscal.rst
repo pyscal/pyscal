@@ -30,6 +30,14 @@ pyscal.crystal\_structures module
    :undoc-members:
    :show-inheritance:
 
+pyscal.trajectory module
+--------------------
+
+.. automodule:: pyscal.trajectory
+  :members:
+  :undoc-members:
+  :show-inheritance:
+
 pyscal.traj\_process module
 ---------------------------
 
