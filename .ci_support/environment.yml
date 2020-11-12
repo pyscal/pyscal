@@ -8,5 +8,4 @@ dependencies:
   - notebook<5.7.5
   - numpy=1.17
   - matplotlib
-  - lammps
   - ase
