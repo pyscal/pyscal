@@ -9,3 +9,5 @@ dependencies:
   - matplotlib
   - lammps
   - ase
+  - ipywidgets=7.5
+  - plotly=4.11.0
