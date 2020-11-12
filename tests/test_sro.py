@@ -22,4 +22,4 @@ def test_sro():
 
     sys.find_neighbors(method='cutoff', cutoff=4.5)
     sro = sys.calculate_sro(reference_type=1, average=True, shells=1)
-    assert np.round(sro[0], decimals=2) == -0.07
+    assert np.round(sro[0], decimals=2) == 0.11

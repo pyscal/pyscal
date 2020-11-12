@@ -153,6 +153,15 @@ vector<Atom> System::get_atoms( ){
 
 }
 
+vector<Atom> System::get_all_atoms( ){
+    //here, we have to filter ghost atoms
+    vector<Atom> retatoms;
+    for(int i=0; i<nop; i++){
+        retatoms.emplace_back(atoms[i]);
+    }
+    return retatoms;
+
+}
 
 Atom System::gatom(int i) { return atoms[i]; }
 void System::satom(Atom atom1) {
@@ -2158,7 +2167,7 @@ void System::identify_cn14(){
     }    
 }
 
-vector<int> System::identify_diamond_structure(int keepstructure){
+vector<int> System::identify_diamond_structure(){
     /*
     Calculate diamond structure
 
@@ -2177,10 +2186,9 @@ vector<int> System::identify_diamond_structure(int keepstructure){
         analyis.emplace_back(0);
     }
 
-    if(!keepstructure){
-        for(int i=0; i<nop; i++){
-            atoms[i].structure = 0;
-        }
+
+    for(int i=0; i<nop; i++){
+        atoms[i].structure = 0;
     }
 
     identify_cndia();

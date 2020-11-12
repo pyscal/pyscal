@@ -60,6 +60,7 @@ class System{
         void read_particle_file(string);    // TBDep
         void set_atoms( vector<Atom>);
         vector<Atom> get_atoms();
+        vector<Atom> get_all_atoms();
         Atom gatom(int);
         void satom(Atom);
 
@@ -158,7 +159,7 @@ class System{
         //-------------------------------------------------------
         double lattice_constant;
         void get_diamond_neighbors();
-        vector<int> identify_diamond_structure(int);
+        vector<int> identify_diamond_structure();
         void identify_cndia();
         void get_cna_neighbors(int);
         void get_acna_neighbors(int);

@@ -1263,7 +1263,7 @@ class System(pc.System):
             self.reset_neighbors()
             self.find_neighbors(method="number", nmax=4, assign_neighbor=False)
         
-        res = self.cidentify_diamond_structure(1)
+        res = self.cidentify_diamond_structure()
 
         st = {}
         st["others"] = res[0]
@@ -1548,7 +1548,7 @@ class System(pc.System):
         if not reference_type in [1,2]:
             raise ValueError("reference atom type should be either 1 or 2")
 
-        atoms = self.atoms
+        atoms = self.get_all_atoms()
 
         try:
             type1 = len([1 for atom in atoms if atom.type == 1])
