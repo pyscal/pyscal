@@ -2,7 +2,7 @@ name: pyscal-test
 channels:
   - conda-forge
 dependencies:
-  - python=3.7
-  - numpy=1.17
+  - numpy
   - matplotlib
   - ase
+  - plotly
