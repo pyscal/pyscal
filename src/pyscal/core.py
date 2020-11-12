@@ -1201,14 +1201,19 @@ class System(pc.System):
 
         Notes
         -----
-        Performs the common neighbor analysis [1] and assigns a structure to each atom.
-        If `cutoff` is not specified, adaptive common neighbor analysis is used. The
-        assigned structures can be accessed by :attr:`~pyscal.catom.Atom.structure`.
+        Performs the common neighbor analysis [1][2] or the adaptive common neighbor
+        analysis [2] and assigns a structure to each atom.
+        
+        If `lattice_constant` is specified, a convential common neighbor analysis is
+        used. If `lattice_constant` is not specified, adaptive common neighbor analysis is used. 
+        The assigned structures can be accessed by :attr:`~pyscal.catom.Atom.structure`.
         The values assigned for stucture are 0 Unknown, 1 fcc, 2 hcp, 3 bcc, 4 icosahedral.
 
         References
         ----------
-        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+        .. [1] Faken, Jonsson, CMS 2, 1994
+        .. [2] Honeycutt, Andersen, JPC 91, 1987
+        .. [3] Stukowski, A, Model Simul Mater SC 20, 2012
 
         """
         
@@ -1227,18 +1232,38 @@ class System(pc.System):
 
         return st
 
-    def identify_diamond(self, find_neighbors=True, keep_structure=True):
+    def identify_diamond(self, find_neighbors=True):
         """
         Identify diamond structure
+
+        Parameters
+        ----------
+        find_neighbors : bool, optional
+            If True, find 4 closest neighbors
+
+        Returns
+        -------
+        diamondstructure : dict
+            dict of structure signature
+
+        Notes
+        -----
+        Identify diamond structure using the algorithm mentioned in [1]. It is an
+        extended CNA method. The integers 5, 6, 7, 8, 9 and 10 are assigned to the
+        structure variable of the atom. 5 stands for cubic diamond, 6 stands for first
+        nearest neighbors of cubic diamond and 7 stands for second nearest neighbors
+        of cubic diamond. 8 signifies hexagonal diamond, the first nearest neighbors
+        are marked with 9 and second nearest neighbors with 10.
+
+        References
+        ----------
+        .. [1] Maras et al, CPC 205, 2016
         """
         if find_neighbors:
             self.reset_neighbors()
             self.find_neighbors(method="number", nmax=4, assign_neighbor=False)
         
-        if keep_structure:
-            res = self.cidentify_diamond_structure(0)
-        else:
-            res = self.cidentify_diamond_structure(1)
+        res = self.cidentify_diamond_structure(1)
 
         st = {}
         st["others"] = res[0]
