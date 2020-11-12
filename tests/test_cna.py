@@ -8,41 +8,51 @@ import pyscal.crystal_structures as pcs
 def test_cna_cutoff():
     atoms, box = pcs.make_crystal(structure="fcc", repetitions=(7,7,7), lattice_constant=4.00, noise=0.01)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
-    vec = sys.calculate_cna(cutoff=0.8536*4.1)
-    assert vec[1] == 7*7*7*4
+    sys.atoms = atoms
+    res = sys.calculate_cna(lattice_constant=4.00)
+    assert res["fcc"] == 7*7*7*4
 
 def test_cna_a1():
     atoms, box = pcs.make_crystal(structure="fcc", repetitions=(7,7,7), lattice_constant=4.00, noise=0.01)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
-    vec = sys.calculate_cna(cutoff=None)
-    assert vec[1] == 7*7*7*4
+    sys.atoms = atoms
+    res = sys.calculate_cna(lattice_constant=None)
+    assert res["fcc"] == 7*7*7*4
 
 #now test adaptive
 def test_cna_adaptive():
     atoms, box = pcs.make_crystal(structure="fcc", repetitions=(7,7,7), lattice_constant=4.00, noise=0.1)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
-    sys.calculate_cna(cutoff=None)
+    sys.atoms = atoms
+    sys.calculate_cna(lattice_constant=None)
     atoms = sys.atoms
     assert atoms[0].structure == 1
 
     atoms, box = pcs.make_crystal(structure="hcp", repetitions=(7,7,7), lattice_constant=4.00, noise=0.1)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
-    sys.calculate_cna(cutoff=None)
+    sys.atoms = atoms
+    sys.calculate_cna(lattice_constant=None)
     atoms = sys.atoms
     assert atoms[0].structure == 2
 
     atoms, box = pcs.make_crystal(structure="bcc", repetitions=(7,7,7), lattice_constant=4.00, noise=0.1)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
-    sys.calculate_cna(cutoff=None)
+    sys.atoms = atoms
+    sys.calculate_cna(lattice_constant=None)
     atoms = sys.atoms
     assert atoms[0].structure == 3
+
+def test_cna_diamond():
+    atoms, box = pcs.make_crystal(structure="diamond", repetitions=(7,7,7), lattice_constant=4.00, noise=0.1)
+    sys = pc.System()
+    sys.box = box
+    sys.atoms = atoms
+    sys.identify_diamond()
+    atoms = sys.atoms
+    assert atoms[0].structure == 5
+

@@ -403,6 +403,18 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     )mydelimiter")
 
     //-------------------------------------------------------
+    // CNA parameters
+    //-------------------------------------------------------
+    .def_readwrite("cna", &Atom::cna, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("common", &Atom::common, R"mydelimiter(
+    )mydelimiter")
+
+    .def_readwrite("bonds", &Atom::bonds, R"mydelimiter(
+    )mydelimiter")
+
+    //-------------------------------------------------------
     // Other order parameters
     //-------------------------------------------------------
     .def_readwrite("sro", &Atom::sro, R"mydelimiter(
@@ -413,12 +425,6 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     .def_readwrite("centrosymmetry", &Atom::centrosymmetry, R"mydelimiter(
         *Float*.
         The value of centrosymmetry parameter.
-    )mydelimiter")
-
-    .def("calculate_adaptive_cna", &Atom::calculate_adaptive_cna, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("common_neighbor_count", &Atom::common_neighbor_count, R"mydelimiter(
     )mydelimiter")
 
     .def_readwrite("entropy", &Atom::entropy, R"mydelimiter(

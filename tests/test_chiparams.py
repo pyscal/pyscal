@@ -6,8 +6,8 @@ import pyscal.crystal_structures as pcs
 def test_chiparamsbcc():
     atoms, box = pcs.make_crystal('bcc', repetitions=[3,3,3], lattice_constant=4)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
     sys.find_neighbors(method='cutoff', cutoff=0)
     sys.calculate_chiparams()
     atoms = sys.atoms
@@ -18,8 +18,8 @@ def test_chiparamsbcc():
 def test_chiparamsfcc():
     atoms, box = pcs.make_crystal('fcc', repetitions=[5,5,5], lattice_constant=4)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
     sys.find_neighbors(method='cutoff', cutoff=0)
     sys.calculate_chiparams()
     atoms = sys.atoms
@@ -29,8 +29,8 @@ def test_chiparamsfcc():
 def test_chiparamshcp():
     atoms, box = pcs.make_crystal('hcp', repetitions=[3,3,3], lattice_constant=4)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
     sys.find_neighbors(method='cutoff', cutoff=0)
     sys.calculate_chiparams()
     atoms = sys.atoms
@@ -40,8 +40,8 @@ def test_chiparamshcp():
 def test_chiparamsdia():
     atoms, box = pcs.make_crystal('diamond', repetitions=[3,3,3], lattice_constant=4)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
     sys.find_neighbors(method='cutoff', cutoff=0)
     sys.calculate_chiparams()
     atoms = sys.atoms

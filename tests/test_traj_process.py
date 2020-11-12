@@ -11,8 +11,8 @@ def test_create_multislice_dump():
     """
     atoms, boxdims = pcs.make_crystal('bcc', repetitions=[6,6,6])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     ptp.write_file(sys, "tests/bcc1.dump")
 
@@ -24,8 +24,8 @@ def test_create_multislice_dump():
     assert len(atoms2) == 432
     #write it out
     sys2 = pc.System()
-    sys2.atoms = atoms2
     sys2.box = boxdims2
+    sys2.atoms = atoms2
 
     ptp.write_file(sys2, "tests/bcc2.dump")
 
@@ -41,8 +41,8 @@ def test_customvals_dump():
     """
     atoms, boxdims = pcs.make_crystal('bcc', repetitions=[1,1,1])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
 
     #test for multiple customvals

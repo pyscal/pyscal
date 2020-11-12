@@ -60,6 +60,7 @@ class System{
         void read_particle_file(string);    // TBDep
         void set_atoms( vector<Atom>);
         vector<Atom> get_atoms();
+        vector<Atom> get_all_atoms();
         Atom gatom(int);
         void satom(Atom);
 
@@ -97,7 +98,6 @@ class System{
         void get_temp_neighbors_cells();
         void get_temp_neighbors_brute();
         void store_neighbor_info();
-        void get_diamond_neighbors();
         void set_atom_cutoff(double);
 
         //---------------------------------------------------
@@ -155,10 +155,23 @@ class System{
         void set_face_cutoff(double);
 
         //-------------------------------------------------------
+        // CNA parameters
+        //-------------------------------------------------------
+        double lattice_constant;
+        void get_diamond_neighbors();
+        vector<int> identify_diamond_structure();
+        void identify_cndia();
+        void get_cna_neighbors(int);
+        void get_acna_neighbors(int);
+        void get_common_neighbors(int);
+        void get_common_bonds(int);
+        void identify_cn12();
+        void identify_cn14();
+        vector<int> calculate_cna(int);
+
+        //-------------------------------------------------------
         // Other order parameters
         //-------------------------------------------------------
-        vector<int> calculate_acna();
-        vector<int> calculate_cna();
         double switching_fn(double, double, int, int);
         void average_entropy();
         void average_entropy_switch(double, int, int);

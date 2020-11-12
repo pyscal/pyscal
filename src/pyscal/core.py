@@ -116,7 +116,24 @@ class System(pc.System):
 
         self._box = userbox
 
+    @property
+    def atoms(self):
+        """
+        Atom access
+        """
+        return self.get_atoms()
 
+    @atoms.setter
+    def atoms(self, atoms):
+        """
+        Set atoms
+        """
+        if(len(atoms) < 200):
+            if np.sum(self.box) == 0:
+                raise ValueError("Simulation box should be initialized before atoms")
+            atoms = self.repeat((3, 3, 3), atoms=atoms, ghost=True, scale_box=True)
+
+        self.set_atoms(atoms)
 
     def read_inputfile(self, filename, format="lammps-dump", compressed = False, customkeys=None):
         """
@@ -167,11 +184,8 @@ class System(pc.System):
         atoms, box = ptp.read_file(filename, format=format, 
                                     compressed=compressed, customkeys=customkeys,
                                         )
-        self.atoms = atoms
         self.box = box
-
-        if(len(atoms) < 20):
-            self.repeat((3, 3, 3), ghost=True, scale_box=True)
+        self.atoms = atoms
 
 
     def get_atom(self, index):
@@ -446,9 +460,6 @@ class System(pc.System):
 
         """
         #first reset all neighbors
-        if(self.natoms < 20):
-            self.repeat((3, 3, 3), ghost=True, scale_box=True)
-
         self.reset_allneighbors()
         self.filter = 0
 
@@ -1173,50 +1184,101 @@ class System(pc.System):
         self.atoms = atoms
 
     
-    def calculate_cna(self, cutoff=None, calculate_neighbors=True):
+    def calculate_cna(self, lattice_constant=None):
         """
         Calculate the Common Neighbor Analysis indices
 
         Parameters
         ----------
-        cutoff : float, optional
-            cutoff value to calculate CNA. If not specified,
+        lattice_constant : float, optional
+            lattice constant to calculate CNA. If not specified,
             adaptive CNA will be used
-
-        calculate_neighbors : bool, optional
-            If True, calculate neighbors using number method.
-            If False, existing neighbors will be used. Default True.
-            Only used if the cutoff is None.
 
         Returns
         -------
-        cna : list of ints
-            list of length 5 with number of atoms that belong to each
-            structure.
+        cna : dict
+            dict containing the cna signature of the system
 
         Notes
         -----
-        Performs the common neighbor analysis [1] and assigns a structure to each atom.
-        If `cutoff` is not specified, adaptive common neighbor analysis is used. The
-        assigned structures can be accessed by :attr:`~pyscal.catom.Atom.structure`.
+        Performs the common neighbor analysis [1][2] or the adaptive common neighbor
+        analysis [2] and assigns a structure to each atom.
+        
+        If `lattice_constant` is specified, a convential common neighbor analysis is
+        used. If `lattice_constant` is not specified, adaptive common neighbor analysis is used. 
+        The assigned structures can be accessed by :attr:`~pyscal.catom.Atom.structure`.
         The values assigned for stucture are 0 Unknown, 1 fcc, 2 hcp, 3 bcc, 4 icosahedral.
 
         References
         ----------
-        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+        .. [1] Faken, Jonsson, CMS 2, 1994
+        .. [2] Honeycutt, Andersen, JPC 91, 1987
+        .. [3] Stukowski, A, Model Simul Mater SC 20, 2012
 
         """
         
-        if cutoff is None:
-            if calculate_neighbors:
-                self.find_neighbors(method="number", nmax=14, assign_neighbor=False)
-            cna = self.calculate_acna()
-            return cna
+        if lattice_constant is None:
+            res = self.ccalculate_cna(2);
         else:
-            self.find_neighbors(method="cutoff", cutoff=cutoff)
-            cna = self.calculate_cna()
-            return cna
+            self.lattice_constant = lattice_constant
+            res = self.ccalculate_cna(1);
+        #pad results to a dict
+        st = {}
+        st["others"] = res[0]
+        st["fcc"] = res[1]
+        st["hcp"] = res[2]
+        st["bcc"] = res[3]
+        st["ico"] = res[4]
 
+        return st
+
+    def identify_diamond(self, find_neighbors=True):
+        """
+        Identify diamond structure
+
+        Parameters
+        ----------
+        find_neighbors : bool, optional
+            If True, find 4 closest neighbors
+
+        Returns
+        -------
+        diamondstructure : dict
+            dict of structure signature
+
+        Notes
+        -----
+        Identify diamond structure using the algorithm mentioned in [1]. It is an
+        extended CNA method. The integers 5, 6, 7, 8, 9 and 10 are assigned to the
+        structure variable of the atom. 5 stands for cubic diamond, 6 stands for first
+        nearest neighbors of cubic diamond and 7 stands for second nearest neighbors
+        of cubic diamond. 8 signifies hexagonal diamond, the first nearest neighbors
+        are marked with 9 and second nearest neighbors with 10.
+
+        References
+        ----------
+        .. [1] Maras et al, CPC 205, 2016
+        """
+        if find_neighbors:
+            self.reset_neighbors()
+            self.find_neighbors(method="number", nmax=4, assign_neighbor=False)
+        
+        res = self.cidentify_diamond_structure()
+
+        st = {}
+        st["others"] = res[0]
+        st["fcc"] = res[1]
+        st["hcp"] = res[2]
+        st["bcc"] = res[3]
+        st["ico"] = res[4]
+        st["cubic diamond"] = res[5]
+        st["cubic diamond 1NN"] = res[6]
+        st["cubic diamond 2NN"] = res[7]
+        st["hex diamond"] = res[8]
+        st["hex diamond 1NN"] = res[9]
+        st["hex diamond 2NN"] = res[10]
+
+        return st
 
     def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
         """
@@ -1486,7 +1548,7 @@ class System(pc.System):
         if not reference_type in [1,2]:
             raise ValueError("reference atom type should be either 1 or 2")
 
-        atoms = self.atoms
+        atoms = self.get_all_atoms()
 
         try:
             type1 = len([1 for atom in atoms if atom.type == 1])
@@ -1788,7 +1850,7 @@ class System(pc.System):
         self.atoms = atoms
 
 
-    def repeat(self, reps, ghost=False, scale_box=True):
+    def repeat(self, reps, atoms=None, ghost=False, scale_box=True):
         """
         Replicate simulation cell
         
@@ -1796,6 +1858,9 @@ class System(pc.System):
         ----------
         reps : list of ints of size 3
             repetitions in each direction
+        
+        atoms : list of atoms, optional
+            if not provided, use atoms that are assigned
 
         ghost : bool, optional
             If True, assign the new atoms as ghost instead of actual atoms
@@ -1804,7 +1869,8 @@ class System(pc.System):
         box = self.box        
         self.actual_box = box.copy()
 
-        atoms = self.atoms
+        if atoms is None:
+            atoms = self.atoms
 
         newatoms = []
         idstart = len(atoms) + 1
@@ -1836,7 +1902,7 @@ class System(pc.System):
 
         completeatoms = atoms + newatoms
         #print(len(completeatoms))
-        self.atoms = completeatoms
+        return completeatoms
 
 
     def show(self, colorby=None, filterby=None):

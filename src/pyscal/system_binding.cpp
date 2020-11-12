@@ -47,7 +47,9 @@ PYBIND11_MODULE(csystem, m) {
         //-----------------------------------------------------
         // Atom related methods
         //-----------------------------------------------------
-        .def_property("atoms", &System::get_atoms, &System::set_atoms)
+        .def("get_atoms", &System::get_atoms)
+        .def("get_all_atoms", &System::get_all_atoms)
+        .def("set_atoms", &System::set_atoms)
         //.def_readwrite("atoms", &System::atoms)
         .def("cget_atom",  &System::gatom)
         .def("cset_atom", &System::satom)
@@ -69,7 +71,6 @@ PYBIND11_MODULE(csystem, m) {
         .def("reset_allneighbors", &System::reset_all_neighbors)
         .def("get_pairdistances",&System::get_pairdistances)
         .def("store_neighbor_info",&System::store_neighbor_info)
-        .def("get_diamond_neighbors",&System::get_diamond_neighbors)
         .def("cset_atom_cutoff",&System::set_atom_cutoff)
 
         //---------------------------------------------------
@@ -105,10 +106,16 @@ PYBIND11_MODULE(csystem, m) {
         .def("find_average_volume",&System::find_average_volume)
 
         //-------------------------------------------------------
+        // CNA parameters
+        //-------------------------------------------------------
+        .def_readwrite("lattice_constant", &System::lattice_constant)
+        .def("ccalculate_cna",&System::calculate_cna)
+        .def("get_diamond_neighbors",&System::get_diamond_neighbors)
+        .def("cidentify_diamond_structure",&System::identify_diamond_structure)
+
+        //-------------------------------------------------------
         // Other order parameters
         //-------------------------------------------------------
-        .def("calculate_acna",&System::calculate_acna)
-        .def("calculate_cna",&System::calculate_cna)
         .def("entropy",&System::entropy)
         .def("average_entropy",&System::average_entropy)
         .def("average_entropy_switch",&System::average_entropy_switch)

@@ -8,8 +8,9 @@ def test_q_2():
     #this might take a while, it will find all qs
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [6, 6, 6])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
+
     #sys.read_inputfile("tests/bcc.dat")
     sys.find_neighbors(method = 'voronoi')
     #sys.get_neighbors(method = 'cutoff', cutoff=0.9)

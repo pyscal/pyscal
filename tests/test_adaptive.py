@@ -8,8 +8,8 @@ def test_neighbors_sann():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [6, 6, 6])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
 
     #then lets find neighbors
@@ -30,25 +30,13 @@ def test_neighbors_sann():
     assert np.round(np.mean(np.array(q), dtype=np.float64), decimals=2) == 0.45
 
 
-    #sys.calculate_q(7, averaged=True)
-    #q = sys.get_qvals(7, averaged=True)
-    #summ = 0
-    #counts = len(q)
-    #for qq in q:
-    #    summ += qq
-    #avgg = summ/float(counts)
-
-
-    #assert avgg == 0.05
-
-
 
 def test_neighbors_adaptive():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [6, 6, 6])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     #then lets find neighbors
     #SANN algo test

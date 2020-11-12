@@ -7,8 +7,9 @@ import pyscal.crystal_structures as pcs
 def test_sro():
     atoms, box = pcs.make_crystal('l12', lattice_constant=4.00, repetitions=[2,2,2])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
+
     sys.find_neighbors(method='cutoff', cutoff=4.5)
     sro = sys.calculate_sro(reference_type=1, average=True)
     assert np.round(sro[0], decimals=2) == -0.33
@@ -21,4 +22,4 @@ def test_sro():
 
     sys.find_neighbors(method='cutoff', cutoff=4.5)
     sro = sys.calculate_sro(reference_type=1, average=True, shells=1)
-    assert np.round(sro[0], decimals=2) == -0.07
+    assert np.round(sro[0], decimals=2) == 0.11
