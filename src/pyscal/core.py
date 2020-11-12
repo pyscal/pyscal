@@ -116,7 +116,24 @@ class System(pc.System):
 
         self._box = userbox
 
+    @property
+    def atoms(self):
+        """
+        Atom access
+        """
+        return self.get_atoms()
 
+    @atoms.setter
+    def atoms(self, atoms):
+        """
+        Set atoms
+        """
+        if(len(atoms) < 200):
+            if np.sum(self.box) == 0:
+                raise ValueError("Simulation box should be initialized before atoms")
+            atoms = self.repeat((3, 3, 3), atoms=atoms, ghost=True, scale_box=True)
+
+        self.set_atoms(atoms)
 
     def read_inputfile(self, filename, format="lammps-dump", compressed = False, customkeys=None):
         """
@@ -167,11 +184,8 @@ class System(pc.System):
         atoms, box = ptp.read_file(filename, format=format, 
                                     compressed=compressed, customkeys=customkeys,
                                         )
-        self.atoms = atoms
         self.box = box
-
-        if(len(atoms) < 20):
-            self.repeat((3, 3, 3), ghost=True, scale_box=True)
+        self.atoms = atoms
 
 
     def get_atom(self, index):
@@ -446,9 +460,6 @@ class System(pc.System):
 
         """
         #first reset all neighbors
-        if(self.natoms < 20):
-            self.repeat((3, 3, 3), ghost=True, scale_box=True)
-
         self.reset_allneighbors()
         self.filter = 0
 
@@ -1814,7 +1825,7 @@ class System(pc.System):
         self.atoms = atoms
 
 
-    def repeat(self, reps, ghost=False, scale_box=True):
+    def repeat(self, reps, atoms=None, ghost=False, scale_box=True):
         """
         Replicate simulation cell
         
@@ -1822,6 +1833,9 @@ class System(pc.System):
         ----------
         reps : list of ints of size 3
             repetitions in each direction
+        
+        atoms : list of atoms, optional
+            if not provided, use atoms that are assigned
 
         ghost : bool, optional
             If True, assign the new atoms as ghost instead of actual atoms
@@ -1830,7 +1844,8 @@ class System(pc.System):
         box = self.box        
         self.actual_box = box.copy()
 
-        atoms = self.atoms
+        if atoms is None:
+            atoms = self.atoms
 
         newatoms = []
         idstart = len(atoms) + 1
@@ -1862,7 +1877,7 @@ class System(pc.System):
 
         completeatoms = atoms + newatoms
         #print(len(completeatoms))
-        self.atoms = completeatoms
+        return completeatoms
 
 
     def show(self, colorby=None, filterby=None):
