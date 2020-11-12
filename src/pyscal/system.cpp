@@ -2229,38 +2229,40 @@ void System::identify_cndia(){
     //now for each atom
     for(int ti=0; ti<nop; ti++){
         if(atoms[ti].structure == 1){
-            //this is cubic diamond
             atoms[ti].structure = 5;
+        }
+        else if(atoms[ti].structure == 2){
+            atoms[ti].structure = 8;
+        }
+    }
+    //second pass
+    for(int ti=0; ti<nop; ti++){
+        if ((atoms[ti].structure != 5) && (atoms[ti].structure != 8)){
             for(int i=0; i<4; i++){
                 n = atoms[ti].nn1[i];
-                //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
-                    atoms[n].structure = 6;
+                if(atoms[n].structure == 5){
+                    atoms[ti].structure = 6;
+                    break;
                 }
-            }
-            for(int i=0; i<atoms[ti].n_neighbors; i++){
-                n = atoms[ti].neighbors[i];
-                //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
-                    atoms[n].structure = 7;
+                else if (atoms[n].structure == 8){
+                    atoms[ti].structure = 9;
+                    break;
                 }
             }
         }
-        else if(atoms[ti].structure == 2){
-            //this is cubic diamond
-            atoms[ti].structure = 8;
-            for(int i=0; i<4; i++){
-                n = atoms[ti].nn1[i];
-                //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
-                    atoms[n].structure = 9;
-                }
-            }
+    }
+
+    for(int ti=0; ti<nop; ti++){
+        if ((atoms[ti].structure != 5) && (atoms[ti].structure != 8) && (atoms[ti].structure != 6) && (atoms[ti].structure != 9)){
             for(int i=0; i<atoms[ti].n_neighbors; i++){
                 n = atoms[ti].neighbors[i];
-                //only assign if structure is not 1 or 2#
-                if((atoms[n].structure != 1) && (atoms[n].structure != 2) && (atoms[n].structure != 5) && (atoms[n].structure != 8)){
-                    atoms[n].structure = 10;
+                if(atoms[n].structure == 5){
+                    atoms[ti].structure = 7;
+                    break;
+                }
+                else if (atoms[n].structure == 8){
+                    atoms[ti].structure = 10;
+                    break;
                 }
             }
         }
