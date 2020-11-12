@@ -1,0 +1,11 @@
+name: pyscal-test
+channels:
+  - conda-forge
+dependencies:
+  - numpy
+  - matplotlib
+  - ase
+  - plotly
+  - ipywidgets
+  - pytest
+  - pytest-cov
