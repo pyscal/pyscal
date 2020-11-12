@@ -1,3 +1,4 @@
+name: pyscal-test
 channels:
   - conda-forge
 dependencies:
