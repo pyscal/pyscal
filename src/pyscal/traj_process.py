@@ -18,10 +18,10 @@ import io
 import os
 import warnings
 from ase.io import write, read
-import pyscal.trajectory.ase as ptase
-import pyscal.trajectory.lammps as ptlammps
-import pyscal.trajectory.mdtraj as ptmdtraj
-import pyscal.trajectory.vasp as ptvasp
+import pyscal.formats.ase as ptase
+import pyscal.formats.lammps as ptlammps
+import pyscal.formats.mdtraj as ptmdtraj
+import pyscal.formats.vasp as ptvasp
 
 
 def read_file(filename, format="lammps-dump",

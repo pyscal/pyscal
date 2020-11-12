@@ -62,18 +62,24 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
     >>> atoms, box = read_lammps_dump('conf.d', compressed=True)
 
     """
-    if not os.path.exists(infile):
-        raise FileNotFoundError("Filename %s not found"%infile)
+    if isinstance(infile, list):
+        islist = True
+        f = infile
+    else:
+        islist = False
+
+    if not islist:
+        if not os.path.exists(infile):
+            raise FileNotFoundError("Filename %s not found"%infile)
+        #first depending on if the extension is .gz - use zipped read
+        raw = infile.split('.')
+        if raw[-1] == 'gz' or  compressed:
+            f = gzip.open(infile,'rt')
+        else:
+            f = open(infile,'r')
 
     if customkeys == None:
         customkeys = []
-
-    #first depending on if the extension is .gz - use zipped read
-    raw = infile.split('.')
-    if raw[-1] == 'gz' or  compressed:
-        f = gzip.open(infile,'rt')
-    else:
-        f = open(infile,'r')
 
     #now go through the file line by line
     paramsread = False
@@ -161,7 +167,8 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
             atoms.append(atom)
 
     #close files
-    f.close()
+    if not islist:
+        f.close()
 
     if triclinic:
         #process triclinic box
@@ -262,12 +269,15 @@ def write_snap(sys, outfile, compressed = False,
             cvals = customvals
 
     #open files for writing
-    if compressed:
-        gz = gzip.open(outfile,'wt')
-        dump = gz
+    if isinstance(outfile, io.IOBase):
+        dump = outfile
     else:
-        gz = open(outfile,'w')
-        dump = gz
+        if compressed:
+            gz = gzip.open(outfile,'wt')
+            dump = gz
+        else:
+            gz = open(outfile,'w')
+            dump = gz
 
     #now write
     dump.write("ITEM: TIMESTEP\n")
@@ -298,7 +308,8 @@ def write_snap(sys, outfile, compressed = False,
 
         dump.write(atomline)
 
-    dump.close()
+    if not isinstance(outfile, io.IOBase):
+        dump.close()
 
 
 def split_snaps(infile, compressed = False):
