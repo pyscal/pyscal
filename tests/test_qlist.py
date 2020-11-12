@@ -9,8 +9,8 @@ def test_q_list():
     #this might take a while, it will find all qs
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [4, 4, 4])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     sys.find_neighbors(method = 'voronoi')
 

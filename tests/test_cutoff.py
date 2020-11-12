@@ -7,8 +7,8 @@ import pyscal.crystal_structures as pcs
 def test_cutoff():
     atoms, box = pcs.make_crystal(structure="fcc", lattice_constant=4.07, repetitions=(6,6,6))
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
     sys.find_neighbors(method="cutoff", cutoff=0)
     sys.set_atom_cutoff(factor=2)
     atoms = sys.atoms

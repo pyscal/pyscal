@@ -35,8 +35,8 @@ def test_lammps_dump():
 def test_neighbors_number():
     atoms, box = pcs.make_crystal(structure="fcc", repetitions=(3,3,3), lattice_constant=4.00)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
 
     sys.find_neighbors(method="number", nmax=8)
     atoms = sys.atoms

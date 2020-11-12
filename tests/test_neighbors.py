@@ -8,8 +8,8 @@ def test_neighbors_system():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [6, 6, 6])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     #test that atoms are set properly
     assert len(sys.atoms) == 432
@@ -49,8 +49,8 @@ def test_neighbors_system_filter():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [5, 5, 5])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
 
     sys.find_neighbors(method = 'cutoff', cutoff=0.867)
@@ -81,8 +81,9 @@ def test_neighbors_system_filter():
 def test_neighbors_diamond():
     atoms, box = pcs.make_crystal(structure="diamond", lattice_constant=5.67, repetitions=(6,6,6))
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
+
     sys.find_diamond_neighbors()
     sys.calculate_q([4,6], averaged=True)
     assert (np.mean(sys.get_qvals(4))-0.19094065395649326) < 1E-2
@@ -90,8 +91,9 @@ def test_neighbors_diamond():
 
     atoms, box = pcs.make_crystal(structure="fcc", lattice_constant=4.07, repetitions=(6,6,6))
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
+
     sys.find_neighbors(method="cutoff", cutoff=0)
     sys.calculate_q([4,6], averaged=True)
     assert (np.mean(sys.get_qvals(4))-0.19094065395649326) < 1E-2
@@ -99,8 +101,9 @@ def test_neighbors_diamond():
 
     atoms, box = pcs.make_crystal(structure="fcc", lattice_constant=4.07, repetitions=(6,6,6))
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = box
+    sys.atoms = atoms
+
     sys.find_diamond_neighbors()
     sys.calculate_q([4,6], averaged=True)
     assert (np.mean(sys.get_qvals(4))-0.210287193019979) < 1E-2

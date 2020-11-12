@@ -7,8 +7,8 @@ import pyscal.crystal_structures as pcs
 def test_q_11():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [4, 4, 4])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     sys.find_neighbors(method = 'voronoi')
 

@@ -9,8 +9,8 @@ def test_file_system():
 
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [1, 1, 1])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
     sys.find_neighbors(method = 'voronoi')
 
     sys.to_file('tests/tjkf.dat')
@@ -26,8 +26,8 @@ def test_file_system():
 
     #now try to read in the file
     sys3 = pc.System()
-    sys3.atoms = atoms
     sys3.box = boxdims
+    sys3.atoms = atoms
     sys3.to_file('tests/tjkf.dat', customkeys=['velocity'])
 
     #now read it again

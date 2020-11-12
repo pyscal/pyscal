@@ -8,8 +8,8 @@ import pyscal.crystal_structures as pcs
 def test_voro_props():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [10, 10, 10])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
 
     sys.find_neighbors(method = 'voronoi')

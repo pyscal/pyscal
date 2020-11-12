@@ -7,8 +7,8 @@ import pyscal.crystal_structures as pcs
 def test_cs_ges():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [4, 4, 4], lattice_constant=4.00)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     sys.calculate_centrosymmetry(nmax=8)
     atoms = sys.atoms
@@ -23,8 +23,8 @@ def test_cs_ges():
 def test_cs_gvm():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [4, 4, 4], lattice_constant=4.00)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     sys.calculate_centrosymmetry(nmax=8, algorithm="gvm")
     atoms = sys.atoms

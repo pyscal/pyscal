@@ -30,8 +30,8 @@ def test_system_nucsize_fraction():
     #create some atoms
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [2, 2, 2], lattice_constant=3.20)
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
 
     #test that atoms are set properly
     assert len(sys.atoms) == 16

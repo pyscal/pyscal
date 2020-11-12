@@ -7,8 +7,9 @@ import pyscal.crystal_structures as pcs
 def test_q_4():
     atoms, boxdims = pcs.make_crystal('bcc', repetitions = [4, 4, 4])
     sys = pc.System()
-    sys.atoms = atoms
     sys.box = boxdims
+    sys.atoms = atoms
+
     #sys.get_neighbors(method = 'voronoi')
     sys.find_neighbors(method = 'cutoff', cutoff=0.9)
     sys.calculate_q([4, 6], averaged=True)
