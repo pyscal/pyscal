@@ -16,23 +16,26 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
-    - name: Setup conda
-      uses: s-weigand/setup-conda@v1
+    - name: Cache conda
+      uses: actions/cache@v1
+      env:
+        # Increase this value to reset cache if etc/example-environment.yml has not changed
+        CACHE_NUMBER: 0
       with:
-        update-conda: true
-        python-version: ${{ matrix.python-version }}
-        conda-channels: anaconda, conda-forge
+        path: ~/conda_pkgs_dir
+        key:
+          ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }}-${{
+          hashFiles('.ci_support/environment.yml') }}
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: anaconda-client-env
+        channel-priority: strict
+        environment-file: .ci_support/environment.yml
+        use-only-tar-bz2: true # IMPORTANT: This needs to be set for caching to work properly!
     
-    - name: Install requirements
-      run: |
-        conda --version
-        which python
-        conda config --set always_yes yes --set changeps1 no
-        conda install -c conda-forge --file requirements_dev.txt
-        pip install -e .
-
     - name: run tests
       run: |
+        pip install -e .
         pip install pytest
         pip install pytest-cov
         pytest --cov-report=xml --cov=pyscal tests/
