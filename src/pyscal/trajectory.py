@@ -1,5 +1,4 @@
 import os
-import pyscal.core as pc
 import numpy as np
 
 class Timeslice:
