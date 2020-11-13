@@ -3,6 +3,7 @@ import os,sys,inspect
 import numpy as np
 import pyscal.core as pc
 import pyscal.crystal_structures as pcs
+from ase.build import bulk
 
 #test conventional cna for fcc
 def test_cna_cutoff():
@@ -56,3 +57,24 @@ def test_cna_diamond():
     atoms = sys.atoms
     assert atoms[0].structure == 5
 
+
+def test_ase_bulks():
+    
+    al_fcc = bulk("Al")
+    fe_bcc = bulk("Fe")
+    ti_hcp = bulk("Ti")
+
+    sys = pc.System()
+    sys.read_inputfile(al_fcc, format="ase")
+    cna = sys.calculate_cna()
+    assert cna["fcc"] == 1
+
+    sys = pc.System()
+    sys.read_inputfile(fe_bcc, format="ase")
+    cna = sys.calculate_cna()
+    assert cna["bcc"] == 1
+
+    sys = pc.System()
+    sys.read_inputfile(ti_hcp, format="ase")
+    cna = sys.calculate_cna()
+    assert cna["hcp"] == 2
