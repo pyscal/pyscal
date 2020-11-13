@@ -129,9 +129,15 @@ class System(pc.System):
         Set atoms
         """
         if(len(atoms) < 200):
+            #we need to estimate a rough idea
+            needed_atoms = 200 - len(atoms)
+            #get a rough cell
+            needed_cells = needed_atoms/2
+            nx = int(needed_cells**(1/3))
+
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
-            atoms = self.repeat((3, 3, 3), atoms=atoms, ghost=True, scale_box=True)
+            atoms = self.repeat((nx+1, nx+1, nx+1), atoms=atoms, ghost=True, scale_box=True)
 
         self.set_atoms(atoms)
 
