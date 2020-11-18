@@ -132,8 +132,9 @@ class System(pc.System):
             #we need to estimate a rough idea
             needed_atoms = 200 - len(atoms)
             #get a rough cell
-            needed_cells = needed_atoms/2
+            needed_cells = np.ceil(needed_atoms/len(atoms))
             nx = int(needed_cells**(1/3))
+            nx = int(np.ceil(nx/2))
 
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
