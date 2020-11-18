@@ -497,14 +497,51 @@ vector<double> System::remap_atom(vector<double> pos){
     double dx = pos[0];
     double dy = pos[1];
     double dz = pos[2];
+    double ax, ay, az;
 
-    if (dx < 0) dx+=boxx;
-    else if (dx >= boxx) dx-=boxx;
-    if (dy < 0) dy+=boxy;
-    else if (dy >= boxy) dy-=boxy;
-    if (dz < 0) dz+=boxz;
-    else if (dz >= boxz) dz-=boxz;
+    if (triclinic == 1){
+        //convert to the triclinic system
+        ax = rotinv[0][0]*dx + rotinv[0][1]*dy + rotinv[0][2]*dz;
+        ay = rotinv[1][0]*dx + rotinv[1][1]*dy + rotinv[1][2]*dz;
+        az = rotinv[2][0]*dx + rotinv[2][1]*dy + rotinv[2][2]*dz;
 
+        //scale to match the triclinic box size
+        dx = ax*boxx;
+        dy = ay*boxy;
+        dz = az*boxz;
+
+        //now check pbc
+        //nearest image
+        if (dx> boxx/2.0) {dx-=boxx;};
+        if (dx<-boxx/2.0) {dx+=boxx;};
+        if (dy> boxy/2.0) {dy-=boxy;};
+        if (dy<-boxy/2.0) {dy+=boxy;};
+        if (dz> boxz/2.0) {dz-=boxz;};
+        if (dz<-boxz/2.0) {dz+=boxz;};
+
+        //now divide by box vals - scale down the size
+        dx = dx/boxx;
+        dy = dy/boxy;
+        dz = dz/boxz;
+
+        //now transform back to normal system
+        ax = rot[0][0]*dx + rot[0][1]*dy + rot[0][2]*dz;
+        ay = rot[1][0]*dx + rot[1][1]*dy + rot[1][2]*dz;
+        az = rot[2][0]*dx + rot[2][1]*dy + rot[2][2]*dz;
+
+        //now assign to diffs and calculate distnace
+        dx = ax;
+        dy = ay;
+        dz = az;
+    }
+    else{
+        if (dx < 0) dx+=boxx;
+        else if (dx >= boxx) dx-=boxx;
+        if (dy < 0) dy+=boxy;
+        else if (dy >= boxy) dy-=boxy;
+        if (dz < 0) dz+=boxz;
+        else if (dz >= boxz) dz-=boxz;
+    }
     vector<double> rpos;
     rpos.emplace_back(dx);
     rpos.emplace_back(dy);
@@ -1791,12 +1828,14 @@ void System::get_all_neighbors_voronoi(){
     vector<int> idss;
     //vector<int> nvector;
     double weightsum;
-
+    vector <double> pos;
 
     //pre_container pcon(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],true,true,true);
     pre_container pcon(0.00, boxx, 0.00, boxy, 0.0, boxz, true, true, true);
     for(int i=0; i<nop; i++){
-        pcon.put(i, atoms[i].posx-boxdims[0][0], atoms[i].posy-boxdims[1][0], atoms[i].posz-boxdims[2][0]);
+        pos = atoms[i].gx();
+        pos = remap_atom(pos);
+        pcon.put(i, pos[0], pos[1], pos[2]);
     }
     pcon.guess_optimal(tnx,tny,tnz);
     //container con(boxdims[0][0],boxdims[1][1],boxdims[1][0],boxdims[1][1],boxdims[2][0],boxdims[2][1],tnx,tny,tnz,true,true,true, nop);

@@ -137,7 +137,7 @@ class System(pc.System):
 
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
-            atoms = self.repeat((nx+1, nx+1, nx+1), atoms=atoms, ghost=True, scale_box=True)
+            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True)
 
         self.set_atoms(atoms)
 
@@ -523,8 +523,18 @@ class System(pc.System):
                 raise RuntimeError("Could not find enough neighbors - try increasing threshold")
 
         elif method == 'voronoi':
+            
             self.voroexp = int(voroexp)
+
+            #copy the simulation cell
+            backupbox = self._box.copy()
+            if self.triclinic:
+                self.embed_in_cubic_box()
+            #self.embed_in_cubic_box()
             self.get_all_neighbors_voronoi()
+
+            #replace box
+            self.box = backupbox
 
         self.neighbors_found = True
 
@@ -1881,9 +1891,20 @@ class System(pc.System):
         newatoms = []
         idstart = len(atoms) + 1
 
-        for i in range(0, reps[0]):
-            for j in range(0, reps[1]):
-                for k in range(0, reps[2]):
+        x1 = -reps[0]
+        x2 = reps[0]+1
+        y1 = -reps[1]
+        y2 = reps[1]+1
+        z1 = -reps[2]
+        z2 = reps[2]+1
+        xs = 2*reps[0] + 1
+        ys = 2*reps[1] + 1
+        zs = 2*reps[2] + 1
+
+
+        for i in range(x1, x2):
+            for j in range(y1, y2):
+                for k in range(z1, z2):
                     if (i==j==k==0):
                         continue
                     for atom in atoms:
@@ -1899,9 +1920,9 @@ class System(pc.System):
                         newatoms.append(a)
 
         if scale_box:
-            box[0] = reps[0]*np.array(box[0])
-            box[1] = reps[1]*np.array(box[1])
-            box[2] = reps[2]*np.array(box[2])
+            box[0] = xs*np.array(box[0])
+            box[1] = ys*np.array(box[1])
+            box[2] = zs*np.array(box[2])
             self.box = box
         if ghost:
             self.ghosts_created = True
@@ -1910,6 +1931,58 @@ class System(pc.System):
         #print(len(completeatoms))
         return completeatoms
 
+
+    def embed_in_cubic_box(self,):
+        """
+        Embedded the triclinic box in a cubic box
+        """
+        #first task is to create a box representation
+        
+        box = self._box
+        backupbox = box.copy()
+        
+        a = np.array(box[0])
+        b = np.array(box[1])
+        c = np.array(box[2])
+
+        cosa = np.dot(b, c)/(np.linalg.norm(b)*np.linalg.norm(c))
+        cosb = np.dot(c, a)/(np.linalg.norm(c)*np.linalg.norm(a))
+        cosc = np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
+
+        lx = np.linalg.norm(a)
+        xy = np.linalg.norm(b)*cosc
+        xz = np.linalg.norm(c)*cosb
+        ly = np.sqrt(np.linalg.norm(b)*np.linalg.norm(b) - xy*xy)
+        yz = (np.linalg.norm(b)*np.linalg.norm(c)*cosa - xy*xz)/ly
+        lz = np.sqrt(np.linalg.norm(c)*np.linalg.norm(c) - xz*xz - yz*yz)
+
+        xlo = ylo = zlo = 0
+        xhi = lx
+        yhi = ly
+        zhi = lz
+
+        xlo_bound = xlo + min(0.0,xy,xz,xy+xz)
+        xhi_bound = xhi + max(0.0,xy,xz,xy+xz)
+        ylo_bound = ylo + min(0.0,yz)
+        yhi_bound = yhi + max(0.0,yz)
+        zlo_bound = zlo
+        zhi_bound = zhi
+
+        newbox = np.array([[xhi_bound-xlo_bound, 0, 0], [0, yhi_bound-ylo_bound, 0], [0, 0, zhi_bound-zlo_bound]])
+        
+        #we also need to remap atoms
+        #atoms = self.get_all_atoms()
+        #for atom in atoms:
+        #    pos = atom.pos
+        #    pos[0] = pos[0]-xlo_bound
+        #    pos[1] = pos[1]-ylo_bound
+        #    pos[2] = pos[2]-zlo_bound
+        #    atom.pos = pos
+
+
+        self.newbox = newbox
+        self.box = newbox
+        #self.atoms = atoms
 
     def show(self, colorby=None, filterby=None):
         """
