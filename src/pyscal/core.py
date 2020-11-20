@@ -1348,6 +1348,8 @@ class System(pc.System):
         if not nmax%2 == 0:
             raise ValueError("nmax has to even integer")
 
+        self.ccalculate_centrosymmetry(nmax)
+        """    
         if calculate_neighbors:
             self.find_neighbors(method="number", nmax=nmax)
 
@@ -1357,7 +1359,7 @@ class System(pc.System):
             self.greedy_vertex_matching(nmax)
         else:
             raise ValueError("unknown algorithm")
-
+        """
 
     def greedy_edge_selection(self, nmax):
         """

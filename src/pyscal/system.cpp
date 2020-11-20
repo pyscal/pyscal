@@ -2437,3 +2437,51 @@ void System::entropy(double sigma, double rho, double rstart, double rstop, doub
     }
 }
 
+
+void System::calculate_centrosymmetry_atom(int ti, int nmax){
+    /*
+    Calculate centrosymmetry parameter
+    */
+    //loop over neighbors
+    
+    double d, dx, dy, dz, weight;
+    int t1, t2;
+    vector<datom> temp;
+    int count = 0;
+
+    for(int i=0; i<atoms[ti].n_neighbors-1; i++){
+        for(int j=i+1; j<atoms[ti].n_neighbors; j++){
+            //now get dist vectors
+            dx = atoms[ti].n_diffx[i] + atoms[ti].n_diffx[j];
+            dy = atoms[ti].n_diffy[i] + atoms[ti].n_diffy[j];
+            dz = atoms[ti].n_diffz[i] + atoms[ti].n_diffz[j];
+            weight = sqrt(dx*dx+dy*dy+dz*dz);
+            datom x = {weight, count};
+            temp.emplace_back(x);
+            count++;            
+        }
+    }
+
+    //now sort
+    sort(temp.begin(), temp.end(), by_dist());
+
+    //now do the second loop
+    double csym = 0;
+
+    for(int i=0; i<nmax/2; i++){
+        csym += temp[i].dist*temp[i].dist;
+    }
+
+    atoms[ti].centrosymmetry = csym;
+}
+
+void System::calculate_centrosymmetry(int nmax){
+
+    reset_all_neighbors();
+    get_all_neighbors_bynumber(3, nmax, 1);
+
+    //now loop over atoms and call
+    for(int ti=0; ti<nop; ti++){
+        calculate_centrosymmetry_atom(ti, nmax);
+    }
+}
