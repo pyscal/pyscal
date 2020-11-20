@@ -176,5 +176,8 @@ class System{
         void average_entropy();
         void average_entropy_switch(double, int, int);
         void entropy(double, double, double, double, double, double);
+        void calculate_centrosymmetry_atom(int, int);
+        void calculate_centrosymmetry(int);
+        vector<double> get_centrosymmetry();
 
 };
