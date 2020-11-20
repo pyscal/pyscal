@@ -1297,7 +1297,7 @@ class System(pc.System):
 
         return st
 
-    def calculate_centrosymmetry(self, nmax=12, calculate_neighbors=True, algorithm="ges"):
+    def calculate_centrosymmetry(self, nmax=12):
         """
         Calculate the centrosymmetry parameter
 
@@ -1307,23 +1307,9 @@ class System(pc.System):
             number of neighbors to be considered for centrosymmetry 
             parameters. Has to be a positive, even integer. Default 12
 
-        calculate_neighbors : bool, optional
-            if True recalculate neighbors using number method, if False
-            neighbor calculation is not done. 
-
-        algorithm : {'ges', 'gvm'}, optional
-            `ges` uses the Greedy Edge Selection algorithm,
-            `gvm` uses Greedy Vertex Matching. Default `ges`.
-
         Returns
         -------
         None
-
-        References
-        ----------
-        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
-        .. [2] Bulatov, Cai, ISBN:978-0198526148, 2006
-        .. [3] Larsen, arXiv:2003.08879v1, 2020
         
         Notes
         -----
@@ -1332,14 +1318,14 @@ class System(pc.System):
         symmetry of an atomic environment. Centrosymmetry recalculates the neighbor using
         the number method as specified in :func:`¬pyscal.core.System.find_neighbors` method. This
         is the ensure that the required number of neighbors are found for calculation of the parameter.
-        The calculation of neighbors through number method can be suppressed by setting
-        ``calculate_neighbors=False``.
 
-        This method uses two different algorithms, The Greedy Edge Selection (GES) [1] or the
-        Greedy Vertex Matching (GVM) [2] as specified in [3]. GES algorithm is implemented
-        in LAMMPS and Ovito, whereas GVM is used in AtomEye and Atomsk. Please see [3] for
-        a detailed description of the algorithms. The algorithm can be selected using the
-        `algorithm` argument. GVM values are not normalised currently.
+        The Greedy Edge Selection (GES) [1] as specified in [2] in used in this method. 
+        GES algorithm is implemented in LAMMPS and Ovito. Please see [2] for
+        a detailed description of the algorithms. 
+        References
+        ----------
+        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
+        .. [2] Larsen, arXiv:2003.08879v1, 2020
 
         """
         if not nmax>0:
@@ -1349,125 +1335,6 @@ class System(pc.System):
             raise ValueError("nmax has to even integer")
 
         self.ccalculate_centrosymmetry(nmax)
-        """    
-        if calculate_neighbors:
-            self.find_neighbors(method="number", nmax=nmax)
-
-        if algorithm == "ges":
-            self.greedy_edge_selection(nmax)
-        elif algorithm == "gvm":
-            self.greedy_vertex_matching(nmax)
-        else:
-            raise ValueError("unknown algorithm")
-        """
-
-    def greedy_edge_selection(self, nmax):
-        """
-        Greedy edge selection scheme for centrosymmetry parameters
-
-        Parameters
-        ----------
-        nmax : int
-            number of neighbors to be considered for centrosymmetry 
-            parameters
-
-        Returns
-        -------
-        None
-
-        References
-        ----------
-        .. [1] Stukowski, A, Model Simul Mater SC 20, 2012
-
-        """
-        atoms = self.atoms
-        for atom in atoms:
-            distvectors = atom.neighbor_vector
-
-            #go through all combinations
-            combos = list(itertools.combinations(range(atom.coordination), 2))
-            selected_combos = []
-
-            data = []
-
-            for c, combo in enumerate(combos):
-                distsum = np.array(distvectors[combo[0]]) + np.array(distvectors[combo[1]])
-                distsum = np.sum([x**2 for x in distsum])
-                weight = np.sqrt(distsum)
-                dd = [combo, distsum, weight, c]
-                data.append(dd)
-                
-            #now sort weights
-            data = np.array(data)
-            sorted_data = data[np.argsort(data[:,2])]
-
-            csym = 0
-            for i in range(nmax//2):
-                csym += sorted_data[i][1]
-                selected_combos.append(sorted_data[i][0])
-
-            atom.centrosymmetry = csym
-
-        self.atoms = atoms
-
-
-    def greedy_vertex_matching(self, nmax):
-        """
-        Greedy vertex matching scheme for centrosymmetry parameters
-
-        Parameters
-        ----------
-        nmax : int
-            number of neighbors to be considered for centrosymmetry 
-            parameters
-
-        Returns
-        -------
-        None
-
-        References
-        ----------
-        .. [1] Bulatov, Cai, ISBN:978-0198526148, 2006
-        
-        """
-        atoms = self.atoms
-        for atom in atoms:
-            distvectors = atom.neighbor_vector
-            distances = atom.neighbor_distance
-            sorted_distance_args = np.argsort(distances)
-            neighs = atom.neighbors
-            scombos = []
-
-            combos = list(itertools.combinations(range(atom.coordination), 2))
-            combos = np.array(combos)
-
-            data = []
-
-            for c, combo in enumerate(combos):
-                distsum = np.array(distvectors[combo[0]]) + np.array(distvectors[combo[1]])
-                distsum = np.sum([x**2 for x in distsum])
-                weight = np.sqrt(distsum)
-                dd = [combo, distsum, weight, c]
-                data.append(dd)
-
-            data = np.array(data)
-            csym = 0
-            for ind in sorted_distance_args:
-                ndata = data[combos[:,0]==ind]
-                if len(ndata) > 0:
-                    spair = ndata[np.argsort(ndata[:,2])][0]
-                    csym += spair[1]
-                    scombos.append(spair[0])
-                    i1, i2 = spair[0]
-                    arr = (combos[:,0]!=i1)*(combos[:,1]!=i1)*(combos[:,0]!=i2)*(combos[:,1]!=i2)
-                    combos = combos[arr]
-                    data = data[arr]
-                    if len(combos) == 0:
-                        break 
-            atom.centrosymmetry = csym
-
-        self.atoms = atoms
-
 
     def calculate_disorder(self, averaged=False, q=6):
         """
