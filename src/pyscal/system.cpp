@@ -2485,3 +2485,12 @@ void System::calculate_centrosymmetry(int nmax){
         calculate_centrosymmetry_atom(ti, nmax);
     }
 }
+
+vector<double> System::get_centrosymmetry(){
+
+    vector<double> csm;
+    for (int i=0; i<real_nop; i++){
+        csm.emplace_back(atoms[i].centrosymmetry);
+    }
+    return csm;
+}

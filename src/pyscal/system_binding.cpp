@@ -120,7 +120,7 @@ PYBIND11_MODULE(csystem, m) {
         .def("average_entropy",&System::average_entropy)
         .def("average_entropy_switch",&System::average_entropy_switch)
         .def("ccalculate_centrosymmetry",&System::calculate_centrosymmetry)
-        
+        .def("get_centrosymmetry",&System::get_centrosymmetry)        
         ;
 
 

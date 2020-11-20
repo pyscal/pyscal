@@ -1297,7 +1297,7 @@ class System(pc.System):
 
         return st
 
-    def calculate_centrosymmetry(self, nmax=12):
+    def calculate_centrosymmetry(self, nmax=12, get_vals=True):
         """
         Calculate the centrosymmetry parameter
 
@@ -1335,6 +1335,11 @@ class System(pc.System):
             raise ValueError("nmax has to even integer")
 
         self.ccalculate_centrosymmetry(nmax)
+
+        if get_vals:
+            vals = self.get_centrosymmetry()
+            return vals 
+
 
     def calculate_disorder(self, averaged=False, q=6):
         """
