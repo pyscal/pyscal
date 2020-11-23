@@ -501,7 +501,8 @@ class System(pc.System):
                 if threshold < 1:
                     raise ValueError("value of threshold should be at least 1.00")
 
-                self.usecells =  (len(self.atoms) > 4000)
+                #self.usecells =  (len(self.atoms) > 4000)
+                self.usecells = (self.ntotal > 4000)
                 finished = self.get_all_neighbors_adaptive(threshold, nlimit, padding)
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")
@@ -1278,7 +1279,7 @@ class System(pc.System):
         """
         if find_neighbors:
             self.reset_neighbors()
-            self.find_neighbors(method="number", nmax=4, assign_neighbor=False)
+            self.find_neighbors(method="number", nmax=4, assign_neighbor=False, threshold=3)
         
         res = self.cidentify_diamond_structure()
 

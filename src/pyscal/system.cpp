@@ -458,6 +458,7 @@ void System::set_up_cells(){
       }
       int cx, cy, cz;
       double dx, dy, dz;
+      double ddx, ddy, ddz;
       int ind;
 
       //now loop over all atoms and assign cells
@@ -467,8 +468,15 @@ void System::set_up_cells(){
           dx = atoms[ti].posx;
           dy = atoms[ti].posy;
           dz = atoms[ti].posz;
-
+          
           //now apply boxdims
+          if( abs(dx-0) < 1E-6)
+              dx = 0;
+          if( abs(dy-0) < 1E-6)
+              dy = 0;
+          if( abs(dz-0) < 1E-6)
+              dz = 0;
+
           if (dx < 0) dx+=boxx;
           else if (dx >= boxx) dx-=boxx;
           if (dy < 0) dy+=boxy;
