@@ -51,6 +51,8 @@ Atom::Atom( vector<double> pos, int idd, int typ){
     for (int tn = 0; tn<11; tn++){
         q[tn] = -1;
         aq[tn] = -1;
+        w[tn] = -1;
+        aw[tn] = -1;
 
         for (int tnn =0; tnn<25; tnn++){
             realq[tn][tnn] = -1;
@@ -314,6 +316,38 @@ vector<complex<double>> Atom::get_qcomps(int qq, bool averaged){
   return qlms;
 }
 
+vector<double> Atom::wallq(){
+    vector<double> allq;
+    for(int i=0; i<11; i++){
+        allq.emplace_back(w`[i]);
+    }
+    return allq;
+}
+
+vector<double> Atom::gallaw(){
+    vector<double> allq;
+    for(int i=0; i<11; i++){
+        allq.emplace_back(aw[i]);
+    }
+    return allq;
+}
+
+void Atom::sallw(vector<double> allq){
+    for(int i=0; i<11; i++){
+        w[i] = allq[i];
+    }
+}
+
+void Atom::sallaw(vector<double> allaq){
+    for(int i=0; i<11; i++){
+        aw[i] = allaq[i];
+    }
+}
+double Atom::gw(int qq){ return w[qq-2]; }
+void Atom::sw(int qq, double qval){ w[qq-2] = qval; }
+
+double Atom::gaw(int qq){ return aw[qq-2]; }
+void Atom::saw(int qq, double qval){ aw[qq-2] = qval; }
 
 //-------------------------------------------------------
 // Solid related properties

@@ -147,6 +147,7 @@ class Atom{
         double imgq[11][25];
         double arealq[11][25];
         double aimgq[11][25];
+
         vector<complex<double>> get_qcomps(int, bool);
         vector<double> gallq();
         vector<double> gallaq();
@@ -163,6 +164,17 @@ class Atom{
         double sii;
         double disorder;
         double avgdisorder;
+
+        double w[11];        
+        double aw[11];
+        vector<double> gallw();
+        vector<double> gallaw();
+        void sallw(vector<double>);
+        void sallaw(vector<double>);
+        double gw(int);
+        void sw(int, double);
+        double gaw(int);
+        void saw(int, double);
 
         //-------------------------------------------------------
         // Solid related properties
