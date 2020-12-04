@@ -531,7 +531,11 @@ class System(pc.System):
             #copy the simulation cell
             backupbox = self._box.copy()
             if self.triclinic:
-                self.embed_in_cubic_box()
+                if not self.ghosts_created:
+                    atoms  = self.get_atoms()
+                    atoms = self.repeat((1, 1, 1), atoms=atoms, ghost=True, scale_box=True)
+                    self.set_atoms(atoms)
+                    self.embed_in_cubic_box()
             #self.embed_in_cubic_box()
             self.get_all_neighbors_voronoi()
 
