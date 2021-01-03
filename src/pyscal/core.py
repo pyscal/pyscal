@@ -108,7 +108,7 @@ class System(pc.System):
             summ += np.dot(box1, box2)/(np.linalg.norm(box1)*np.linalg.norm(box2))
 
         #check if the summ is zero
-        if np.abs(summ) > 0:
+        if (np.abs(summ) > 1E-6):
             #this is a triclinic box
             rot = np.array(userbox).T
             rotinv = np.linalg.inv(rot)
