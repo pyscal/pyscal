@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from pyscal.formats.ase import convert_snap
+import pyscal.core as pc
 
 class Timeslice:
     """
