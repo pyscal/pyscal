@@ -98,7 +98,7 @@ def convert_snap(sys, species=None):
         types = [atom.type for atom in atoms]
         unique_types = np.unique(types)
         if not (len(unique_types) == len(species)):
-            raise ValueError("Length of species and number of types found in system are different")
+            raise ValueError("Length of species and number of types found in system are different. Maybe you specified \"Au\" instead of [\"Au\"]")
         #now assign the species to custom
         for atom in atoms:
             custom = atom.custom

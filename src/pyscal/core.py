@@ -5,6 +5,7 @@
 
 
 import pyscal.traj_process as ptp
+from pyscal.formats.ase import convert_snap
 import pyscal.routines as routines
 import os
 import numpy as np
@@ -1677,6 +1678,20 @@ class System(pc.System):
             timestep = timestep, species = species)
 
 
+    def to_ase(self, species):
+        """
+        Convert system to an ASE Atoms object
+
+        Parameters
+        ----------
+        species : list of string
+            The chemical species
+
+        Returns
+        -------
+        None
+        """
+        return convert_snap(self, species=species)
 
     def calculate_energy(self, species='Au', pair_style=None, 
                                         pair_coeff=None, mass=1.0,
