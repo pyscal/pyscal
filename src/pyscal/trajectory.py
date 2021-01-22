@@ -3,7 +3,7 @@ import numpy as np
 from pyscal.formats.ase import convert_snap
 import pyscal.core as pc
 import h5py
-
+import warnings
 
 class Timeslice:
     """
@@ -130,7 +130,7 @@ class Timeslice:
             self.trajectories[count]._get_blocks_to_file(fout, self.blocklists[count])
         fout.close()
 
-    def to_hdf(outfile, keys=None, mode='w', compression="gzip"):
+    def to_hdf(self, outfile, keys=None, mode='w', compression="gzip"):
         """
         Get the block as hdf file
 
@@ -139,7 +139,7 @@ class Timeslice:
         outfile : string
             name of the output file
 
-        keys : list, optional
+        headers : list, optional
             The keys to be stored in hdf format.
             Default values stored are [id, type, x, y, z]
         
@@ -155,9 +155,9 @@ class Timeslice:
         None
         """
         if keys is None:
-            keys = ['id', 'type', 'x', 'y', 'z']
+            outkeys = ['id', 'type', 'x', 'y', 'z']
         else:
-            keys = np.concatenate((['id', 'type', 'x', 'y', 'z'], keys))
+            outkeys = np.concatenate((['id', 'type', 'x', 'y', 'z'], keys))
 
         count = 0
         with h5py.File(outfile, 'w') as hf:
@@ -170,7 +170,7 @@ class Timeslice:
                     hf.create_group(tk)
                     hf[tk].create_dataset('box', data=data['box'], compression=compression)
                     hf[tk].create_group("atoms")
-                    for key in keys:
+                    for key in outkeys:
                        hf[tk]["atoms"].create_dataset(key, data=data['atoms'][key], compression=compression)
 
 class Trajectory:
