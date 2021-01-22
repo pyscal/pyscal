@@ -8,6 +8,7 @@ import h5py
 class Timeslice:
     """
     Timeslice containing info about a single time slice
+    Timeslices can also be added to each
     """
     def __init__(self, trajectory, blocklist):
         """
@@ -68,7 +69,7 @@ class Timeslice:
         sys = []
         for count, traj in enumerate(self.trajectories):
             for x in self.blocklists[count]:
-                s = self.trajectories[count].get_block_as_system(x, customkeys=customkeys)
+                s = self.trajectories[count]._get_block_as_system(x, customkeys=customkeys)
                 sys.append(s)
         return sys
 
@@ -89,9 +90,21 @@ class Timeslice:
         sys = []
         for count, traj in enumerate(self.trajectories):
             for x in self.blocklists[count]:
-                s = self.trajectories[count].get_block_as_ase(x, species=species)
+                s = self.trajectories[count]._get_block_as_ase(x, species=species)
                 sys.append(s)
         return sys
+
+    def to_dict(self,):
+        """
+        Get the required block as data
+        """
+        data = []
+        for count, traj in enumerate(self.trajectories):
+            for x in self.blocklists[count]:
+                self.trajectories[count].load(x)
+                data.append(self.trajectories[count].data[x])
+                self.trajectories[count].unload(x)
+        return data
 
     def to_file(self, outfile, mode="w"):
         """
@@ -114,9 +127,51 @@ class Timeslice:
         """
         fout = open(outfile, mode)
         for count, traj in enumerate(self.trajectories):
-            self.trajectories[count].get_blocks_to_file(fout, self.blocklists[count])
+            self.trajectories[count]._get_blocks_to_file(fout, self.blocklists[count])
         fout.close()
 
+    def to_hdf(outfile, keys=None, mode='w', compression="gzip"):
+        """
+        Get the block as hdf file
+
+        Parameters
+        ----------
+        outfile : string
+            name of the output file
+
+        keys : list, optional
+            The keys to be stored in hdf format.
+            Default values stored are [id, type, x, y, z]
+        
+        mode : string, optional
+            h5 write mode.
+            see here - https://docs.h5py.org/en/stable/high/file.html
+        
+        compression : string, optional
+            the compression algorithm to choose. Default gzip
+
+        Returns
+        -------
+        None
+        """
+        if keys is None:
+            keys = ['id', 'type', 'x', 'y', 'z']
+        else:
+            keys = np.concatenate((['id', 'type', 'x', 'y', 'z'], keys))
+
+        count = 0
+        with h5py.File(outfile, 'w') as hf:
+            for count, traj in enumerate(self.trajectories):
+                for x in self.blocklists[count]:
+                    self.trajectories[count].load(x)
+                    data = self.trajectories[count].data[x]
+                    self.trajectories[count].unload(x)
+                    tk = str(count)
+                    hf.create_group(tk)
+                    hf[tk].create_dataset('box', data=data['box'], compression=compression)
+                    hf[tk].create_group("atoms")
+                    for key in keys:
+                       hf[tk]["atoms"].create_dataset(key, data=data['atoms'][key], compression=compression)
 
 class Trajectory:
     """
@@ -145,8 +200,8 @@ class Trajectory:
         self.loadlist = None
         self.data = None
 
-        self.get_natoms()
-        self.get_nblocks()
+        self._get_natoms()
+        self._get_nblocks()
         
     def __repr__(self):
         """
@@ -167,7 +222,7 @@ class Trajectory:
             timeslice = Timeslice(self, blocklist)
             return timeslice
 
-    def get_natoms(self):
+    def _get_natoms(self):
         """
         Get number of atoms in the system
 
@@ -183,7 +238,7 @@ class Trajectory:
             data = [next(fout) for x in range(0, 4)]
         self.natoms = (int(data[-1]))
 
-    def get_nlines(self):
+    def _get_nlines(self):
         """
         Get total number of lines in the file
 
@@ -208,7 +263,7 @@ class Trajectory:
         self.line_offset = line_offset
         return nlines
     
-    def get_nblocks(self):
+    def _get_nblocks(self):
         """
         Get number of blocks in the trajectory file
 
@@ -220,8 +275,8 @@ class Trajectory:
         -------
         None
         """
-        self.get_natoms()
-        nlines = self.get_nlines()
+        self._get_natoms()
+        nlines = self._get_nlines()
         self.blocksize = self.natoms+9
         self.nblocks = nlines//self.blocksize
         self.straylines = nlines - self.nblocks*self.blocksize
@@ -309,7 +364,7 @@ class Trajectory:
         self.data[blockno] = None
         self.loadlist[blockno] = False        
 
-    def convert_data_to_lines(self, blockno):
+    def _convert_data_to_lines(self, blockno):
         """
         Create lines from loaded data
         
@@ -379,7 +434,7 @@ class Trajectory:
 
         return data        
 
-    def get_block_as_system(self, blockno, customkeys=None):
+    def _get_block_as_system(self, blockno, customkeys=None):
         """
         Get block as pyscal system
         
@@ -400,7 +455,7 @@ class Trajectory:
         sys.read_inputfile(data, customkeys=customkeys)
         return sys
 
-    def get_block_as_ase(self, blockno, species=None):
+    def _get_block_as_ase(self, blockno, species=None):
         """
         Get block as pyscal system
         
@@ -422,7 +477,7 @@ class Trajectory:
         asesys = convert_snap(sys, species=species)
         return asesys
 
-    def get_blocks_to_file(self, fout, blocklist):
+    def _get_blocks_to_file(self, fout, blocklist):
         """
         Get a series of blocks from the file as raw data
 
@@ -443,7 +498,7 @@ class Trajectory:
         #convert lines to start from end
         for x in xl:
             if self.loadlist[x]:
-                data = self.convert_data_to_lines(x)
+                data = self._convert_data_to_lines(x)
             else:
                 data = self.get_block(x)
             for line in data:
