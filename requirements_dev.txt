@@ -3,5 +3,6 @@ pytest
 pytest-cov
 pytest-benchmark
 codecov
+h5py
 ipywidgets=7.5
 plotly=4.11.0
