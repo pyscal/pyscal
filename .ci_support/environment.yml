@@ -9,3 +9,4 @@ dependencies:
   - ipywidgets
   - pytest
   - pytest-cov
+  - h5py
