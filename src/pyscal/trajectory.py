@@ -1,5 +1,7 @@
 import os
 import numpy as np
+from pyscal.formats.ase import convert_snap
+import pyscal.core as pc
 
 class Timeslice:
     """
@@ -65,6 +67,27 @@ class Timeslice:
         for count, traj in enumerate(self.trajectories):
             for x in self.blocklists[count]:
                 s = self.trajectories[count].get_block_as_system(x, customkeys=customkeys)
+                sys.append(s)
+        return sys
+
+    def to_ase(self, species=None):
+        """
+        Get block as Ase objects
+
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+
+        Returns
+        -------
+        sys : ASE object
+            
+        """
+        sys = []
+        for count, traj in enumerate(self.trajectories):
+            for x in self.blocklists[count]:
+                s = self.trajectories[count].get_block_as_ase(x, species=species)
                 sys.append(s)
         return sys
 
@@ -374,6 +397,28 @@ class Trajectory:
         sys = pc.System()
         sys.read_inputfile(data, customkeys=customkeys)
         return sys
+
+    def get_block_as_ase(self, blockno, species=None):
+        """
+        Get block as pyscal system
+        
+        Parameters
+        ----------
+        blockno : int
+            number of the block to be read, starts from 0
+        
+        Returns
+        -------
+        sys : System
+            pyscal System
+        """
+        #convert to system and return
+        data = self.get_block(blockno)
+
+        sys = pc.System()
+        sys.read_inputfile(data, customkeys=None)
+        asesys = convert_snap(sys, species=species)
+        return asesys
 
     def get_blocks_to_file(self, fout, blocklist):
         """
