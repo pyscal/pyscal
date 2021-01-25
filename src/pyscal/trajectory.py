@@ -5,6 +5,61 @@ import pyscal.core as pc
 import h5py
 import warnings
 
+def hdf_to_dump(infile, outfile, keys=None):
+    """
+    A support function that can convert hdf formatted
+    trajectory to dump format
+
+    Parameters
+    ----------
+    infile : string
+        name of the input hdf file
+
+    outfile : string
+        name of the output dump file
+
+    keys : list, optional
+        output keys to be written.
+        default keys are box, [id, type, x, y, z]
+    """
+    if keys is None:
+        outkeys = ['x', 'y', 'z']
+        mainkey = ['id', 'type', 'x', 'y', 'z']
+    else:
+        outkeys = np.concatenate((['x', 'y', 'z'], keys))
+        mainkey = np.concatenate((['id', 'type', 'x', 'y', 'z'], keys))
+
+    keyheader = " ".join(mainkey)
+    keyheader = " ".join(["ITEM: ATOMS", keyheader, "\n"])
+
+    with open(outfile, "w") as dump:
+        with h5py.File(infile, "r") as hf:
+            for key in hf.keys():
+                
+                natoms = len(np.array(hf[key]["atoms"]["x"]))
+                box = np.array(hf[key]["box"])
+
+                dump.write("ITEM: TIMESTEP\n")
+                dump.write("%s\n" % key)
+                dump.write("ITEM: NUMBER OF ATOMS\n")
+                dump.write("%d\n" % natoms)
+                dump.write("ITEM: BOX BOUNDS\n")
+                dump.write("%f %f\n" % (box[0][0], box[0][1]))
+                dump.write("%f %f\n" % (box[1][0], box[1][1]))
+                dump.write("%f %f\n" % (box[2][0], box[2][1]))
+
+                dump.write(keyheader)
+
+                for i in range(natoms):
+                    outval1 = ["%d %d"%(int(hf[key]["atoms"]["id"][i]), int(hf[key]["atoms"]["type"][i])) ]
+                    outval2 = [str(hf[key]["atoms"][x][i]) for x in outkeys]
+                    outvals = [*outval1, *outval2]
+                    outvals.append("\n")
+                    outline = " ".join(outvals)
+                    dump.write(outline)
+
+
+
 class Timeslice:
     """
     Timeslice containing info about a single time slice
@@ -159,19 +214,21 @@ class Timeslice:
         else:
             outkeys = np.concatenate((['id', 'type', 'x', 'y', 'z'], keys))
 
-        count = 0
+        c = 0
         with h5py.File(outfile, 'w') as hf:
             for count, traj in enumerate(self.trajectories):
                 for x in self.blocklists[count]:
                     self.trajectories[count].load(x)
                     data = self.trajectories[count].data[x]
                     self.trajectories[count].unload(x)
-                    tk = str(count)
+                    tk = str(c)
+                    #warnings.warn(tk)
                     hf.create_group(tk)
                     hf[tk].create_dataset('box', data=data['box'], compression=compression)
                     hf[tk].create_group("atoms")
                     for key in outkeys:
                        hf[tk]["atoms"].create_dataset(key, data=data['atoms'][key], compression=compression)
+                    c += 1
 
 class Trajectory:
     """
