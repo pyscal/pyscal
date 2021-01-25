@@ -2,7 +2,7 @@ import pytest
 import os
 import numpy as np
 import pyscal.core as pc
-from pyscal.trajectory import Trajectory
+from pyscal.trajectory import Trajectory, hdf_to_dump
 
 def test_traj():
 	traj = Trajectory("examples/traj.light")
@@ -33,3 +33,6 @@ def test_timeslice():
 
 	traj[0].to_hdf("test.hdf")
 	assert os.path.exists("test.hdf") == True
+
+	hdf_to_dump("test.hdf", "test.dat")
+	assert os.path.exists("test.dat") == True	
