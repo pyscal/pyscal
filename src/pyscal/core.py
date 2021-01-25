@@ -86,6 +86,15 @@ class System(pc.System):
         self.actual_box = None
         pc.System.__init__(self)
 
+    #iterator for atoms
+    def iter_atoms(self):
+        """
+        Iter over atoms
+        """
+        for i in range(self.natoms):
+            yield self.cget_atom(i)
+
+
     @property
     def box(self):
         """
