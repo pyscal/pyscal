@@ -31,8 +31,8 @@ def test_timeslice():
 	traj[0].to_file("test.out")
 	assert os.path.exists("test.out") == True
 
-	traj[0].to_hdf("test.hdf")
-	assert os.path.exists("test.hdf") == True
+	#traj[0].to_hdf("test.hdf")
+	#assert os.path.exists("test.hdf") == True
 
 	hdf_to_dump("test.hdf", "test.dat")
 	assert os.path.exists("test.dat") == True	

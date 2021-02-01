@@ -2,10 +2,11 @@ import os
 import numpy as np
 from pyscal.formats.ase import convert_snap
 import pyscal.core as pc
-import h5py
+#import h5py
 import warnings
 
-def hdf_to_dump(infile, outfile, keys=None):
+
+#def hdf_to_dump(infile, outfile, keys=None):
     """
     A support function that can convert hdf formatted
     trajectory to dump format
@@ -21,6 +22,7 @@ def hdf_to_dump(infile, outfile, keys=None):
     keys : list, optional
         output keys to be written.
         default keys are box, [id, type, x, y, z]
+    """
     """
     if keys is None:
         outkeys = ['x', 'y', 'z']
@@ -57,7 +59,7 @@ def hdf_to_dump(infile, outfile, keys=None):
                     outvals.append("\n")
                     outline = " ".join(outvals)
                     dump.write(outline)
-
+    """
 
 
 class Timeslice:
@@ -185,7 +187,8 @@ class Timeslice:
             self.trajectories[count]._get_blocks_to_file(fout, self.blocklists[count])
         fout.close()
 
-    def to_hdf(self, outfile, keys=None, mode='w', compression="gzip"):
+
+    #def to_hdf(self, outfile, keys=None, mode='w', compression="gzip"):
         """
         Get the block as hdf file
 
@@ -209,6 +212,7 @@ class Timeslice:
         -------
         None
         """
+        """
         if keys is None:
             outkeys = ['id', 'type', 'x', 'y', 'z']
         else:
@@ -229,6 +233,7 @@ class Timeslice:
                     for key in outkeys:
                        hf[tk]["atoms"].create_dataset(key, data=data['atoms'][key], compression=compression)
                     c += 1
+        """
 
 class Trajectory:
     """
