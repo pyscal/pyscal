@@ -22,8 +22,8 @@ import warnings
     keys : list, optional
         output keys to be written.
         default keys are box, [id, type, x, y, z]
-    """
-    """
+"""
+"""
     if keys is None:
         outkeys = ['x', 'y', 'z']
         mainkey = ['id', 'type', 'x', 'y', 'z']
@@ -211,8 +211,8 @@ class Timeslice:
         Returns
         -------
         None
-        """
-        """
+    """
+    """
         if keys is None:
             outkeys = ['id', 'type', 'x', 'y', 'z']
         else:
