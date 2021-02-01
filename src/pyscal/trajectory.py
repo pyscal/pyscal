@@ -7,7 +7,7 @@ import warnings
 
 
 #def hdf_to_dump(infile, outfile, keys=None):
-    """
+"""
     A support function that can convert hdf formatted
     trajectory to dump format
 
@@ -59,7 +59,7 @@ import warnings
                     outvals.append("\n")
                     outline = " ".join(outvals)
                     dump.write(outline)
-    """
+"""
 
 
 class Timeslice:
@@ -189,7 +189,7 @@ class Timeslice:
 
 
     #def to_hdf(self, outfile, keys=None, mode='w', compression="gzip"):
-        """
+    """
         Get the block as hdf file
 
         Parameters
@@ -233,7 +233,7 @@ class Timeslice:
                     for key in outkeys:
                        hf[tk]["atoms"].create_dataset(key, data=data['atoms'][key], compression=compression)
                     c += 1
-        """
+    """
 
 class Trajectory:
     """
