@@ -2,7 +2,8 @@ import pytest
 import os
 import numpy as np
 import pyscal.core as pc
-from pyscal.trajectory import Trajectory, hdf_to_dump
+#from pyscal.trajectory import Trajectory, hdf_to_dump
+from pyscal.trajectory import Trajectory
 
 def test_traj():
 	traj = Trajectory("examples/traj.light")
