@@ -184,6 +184,7 @@ class Atom{
         double faceperimeters[MAXNUMBEROFNEIGHBORS];
         int n3, n4, n5, n6;
         vector<vector<double>> edgelengths;
+        vector<vector<double>> vertex_positions;
         vector<double> vertex_vectors;
         vector<int> vertex_numbers;
         double volume;
@@ -196,6 +197,8 @@ class Atom{
         void sedgelengths(vector<vector<double>>);
         vector<int> gvorovector();
         void svorovector(vector<int>);
+        vector<vector<double>> gvertexpositions();
+        void svertexpositions(vector<vector<double>>);
 
 
         //-------------------------------------------------------

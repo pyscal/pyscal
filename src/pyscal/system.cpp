@@ -1825,7 +1825,7 @@ void System::get_all_neighbors_voronoi(){
     double diffx,diffy,diffz;
     double r,theta,phi;
     int i;
-    int ti,id,tnx,tny,tnz;
+    int ti,id,tnx,tny,tnz, nverts;
 
     double rx,ry,rz,tsum, fa, x, y, z, vol;
     vector<int> neigh,f_vert, vert_nos;
@@ -1877,6 +1877,18 @@ void System::get_all_neighbors_voronoi(){
             atoms[ti].vertex_vectors = v;
             atoms[ti].vertex_numbers = vert_nos;
             atoms[ti].cutoff = cbrt(3*vol/(4*3.141592653589793));
+            
+            //clean up and add vertex positions
+            nverts = int(v.size())/3;
+            
+            for(int si=0; si<nverts; si++){
+                vector<double> temp;
+                for(int vi=si*3, vi<(si*3+3); vi++){
+                    temp.emplace_back(v[vi]);
+                }
+                atoms[ti].vertex_positions[si].emplace_back(temp);
+            }
+
             //assign to the atom
             //atoms[ti].vorovector = nvector;
 
