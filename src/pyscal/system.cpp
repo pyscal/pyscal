@@ -608,6 +608,9 @@ void System::get_all_neighbors_cells(){
                         if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
                             continue;
                         }
+                        else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
+                            continue;
+                        }
                         //process_neighbor(ti, tj);
                         atoms[ti].neighbors[atoms[ti].n_neighbors] = tj;
                         atoms[ti].neighbordist[atoms[ti].n_neighbors] = d;
@@ -667,6 +670,9 @@ void System::get_all_neighbors_normal(){
             d = get_abs_distance(ti,tj,diffx,diffy,diffz);
             if (d < neighbordistance){
                 if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                    continue;
+                }
+                else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
                     continue;
                 }
                 //process_neighbor(ti, tj);
@@ -1192,7 +1198,9 @@ int System::get_all_neighbors_adaptive(double prefactor, int nlimit, double padd
                 if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
                     continue;
                 }
-
+                else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
+                    continue;
+                }
                 d = get_abs_distance(ti,tj,diffx,diffy,diffz);
                 atoms[ti].neighbors[atoms[ti].n_neighbors] = tj;
                 atoms[ti].neighbordist[atoms[ti].n_neighbors] =d;
@@ -1883,10 +1891,10 @@ void System::get_all_neighbors_voronoi(){
             
             for(int si=0; si<nverts; si++){
                 vector<double> temp;
-                for(int vi=si*3, vi<(si*3+3); vi++){
+                for(int vi=si*3; vi<(si*3+3); vi++){
                     temp.emplace_back(v[vi]);
                 }
-                atoms[ti].vertex_positions[si].emplace_back(temp);
+                atoms[ti].vertex_positions.emplace_back(temp);
             }
 
             //assign to the atom
@@ -1903,7 +1911,9 @@ void System::get_all_neighbors_voronoi(){
                 if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
                     continue;
                 }
-
+                else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
+                    continue;
+                }
                 atoms[ti].neighbors[tj] = neigh[tj];
                 atoms[ti].n_neighbors += 1;
                 d = get_abs_distance(ti,neigh[tj],diffx,diffy,diffz);
