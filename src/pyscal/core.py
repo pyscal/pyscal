@@ -1892,6 +1892,70 @@ class System(pc.System):
         self.box = newbox
         #self.atoms = atoms
 
+    def extract_cubic_box(self, repeat=(3,3,3)):
+        """
+        Extract a cubic representation of the box from triclinic cell
+
+        Parameters
+        ----------
+        repeat : list of ints
+            the number of times box should be repeat
+
+        Returns
+        -------
+        cubebox: list of list of floats
+            cubic box
+
+        atoms: list of Atom objects
+            atoms in the cubic box
+        """
+        ratoms = self.repeat(repeat)
+        anchor = ratoms[0]
+
+        nb = []
+
+        for count, ind in enumerate([[1, 2], [0, 2], [0, 1]]): 
+            mindist = 10000
+            minatom = None
+            for atom in ratoms[1:]:
+                if np.abs(atom.pos[ind[0]]-anchor.pos[ind[0]])< 1E-5:
+                    if np.abs(atom.pos[ind[1]]-anchor.pos[ind[1]])< 1E-5:
+                        if atom.type == anchor.type:
+                            dist = self.get_distance(anchor, atom)
+                            if dist < mindist:
+                                mindist = dist
+                                minatom = atom
+            if minatom is None:
+                raise ValueError("Cubic box cound not be found, try increasing repeat")
+            lo = min(anchor.pos[count], minatom.pos[count])
+            hi = max(anchor.pos[count], minatom.pos[count])
+            nb.append([lo, hi])
+
+        #collect atoms
+        collectedatoms = []
+        for atom in ratoms:
+            pos = atom.pos
+            if (nb[0][0] <= pos[0] < nb[0][1]):
+                if (nb[1][0] <= pos[1] < nb[1][1]):
+                    if (nb[2][0] <= pos[2] < nb[2][1]):
+                        collectedatoms.append(atom)
+
+        #remap atoms to box
+        for atom in collectedatoms:
+            pos = atom.pos
+            pos[0] = pos[0]-nb[0][0]
+            pos[1] = pos[1]-nb[1][0]
+            pos[2] = pos[2]-nb[2][0]
+            atom.pos = pos
+
+        #create a new box
+        cubebox = [[(nb[0][1]-nb[0][0]), 0, 0],
+                       [0, (nb[1][1]-nb[1][0]), 0],
+                       [0, 0, (nb[2][1]-nb[2][0])]]
+
+        return cubebox, collectedatoms
+
+
     def show(self, colorby=None, filterby=None):
         """
         Plot the system
