@@ -399,9 +399,10 @@ class System(pc.System):
         threshold : float, optional
             only used if ``cutoff=adaptive``. A threshold which is used as safe limit for calculation of cutoff.
 
-        filter : {'None', 'type'}, optional
+        filter : {'None', 'type', 'type_r'}, optional
             apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
-            `type`, only atoms of the same type would be included in the neighbor calculations. Default None.
+            `type`, only atoms of the same type would be included in the neighbor calculations. 
+            If `type_r`, only atoms of a different type will be included in the calculation. Default None.
 
         voroexp : int, optional
             only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards
@@ -483,6 +484,9 @@ class System(pc.System):
         if filter == 'type':
             # type corresponds to 1
             self.filter = 1
+        if filter == 'type_r':
+            # type corresponds to 1
+            self.filter = 2
 
         if method == 'cutoff':
             if cutoff=='sann':

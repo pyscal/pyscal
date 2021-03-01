@@ -362,6 +362,15 @@ vector<vector<double>> Atom::gedgelengths(){
     return edgelengths;
 }
 
+void Atom::svertexpositions(vector<vector<double>> nss){
+    vertex_positions.clear();
+    vertex_positions = nss;
+}
+
+vector<vector<double>> Atom::gvertexpositions(){
+    return vertex_positions;
+}
+
 vector<int> Atom::gvorovector(){
     vector<int> voro;
     voro.emplace_back(n3);

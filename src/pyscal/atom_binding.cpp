@@ -363,6 +363,12 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
           using the `method='voronoi'` option is used.
     )mydelimiter")
 
+    .def_property("vertex_positions", &Atom::gvertexpositions, &Atom::svertexpositions, R"mydelimiter(
+          *list of list of floats*. Positions of Voronoi vertices.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
+          using the `method='voronoi'` option is used.
+    )mydelimiter")
+
+
     .def_property("edge_lengths", &Atom::gedgelengths, &Atom::sedgelengths, R"mydelimiter(
           *list of floats*. For each face, this vector contains the lengths of edges
           that make up the Voronoi polyhedra of the atom.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
