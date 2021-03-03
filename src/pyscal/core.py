@@ -1970,6 +1970,68 @@ class System(pc.System):
         return cubebox, collectedatoms
 
 
+    def remap_atoms(self, remove_images=True, assign=False, 
+        remove_atoms=False, rtol=0.1):
+        """
+        Remap atom back into simulation box
+
+        Parameters
+        ----------
+        pbc : bool, optional
+            If True, remove atoms on borders that are repeated
+
+        assign : bool, optional
+            If True, assign atoms to the system, otherwise return.
+
+        remove_atoms : bool, optional
+            If True, after the atoms, are remapped, remove those still 
+            outside the box. 
+
+        rtol : float, optional
+            Tolerance for removing atomic positions. Defaullt 0.1
+
+        """
+        box = self.box
+        atoms = self.atoms
+        newatoms = []
+
+        for atom in atoms:
+            pos = atom.pos
+            if pos[0] < 0:
+                pos[0] = pos[0]+box[0][0]
+            elif pos[0] >= box[0][0]:
+                pos[0] = pos[0]-box[0][0]
+            if pos[1] < 0:
+                pos[1] = pos[1]+box[1][1]
+            elif pos[1] >= box[1][1]:
+                pos[1] = pos[1]-box[1][1]
+            if pos[2] < 0:
+                pos[2] = pos[2]+box[2][2]
+            elif pos[2] >= box[2][2]:
+                pos[2] = pos[2]-box[2][2]
+            atom.pos = pos
+            
+
+        if remove_images:
+            pairs = []
+            for i in range(len(atoms)):
+                for j in range(i+1, len(atoms)):
+                    dist = self.get_distance(atoms[i], atoms[j])
+                    if dist <= rtol:
+                        pairs.append(i) 
+            for count, atom in enumerate(atoms):
+                if count not in pairs:
+                    new_atoms.append(atom)
+            if assign:
+                self.atoms = new_atoms
+            return new_atoms
+
+        if assign:
+            self.atoms = atoms
+        return atoms
+
+
+
     def show(self, colorby=None, filterby=None):
         """
         Plot the system
