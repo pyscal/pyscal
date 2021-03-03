@@ -161,7 +161,7 @@ void System::add_atoms(vector<Atom> atomitos){
     int tg = 0;
     int tl = 0;
 
-    for(int i=0; i<nop; i++){
+    for(int i=0; i<atomitos.size(); i++){
         if(atomitos[i].ghost==0){
             tl++;
         }
