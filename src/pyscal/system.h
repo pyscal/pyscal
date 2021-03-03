@@ -60,6 +60,7 @@ class System{
         void read_particle_file(string);    // TBDep
         void set_atoms( vector<Atom>);
         vector<Atom> get_atoms();
+        void add_atoms( vector<Atom>);
         vector<Atom> get_all_atoms();
         Atom gatom(int);
         void satom(Atom);

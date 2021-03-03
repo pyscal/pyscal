@@ -153,6 +153,74 @@ vector<Atom> System::get_atoms( ){
 
 }
 
+void System::add_atoms(vector<Atom> atomitos){
+
+    nop = nop + atomitos.size();
+
+    //check for ghost atoms
+    int tg = 0;
+    int tl = 0;
+
+    for(int i=0; i<nop; i++){
+        if(atomitos[i].ghost==0){
+            tl++;
+        }
+        else{
+            tg++;
+        }
+    }
+
+    //if there is are no ghosts in system and list, just add and forget
+    if(ghost_nop==0){
+        if(tg==0){
+            for (int i=0; i<atomitos.size(); i++){
+                atoms.emplace_back(atomitos[i]);
+            }            
+        }
+    }
+    else if (ghost_nop>0){
+        //now the atoms need to be reordered
+        vector<Atom> real_atoms;
+        vector<Atom> ghost_atoms;        
+        
+        for(int i=0; i<nop; i++){
+            if(atoms[i].ghost==0){
+                real_atoms.emplace_back(atoms[i]);
+            }
+            else{
+                ghost_atoms.emplace_back(atoms[i]);
+            }
+        }
+        //now also add new atoms to the list
+        for (int i=0; i<atomitos.size(); i++){
+            if(atomitos[i].ghost==0){
+                real_atoms.emplace_back(atomitos[i]);
+            }
+            else{
+                ghost_atoms.emplace_back(atomitos[i]);
+            }            
+        }
+        //now put them all in the big list
+        atoms.clear();
+
+        for(int i=0; i<real_atoms.size(); i++){
+            atoms.emplace_back(real_atoms[i]);
+        }
+        for(int i=0; i<ghost_atoms.size(); i++){
+            atoms.emplace_back(ghost_atoms[i]);
+        }
+
+        //we can clear now
+        real_atoms.clear();
+        ghost_atoms.clear();
+    }
+
+    //update 
+    ghost_nop = ghost_nop + tg;
+    real_nop = real_nop + tl;
+}
+
+
 vector<Atom> System::get_all_atoms( ){
     //here, we have to filter ghost atoms
     vector<Atom> retatoms;

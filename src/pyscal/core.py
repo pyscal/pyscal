@@ -152,6 +152,20 @@ class System(pc.System):
 
         self.set_atoms(atoms)
 
+    def add_atoms(self, atoms):
+        """
+        Add a given list of atoms
+
+        Parameters
+        ----------
+        atoms : List of Atoms
+
+        Returns
+        -------
+        None
+        """
+        self.cadd_atoms(atoms)
+
     def read_inputfile(self, filename, format="lammps-dump", compressed = False, customkeys=None):
         """
 
