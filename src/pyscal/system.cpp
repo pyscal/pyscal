@@ -155,7 +155,7 @@ vector<Atom> System::get_atoms( ){
 
 void System::add_atoms(vector<Atom> atomitos){
 
-    nop = nop + atomitos.size();
+    
 
     //check for ghost atoms
     int tg = 0;
@@ -218,6 +218,7 @@ void System::add_atoms(vector<Atom> atomitos){
     //update 
     ghost_nop = ghost_nop + tg;
     real_nop = real_nop + tl;
+    nop = nop + atomitos.size();
 }
 
 
