@@ -1970,8 +1970,28 @@ class System(pc.System):
         return cubebox, collectedatoms
 
 
-    def remap_atoms(self, remove_images=True, assign=False, 
-        remove_atoms=False, rtol=0.1):
+    def get_concentration(self):
+        """
+        Return a dict containing the concentration of the system
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        condict : dict
+            dict of concentration values
+        """
+        typelist = [atom.type for atom in self.iter_atoms()]
+        types, typecounts = np.unique(typelist, return_counts=True)
+        concdict = {}
+        for c, t in enumerate(types):
+            concdict[str(t)] = typecounts[c]
+        return concdict
+
+    def remap_atoms(self, remove_images=True, assign=True, 
+        remove_atoms=False, dtol=0.1):
         """
         Remap atom back into simulation box
 
@@ -1993,6 +2013,7 @@ class System(pc.System):
         """
         box = self.box
         atoms = self.atoms
+        self.box = box
         newatoms = []
 
         for atom in atoms:
@@ -2011,24 +2032,39 @@ class System(pc.System):
                 pos[2] = pos[2]-box[2][2]
             atom.pos = pos
             
-
+        if remove_atoms:
+            temp = []
+            for atom in atoms:
+                pos = atom.pos
+                if (0 <= pos[0] < box[0][0]):
+                    if (0 <= pos[1] < box[1][1]):
+                        if (0 <= pos[2] < box[2][2]):
+                            temp.append(atom)
+            atoms = temp
+        
         if remove_images:
             pairs = []
             for i in range(len(atoms)):
                 for j in range(i+1, len(atoms)):
+                    #we need explicit treatment of images
                     dist = self.get_distance(atoms[i], atoms[j])
-                    if dist <= rtol:
+                    if dist <= dtol:
                         pairs.append(i) 
             for count, atom in enumerate(atoms):
                 if count not in pairs:
-                    new_atoms.append(atom)
+                    newatoms.append(atom)
             if assign:
-                self.atoms = new_atoms
-            return new_atoms
+                self.set_atoms(newatoms)
+                return None
+            else:
+                return newatoms
 
         if assign:
-            self.atoms = atoms
-        return atoms
+            self.set_atoms(atoms)
+            return None
+        else:
+            return atoms
+
 
 
 

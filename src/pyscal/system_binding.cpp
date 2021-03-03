@@ -34,6 +34,9 @@ PYBIND11_MODULE(csystem, m) {
         .def_readonly("nop", &System::real_nop)
         .def_readonly("ntotal", &System::nop)
         .def_readonly("natoms", &System::real_nop)
+        .def_readonly("boxx", &System::boxx)
+        .def_readonly("boxy", &System::boxy)
+        .def_readonly("boxz", &System::boxz)
 
         //-----------------------------------------------------
         // Simulation box related methods
