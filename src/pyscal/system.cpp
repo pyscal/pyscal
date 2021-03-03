@@ -1888,11 +1888,13 @@ void System::get_all_neighbors_voronoi(){
             
             //clean up and add vertex positions
             nverts = int(v.size())/3;
-            
+            pos = atoms[i].gx();
             for(int si=0; si<nverts; si++){
                 vector<double> temp;
+                int li=0;
                 for(int vi=si*3; vi<(si*3+3); vi++){
-                    temp.emplace_back(v[vi]);
+                    temp.emplace_back(v[vi]*pos[li]);
+                    li++;
                 }
                 atoms[ti].vertex_positions.emplace_back(temp);
             }
