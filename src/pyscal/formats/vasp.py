@@ -92,12 +92,13 @@ def write_poscar(sys, outfile, comments="pyscal"):
     atypes = [atom.type for atom in atoms]
     
     tt, cc  = np.unique(atypes, return_counts=True)
+    
     atomgroups = [[] for x in range(len(tt))]
     
-    for t in tt:
+    for count, t in enumerate(tt):
         for atom in atoms:
             if int(atom.type) == t:
-                atomgroups[t-1].append(atom)
+                atomgroups[count].append(atom)
 
     fout.write("  ")
     for c in cc:
