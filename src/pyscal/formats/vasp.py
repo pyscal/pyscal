@@ -7,6 +7,7 @@ import io
 import os
 from ase.io import write, read
 import pyscal.formats.ase as ptase
+import warnings
 
 def read_snap(infile, compressed = False):
     """
@@ -53,8 +54,12 @@ def write_snap(sys, outfile, comments="pyscal", species=None):
 
 
     """
-    aseobj = ptase.convert_snap(sys, species=species)
-    write(outfile, aseobj, format="vasp")
+    if species is None:
+        warnings.warn("Using legacy poscar writer, to use ASE backend specify species")
+        write_poscar(sys, outfile, comments=comments)
+    else:
+        aseobj = ptase.convert_snap(sys, species=species)
+        write(outfile, aseobj, format="vasp")
 
 
 def split_snaps(**kwargs):
@@ -62,3 +67,48 @@ def split_snaps(**kwargs):
 
 def convert_snap(**kwargs):
     raise NotImplementedError("convert method for mdtraj is not implemented")
+
+def write_poscar(sys, outfile, comments="pyscal"):
+    """
+    Function to read a POSCAR format.
+    Parameters
+    ----------
+    outfile : string
+        name of the input file
+    """
+
+    fout = open(outfile, 'w')
+
+    fout.write(comments+"\n")
+    fout.write("   1.00000000000000\n")
+
+    #write box
+    vecs = sys.get_boxvecs()
+    fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[0][0], vecs[0][1], vecs[0][2]))
+    fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[1][0], vecs[1][1], vecs[1][2]))
+    fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[2][0], vecs[2][1], vecs[2][2]))
+
+    atoms = sys.atoms
+    atypes = [atom.type for atom in atoms]
+    
+    tt, cc  = np.unique(atypes, return_counts=True)
+    atomgroups = [[] for x in range(len(tt))]
+    
+    for t in tt:
+        for atom in atoms:
+            if int(atom.type) == t:
+                atomgroups[t-1].append(atom)
+
+    fout.write("  ")
+    for c in cc:
+        fout.write("%d   "%int(c))
+    fout.write("\n")
+
+    fout.write("Cartesian\n")
+
+    for i in range(len(atomgroups)):
+        for atom in atomgroups[i]:
+            pos = atom.pos
+            fout.write(" %1.14f %1.14f %1.14f\n"%(pos[0], pos[1], pos[2]))
+
+    fout.close()
