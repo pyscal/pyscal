@@ -83,7 +83,7 @@ def write_poscar(sys, outfile, comments="pyscal"):
     fout.write("   1.00000000000000\n")
 
     #write box
-    vecs = sys.get_boxvecs()
+    vecs = sys.box
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[0][0], vecs[0][1], vecs[0][2]))
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[1][0], vecs[1][1], vecs[1][2]))
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[2][0], vecs[2][1], vecs[2][2]))
