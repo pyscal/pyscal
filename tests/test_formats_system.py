@@ -77,7 +77,7 @@ def test_poscar():
 
 def test_others():
     sys = pc.System()
-    sys.read_inputfile('tests/bcc.prim.dat')
+    sys.read_inputfile('tests/conf.fcc.Al.dump')
     sys.to_file('tests/prim1', format="poscar", species=['Fe'])
 
     #try reading in
@@ -98,7 +98,7 @@ def test_poscar_write():
     atoms = sys.atoms
     assert len(atoms) == 42
 
-    ptp.write_file(sys, 'tests/POSCARtest', format="poscar")
+    ptp.write_file(sys, 'tests/POSCARtest', format="poscar", species=["Al", "Cu"])
     sys = pc.System()
     sys.read_inputfile('tests/POSCARtest', format='poscar')
     atoms = sys.atoms
