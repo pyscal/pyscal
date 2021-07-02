@@ -5,7 +5,7 @@ pyscal visualization module
 Used for visualization of system objects in jupyter notebooks and lab. Uses plotly.
 """
 import numpy as np
-import plotly.graph_objects as go
+from plotly import graph_objs as go
 import ipywidgets as widgets
 import itertools
 
