@@ -28,8 +28,8 @@ def setup(app):
 # -- Project information -----------------------------------------------------
 
 project = u'pyscal'
-copyright = u'2019, Sarath Menon, Grisell Díaz Leines, Jutta Rogal'
-author = u'Sarath Menon, Grisell Díaz Leines, Jutta Rogal'
+copyright = u'2019, Sarath Menon'
+author = u'Sarath Menon'
 
 # The short X.Y version
 version = u'2.10.14'
@@ -54,27 +54,21 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.napoleon',
     'sphinx_rtd_theme',
+    'm2r2',
 ]
 
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 #html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
-html_logo = "../_static/pyscal_logo1.png"
+
+html_static_path = ["../_static"]
 html_theme_options = {
-    'logo_only' : True,
-    'canonical_url' : 'https://pyscal.readthedocs.io/',
+    "light_logo": "pyscal_logo1.png",
+    "dark_logo": "pyscal_logo2.png",
 }
 
-html_extra_path = ['../_static']
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['../_templates']
-
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = 'index'
@@ -133,9 +127,6 @@ pygments_style = None
 
 #}
 
-html_static_path = ['../_static']
-def setup(app):
-    app.add_stylesheet("theme_extra.css")
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
