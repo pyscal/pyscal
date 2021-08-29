@@ -15,6 +15,7 @@
 import os
 import sys
 import sphinx_rtd_theme
+import shutil
 
 sys.path.insert(0, os.path.abspath('../../src/pyscal/'))
 
@@ -24,6 +25,11 @@ def skip(app, what, name, obj, would_skip, options):
     return would_skip  
 def setup(app):
     app.connect('autodoc-skip-member', skip) 
+
+#copy ipynb here
+#if os.path.exists("examples"):
+#    shutil.rmtree("examples")
+#shutil.copytree("../../examples", "examples")
 
 # -- Project information -----------------------------------------------------
 
@@ -55,6 +61,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx_rtd_theme',
     'm2r2',
+    'nbsphinx',
 ]
 
 html_theme = 'furo'
@@ -69,6 +76,8 @@ html_theme_options = {
 
 
 source_suffix = ['.rst', '.md']
+nbsphinx_execute = 'never'
+nbsphinx_allow_errors = True
 
 # The master toctree document.
 master_doc = 'index'
