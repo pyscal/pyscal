@@ -27,9 +27,9 @@ def setup(app):
     app.connect('autodoc-skip-member', skip) 
 
 #copy ipynb here
-#if os.path.exists("examples"):
-#    shutil.rmtree("examples")
-#shutil.copytree("../../examples", "examples")
+if os.path.exists("examples"):
+    shutil.rmtree("examples")
+shutil.copytree("../../examples", "examples")
 
 # -- Project information -----------------------------------------------------
 

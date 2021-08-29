@@ -91,6 +91,6 @@ Documentation
     prologue/gettingstarted
     prologue/download
     prologue/news
-    01_getting_started.ipynb
+    examplesindex
     modules
 
