@@ -91,6 +91,7 @@ Documentation
     prologue/gettingstarted
     prologue/download
     prologue/news
+    methodsindex
     examplesindex
     modules
 
