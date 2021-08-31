@@ -88,13 +88,11 @@ Documentation
 
 .. toctree::
 
-    prologue/gettingstarted
-    prologue/download
+    downloadandinstall
     prologue/news
-    methodsindex
-    examplesindex
+    methodsandexamples
     modules
-    prologue/publications
+    pubsandprojects
     prologue/extending
     prologue/citing
     prologue/acknowledgements
