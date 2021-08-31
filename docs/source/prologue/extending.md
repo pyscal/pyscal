@@ -66,14 +66,3 @@ If you have trouble with any of the steps, or you need help, please
 help! All of the contributions are greatly appreciated and will be
 credited in Developers/Acknowledgements page.
 
-## Help and support
-
-In case of bugs and feature improvements, you are welcome to create a
-new issue on the [github repo](https://github.com/srmnitc/pyscal). You
-are also welcome to fix a bug or implement a feature. Please see the
-[extending and
-contributing](https://pyscal.readthedocs.io/en/latest/extending.html)
-section for more details.
-
-Any other questions or suggestions are welcome, please contact
-[us](mailto:sarath.menon@pyscal.org).

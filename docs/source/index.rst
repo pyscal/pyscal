@@ -94,6 +94,7 @@ Documentation
     modules
     pubsandprojects
     prologue/extending
+    prologue/helpandsupport
     prologue/citing
     prologue/acknowledgements
     prologue/license
