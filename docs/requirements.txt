@@ -5,3 +5,6 @@ h5py
 ipywidgets==7.5
 plotly==4.11.0
 sphinx_rtd_theme
+m2r2
+furo
+nbsphinx
