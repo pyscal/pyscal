@@ -94,6 +94,7 @@ Documentation
     methodsindex
     examplesindex
     modules
+    prologue/publications
     prologue/extending
     prologue/citing
     prologue/acknowledgements
