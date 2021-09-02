@@ -1637,7 +1637,10 @@ class System(pc.System):
         #calculate rho
         box = self.box
         vol = np.dot(np.cross(box[0], box[1]), box[2])
-        rho = len(self.atoms)/vol
+        if local:
+            rho = 0
+        else:
+            rho = len(self.atoms)/vol
         self.entropy(sigma, rho, rstart, rm, h, kb)
 
         if averaged:
