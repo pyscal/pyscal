@@ -1,4 +1,4 @@
-cmake
+pybind11
 numpy
 ase
 h5py
