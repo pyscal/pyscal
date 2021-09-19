@@ -8,8 +8,8 @@ with open('README.rst') as readme_file:
 setup(
     name='pyscal',
     version='2.10.14',
-    author='Sarath Menon, Jutta Rogal, Grisell Diaz Leines',
-    author_email='sarath.menon@rub.de',
+    author='Sarath Menon',
+    author_email='sarath.menon@pyscal.org',
     description='Python library written in C++ for calculation of local atomic structural environment',
     long_description=readme,
     # tell setuptools to look for any packages under 'src'
@@ -36,8 +36,8 @@ setup(
     # add custom build_ext command
     cmdclass={"build_ext": build_ext},
     zip_safe=False,
-    download_url = 'https://github.com/srmnitc/pyscal/archive/2.3.4.tar.gz',
-    url = 'https://github.com/srmnitc/pyscal',
+    download_url = 'https://anaconda.org/conda-forge/pyscal',
+    url = 'https://pyscal.org',
     install_requires=['numpy', 'ase'],
     classifiers=[
         'Programming Language :: Python :: 3'
