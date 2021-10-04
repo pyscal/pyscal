@@ -1523,6 +1523,122 @@ class System(pc.System):
                     vec += np.array(atom.sro)
                     count += 1
             return vec/float(count)
+            
+    def calculate_pmsro(self, reference_type=1, compare_type=2, average=True, shells=2, delta=True):
+        """
+        Calculate pairwise multicomponent short range order
+
+        Parameters
+        ----------
+        reference_type: int, optional
+            type of the atom to be used a reference. default 1
+        
+        compare_type: int, optional
+            type of the atom to be used to compare. default 2
+
+        average: bool, optional
+            if True, average over all atoms of the reference type in the system.
+            default True.
+            
+        delta: bool, optional
+            if True, SRO calculation contain the Kronecker delta in the definition.
+            if False, delta is always 0, and the function return the Cowley-SRO value.
+            default True.
+
+        Returns
+        -------
+        vec: list of float
+            The short range order averaged over the whole system for atom of
+            the reference type. Only returned if `average` is True. First value is SRO
+            of the first neighbor shell and the second value corresponds to the second
+            nearest neighbor shell.
+
+        Notes
+        -----
+        Calculates the pairwise multicomponent short range order for a higher-dimensional systems alloy using the approach by
+        Fontaine [1]. Pairwise multicomponent short range order is calculated as,
+
+        .. math::
+
+            \\alpha_ij = \\frac{n_j/mA - c_j}{\\delta_{ij} - c_j}
+            
+        where i refers to reference type. n_j is the number of atoms of the non reference type among the c_j atoms
+        in the ith shell. m_A is the concentration of the non reference atom.  \\delta_{ij}" = 1 if i = j. Please
+        note that the value is calculated for shells 1 and 2 by default. In order for
+        this to be possible, neighbors have to be found first using the :func:`~pyscal.core.System.find_neighbors`
+        method. The selected neighbor method should include the second shell as well. For this
+        purpose `method=cutoff` can be chosen with a cutoff long enough to include the second
+        shell. In order to estimate this cutoff, one can use the :func:`~pyscal.core.System.calculate_rdf`
+        method.
+
+        References
+        ----------
+        .. [1] de Fountaine D., J. Appl. Cryst. 4(15), 1971.
+
+        """
+        if not self.neighbors_found:
+            raise RuntimeError("Neighbors not found, please find neighbors using the cutoff method")
+
+        atoms = self.get_all_atoms()
+        
+        typelist = [atom.type for atom in self.iter_atoms()]
+        types = np.unique(typelist, return_counts=True)
+        
+        if not reference_type in types[0]:
+            raise ValueError("reference atom type is invalid")
+            
+        if not compare_type in types[0]:
+            raise ValueError("Compare atom type is invalid")
+    
+        mref  = types[1][reference_type-1]/float(np.sum(types[1]))
+        mcomp = types[1][compare_type-1]/float(np.sum(types[1]))
+
+        for atom in atoms:
+            if atom.type == reference_type:
+                neighs = atom.neighbors
+                #get all neighbor distances
+                distances = [self.get_distance(atom, atoms[n]) for n in neighs]
+                avgdistance = np.mean(distances)
+                distsplit = avgdistance/2.00
+                #find two shells of atoms
+                if shells == 2:
+                    set1 = [neighs[n] for n, dist in enumerate(distances) if dist <= avgdistance]
+                    set2 = [neighs[n] for n, dist in enumerate(distances) if dist > avgdistance]
+                    #now evaluate types of atoms
+                    set1ref = np.sum([1 for n in set1 if atoms[n].type == reference_type])
+                    set1comp = np.sum([1 for n in set1 if atoms[n].type == compare_type])
+                    set2ref = np.sum([1 for n in set2 if atoms[n].type == reference_type])
+                    set2comp = np.sum([1 for n in set2 if atoms[n].type == compare_type])
+                    #now calculate values
+                    if (reference_type == compare_type and delta):
+                        shell1 = (set1comp/len(set1)-mcomp)/(1.0-mcomp)
+                        shell2 = (set2comp/len(set2)-mcomp)/(1.0-mcomp)
+                        atom.sro = [shell1, shell2]
+                    else:
+                        shell1 = 1 - (set1comp/(len(set1)*mcomp))
+                        shell2 = 1 - (set2comp/(len(set2)*mcomp))
+                        atom.sro = [shell1, shell2]
+                elif shells == 1:
+                    set1ref = np.sum([1 for n in neighs if atoms[n].type == reference_type])
+                    set1comp = np.sum([1 for n in neighs if atoms[n].type == compare_type])
+                    if (reference_type == compare_type and delta):
+                        shell1 = (set1comp/len(neighs)-mcomp)/(1.0-mcomp)
+                        atom.sro = [shell1]
+                    else:
+                        shell1 = 1 - (set1comp/(len(neighs)*mcomp))
+                        atom.sro = [shell1]
+
+        #add atoms
+        self.atoms = atoms
+        #now if avg is reqd, find it
+        if average:
+            vec = np.zeros(2)
+            count = 0
+            for atom in atoms:
+                if atom.type == reference_type:
+                    vec += np.array(atom.sro)
+                    count += 1
+            return vec/float(count)
 
     def get_custom(self, atom, customkeys):
         """
