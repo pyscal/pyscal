@@ -38,7 +38,7 @@ setup(
     zip_safe=False,
     download_url = 'https://anaconda.org/conda-forge/pyscal',
     url = 'https://pyscal.org',
-    install_requires=['numpy', 'ase', 'plotly'],
+    install_requires=['numpy', 'ase', 'plotly', 'ipywidgets'],
     classifiers=[
         'Programming Language :: Python :: 3'
     ]
