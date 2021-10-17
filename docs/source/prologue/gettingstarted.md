@@ -28,24 +28,11 @@ This is the recommended way to install if you have an
 [Anaconda](https://www.anaconda.com/) distribution.
 
 The above command installs the [latest release
-version](https://github.com/srmnitc/pyscal/releases) of pyscal and works
+version](https://github.com/pyscal/pyscal/releases) of pyscal and works
 on all three operating systems.
 
 ```{warning}
 pyscal is no longer maintained for Python 2. Although quick installation method might work for Python 2, all features may not work as expected.
-```
-
-### Quick installation
-
-pyscal can be installed using the following steps-
-
--   Download an archive of the pyscal library from
-    [here](https://pyscal.readthedocs.io/en/latest/download.html).
--   Extract the downloaded version. From the extracted folder, run,
-    `python setup.py install --user`
-
-```{note}
-Pyscal can be installed system-wide using `python setup.py install`.
 ```
 
 
@@ -55,7 +42,8 @@ pyscal is not available on pip directly. However pyscal can be installed
 using pip by
 
 ``` console
-pip install git+https://github.com/srmnitc/pyscal
+pip install pybind11
+pip install git+https://github.com/pyscal/pyscal
 ```
 
 ### Installation from the repository
@@ -63,7 +51,8 @@ pip install git+https://github.com/srmnitc/pyscal
 pyscal can be built from the repository by-
 
 ``` console
-git clone https://github.com/srmnitc/pyscal.git
+git clone https://github.com/pyscal/pyscal.git
+pip install pybind11
 cd pyscal
 python setup.py install --user
 ```
@@ -83,18 +72,18 @@ Once created, the environment can be activated using,
 conda activate myenv
 ```
 
-In case Cmake and C++11 are not available, these can be installed using,
+In case C++11 is not available, these can be installed using,
 
 ``` console
 (myenv) conda install -c anaconda gcc
-(myenv) conda install -c anaconda cmake
 ```
 
 Now the pyscal repository can be cloned and the module can be installed.
 Python dependencies are installed automatically.
 
 ``` console
-(myenv) git clone https://github.com/srmnitc/pyscal.git
+(myenv) git clone https://github.com/pyscal/pyscal.git
+(myenv) conda install -c conda-forge pybind11
 (myenv) cd pyscal
 (myenv) python setup.py install
 ```
@@ -108,18 +97,21 @@ A good guide on managing Conda environments is available
 
 Dependencies for the C++ part
 
--   [Cmake](https://cmake.org/)
+-   [pybind11](https://github.com/pybind/pybind11)
 -   C++ 11
 
 Dependencies for the python part
 
 -   [numpy](https://numpy.org/)
 -   [ase](https://wiki.fysik.dtu.dk/ase/)
+-   [plotly](https://plotly.com/)
+-   [ipywidgets](https://ipywidgets.readthedocs.io/en/latest/)
 
 Optional dependencies
 
 -   [pytest](https://docs.pytest.org/en/latest/)
 -   [matplotlib](https://matplotlib.org/)
+-   [LAMMPS](https://www.lammps.org/)
 
 ### Tests
 
