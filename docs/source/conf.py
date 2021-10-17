@@ -38,9 +38,9 @@ copyright = u'2019, Sarath Menon'
 author = u'Sarath Menon'
 
 # The short X.Y version
-version = u'2.10.14'
+version = u'2.10.15'
 # The full version, including alpha/beta/rc tags
-release = u'2.10.14'
+release = u'2.10.15'
 
 
 # -- General configuration ---------------------------------------------------
