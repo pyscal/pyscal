@@ -11,6 +11,8 @@
 -   [Jan Janßen](https://jan-janssen.com/) - developing and
     maintaining a [conda-forge](https://conda-forge.org/) recipe.
 
+- 	[Pedro Antonio Santos Flórez](https://github.com/pedroantoniosantosf) - addition of the pairwise multicomponent short range order parameter.
+
 ## Acknowledgements
 
 We acknowledge [Bond order
