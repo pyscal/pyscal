@@ -37,6 +37,11 @@ setup(
             ["src/pyscal/modsystem.cpp", "src/pyscal/modsystem_binding.cpp"],
             language='c++',
         ),
+        Pybind11Extension(
+            "pyscal.csh",
+            ["src/pyscal/sh.cpp"],
+            language='c++',
+        ),
 
     ],
     # add custom build_ext command
