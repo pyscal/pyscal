@@ -6,7 +6,8 @@ import pyscal.catom as pc
 import numpy as np
 import warnings
 
-def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
+def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0,
+    return_dict=False):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.
@@ -255,6 +256,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     xh = nx*lattice_constant*xfact
     yh = ny*lattice_constant*yfact
     zh = nz*lattice_constant*zfact
+    
     box = [[xh, 0, 0], [0, yh, 0], [0, 0, zh]]
 
     #create structure
@@ -270,12 +272,19 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                         posx = np.random.normal(loc=posx, scale=noise)
                         posy = np.random.normal(loc=posy, scale=noise)
                         posz = np.random.normal(loc=posz, scale=noise)
-                    atom = pc.Atom()
-                    atom.pos = [posx, posy, posz]
-                    atom.id = co
-                    atom.type = atomtype[l-1]
-                    atom.loc = co-1
-                    atoms.append(atom)
+                    if return_dict:
+                        atom = {}
+                        atom['pos'] = [posx, posy, posz]
+                        atom['id'] = co
+                        atom['type'] = atomtype[l-1]
+                        atoms.append(atom)
+                    else:
+                        atom = pc.Atom()
+                        atom.pos = [posx, posy, posz]
+                        atom.id = co
+                        atom.type = atomtype[l-1]
+                        atom.loc = co-1
+                        atoms.append(atom)
                     co += 1
 
     return atoms, box
