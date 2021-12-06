@@ -133,15 +133,14 @@ class System:
                     if (i==j==k==0):
                         continue
                     for atom in atoms:
-                        pos = np.array(atom.pos)
+                        pos = np.array(atom['pos'])
                         pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                        a = Atom()
-                        a.pos = pos
-                        a.id = idstart
+                        a = {}
+                        a['pos'] = pos
+                        a['id'] = idstart
                         idstart += 1
-                        a.type = atom.type
-                        if ghost:
-                            a.ghost = 1
+                        a['type'] = atom['type']
+                        a['ghost'] = ghost
                         newatoms.append(a)
 
         if scale_box:

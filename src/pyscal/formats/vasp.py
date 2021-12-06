@@ -89,7 +89,7 @@ def write_poscar(sys, outfile, comments="pyscal"):
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[2][0], vecs[2][1], vecs[2][2]))
 
     atoms = sys.atoms
-    atypes = [atom.type for atom in atoms]
+    atypes = [atom['type'] for atom in atoms]
     
     tt, cc  = np.unique(atypes, return_counts=True)
     
@@ -97,7 +97,7 @@ def write_poscar(sys, outfile, comments="pyscal"):
     
     for count, t in enumerate(tt):
         for atom in atoms:
-            if int(atom.type) == t:
+            if int(atom['type']) == t:
                 atomgroups[count].append(atom)
 
     fout.write("  ")
@@ -109,7 +109,7 @@ def write_poscar(sys, outfile, comments="pyscal"):
 
     for i in range(len(atomgroups)):
         for atom in atomgroups[i]:
-            pos = atom.pos
+            pos = atom['pos']
             fout.write(" %1.14f %1.14f %1.14f\n"%(pos[0], pos[1], pos[2]))
 
     fout.close()

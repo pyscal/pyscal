@@ -7,7 +7,7 @@ import numpy as np
 import warnings
 
 def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0,
-    return_dict=False):
+    return_dict=True):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.

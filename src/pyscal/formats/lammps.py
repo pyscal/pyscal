@@ -151,19 +151,16 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
             y = float(raw[headerdict["y"]])
             z = float(raw[headerdict["z"]])
 
-            atom = pca.Atom()
-            atom.pos = [x, y, z]
-            atom.id = idd
-            atom.type = typ
-            atom.loc = count-8
+            atom = {}
+            atom['pos'] = [x, y, z]
+            atom['id'] = idd
+            atom['type'] = typ
 
             customdict = {}
             #if customkeys need to be read, do it
             if customread:
                 for cc, kk in enumerate(customkeys):
-                    customdict[kk] = raw[headerdict[kk]]
-
-            atom.custom = customdict
+                    atom[kk] = raw[headerdict[kk]]
             atoms.append(atom)
 
     #close files
@@ -194,8 +191,8 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
 
         for atom in atoms:
             #correct zero of the atomic positions (shift box to origin)
-            dist = np.array(atom.pos) - ortho_origin
-            atom.pos = dist
+            dist = np.array(atom['pos']) - ortho_origin
+            atom['pos'] = dist            
 
         #finally change boxdims - to triclinic box size
         box = np.array([a, b, c])
@@ -299,12 +296,12 @@ def write_snap(sys, outfile, compressed = False,
     dump.write(title_str)
 
     for cc, atom in enumerate(atoms):
-        pos = atom.pos
+        pos = atom['pos']
         if len(customkeys) > 0:
             cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-            atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
+            atomline = ("%d %d %f %f %f %s\n")%(atom['id'], atom['type'], pos[0], pos[1], pos[2], cval_atom)
         else:
-            atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
+            atomline = ("%d %d %f %f %f\n")%(atom['id'], atom['type'], pos[0], pos[1], pos[2])
 
         dump.write(atomline)
 

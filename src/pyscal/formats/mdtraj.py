@@ -39,14 +39,11 @@ def read_snap(mdobject, check_triclinic=False):
     atoms = []
     positions = mdobject.xyz[0]
     for count, position in enumerate(positions):
-        atom = pca.Atom()
-        atom.pos = list(position)
-        atom.id = count+1
-        atom.type = typedict[chems[count]]
-        atom.loc = count
-
-        customdict = {'species': chems[count]}
-        atom.custom = customdict
+        atom = {}
+        atom['pos'] = list(position)
+        atom['id'] = count+1
+        atom['type'] = typedict[chems[count]]
+        atom['species'] = chems[count]
         atoms.append(atom)
 
     return atoms, box
