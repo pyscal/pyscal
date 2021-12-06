@@ -7,9 +7,15 @@ be elaborate and ideally follow pep-8 conventions.
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include <vector>
 #include <string>
 #include "system.h"
+#include <map>
+#include <string>
+#include <any>
+
+//PYBIND11_MAKE_OPAQUE(map<std::string, any>);
 
 
 namespace py = pybind11;
@@ -24,8 +30,12 @@ public:
 PYBIND11_MODULE(csystem, m) {
     py::options options;
     options.disable_function_signatures();
-
+    //py::bind_map<std::map<std::string, any>>(m, "MapAny");
     //bindings and documentation for individual functions
+    m.def("dict_contains",
+          [](const py::dict &dict, py::object val) { return dict.contains(val); });
+    m.def("dict_contains",
+          [](const py::dict &dict, const char *val) { return dict.contains(val); });
     py::class_<System>(m,"System")
         //-----------------------------------------------------
         // Constructor, Destructor and Access functions
@@ -38,6 +48,10 @@ PYBIND11_MODULE(csystem, m) {
         .def_readonly("boxy", &System::boxy)
         .def_readonly("boxz", &System::boxz)
 
+        .def("test_dict",&System::test_dict)
+        .def("test_speed_atom1",&System::test_speed_atom1)
+        .def("test_speed_atom2",&System::test_speed_atom2)
+        .def("test_speed_atom3",&System::test_speed_atom3)
         //-----------------------------------------------------
         // Simulation box related methods
         //-----------------------------------------------------

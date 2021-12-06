@@ -6,7 +6,15 @@
 #include "voro++.hh"
 #include "string.h"
 #include <chrono>
+#include <pybind11/pybind11.h>
+#include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <pybind11/complex.h>,
+#include <pybind11/functional.h>
+#include <pybind11/chrono.h>
+#include <map>
+#include <string>
+#include <any>
 
 using namespace voro;
 
@@ -43,6 +51,53 @@ System::System(){
 System::~System(){
 }
 
+py::dict System::test_dict(py::dict test){
+    test[py::str("a")] = -1;
+    return test;
+}
+
+//test normal Atoms; pass a vector and return a vector
+vector<double> System::test_speed_atom1(vector<Atom> atomitos){
+    vector<double> dist;
+    for(int ti=0; ti<atomitos.size(); ti++){
+        for(int tj=ti+1; tj<atomitos.size(); tj++){
+            double d = get_abs_distance(atomitos[ti], atomitos[tj]);
+            dist.emplace_back(d);
+        }
+    }
+    return dist;
+}
+
+void System::test_speed_atom2(vector<py::dict>& atomitos){
+    double dx1, dy1, dz1, dx2, dy2, dz2;
+    vector<double> dist;
+    for(int ti=0; ti<atomitos.size(); ti++){
+        dist.clear();
+        for(int tj=ti+1; tj<atomitos.size(); tj++){
+            dx1 = atomitos[ti][py::str("posx")].cast<py::float_>();
+            dx2 = atomitos[tj][py::str("posx")].cast<py::float_>();
+            dy1 = atomitos[ti][py::str("posy")].cast<py::float_>();
+            dy2 = atomitos[tj][py::str("posy")].cast<py::float_>();
+            dz1 = atomitos[ti][py::str("posz")].cast<py::float_>();
+            dz2 = atomitos[tj][py::str("posz")].cast<py::float_>();
+            double d = get_abs_distance(dx1, dy1, dz1, dx2, dy2, dz2);
+            dist.emplace_back(d);
+        }
+        atomitos[ti][py::str("dist")] = dist;
+    }
+    //return atomitos;
+}
+
+vector<double> System::test_speed_atom3(){
+    vector<double> dist;
+    for(int ti=0; ti<atoms.size(); ti++){
+        for(int tj=ti+1; tj<atoms.size(); tj++){
+            double d = get_abs_distance(atoms[ti], atoms[tj]);
+            dist.emplace_back(d);
+        }
+    }
+    return dist;
+}
 //-----------------------------------------------------
 // Simulation box related methods
 //-----------------------------------------------------
@@ -362,6 +417,67 @@ double System::get_abs_distance(Atom atom1 , Atom atom2 ){
         abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
     }
 
+    return abs;
+}
+
+
+double System::get_abs_distance(double dx1, double dy1, double dz1, double dx2, double dy2, double dz2){
+
+    double abs, ax, ay, az;
+    double diffx = dx1-dx2;
+    double diffy = dy1-dy2;
+    double diffz = dz1-dz2;
+
+    if (triclinic == 1){
+
+        //convert to the triclinic system
+        ax = rotinv[0][0]*diffx + rotinv[0][1]*diffy + rotinv[0][2]*diffz;
+        ay = rotinv[1][0]*diffx + rotinv[1][1]*diffy + rotinv[1][2]*diffz;
+        az = rotinv[2][0]*diffx + rotinv[2][1]*diffy + rotinv[2][2]*diffz;
+
+        //scale to match the triclinic box size
+        diffx = ax*boxx;
+        diffy = ay*boxy;
+        diffz = az*boxz;
+
+        //now check pbc
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+
+        //now divide by box vals - scale down the size
+        diffx = diffx/boxx;
+        diffy = diffy/boxy;
+        diffz = diffz/boxz;
+
+        //now transform back to normal system
+        ax = rot[0][0]*diffx + rot[0][1]*diffy + rot[0][2]*diffz;
+        ay = rot[1][0]*diffx + rot[1][1]*diffy + rot[1][2]*diffz;
+        az = rot[2][0]*diffx + rot[2][1]*diffy + rot[2][2]*diffz;
+
+        //now assign to diffs and calculate distnace
+        diffx = ax;
+        diffy = ay;
+        diffz = az;
+
+        //finally distance
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+
+    }
+    else{
+        //nearest image
+        if (diffx> boxx/2.0) {diffx-=boxx;};
+        if (diffx<-boxx/2.0) {diffx+=boxx;};
+        if (diffy> boxy/2.0) {diffy-=boxy;};
+        if (diffy<-boxy/2.0) {diffy+=boxy;};
+        if (diffz> boxz/2.0) {diffz-=boxz;};
+        if (diffz<-boxz/2.0) {diffz+=boxz;};
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+    }
     return abs;
 }
 

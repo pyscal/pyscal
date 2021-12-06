@@ -13,6 +13,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
 #include <pybind11/stl.h>
+#include <string>
+#include <any>
 #include "atom.h"
 
 namespace py = pybind11;
@@ -27,6 +29,14 @@ struct cell{
 class System{
 
     public:
+
+
+        //Test methods
+        py::dict test_dict(py::dict);
+        vector<double> test_speed_atom1(vector<Atom>);
+        void test_speed_atom2(vector<py::dict>&);
+        vector<double> test_speed_atom3();
+
 
         //-----------------------------------------------------
         // Constructor, Destructor and Access functions
@@ -85,6 +95,7 @@ class System{
         void reset_all_neighbors();
         void reset_main_neighbors();        
         double get_abs_distance(int,int,double&,double&,double&);
+        double get_abs_distance(double, double, double, double, double, double);
         double get_abs_distance(Atom , Atom );
         vector<double> get_distance_vector(Atom , Atom);
         void set_neighbordistance(double);

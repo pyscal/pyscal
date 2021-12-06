@@ -32,6 +32,12 @@ setup(
             language='c++',
             include_dirs=['lib/voro++']
         ),
+        Pybind11Extension(
+            "pyscal.cmodsystem",
+            ["src/pyscal/modsystem.cpp", "src/pyscal/modsystem_binding.cpp"],
+            language='c++',
+        ),
+
     ],
     # add custom build_ext command
     cmdclass={"build_ext": build_ext},
