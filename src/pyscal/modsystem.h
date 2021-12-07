@@ -20,8 +20,11 @@
 namespace py = pybind11;
 using namespace std;
 
-double get_abs_distance(const vector<double>&, const vector<double>&, 
-	const int&, const vector<vector<double>>&, const vector<vector<double>>&,
-	const vector<double>&);
-
-
+double get_abs_distance(const vector<double>&, const vector<double>&, const int&, 
+	const vector<vector<double>>&, const vector<vector<double>>&, 
+	const vector<double>&, double&, double&, double&);
+void reset_all_neighbors(vector<py::dict>&);
+void convert_to_spherical_coordinates(double, double, double, 
+	double &, double &, double &);
+void get_all_neighbors_normal(vector<py::dict>&, const int&, const vector<vector<double>>&, 
+	const vector<vector<double>>&, const vector<double>&, const double, const int);

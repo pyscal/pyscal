@@ -16,6 +16,8 @@ PYBIND11_MODULE(cmodsystem, m) {
     py::options options;
     options.disable_function_signatures();
     m.def("get_abs_distance", &get_abs_distance);
+    m.def("reset_all_neighbors", &reset_all_neighbors);
+    m.def("get_all_neighbors_normal", &get_all_neighbors_normal);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

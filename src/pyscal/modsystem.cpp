@@ -16,14 +16,20 @@
 #include <any>
 
 
-double get_abs_distance(const vector<double>& pos1, const vector<double>& pos2, 
-	const int& triclinic, const vector<vector<double>>& rot, const vector<vector<double>>& rotinv,
-	const vector<double>& box){
+double get_abs_distance(const vector<double>& pos1, 
+    const vector<double>& pos2, 
+	const int& triclinic, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+	const vector<double>& box,
+    double& diffx,
+    double& diffy,
+    double& diffz){
 
     double abs, ax, ay, az;
-    double diffx = pos1[0]-pos2[0];
-    double diffy = pos1[1]-pos2[1];
-    double diffz = pos1[2]-pos2[2];
+    diffx = pos1[0]-pos2[0];
+    diffy = pos1[1]-pos2[1];
+    diffz = pos1[2]-pos2[2];
 
 
     if (triclinic == 1){
@@ -77,4 +83,103 @@ double get_abs_distance(const vector<double>& pos1, const vector<double>& pos2,
         abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
     }
     return abs;
+}
+
+void reset_all_neighbors(vector<py::dict>& atoms){   
+    vector<int> tempint;
+    vector<int> tempdouble;
+    for(unsigned int ti=0; ti<atoms.size(); ti++){
+        atoms[ti][py::str("neighbors")] = tempint;
+        atoms[ti][py::str("neighbordist")] = tempdouble;
+        atoms[ti][py::str("neighborweight")] = tempdouble;
+        atoms[ti][py::str("diff")] = tempdouble;
+        atoms[ti][py::str("r")] = tempdouble;
+        atoms[ti][py::str("phi")] = tempdouble;
+        atoms[ti][py::str("theta")] = tempdouble;
+        atoms[ti][py::str("cutoff")] = 0.0;
+    }
+}
+
+void convert_to_spherical_coordinates(double x, 
+    double y, 
+    double z, 
+    double &r, 
+    double &phi, 
+    double &theta){
+    r = sqrt(x*x+y*y+z*z);
+    theta = acos(z/r);
+    phi = atan2(y,x);
+}
+
+void get_all_neighbors_normal(vector<py::dict>& atoms, 
+    const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box, 
+    const double neighbordistance,
+    const int filter){
+
+    double d;
+    double diffx, diffy, diffz;
+    double r,theta, phi;
+    int nop = atoms.size();
+    vector<double> pos1, pos2, diffi, diffj;
+    int type1, type2;
+
+    for (int ti=0; ti<nop; ti++){
+        for (int tj=ti+1; tj<nop; tj++){
+
+            //access positions
+            pos1 = atoms[ti][py::str("pos")].cast<vector<double>>();
+            pos2 = atoms[tj][py::str("pos")].cast<vector<double>>();
+            type1 = atoms[ti][py::str("type")].cast<py::int_>();
+            type2 = atoms[tj][py::str("type")].cast<py::int_>();
+
+            d = get_abs_distance(pos1, pos2, triclinic, rot, rotinv, box, diffx, diffy, diffz);
+            
+            if (d < neighbordistance){
+                if ((filter == 1) && (type1 != type2)){
+                    continue;
+                }
+                else if ((filter == 2) && (type1 == type2)){
+                    continue;
+                }
+                
+                atoms[ti][py::str("neighbors")].cast<py::list>().append(tj);
+                atoms[tj][py::str("neighbors")].cast<py::list>().append(ti);
+                
+                atoms[ti][py::str("neighbordist")].cast<py::list>().append(d);
+                atoms[tj][py::str("neighbordist")].cast<py::list>().append(d);
+
+                atoms[ti][py::str("neighborweight")].cast<py::list>().append(1.00);
+                atoms[tj][py::str("neighborweight")].cast<py::list>().append(1.00);
+
+                diffi.clear();
+                diffi.emplace_back(diffx);
+                diffi.emplace_back(diffy);
+                diffi.emplace_back(diffz);
+
+                diffj.clear();
+                diffj.emplace_back(-diffx);
+                diffj.emplace_back(-diffy);
+                diffj.emplace_back(-diffz);
+
+                atoms[ti][py::str("diff")].cast<py::list>().append(diffi);
+                atoms[tj][py::str("diff")].cast<py::list>().append(diffj);
+
+                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
+                atoms[ti][py::str("r")].cast<py::list>().append(r);
+                atoms[ti][py::str("phi")].cast<py::list>().append(phi);
+                atoms[ti][py::str("theta")].cast<py::list>().append(theta);
+
+                convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
+                atoms[tj][py::str("r")].cast<py::list>().append(r);
+                atoms[tj][py::str("phi")].cast<py::list>().append(phi);
+                atoms[tj][py::str("theta")].cast<py::list>().append(theta);
+
+                atoms[ti][py::str("cutoff")] = neighbordistance;
+                atoms[tj][py::str("cutoff")] = neighbordistance;
+            }
+        }
+    }
 }
