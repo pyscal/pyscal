@@ -20,6 +20,19 @@
 namespace py = pybind11;
 using namespace std;
 
+/*-----------------------------------------------------
+    Some utility objects
+-----------------------------------------------------*/
+
+struct cell{
+  vector<int> members;
+  vector<int> neighbor_cells;
+};
+
+/*-----------------------------------------------------
+    Neighbor Methods
+-----------------------------------------------------*/
+
 double get_abs_distance(vector<double>, vector<double>,
 	const int&, 
 	const vector<vector<double>>&, 
@@ -40,4 +53,17 @@ void get_all_neighbors_normal(py::dict&,
 	const vector<vector<double>>&,
 	const vector<double>&);
 
-void perturb_atom(vector<Atom>&);
+int cell_index(int, int, int, int, int, int);
+vector<int> cell_periodic(int, int, int, int, int, int);
+
+vector<cell> set_up_cells(const vector<vector<double>>&,
+    const vector<double>&,
+    const double);
+
+void get_all_neighbors_cells(py::dict&,
+    const double&,
+    const int&,
+    const int&, 
+    const vector<vector<double>>&, 
+    const vector<vector<double>>&,
+    const vector<double>&);

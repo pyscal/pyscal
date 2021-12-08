@@ -112,11 +112,6 @@ void convert_to_spherical_coordinates(double x,
     phi = atan2(y,x);
 }
 
-void perturb_atom(vector<Atom>& atoms){
-    for(int i=0; i<atoms.size(); i++)
-        atoms[i].neighbors.emplace_back(1);
-}
-
 void get_all_neighbors_normal(py::dict& atoms,
     const double& neighbordistance,
     const int& triclinic,
@@ -211,88 +206,223 @@ void get_all_neighbors_normal(py::dict& atoms,
     atoms[py::str("cutoff")] = cutoff;
 }
 
-/*
-void get_all_neighbors_normal(vector<Atom>& atoms,
+
+int cell_index(int cx, int cy, int cz, int nx, int ny, int nz){
+    return cx*ny*nz + cy*nz + cz;
+}
+
+vector<int> cell_periodic(int i, int j, int k, int nx, int ny, int nz){
+    vector<int> ci;
+    //apply periodic conditions
+    if (i<0) i = i + nx;
+    else if (i>nx-1) i = i -nx;
+    ci.emplace_back(i);
+    if (j<0) j = j + ny;
+    else if (j>ny-1) j = j -ny;
+    ci.emplace_back(j);
+    if (k<0) k = k + nz;
+    else if (k>nz-1) k = k -nz;
+    ci.emplace_back(k);
+    return ci;
+
+}
+
+vector<cell> set_up_cells(const vector<vector<double>>& positions,
+    const vector<double>& box,
+    const double neighbordistance){
+
+      int si,sj,sk, maincell, subcell, total_cells;
+      int nx, ny, nz;
+      double lx, ly, lz;
+      vector<int> cc;
+      vector<cell> cells;
+      
+      //find of all find the number of cells in each direction
+      nx = box[0]/neighbordistance;
+      ny = box[1]/neighbordistance;
+      nz = box[2]/neighbordistance;
+      
+      //now use this to find length of cell in each direction
+      lx = box[0]/nx;
+      ly = box[1]/ny;
+      lz = box[2]/nz;
+
+      //find the total number of cells
+      total_cells = nx*ny*nz;
+      cells.resize(total_cells);
+      
+      //all neighbor cells are also added
+      for(int i=0; i<nx; i++){
+         for(int j=0; j<ny; j++){
+           for(int k=0; k<nz; k++){
+              maincell = cell_index(i, j, k, nx, ny, nz);
+              for(int si=i-1; si<=i+1; si++){
+                  for(int sj=j-1; sj<=j+1; sj++){
+                      for(int sk=k-1; sk<=k+1; sk++){
+                         cc = cell_periodic(si, sj, sk, nx, ny, nz);
+                         subcell = cell_index(cc[0], cc[1], cc[2], nx, ny, nz);
+                         //add this to the list of neighbors
+                         cells[maincell].neighbor_cells.emplace_back(subcell);
+
+                      }
+                  }
+              }
+           }
+         }
+      }
+      
+      int cx, cy, cz;
+      double dx, dy, dz;
+      double ddx, ddy, ddz;
+      int ind;
+      int nop = positions.size();
+
+      //now loop over all atoms and assign cells
+      for(int ti=0; ti<nop; ti++){
+
+          //calculate c indices for the atom
+          dx = positions[ti][0];
+          dy = positions[ti][1];
+          dz = positions[ti][2];
+          
+          //now apply boxdims
+          if( abs(dx-0) < 1E-6)
+              dx = 0;
+          if( abs(dy-0) < 1E-6)
+              dy = 0;
+          if( abs(dz-0) < 1E-6)
+              dz = 0;
+
+          if (dx < 0) dx+=box[0];
+          else if (dx >= box[0]) dx-=box[0];
+          if (dy < 0) dy+=box[1];
+          else if (dy >= box[1]) dy-=box[1];
+          if (dz < 0) dz+=box[2];
+          else if (dz >= box[2]) dz-=box[2];
+
+          //now find c vals
+          cx = dx/lx;
+          cy = dy/ly;
+          cz = dz/lz;
+
+          //now get cell index
+          ind = cell_index(cx, cy, cz, nx, ny, nz);
+          
+          //now add the atom to the corresponding cells
+          cells[ind].members.emplace_back(ti);
+
+      }
+      return cells;
+}
+
+
+void get_all_neighbors_cells(py::dict& atoms,
     const double& neighbordistance,
     const int& triclinic,
     const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
-    const vector<double>& box)
-    {
-    
+    const vector<double>& box){
+
     double d;
     double diffx,diffy,diffz;
-    double r,theta,phi;
+    double tempr,temptheta,tempphi;
     vector<double> diffi, diffj;
 
-    int nop = atoms.size();
+    //access positions and put it in an array
+    vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
 
-    //clear all arrays
-    for (int ti=0; ti<nop; ti++){
-        atoms[ti].neighbors.clear();
-        atoms[ti].neighbordist.clear();
-        atoms[ti].neighborweight.clear();
-        atoms[ti].diff.clear();
-        atoms[ti].r.clear();
-        atoms[ti].phi.clear();
-        atoms[ti].theta.clear();
-    }    
+    int nop = positions.size();
+    vector<vector<int>> neighbors(nop);
+    vector<vector<double>> neighbordist(nop);
+    vector<vector<double>> neighborweight(nop);
+    vector<vector<vector<double>>> diff(nop);
+    vector<vector<double>> r(nop);
+    vector<vector<double>> phi(nop);
+    vector<vector<double>> theta(nop);
+    vector<double> cutoff(nop); 
+    
+    vector<cell> cells = set_up_cells(positions, box, neighbordistance);
+    int total_cells = cells.size();
+    int maincell, subcell;
 
-    for (int ti=0; ti<nop; ti++){
-        for (int tj=ti+1; tj<nop; tj++){
-            d = get_abs_distance(atoms[ti], atoms[tj],
-                triclinic, rot, rotinv, box, 
-                diffx, diffy, diffz);
-            if (d < neighbordistance){
-                if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                    continue;
+    //now loop to find distance
+    for(int i=0; i<total_cells; i++){
+        //for each member in cell i
+        for(int mi=0; mi<cells[i].members.size(); mi++){
+            //now go through the neighbors
+            ti = cells[i].members[mi];
+            for(int j=0 ; j<cells[i].neighbor_cells.size(); j++){
+               //loop through members of j
+               subcell = cells[i].neighbor_cells[j];
+               for(int mj=0; mj<cells[subcell].members.size(); mj++){
+                    //now we have mj -> members/compare with
+                    tj = cells[subcell].members[mj];
+                    //compare ti and tj and add
+                    if (ti < tj){
+                        d = get_abs_distance(positions[ti], positions[tj],
+                            triclinic, rot, rotinv, box, 
+                            diffx, diffy, diffz);
+                        if (d < neighbordistance){
+                            //if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
+                            //    continue;
+                            //}
+                            //else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
+                            //    continue;
+                            //}
+                            neighbors[ti].emplace_back(tj);
+                            neighbors[tj].emplace_back(ti);
+
+                            neighbordist[ti].emplace_back(d);
+                            neighbordist[tj].emplace_back(d);
+
+                            neighborweight[ti].emplace_back(1.00);
+                            neighborweight[tj].emplace_back(1.00);
+
+                            diffi.clear();
+                            diffi.emplace_back(diffx);
+                            diffi.emplace_back(diffy);
+                            diffi.emplace_back(diffz);
+
+                            diffj.clear();
+                            diffj.emplace_back(-diffx);
+                            diffj.emplace_back(-diffy);
+                            diffj.emplace_back(-diffz);
+
+                            diff[ti].emplace_back(diffi);
+                            diff[tj].emplace_back(diffj);
+                            
+                            convert_to_spherical_coordinates(diffx, diffy, diffz, tempr, tempphi, temptheta);
+                            
+                            r[ti].emplace_back(tempr);
+                            phi[ti].emplace_back(tempphi);
+                            theta[ti].emplace_back(temptheta);
+                            //n_neighbors += 1;
+                            cutoff[ti] = neighbordistance;
+
+                            convert_to_spherical_coordinates(-diffx, -diffy, -diffz, tempr, tempphi, temptheta);
+
+                            r[tj].emplace_back(tempr);
+                            phi[tj].emplace_back(tempphi);
+                            theta[tj].emplace_back(temptheta);
+                            //atoms[tj].n_neighbors += 1;
+                            cutoff[tj] = neighbordistance;
+                        }
+                    }
                 }
-                else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
-                    continue;
-                }
-                
-                atoms[ti].neighbors.emplace_back(tj);
-                atoms[tj].neighbors.emplace_back(ti);
-
-                atoms[ti].neighbordist.emplace_back(d);
-                atoms[tj].neighbordist.emplace_back(d);
-
-                atoms[ti].neighborweight.emplace_back(1.00);
-                atoms[tj].neighborweight.emplace_back(1.00);
-
-                diffi.clear();
-                diffi.emplace_back(diffx);
-                diffi.emplace_back(diffy);
-                diffi.emplace_back(diffz);
-
-                diffj.clear();
-                diffj.emplace_back(-diffx);
-                diffj.emplace_back(-diffy);
-                diffj.emplace_back(-diffz);
-
-                atoms[ti].diff.emplace_back(diffi);
-                atoms[tj].diff.emplace_back(diffj);
-                
-                convert_to_spherical_coordinates(diffx, diffy, diffz, r, phi, theta);
-                
-                atoms[ti].r.emplace_back(r);
-                atoms[ti].phi.emplace_back(phi);
-                atoms[ti].theta.emplace_back(theta);
-                atoms[ti].n_neighbors += 1;
-                atoms[ti].cutoff = neighbordistance;
-
-                convert_to_spherical_coordinates(-diffx, -diffy, -diffz, r, phi, theta);
-
-                atoms[tj].r.emplace_back(r);
-                atoms[tj].phi.emplace_back(phi);
-                atoms[tj].theta.emplace_back(theta);
-                atoms[tj].n_neighbors += 1;
-                atoms[tj].cutoff = neighbordistance;
-
             }
         }
     }
+
+    //calculation over lets assign
+    atoms[py::str("neighbors")] = neighbors;
+    atoms[py::str("neighbordist")] = neighbordist;
+    atoms[py::str("neighborweight")] = neighborweight;
+    atoms[py::str("diff")] = diff;
+    atoms[py::str("r")] = r;
+    atoms[py::str("theta")] = theta;
+    atoms[py::str("phi")] = phi;
+    atoms[py::str("cutoff")] = cutoff;
 }
 
-*/
+
