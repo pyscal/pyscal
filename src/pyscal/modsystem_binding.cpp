@@ -12,10 +12,8 @@
 namespace py = pybind11;
 using namespace std;
 
-PYBIND11_MAKE_OPAQUE(std::vector<Atom, std::allocator<Atom>>);
-using AtomList = std::vector<Atom, std::allocator<Atom>>;
 
-PYBIND11_MODULE(cmodsystem, m) {
+PYBIND11_MODULE(csystem, m) {
     py::options options;
     options.disable_function_signatures();
     m.def("get_abs_distance", &get_abs_distance);

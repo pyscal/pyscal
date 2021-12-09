@@ -47,7 +47,11 @@ void convert_to_spherical_coordinates(double, double, double,
 
 void get_all_neighbors_normal(py::dict&,
 	const double&,
-	const int&);
+	const int&,
+	const int&,
+	const vector<vector<double>>&,
+	const vector<vector<double>>&,
+	const vector<double>&);
 
 int cell_index(int, int, int, int, int, int);
 vector<int> cell_periodic(int, int, int, int, int, int);
@@ -58,7 +62,11 @@ vector<cell> set_up_cells(const vector<vector<double>>&,
 
 void get_all_neighbors_cells(py::dict&,
     const double&,
-    const int&);
+    const int&,
+    const int&, 
+    const vector<vector<double>>&, 
+    const vector<vector<double>>&,
+    const vector<double>&);
 
 void get_temp_neighbors_brute(const vector<vector<double>>& positions,
     vector<vector<datom>>& temp_neighbors,
@@ -78,19 +86,34 @@ void get_temp_neighbors_cells(const vector<vector<double>>& positions,
 
 int get_all_neighbors_bynumber(py::dict& atoms,
     double& neighbordistance,
+    const int& triclinic,
     const int& filter, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
     double prefactor,
     int nns, 
+    int usecells,
     int assign);
 
 int get_all_neighbors_sann(py::dict& atoms,
     double& neighbordistance,
+    const int& triclinic,
     const int& filter, 
-    double prefactor);
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
+    double prefactor,
+    int usecells);
 
 int get_all_neighbors_adaptive(py::dict& atoms,
     double& neighbordistance,
+    const int& triclinic,
     const int& filter, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
     double prefactor,
     int nlimit,
-    double padding);
+    double padding, 
+    int usecells);

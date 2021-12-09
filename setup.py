@@ -28,7 +28,7 @@ setup(
             include_dirs=['lib/voro++']
         ),
         Pybind11Extension(
-            "pyscal.cmodsystem",
+            "pyscal.csystem",
             ["src/pyscal/neighbor.cpp", "src/pyscal/modsystem_binding.cpp", "src/pyscal/atom.cpp",],
             language='c++',
         ),
