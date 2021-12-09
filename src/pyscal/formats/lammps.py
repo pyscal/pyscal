@@ -1,13 +1,12 @@
 import numpy as np
 import gzip
-import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
 import os
 
 #functions that are not wrapped from C++
-def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None):
+def read_snap(infile, compressed = False, customkeys=None):
     """
     Function to read a lammps dump file format - single time slice.
 
@@ -19,9 +18,6 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
     compressed : bool, optional
         force to read a `gz` zipped file. If the filename ends with `.gz`, use of this keyword is not
         necessary. Default True.
-
-    check_triclinic : bool, optional
-        If true check if the sim box is triclinic. Default False.
 
     customkeys : list of strings, optional
         A list of extra keywords to read from trajectory file.
@@ -40,14 +36,6 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
         list of the type `[[x1, x2, x3], [y1, y2, y3], [zz1, z2, z3]]` which are the box vectors. Only returned if
         `box_vectors` is set to True.
 
-    triclinic : bool
-        True if the box is triclinic. Only returned if `check_triclinic` is set to True
-
-    .. note::
-
-        Values are always returned in the order `atoms, boxdims, box, triclinic` if all
-        return keywords are selected. For example, ff `check_triclinic` is not selected, the return
-        values would still preserve the order and fall back to  `atoms, boxdims, box`.
 
     Notes
     -----
@@ -83,7 +71,6 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
 
     #now go through the file line by line
     paramsread = False
-    atoms = []
     triclinic = False
     volume_fraction = 1.00
 
@@ -92,6 +79,11 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
     customlength = len(customkeys)
     if customlength > 0:
         customread = True
+
+    positions = []
+    ids = []
+    types = []
+    customdict = [[] for x in range(len(customkeys))]
 
     nblock = 0
     for count, line in enumerate(f):
@@ -145,26 +137,22 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
             if count == nblock:
                 break
             raw = line.strip().split()
-            idd = int(raw[headerdict["id"]])
-            typ = int(raw[headerdict["type"]])
-            x = float(raw[headerdict["x"]])
-            y = float(raw[headerdict["y"]])
-            z = float(raw[headerdict["z"]])
+            ids.append(int(raw[headerdict["id"]]))
+            types.append(int(raw[headerdict["type"]]))
+            positions.append([float(raw[headerdict["x"]]), float(raw[headerdict["y"]]), float(raw[headerdict["z"]])])
 
-            atom = pca.Atom()
-            atom.pos = [x, y, z]
-            atom.id = idd
-            atom.type = typ
-            atom.loc = count-8
-
-            customdict = {}
             #if customkeys need to be read, do it
             if customread:
                 for cc, kk in enumerate(customkeys):
-                    customdict[kk] = raw[headerdict[kk]]
+                    customdict[cc].append(raw[headerdict[kk]])
 
-            atom.custom = customdict
-            atoms.append(atom)
+    atoms = {}
+    atoms['positions'] = positions
+    atoms['ids'] = ids
+    atoms['types'] = types
+
+    for cc, kk in enumerate(customkeys):
+        atoms[kk] = customdict[cc]
 
     #close files
     if not islist:
@@ -192,10 +180,13 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
         rotinv = np.linalg.inv(rot)
         ortho_origin = np.array([boxx[0], boxy[0], boxz[0]])
 
-        for atom in atoms:
+        mod_positions = []
+        for pos in positions:
             #correct zero of the atomic positions (shift box to origin)
-            dist = np.array(atom.pos) - ortho_origin
-            atom.pos = dist
+            dist = np.array(pos) - ortho_origin
+            mod_positions.append(dist)
+
+        atoms['positions'] = mod_positions
 
         #finally change boxdims - to triclinic box size
         box = np.array([a, b, c])
@@ -204,15 +195,15 @@ def read_snap(infile, compressed = False, check_triclinic=False, customkeys=None
 
     #adjust for scled coordinates
     if scaled:
-        for atom in atoms:
-            dist = atom.pos
-            ndist = dist[0]*box[0] + dist[1]*box[1] + dist[2]*box[2]
-            atom.pos = ndist
+        positions = atoms['positions']
+        mod_positions = []
 
-    if check_triclinic:
-        return atoms, box, triclinic
-    else:
-        return atoms, box
+        for pos in positions:
+            ndist = pos[0]*box[0] + pos[1]*box[1] + pos[2]*box[2]
+            mod_positions.append(ndist)
+        atoms['positions'] = mod_positions
+
+    return atoms, box
 
 def write_snap(sys, outfile, compressed = False, 
     customkeys=None, customvals=None, timestep=0):
@@ -254,15 +245,16 @@ def write_snap(sys, outfile, compressed = False,
     boxy = np.sqrt(np.sum(np.array(box[1])**2))
     boxz = np.sqrt(np.sum(np.array(box[2])**2))
 
-    atoms = sys.atoms
 
     if len(customkeys) > 0:
         if customvals is None:
-            cvals = [sys.get_custom(atom, customkeys) for atom in atoms]
+            cvals = []
+            for cc, pos in sys.atoms['positions']:
+                cvals.append([sys.atoms[customkey][cc] for customkey in customkeys])
         else:
             #first check if dim is equal to keys dim
             shape = np.array(customvals).shape
-            rqdshape = (len(atoms), len(customkeys))
+            rqdshape = (len(sys.atoms['positions']), len(customkeys))
             if shape != rqdshape:
                 raise ValueError("Customvals should be of shape natoms x ncustomkeys. Found %d-%d, should be %d-%d"%(shape[0], 
                     shape[1], rqdshape[0], rqdshape[1]))
@@ -283,7 +275,7 @@ def write_snap(sys, outfile, compressed = False,
     dump.write("ITEM: TIMESTEP\n")
     dump.write("%d\n" % timestep)
     dump.write("ITEM: NUMBER OF ATOMS\n")
-    dump.write("%d\n" % len(atoms))
+    dump.write("%d\n" % len(sys.atoms['positions']))
     dump.write("ITEM: BOX BOUNDS\n")
     dump.write("%f %f\n" % (0, boxx))
     dump.write("%f %f\n" % (0, boxy))
@@ -298,13 +290,12 @@ def write_snap(sys, outfile, compressed = False,
 
     dump.write(title_str)
 
-    for cc, atom in enumerate(atoms):
-        pos = atom.pos
+    for cc, pos in enumerate(sys.atoms['positions']):
         if len(customkeys) > 0:
             cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-            atomline = ("%d %d %f %f %f %s\n")%(atom.id, atom.type, pos[0], pos[1], pos[2], cval_atom)
+            atomline = ("%d %d %f %f %f %s\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2], cval_atom)
         else:
-            atomline = ("%d %d %f %f %f\n")%(atom.id, atom.type, pos[0], pos[1], pos[2])
+            atomline = ("%d %d %f %f %f\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2])
 
         dump.write(atomline)
 
