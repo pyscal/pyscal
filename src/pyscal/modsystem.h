@@ -67,3 +67,53 @@ void get_all_neighbors_cells(py::dict&,
     const vector<vector<double>>&, 
     const vector<vector<double>>&,
     const vector<double>&);
+
+void get_temp_neighbors_brute(const vector<vector<double>>& positions,
+    vector<vector<datom>>& temp_neighbors,
+    const int& triclinic,
+    const double neighbordistance, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
+
+void get_temp_neighbors_cells(const vector<vector<double>>& positions,
+    vector<vector<datom>>& temp_neighbors,
+    const int& triclinic,
+    const double neighbordistance, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
+
+int get_all_neighbors_bynumber(py::dict& atoms,
+    double& neighbordistance,
+    const int& triclinic,
+    const int& filter, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
+    double prefactor,
+    int nns, 
+    int usecells,
+    int assign);
+
+int get_all_neighbors_sann(py::dict& atoms,
+    double& neighbordistance,
+    const int& triclinic,
+    const int& filter, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
+    double prefactor,
+    int usecells);
+
+int get_all_neighbors_adaptive(py::dict& atoms,
+    double& neighbordistance,
+    const int& triclinic,
+    const int& filter, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
+    double prefactor,
+    int nlimit,
+    double padding, 
+    int usecells);
