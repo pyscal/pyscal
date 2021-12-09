@@ -22,6 +22,9 @@ PYBIND11_MODULE(cmodsystem, m) {
     m.def("reset_all_neighbors", &reset_all_neighbors);
     m.def("get_all_neighbors_normal", &get_all_neighbors_normal);
     m.def("get_all_neighbors_cells", &get_all_neighbors_cells);
+    m.def("get_all_neighbors_bynumber", &get_all_neighbors_bynumber);
+    m.def("get_all_neighbors_sann", &get_all_neighbors_sann);
+    m.def("get_all_neighbors_adaptive", &get_all_neighbors_adaptive);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

@@ -123,11 +123,7 @@ void convert_to_spherical_coordinates(double x,
 
 void get_all_neighbors_normal(py::dict& atoms,
     const double& neighbordistance,
-    const int& triclinic,
-    const int& filter, 
-    const vector<vector<double>>& rot, 
-    const vector<vector<double>>& rotinv,
-    const vector<double>& box)
+    const int& filter)
     {
     
     double d;
@@ -137,6 +133,10 @@ void get_all_neighbors_normal(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<vector<double>> rot = atoms[py::str("rot")].cast<vector<vector<double>>>();
+    vector<vector<double>> rotinv = atoms[py::str("rotinv")].cast<vector<vector<double>>>();
+    vector<double> box = atoms[py::str("box")].cast<vector<double>>();
+    int triclinic = atoms[py::str("triclinic")].cast<int>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);

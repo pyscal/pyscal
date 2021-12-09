@@ -47,11 +47,7 @@ void convert_to_spherical_coordinates(double, double, double,
 
 void get_all_neighbors_normal(py::dict&,
 	const double&,
-	const int&,
-	const int&,
-	const vector<vector<double>>&,
-	const vector<vector<double>>&,
-	const vector<double>&);
+	const int&);
 
 int cell_index(int, int, int, int, int, int);
 vector<int> cell_periodic(int, int, int, int, int, int);
