@@ -326,11 +326,7 @@ vector<cell> set_up_cells(const vector<vector<double>>& positions,
 
 void get_all_neighbors_cells(py::dict& atoms,
     const double& neighbordistance,
-    const int& triclinic,
-    const int& filter, 
-    const vector<vector<double>>& rot, 
-    const vector<vector<double>>& rotinv,
-    const vector<double>& box){
+    const int& filter){
 
     double d;
     double diffx,diffy,diffz;
@@ -340,6 +336,10 @@ void get_all_neighbors_cells(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<vector<double>> rot = atoms[py::str("rot")].cast<vector<vector<double>>>();
+    vector<vector<double>> rotinv = atoms[py::str("rotinv")].cast<vector<vector<double>>>();
+    vector<double> box = atoms[py::str("box")].cast<vector<double>>();
+    int triclinic = atoms[py::str("triclinic")].cast<int>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -515,14 +515,9 @@ void get_temp_neighbors_cells(const vector<vector<double>>& positions,
 
 int get_all_neighbors_bynumber(py::dict& atoms,
     double& neighbordistance,
-    const int& triclinic,
     const int& filter, 
-    const vector<vector<double>>& rot, 
-    const vector<vector<double>>& rotinv,
-    const vector<double>& box,
     double prefactor,
     int nns, 
-    int usecells,
     int assign){
 
     double d;
@@ -534,6 +529,11 @@ int get_all_neighbors_bynumber(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<vector<double>> rot = atoms[py::str("rot")].cast<vector<vector<double>>>();
+    vector<vector<double>> rotinv = atoms[py::str("rotinv")].cast<vector<vector<double>>>();
+    vector<double> box = atoms[py::str("box")].cast<vector<double>>();
+    int triclinic = atoms[py::str("triclinic")].cast<int>();
+    int usecells = atoms[py::str("usecells")].cast<int>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -651,13 +651,8 @@ int get_all_neighbors_bynumber(py::dict& atoms,
 
 int get_all_neighbors_sann(py::dict& atoms,
     double& neighbordistance,
-    const int& triclinic,
     const int& filter, 
-    const vector<vector<double>>& rot, 
-    const vector<vector<double>>& rotinv,
-    const vector<double>& box,
-    double prefactor,
-    int usecells){
+    double prefactor){
 
     double d, dcut;
     double diffx,diffy,diffz;
@@ -668,6 +663,11 @@ int get_all_neighbors_sann(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<vector<double>> rot = atoms[py::str("rot")].cast<vector<vector<double>>>();
+    vector<vector<double>> rotinv = atoms[py::str("rotinv")].cast<vector<vector<double>>>();
+    vector<double> box = atoms[py::str("box")].cast<vector<double>>();
+    int triclinic = atoms[py::str("triclinic")].cast<int>();
+    int usecells = atoms[py::str("usecells")].cast<int>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -827,15 +827,10 @@ int get_all_neighbors_sann(py::dict& atoms,
 
 int get_all_neighbors_adaptive(py::dict& atoms,
     double& neighbordistance,
-    const int& triclinic,
     const int& filter, 
-    const vector<vector<double>>& rot, 
-    const vector<vector<double>>& rotinv,
-    const vector<double>& box,
     double prefactor,
     int nlimit,
-    double padding, 
-    int usecells){
+    double padding){
 
     double d, dcut;
     double diffx,diffy,diffz;
@@ -845,6 +840,11 @@ int get_all_neighbors_adaptive(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<vector<double>> rot = atoms[py::str("rot")].cast<vector<vector<double>>>();
+    vector<vector<double>> rotinv = atoms[py::str("rotinv")].cast<vector<vector<double>>>();
+    vector<double> box = atoms[py::str("box")].cast<vector<double>>();
+    int triclinic = atoms[py::str("triclinic")].cast<int>();
+    int usecells = atoms[py::str("usecells")].cast<int>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
