@@ -150,6 +150,7 @@ def read_snap(infile, compressed = False, customkeys=None):
     atoms['positions'] = positions
     atoms['ids'] = ids
     atoms['types'] = types
+    atoms['ghost'] = np.ones(len(types))
 
     for cc, kk in enumerate(customkeys):
         atoms[kk] = customdict[cc]

@@ -50,6 +50,7 @@ def read_snap(aseobject, check_triclinic=False):
     atoms['ids'] = ids
     atoms['types'] = types
     atoms['species'] = species
+    atoms['ghost'] = np.ones(len(types))
 
     return atoms, box
 

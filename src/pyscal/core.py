@@ -134,7 +134,7 @@ class System:
         xs = 2*reps[0] + 1
         ys = 2*reps[1] + 1
         zs = 2*reps[2] + 1
-
+        tp = atoms['types'][0]
 
         for i in range(x1, x2):
             for j in range(y1, y2):
@@ -144,13 +144,11 @@ class System:
                     for atom in atoms:
                         pos = np.array(atom.pos)
                         pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                        a = Atom()
-                        a.pos = pos
-                        a.id = idstart
+                        atom['positions'].append(pos)
+                        atoms['ids'].append(idstart)
                         idstart += 1
-                        a.type = atom.type
-                        a.ghost = ghost
-                        newatoms.append(a)
+                        atoms['types'].append(tp)
+                        atoms['ghost'].append(int(ghost))
 
         if scale_box:
             box[0] = xs*np.array(box[0])
@@ -160,6 +158,4 @@ class System:
         if ghost:
             self.ghosts_created = True
 
-        completeatoms = atoms + newatoms
-        #print(len(completeatoms))
-        return completeatoms
+        return atoms
