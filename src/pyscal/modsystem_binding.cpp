@@ -16,7 +16,7 @@ using namespace std;
 PYBIND11_MODULE(csystem, m) {
     py::options options;
     options.disable_function_signatures();
-    m.def("get_abs_distance", &get_abs_distance);
+    //m.def("get_abs_distance", &get_abs_distance);
     m.def("reset_all_neighbors", &reset_all_neighbors);
     m.def("get_all_neighbors_normal", &get_all_neighbors_normal);
     m.def("get_all_neighbors_cells", &get_all_neighbors_cells);

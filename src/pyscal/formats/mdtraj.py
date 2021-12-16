@@ -43,7 +43,7 @@ def read_snap(mdobject, check_triclinic=False):
     atoms['positions'] = positions
     atoms['ids'] = ids
     atoms['species'] = species
-    atoms['ghost'] = np.ones(len(types))
+    atoms['ghost'] = [False for x in range(len(types))]
     return atoms, box
 
 def write_snap(**kwargs):

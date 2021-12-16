@@ -86,6 +86,77 @@ double get_abs_distance(vector<double> pos1, vector<double> pos2,
     return abs;
 }
 
+double get_abs_distance(py::list pos1, py::list pos2, 
+    const int& triclinic, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
+    double& diffx,
+    double& diffy,
+    double& diffz){
+    /*
+    Get absolute distance between two atoms
+    */
+
+    double abs, ax, ay, az;
+    diffx = pos1[0].cast<double>() - pos2[0].cast<double>();
+    diffy = pos1[1].cast<double>() - pos2[1].cast<double>();
+    diffz = pos1[2].cast<double>() - pos2[2].cast<double>();
+
+
+    if (triclinic == 1){
+
+        //convert to the triclinic system
+        ax = rotinv[0][0]*diffx + rotinv[0][1]*diffy + rotinv[0][2]*diffz;
+        ay = rotinv[1][0]*diffx + rotinv[1][1]*diffy + rotinv[1][2]*diffz;
+        az = rotinv[2][0]*diffx + rotinv[2][1]*diffy + rotinv[2][2]*diffz;
+
+        //scale to match the triclinic box size
+        diffx = ax*box[0];
+        diffy = ay*box[1];
+        diffz = az*box[2];
+
+        //now check pbc
+        //nearest image
+        if (diffx> box[0]/2.0) {diffx-=box[0];};
+        if (diffx<-box[0]/2.0) {diffx+=box[0];};
+        if (diffy> box[1]/2.0) {diffy-=box[1];};
+        if (diffy<-box[1]/2.0) {diffy+=box[1];};
+        if (diffz> box[2]/2.0) {diffz-=box[2];};
+        if (diffz<-box[2]/2.0) {diffz+=box[2];};
+
+        //now divide by box vals - scale down the size
+        diffx = diffx/box[0];
+        diffy = diffy/box[1];
+        diffz = diffz/box[2];
+
+        //now transform back to normal system
+        ax = rot[0][0]*diffx + rot[0][1]*diffy + rot[0][2]*diffz;
+        ay = rot[1][0]*diffx + rot[1][1]*diffy + rot[1][2]*diffz;
+        az = rot[2][0]*diffx + rot[2][1]*diffy + rot[2][2]*diffz;
+
+        //now assign to diffs and calculate distnace
+        diffx = ax;
+        diffy = ay;
+        diffz = az;
+
+        //finally distance
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+
+    }
+    else{
+        //nearest image
+        if (diffx> box[0]/2.0) {diffx-=box[0];};
+        if (diffx<-box[0]/2.0) {diffx+=box[0];};
+        if (diffy> box[1]/2.0) {diffy-=box[1];};
+        if (diffy<-box[1]/2.0) {diffy+=box[1];};
+        if (diffz> box[2]/2.0) {diffz-=box[2];};
+        if (diffz<-box[2]/2.0) {diffz+=box[2];};
+        abs = sqrt(diffx*diffx + diffy*diffy + diffz*diffz);
+    }
+    return abs;
+}
+
 void reset_all_neighbors(py::dict& atoms){
     /*
     Reset all neighbors
@@ -122,12 +193,12 @@ void convert_to_spherical_coordinates(double x,
 }
 
 void get_all_neighbors_normal(py::dict& atoms,
-    const double& neighbordistance,
-    const int& triclinic,
-    const int& filter, 
-    const vector<vector<double>>& rot, 
-    const vector<vector<double>>& rotinv,
-    const vector<double>& box)
+    const double neighbordistance,
+    const int triclinic,
+    const int filter, 
+    const vector<vector<double>> rot, 
+    const vector<vector<double>> rotinv,
+    const vector<double> box)
     {
     
     double d;
@@ -137,6 +208,7 @@ void get_all_neighbors_normal(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    //auto positions = atoms[py::str("positions")].cast<py::array_t<double>>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);

@@ -281,6 +281,6 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     atoms['positions'] = positions
     atoms['ids'] = ids
     atoms['types'] = types
-    atoms['ghost'] = np.ones(len(types))
+    atoms['ghost'] = [0 for x in range(len(types))]
 
     return atoms, box

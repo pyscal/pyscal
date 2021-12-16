@@ -86,7 +86,7 @@ class System:
         """
         Set atoms
         """
-        if(len(atoms) < 200):
+        if(len(atoms['positions']) < 200):
             #we need to estimate a rough idea
             needed_atoms = 200 - len(atoms)
             #get a rough cell
@@ -136,19 +136,23 @@ class System:
         zs = 2*reps[2] + 1
         tp = atoms['types'][0]
 
+        positions = []
+        ids = []
+        types = []
+        ghosts = []
+
         for i in range(x1, x2):
             for j in range(y1, y2):
                 for k in range(z1, z2):
                     if (i==j==k==0):
                         continue
-                    for atom in atoms:
-                        pos = np.array(atom.pos)
+                    for pos in atoms['positions']:
                         pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                        atom['positions'].append(pos)
-                        atoms['ids'].append(idstart)
+                        positions.append(pos)
+                        ids.append(idstart)
                         idstart += 1
-                        atoms['types'].append(tp)
-                        atoms['ghost'].append(int(ghost))
+                        types.append(tp)
+                        ghosts.append(ghost)
 
         if scale_box:
             box[0] = xs*np.array(box[0])
@@ -157,5 +161,10 @@ class System:
             self.box = box
         if ghost:
             self.ghosts_created = True
+
+        atoms['positions'] = [*atoms['positions'], *positions]
+        atoms['ids'] = [*atoms['ids'], *ids]
+        atoms['types'] = [*atoms['types'], *types]
+        atoms['ghost'] = [*atoms['ghost'], *ghosts]
 
         return atoms

@@ -19,17 +19,18 @@ setup(
     package_dir={'':'src'},
     # add an extension module named 'python_cpp_example' to the package
     #headers=["src/pyscal/atom.h", "src/pyscal/system.h", "lib/voro++/voro++.hh"],
-    headers=["src/pyscal/atom.h", "src/pyscal/modsystem.h"],
+    #headers=["src/pyscal/atom.h", "src/pyscal/modsystem.h"],
+    headers=["src/pyscal/modsystem.h"],
     ext_modules=[
-        Pybind11Extension(
-            "pyscal.catom",
-            ["src/pyscal/atom.cpp", "src/pyscal/atom_binding.cpp"],
-            language='c++',
-            include_dirs=['lib/voro++']
-        ),
+        #Pybind11Extension(
+        #    "pyscal.catom",
+        #    ["src/pyscal/atom.cpp", "src/pyscal/atom_binding.cpp"],
+        #    language='c++',
+        #    include_dirs=['lib/voro++']
+        #),
         Pybind11Extension(
             "pyscal.csystem",
-            ["src/pyscal/neighbor.cpp", "src/pyscal/modsystem_binding.cpp", "src/pyscal/atom.cpp",],
+            ["src/pyscal/neighbor.cpp", "src/pyscal/modsystem_binding.cpp",],
             language='c++',
         ),
 
