@@ -41,7 +41,8 @@ class System:
     @property
     def natoms(self):
         if 'positions' in self.atoms.keys():
-            return len(self.atoms["positions"])
+            nop = np.sum([1 for x in range(len(self.atoms["positions"])) if self.atoms["ghost"][x]==False])
+            return nop
         else:
             return 0
     
@@ -93,6 +94,21 @@ class System:
         """
         Set atoms
         """
+        #we need to check atoms and add necessary keys
+        if not 'positions' in atoms.keys():
+            raise ValueError('positions is a necessary key in atoms')
+        nop = len(atoms["positions"])
+        for key, val in atoms.items():
+            if not (len(val)==nop):
+                raise ValueError("All times in the atoms dict should have same length as positions")
+        #now add necessary keys-ids, types, ghost
+        if not 'ids' in atoms.keys():
+            atoms['ids'] = [x+1 for x in range(nop)]
+        if not 'types' in atoms.keys():
+            atoms['types'] = [1 for x in range(nop)]
+        if not 'ghost' in atoms.keys():
+            atoms['ghost'] = [False for x in range(nop)]
+
         if(len(atoms['positions']) < 200):
             #we need to estimate a rough idea
             needed_atoms = 200 - len(atoms)

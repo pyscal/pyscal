@@ -28,3 +28,13 @@ def test_system_triclinic():
 	assert np.prod(tb) == 1
 	tb = (sys.rotinv==np.linalg.inv(np.array(struct.cell).T))
 	assert np.prod(tb) == 1
+
+def test_nop():
+	atoms, box = pcs.make_crystal(structure='bcc', 
+                              lattice_constant=3.127, repetitions=(2,2,2),)
+	sys = pc.System()
+	sys.box = box
+	sys.atoms = atoms
+
+	assert sys.natoms == 16
+	assert len(sys.atoms['positions']) == 2000
