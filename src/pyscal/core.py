@@ -134,6 +134,42 @@ class System:
                 rdict[key] = self.atoms[key][i]
             yield rdict 
 
+    def add_atoms(self, atoms):
+        """
+        Cleanly add a given list of atoms
+
+        Parameters
+        ----------
+        atoms : dict
+
+        Returns
+        -------
+        None
+        """ 
+        if not 'positions' in atoms.keys():
+            raise ValueError('positions is a necessary key in atoms')
+        nop = len(atoms["positions"])
+        for key, val in atoms.items():
+            if not (len(val)==nop):
+                raise ValueError("All times in the atoms dict should have same length as positions")
+        
+        #now add necessary keys-ids, types, ghost
+        maxid = max(self.atoms["ids"])
+        if not 'ids' in atoms.keys():
+            atoms['ids'] = [maxid+x+1 for x in range(nop)]
+        else:
+            for i in atoms['ids']:
+                if i in self.atoms['ids']:
+                    raise ValueError("Atom id already exists, unique ID is required")
+
+        if not 'types' in atoms.keys():
+            atoms['types'] = [1 for x in range(nop)]
+        if not 'ghost' in atoms.keys():
+            atoms['ghost'] = [False for x in range(nop)]
+
+        for key in self.atoms.keys():
+            self.atoms[key] = [*self.atoms[key], *atoms[key]]
+
     def repeat(self, reps, atoms=None, ghost=False, scale_box=True):
         """
         Replicate simulation cell

@@ -42,3 +42,7 @@ def test_nop():
 	for a in sys.iter_atoms():
 		assert np.sum(a["positions"]) == 0
 		break
+
+	natoms = {'positions':[[0,0,0]]}
+	sys.add_atoms(natoms)
+	assert sys.natoms == 17
