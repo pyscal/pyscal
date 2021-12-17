@@ -39,6 +39,13 @@ class System:
         self._atoms = {}
 
     @property
+    def natoms(self):
+        if 'positions' in self.atoms.keys():
+            return len(self.atoms["positions"])
+        else:
+            return 0
+    
+    @property
     def box(self):
         """
         Wrap for inbuilt box
