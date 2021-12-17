@@ -9,4 +9,4 @@ def test_create_structure():
     for count, struct in enumerate(structure):
         #dumpfile = os.path.join(os.getcwd(), "test.dat")
         atoms, boxdims = pcs.make_crystal(struct)
-        assert len(atoms) == natoms[count]
+        assert len(atoms["positions"]) == natoms[count]
