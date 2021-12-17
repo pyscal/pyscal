@@ -54,3 +54,12 @@ def test_embed():
 	sys.atoms = {"positions": cu.positions}
 	sys.embed_in_cubic_box()
 	assert np.abs(sys.box[0][0] - 25.5265548) < 1E-5
+
+def test_distance():
+	atoms, box = pcs.make_crystal(structure='bcc', 
+                              lattice_constant=3.127, repetitions=(2,2,2),)
+	sys = pc.System()
+	sys.box = box
+	sys.atoms = atoms
+	dist = sys.get_distance([0.0, 0.0, 0.0], [1.5635, 1.5635, 1.5635])
+	assert np.abs(dist - 2.708061437633939) < 1E-5	

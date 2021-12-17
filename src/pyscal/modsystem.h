@@ -50,13 +50,6 @@ double get_abs_distance(vector<double>, vector<double>,
 	const vector<double>&, 
 	double&, double&, double&);
 
-double get_abs_distance(py::list, py::list,
-    const int&, 
-    const vector<vector<double>>&, 
-    const vector<vector<double>>&, 
-    const vector<double>&, 
-    double&, double&, double&);
-
 void reset_all_neighbors(py::dict&);
 
 void convert_to_spherical_coordinates(double, double, double, 
