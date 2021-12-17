@@ -63,3 +63,17 @@ def test_distance():
 	sys.atoms = atoms
 	dist = sys.get_distance([0.0, 0.0, 0.0], [1.5635, 1.5635, 1.5635])
 	assert np.abs(dist - 2.708061437633939) < 1E-5	
+
+def test_composition():
+	satoms, box = pcs.make_crystal(structure='l12', 
+                              lattice_constant=3.127, repetitions=(2,2,2),)
+	sys = pc.System()
+	sys.box = box
+	sys.atoms = satoms
+	c = sys.concentration
+	assert c['1'] == 8
+	assert c['2'] == 24
+
+	c = sys.composition
+	assert c['1'] == 8
+	assert c['2'] == 24

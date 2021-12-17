@@ -45,7 +45,15 @@ class System:
             return nop
         else:
             return 0
-    
+
+    @property
+    def concentration(self):
+        return self.get_concentration()
+
+    @property
+    def composition(self):
+        return self.get_concentration()
+
     @property
     def box(self):
         """
@@ -128,10 +136,11 @@ class System:
         """
         Iter over atoms
         """
-        for i in range(self.natoms):
-            rdict = {}
-            for key in self.atoms.keys():
-                rdict[key] = self.atoms[key][i]
+        for i in range(len(self.atoms["positions"])):
+            if not self.atoms["ghost"][i]:
+                rdict = {}
+                for key in self.atoms.keys():
+                    rdict[key] = self.atoms[key][i]
             yield rdict 
 
     def add_atoms(self, atoms):
@@ -282,75 +291,6 @@ class System:
         self.box = newbox
         self.actual_box = None
 
-    """
-    def extract_cubic_box(self, repeat=(3,3,3)):
-        """
-        #Extract a cubic representation of the box from triclinic cell
-
-        #Parameters
-        #----------
-        #repeat : list of ints
-        #    the number of times box should be repeat
-
-        #Returns
-        #-------
-        #cubebox: list of list of floats
-        #    cubic box
-
-        #atoms: list of Atom objects
-        #    atoms in the cubic box
-        """
-        ratoms = self.repeat(repeat)
-        anchor = ratoms["positions"][0]
-
-        nb = []
-
-        for count, ind in enumerate([[1, 2], [0, 2], [0, 1]]): 
-            mindist = 10000
-            minpos = None
-            for i, pos in enumerate(ratoms["positions"][1:]):
-                if np.abs(pos[ind[0]]-anchor[ind[0]])< 1E-5:
-                    if np.abs(pos[ind[1]]-anchor[ind[1]])< 1E-5:
-                        if ratoms["types"][i] == ratoms["types"][0]:
-                            dist = self.get_distance(anchor, pos)
-                            print(dist)
-                            if dist < mindist:
-                                mindist = dist
-                                minpos = pos
-            if minpos is None:
-                raise ValueError("Cubic box cound not be found, try increasing repeat")
-            lo = min(anchor[count], minpos[count])
-            hi = max(anchor[count], minpos[count])
-            nb.append([lo, hi])
-
-        print(mindist)
-        #collect atoms
-        collectedatoms = []
-        for i, pos in enumerate(ratoms["positions"]):
-            if (nb[0][0] <= pos[0] < nb[0][1]):
-                if (nb[1][0] <= pos[1] < nb[1][1]):
-                    if (nb[2][0] <= pos[2] < nb[2][1]):
-                        collectedatoms.append(i)
-
-        #remap atoms to box
-        newdict = {}
-        for key in ratoms.keys():
-            newdict[key] = []
-
-        for i in collectedatoms:
-            pos = [ratoms["positions"][i][0]-nb[0][0], ratoms["positions"][i][1]-nb[1][0], ratoms["positions"][i][2]-nb[2][0]]
-            newdict["positions"].append(pos)
-            for key in ratoms.keys():
-                newdict[key].append(ratoms[key][i])
-
-        #create a new box
-        cubebox = [[(nb[0][1]-nb[0][0]), 0, 0],
-                       [0, (nb[1][1]-nb[1][0]), 0],
-                       [0, 0, (nb[2][1]-nb[2][0])]]
-
-        return cubebox, newdict
-    """
-
     def get_distance(self, pos1, pos2):
         """
         Get the distance between two atoms.
@@ -373,3 +313,23 @@ class System:
         """
         return pc.get_abs_distance(pos1, pos2, self.triclinic, 
             self.rot, self.rotinv, self.boxdims, 0.0, 0.0, 0.0)
+
+    def get_concentration(self):
+        """
+        Return a dict containing the concentration of the system
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        condict : dict
+            dict of concentration values
+        """
+        typelist = [self.atoms["types"][x] for x in range(len(self.atoms["positions"])) if self.atoms["ghost"][x]==False]
+        types, typecounts = np.unique(typelist, return_counts=True)
+        concdict = {}
+        for c, t in enumerate(types):
+            concdict[str(t)] = typecounts[c]
+        return concdict
