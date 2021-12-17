@@ -46,3 +46,11 @@ def test_nop():
 	natoms = {'positions':[[0,0,0]]}
 	sys.add_atoms(natoms)
 	assert sys.natoms == 17
+
+def test_embed():
+	cu = bulk('Cu')
+	sys = pc.System()
+	sys.box = np.array(cu.cell)
+	sys.atoms = {"positions": cu.positions}
+	sys.embed_in_cubic_box()
+	assert np.abs(sys.box[0][0] - 25.5265548) < 1E-5

@@ -238,3 +238,46 @@ class System:
         atoms['ghost'] = [*atoms['ghost'], *ghosts]
 
         return atoms
+
+
+    def embed_in_cubic_box(self,):
+        """
+        Embedded the triclinic box in a cubic box
+        """
+        #first task is to create a box representation
+        
+        box = self._box
+        backupbox = box.copy()
+        
+        a = np.array(box[0])
+        b = np.array(box[1])
+        c = np.array(box[2])
+
+        cosa = np.dot(b, c)/(np.linalg.norm(b)*np.linalg.norm(c))
+        cosb = np.dot(c, a)/(np.linalg.norm(c)*np.linalg.norm(a))
+        cosc = np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
+
+        lx = np.linalg.norm(a)
+        xy = np.linalg.norm(b)*cosc
+        xz = np.linalg.norm(c)*cosb
+        ly = np.sqrt(np.linalg.norm(b)*np.linalg.norm(b) - xy*xy)
+        yz = (np.linalg.norm(b)*np.linalg.norm(c)*cosa - xy*xz)/ly
+        lz = np.sqrt(np.linalg.norm(c)*np.linalg.norm(c) - xz*xz - yz*yz)
+
+        xlo = ylo = zlo = 0
+        xhi = lx
+        yhi = ly
+        zhi = lz
+
+        xlo_bound = xlo + min(0.0,xy,xz,xy+xz)
+        xhi_bound = xhi + max(0.0,xy,xz,xy+xz)
+        ylo_bound = ylo + min(0.0,yz)
+        yhi_bound = yhi + max(0.0,yz)
+        zlo_bound = zlo
+        zhi_bound = zhi
+
+        newbox = np.array([[xhi_bound-xlo_bound, 0, 0], [0, yhi_bound-ylo_bound, 0], [0, 0, zhi_bound-zlo_bound]])
+        
+        self.newbox = newbox
+        self.box = newbox
+        self.actual_box = None
