@@ -123,6 +123,17 @@ class System:
 
         self._atoms = atoms
 
+    #iterator for atoms
+    def iter_atoms(self):
+        """
+        Iter over atoms
+        """
+        for i in range(self.natoms):
+            rdict = {}
+            for key in self.atoms.keys():
+                rdict[key] = self.atoms[key][i]
+            yield rdict 
+
     def repeat(self, reps, atoms=None, ghost=False, scale_box=True):
         """
         Replicate simulation cell

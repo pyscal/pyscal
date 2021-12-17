@@ -38,3 +38,7 @@ def test_nop():
 
 	assert sys.natoms == 16
 	assert len(sys.atoms['positions']) == 2000
+
+	for a in sys.iter_atoms():
+		assert np.sum(a["positions"]) == 0
+		break
