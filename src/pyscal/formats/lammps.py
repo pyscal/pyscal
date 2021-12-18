@@ -254,7 +254,7 @@ def write_snap(sys, outfile, compressed = False,
         else:
             #first check if dim is equal to keys dim
             shape = np.array(customvals).shape
-            rqdshape = (len(sys.natoms), len(customkeys))
+            rqdshape = (sys.natoms, len(customkeys))
             if shape != rqdshape:
                 raise ValueError("Customvals should be of shape natoms x ncustomkeys. Found %d-%d, should be %d-%d"%(shape[0], 
                     shape[1], rqdshape[0], rqdshape[1]))
@@ -275,7 +275,7 @@ def write_snap(sys, outfile, compressed = False,
     dump.write("ITEM: TIMESTEP\n")
     dump.write("%d\n" % timestep)
     dump.write("ITEM: NUMBER OF ATOMS\n")
-    dump.write("%d\n" % len(sys.natoms))
+    dump.write("%d\n" % sys.natoms)
     dump.write("ITEM: BOX BOUNDS\n")
     dump.write("%f %f\n" % (0, boxx))
     dump.write("%f %f\n" % (0, boxy))
