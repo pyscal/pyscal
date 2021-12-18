@@ -250,9 +250,7 @@ def write_snap(sys, outfile, compressed = False,
     if len(customkeys) > 0:
         if customvals is None:
             cvals = []
-            for cc, pos in enumerate(sys.atoms['positions']):
-                if not sys.atoms["ghost"][cc]:
-                    cvals.append([sys.atoms[customkey][cc] for customkey in customkeys])
+            cvals.append([getattr(sys, customkey) for customkey in customkeys])
         else:
             #first check if dim is equal to keys dim
             shape = np.array(customvals).shape
@@ -292,15 +290,14 @@ def write_snap(sys, outfile, compressed = False,
 
     dump.write(title_str)
 
-    for cc, pos in enumerate(sys.atoms['positions']):
-        if not sys.atoms["ghost"][cc]:
-            if len(customkeys) > 0:
-                cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-                atomline = ("%d %d %f %f %f %s\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2], cval_atom)
-            else:
-                atomline = ("%d %d %f %f %f\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2])
+    for cc, pos in enumerate(sys.positions):
+        if len(customkeys) > 0:
+            cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
+            atomline = ("%d %d %f %f %f %s\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2], cval_atom)
+        else:
+            atomline = ("%d %d %f %f %f\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2])
 
-            dump.write(atomline)
+        dump.write(atomline)
 
     if not isinstance(outfile, io.IOBase):
         dump.close()

@@ -96,19 +96,18 @@ def convert_snap(sys, species=None):
         if species is None:
             raise ValueError("Species was not known! To convert to ase, species need to be provided using the species keyword")
         #otherwise we know the species
-        types = [sys.atoms['types'][x] for x in range(len(sys.atoms["types"])) if sys.atoms["ghost"][x]==False]
+        types = sys.types
         unique_types = np.unique(types)
         if not (len(unique_types) == len(species)):
             raise ValueError("Length of species and number of types found in system are different. Maybe you specified \"Au\" instead of [\"Au\"]")
         #now assign the species to custom
         atomspecies = []        
-        for cc, typ in enumerate(sys.atoms['types']):
-            if not sys.atoms["ghost"][cc]:
-                atomspecies.append(species[int(typ-1)])
+        for cc, typ in enumerate(types):
+            atomspecies.append(species[int(typ-1)])
     else:
         #now if species are already there in custom
         #we can safely ignore any input
-        atomspecies = [sys.atoms['species'][x] for x in range(len(sys.atoms["species"])) if sys.atoms["ghost"][x]==False]
+        atomspecies = sys.species
       
     cell = sys.box
     pbc = [1, 1, 1]
@@ -120,8 +119,7 @@ def convert_snap(sys, species=None):
     
     #thats everything pretty much
     #now create ase Atom
-    positions = sys.atoms['positions']
-    for count, pos in enumerate(positions):
+    for count, pos in enumerate(sys.positions):
         aseatom = Atom(atomspecies[count], pos)
         aseobject.append(aseatom)
     
