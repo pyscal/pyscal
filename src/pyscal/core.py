@@ -14,8 +14,8 @@ import gzip
 import io
 
 import pyscal.csystem as pc
-#import pyscal.traj_process as ptp
-#from pyscal.formats.ase import convert_snap
+import pyscal.traj_process as ptp
+from pyscal.formats.ase import convert_snap
 
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
@@ -390,6 +390,18 @@ class System:
 
 
         """
+        self.neighbors_found = False
+        self.neighbor_method = None
+        self.ghosts_created = False
+        self.actual_box = None
+
+        #box parameters
+        self.rot = [[0,0,0], [0,0,0], [0,0,0]]
+        self.rotinv = [[0,0,0], [0,0,0], [0,0,0]]
+        self.boxdims = [0,0,0]
+        self.triclinic = 0
+        self._atoms = {}
+
         atoms, box = ptp.read_file(filename, format=format, 
                                     compressed=compressed, customkeys=customkeys,)
         self.box = box
