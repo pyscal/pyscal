@@ -17,4 +17,14 @@ def test_system_init():
 	assert sys.natoms == 2
 
 	sys.read_inputfile("tests/files/POSCAR", format="poscar")
-	assert sys.natoms == 42		
+	assert sys.natoms == 42
+
+	sys = pc.System()
+	sys.read_inputfile("tests/files/conf.dump", customkeys=["vx", "vy"])
+	sys.to_file("test.dump", customkeys=["vx"])
+
+	sys = pc.System()
+	sys.read_inputfile("test.dump", customkeys=["vx"])
+	assert sys.natoms == 500
+	assert sys.vx[0] == '0.0394436'
+
