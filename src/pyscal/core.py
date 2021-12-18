@@ -16,6 +16,7 @@ import io
 import pyscal.csystem as pc
 #import pyscal.traj_process as ptp
 #from pyscal.formats.ase import convert_snap
+
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
 
@@ -37,6 +38,14 @@ class System:
         self.boxdims = [0,0,0]
         self.triclinic = 0
         self._atoms = {}
+
+    #overload get methods
+    def __getattr__(self, name):
+        if name in self.atoms.keys():
+            res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
+            return res            
+        else:
+            raise AttributeError
 
     @property
     def natoms(self):
@@ -333,3 +342,55 @@ class System:
         for c, t in enumerate(types):
             concdict[str(t)] = typecounts[c]
         return concdict
+
+
+    def read_inputfile(self, filename, format="lammps-dump", 
+                                            compressed = False, customkeys=None):
+        """
+
+        Read input file that contains the information of system configuration.
+
+        Parameters
+        ----------
+        filename : string
+            name of the input file.
+
+        format : {'lammps-dump', 'poscar', 'ase', 'mdtraj'}
+            format of the input file, in case of `ase` the ASE Atoms object
+
+        compressed : bool, optional
+            If True, force to read a `gz` compressed format, default False.
+
+        customkeys : list
+            A list containing names of headers of extra data that needs to be read in from the
+            input file.
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        `format` keyword specifies the format of the input file. Currently only
+        a `lammps-dump` and `poscar` files are supported.  Additionaly, the widely
+        use Atomic Simulation environment (https://wiki.fysik.dtu.dk/ase/ase/ase.html).
+        mdtraj objects (http://mdtraj.org/1.9.3/) are also supported by using the keyword
+        `'mdtraj'` for format. Please note that triclinic boxes are not yet supported for
+        mdtraj format.
+        Atoms object can also be used directly. This function uses the
+        :func:`~pyscal.traj_process` module to process a file which is then assigned to system.
+
+        `compressed` keyword is not required if a file ends with `.gz` extension, it is
+        automatically treated as a compressed file.
+
+        Triclinic simulation boxes can also be read in.
+
+        If `custom_keys` are provided, this extra information is read in from input files if
+        available. This information is can be accessed directly as `self.atoms['customkey']`
+
+
+        """
+        atoms, box = ptp.read_file(filename, format=format, 
+                                    compressed=compressed, customkeys=customkeys,)
+        self.box = box
+        self.atoms = atoms

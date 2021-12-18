@@ -250,12 +250,13 @@ def write_snap(sys, outfile, compressed = False,
     if len(customkeys) > 0:
         if customvals is None:
             cvals = []
-            for cc, pos in sys.atoms['positions']:
-                cvals.append([sys.atoms[customkey][cc] for customkey in customkeys])
+            for cc, pos in enumerate(sys.atoms['positions']):
+                if not sys.atoms["ghost"][cc]:
+                    cvals.append([sys.atoms[customkey][cc] for customkey in customkeys])
         else:
             #first check if dim is equal to keys dim
             shape = np.array(customvals).shape
-            rqdshape = (len(sys.atoms['positions']), len(customkeys))
+            rqdshape = (len(sys.natoms), len(customkeys))
             if shape != rqdshape:
                 raise ValueError("Customvals should be of shape natoms x ncustomkeys. Found %d-%d, should be %d-%d"%(shape[0], 
                     shape[1], rqdshape[0], rqdshape[1]))
@@ -276,7 +277,7 @@ def write_snap(sys, outfile, compressed = False,
     dump.write("ITEM: TIMESTEP\n")
     dump.write("%d\n" % timestep)
     dump.write("ITEM: NUMBER OF ATOMS\n")
-    dump.write("%d\n" % len(sys.atoms['positions']))
+    dump.write("%d\n" % len(sys.natoms))
     dump.write("ITEM: BOX BOUNDS\n")
     dump.write("%f %f\n" % (0, boxx))
     dump.write("%f %f\n" % (0, boxy))
@@ -292,13 +293,14 @@ def write_snap(sys, outfile, compressed = False,
     dump.write(title_str)
 
     for cc, pos in enumerate(sys.atoms['positions']):
-        if len(customkeys) > 0:
-            cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-            atomline = ("%d %d %f %f %f %s\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2], cval_atom)
-        else:
-            atomline = ("%d %d %f %f %f\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2])
+        if not sys.atoms["ghost"][cc]:
+            if len(customkeys) > 0:
+                cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
+                atomline = ("%d %d %f %f %f %s\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2], cval_atom)
+            else:
+                atomline = ("%d %d %f %f %f\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2])
 
-        dump.write(atomline)
+            dump.write(atomline)
 
     if not isinstance(outfile, io.IOBase):
         dump.close()
