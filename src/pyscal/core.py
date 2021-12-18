@@ -463,3 +463,18 @@ class System:
         ptp.write_file(self, outfile, format = format,
             compressed = compressed, customkeys = customkeys, customvals = customvals,
             timestep = timestep, species = species)
+
+    def to_ase(self, species):
+        """
+        Convert system to an ASE Atoms object
+
+        Parameters
+        ----------
+        species : list of string
+            The chemical species
+
+        Returns
+        -------
+        None
+        """
+        return convert_snap(self, species=species)
