@@ -476,11 +476,12 @@ void get_temp_neighbors_cells(const vector<vector<double>>& positions,
     //first create cells
     vector<cell> cells = set_up_cells(positions, box, neighbordistance);
     int total_cells = cells.size();
-
     int subcell;
     int ti, tj;
     double d;
     double diffx,diffy,diffz;
+    int nop = positions.size();
+    temp_neighbors.resize(nop);
 
     //now loop to find distance
     for(int i=0; i<total_cells; i++){
@@ -551,7 +552,6 @@ int get_all_neighbors_bynumber(py::dict& atoms,
     vector<int> nids;
     vector<double> dists, sorted_dists;
     double boxvol;
-
     if (triclinic==1){
         double a1, a2, a3, b1, b2, b3, c1, c2, c3;
         //rot is the cell vectors transposed
@@ -569,7 +569,6 @@ int get_all_neighbors_bynumber(py::dict& atoms,
     else{
         boxvol = box[0]*box[1]*box[2];
     }
-
     //now find the volume per particle
     double guessvol = boxvol/float(nop);
 
@@ -580,14 +579,12 @@ int get_all_neighbors_bynumber(py::dict& atoms,
     guessdist = prefactor*guessdist;
     neighbordistance = guessdist;
     vector<vector<datom>> temp_neighbors;
-
     if (usecells){
         get_temp_neighbors_cells(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
     else{
         get_temp_neighbors_brute(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
-    
     for (int ti=0; ti<nop; ti++){
         if (int(temp_neighbors[ti].size()) < nns){
             return 0;
@@ -630,7 +627,6 @@ int get_all_neighbors_bynumber(py::dict& atoms,
 
         finished = 1;            
     }
-
     if (assign==1){
         atoms[py::str("neighbors")] = neighbors;
         atoms[py::str("neighbordist")] = neighbordist;
@@ -641,7 +637,6 @@ int get_all_neighbors_bynumber(py::dict& atoms,
         atoms[py::str("phi")] = phi;
         atoms[py::str("cutoff")] = cutoff;
     }
-
     //in any case add the temp neighbors
     atoms[py::str("temp_neighbors")] = atom_temp_neighbors;
     atoms[py::str("temp_neighbordist")] = atom_temp_neighbordist;
