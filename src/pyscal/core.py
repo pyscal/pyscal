@@ -622,7 +622,7 @@ class System:
             raise ValueError("value of threshold should be at least 1.00")
 
         if cells is None:
-            cells = (len(self.positions) > 2500)
+            cells = (len(self.positions) > 250)
 
         if filter == 'type':
             self.filter = 1
