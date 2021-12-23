@@ -30,7 +30,7 @@ setup(
         #),
         Pybind11Extension(
             "pyscal.csystem",
-            ["src/pyscal/neighbor.cpp", "src/pyscal/modsystem_binding.cpp",],
+            ["src/pyscal/neighbor.cpp", "src/pyscal/sh.cpp", "src/pyscal/modsystem_binding.cpp",],
             language='c++',
         ),
 

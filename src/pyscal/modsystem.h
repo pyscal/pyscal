@@ -16,6 +16,8 @@
 #include <string>
 #include <any>
 
+const double PI = 3.141592653589793;
+
 namespace py = pybind11;
 using namespace std;
 
@@ -44,24 +46,24 @@ struct by_dist{
 -----------------------------------------------------*/
 
 double get_abs_distance(vector<double>, vector<double>,
-	const int&, 
-	const vector<vector<double>>&, 
-	const vector<vector<double>>&, 
-	const vector<double>&, 
-	double&, double&, double&);
+    const int&, 
+    const vector<vector<double>>&, 
+    const vector<vector<double>>&, 
+    const vector<double>&, 
+    double&, double&, double&);
 
 void reset_all_neighbors(py::dict&);
 
 void convert_to_spherical_coordinates(double, double, double, 
-	double&, double&, double&);
+    double&, double&, double&);
 
 void get_all_neighbors_normal(py::dict&,
-	const double,
-	const int,
-	const int,
-	const vector<vector<double>>,
-	const vector<vector<double>>,
-	const vector<double>);
+    const double,
+    const int,
+    const int,
+    const vector<vector<double>>,
+    const vector<vector<double>>,
+    const vector<double>);
 
 int cell_index(int, int, int, int, int, int);
 vector<int> cell_periodic(int, int, int, int, int, int);
@@ -127,3 +129,35 @@ int get_all_neighbors_adaptive(py::dict& atoms,
     int nlimit,
     double padding, 
     int usecells);
+
+
+/*-----------------------------------------------------
+    Steinhardt Methods
+-----------------------------------------------------*/
+
+void calculate_factors(const int lm, 
+    vector<vector<double>>& alm,
+    vector<vector<double>>& blm, 
+    vector<vector<double>>& clm,
+    vector<double>& dl,
+    vector<double>& el);
+
+vector<vector<double>> calculate_plm(const int lm,
+    const double costheta, 
+    const double sintheta);
+
+double dfactorial(int l,
+    int m);
+
+vector<vector<vector<double>>> calculate_ylm(const int lm,
+    const double costheta,
+    const double sintheta,
+    const double cosphi,
+    const double sinphi);
+
+vector<vector<vector<vector<double>>>> calculate_q_atom(const int lm,
+    const vector<double>& theta,
+    const vector<double>& phi);
+
+void calculate_q(py::dict& atoms,
+    const int lm);
