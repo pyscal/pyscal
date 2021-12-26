@@ -123,22 +123,19 @@ vector<vector<vector<double>>> calculate_ylm(const int lm,
 	const double cosphi,
 	const double sinphi)
 	{
-
 	vector<vector<vector<double>>> ylm;
 	vector<vector<double>> plm;
 
 	ylm.resize(lm+1);
 	
 	for(int l=0; l<=lm; l++){
-		ylm[l].resize(lm+1);
-		for(int m=0; m<=(2*l+1); m++){
-			ylm[l][m].emplace_back(0);
-			ylm[l][m].emplace_back(0);
+		ylm[l].resize(2*l+1);
+		for(int m=0; m<(2*l+1); m++){
+			ylm[l][m].emplace_back(0.0);
+			ylm[l][m].emplace_back(0.0);
 		}
 	}
-
 	plm = calculate_plm(lm, costheta, sintheta);
-
 	double zv = 1.0/sqrt(2.0);
 	double cosi = 1.0;
 	double cosf = cosphi;
@@ -146,13 +143,11 @@ vector<vector<vector<double>>> calculate_ylm(const int lm,
 	double sinf = -sinphi; 
 	double ci, si;
 	double fa, fb, factor;
-
 	for(int l=0; l<=lm; l++){
 
 		ylm[l][l][0] = plm[l][0]*zv;
 
 	}
-
 	for(int m=1; m<=lm; m++){
 
 		ci = 2*cosphi*cosi-cosf;
@@ -166,14 +161,13 @@ vector<vector<vector<double>>> calculate_ylm(const int lm,
 			
 			fa = plm[l][m]*ci*zv;
 			fb = plm[l][m]*si*zv;
-
-			factor = sqrt(((2.0*double(l) + 1.0)/ (4.0*PI))*dfactorial(l,m));
+			//factor = sqrt(((2.0*double(l) + 1.0)/ (2.0*PI))*dfactorial(l,m));
+			factor = 1.00;
 
 			ylm[l][l+m][0] = factor*fa;
 			ylm[l][l+m][1] = factor*fb;
-			ylm[l][l-m][0] = factor*fa*pow(-1.0,m);
-			ylm[l][l-m][1] = factor*fb*pow(-1.0,m);
-
+			ylm[l][l-m][0] = factor*fa*pow(-1.0,-m);
+			ylm[l][l-m][1] = factor*fb*pow(-1.0,-m);
 		}
 	}
 
@@ -186,11 +180,9 @@ vector<vector<vector<vector<double>>>> calculate_q_atom(const int lm,
 	const vector<double>& phi)
 {
 	vector<vector<vector<vector<double>>>> ylm_atom;
-
 	//this is like a loop over neighbors
 	for(int i=0; i<theta.size(); i++){
 		ylm_atom.emplace_back(calculate_ylm(lm, cos(theta[i]), sin(theta[i]), cos(phi[i]), sin(phi[i])));
-		//now we need to do the loop over neighbors
 	}
 	return ylm_atom;
 }
@@ -198,12 +190,10 @@ vector<vector<vector<vector<double>>>> calculate_q_atom(const int lm,
 void calculate_q(py::dict& atoms,
 	const int lm)
 {
-
 	//we need theta and pi
     vector<vector<double>> theta = atoms[py::str("theta")].cast<vector<vector<double>>>();
     vector<vector<double>> phi = atoms[py::str("phi")].cast<vector<vector<double>>>();
     vector<vector<double>> weights = atoms[py::str("neighborweight")].cast<vector<vector<double>>>();
-
     int nop = theta.size();
     vector<vector<vector<double>>> qlm_real(nop);
     vector<vector<vector<double>>> qlm_img(nop);
@@ -212,28 +202,25 @@ void calculate_q(py::dict& atoms,
     int nn;
     double summ, weightsum;
     double realti, imgti;
-
 	for (int ti=0; ti<nop; ti++){
 		//calculate ylm first
 		auto ylm_atom = calculate_q_atom(lm, theta[ti], phi[ti]);	
-
 		qlm_real[ti].resize(lm+1);
 		qlm_img[ti].resize(lm+1);
 		
 		for(int l=0; l<=lm; l++){
 			summ = 0;
-			for(int m=0; m<=(2*l+1); m++){
+			for(int m=0; m<(2*l+1); m++){
 				realti = 0;
 				imgti = 0;
 				weightsum = 0;
-				for(int ci=0; ci<nn; ci++){
+				for(int ci=0; ci<theta[ti].size(); ci++){
 					//TODO: add condition
 					realti += weights[ti][ci]*ylm_atom[ci][l][m][0];
-					imgti += weights[ti][ci]*ylm_atom[ci][l][m][1];
+					imgti += weights[ti][ci]*ylm_atom[ci][l][m][1];					
 					weightsum += weights[ti][ci];
 				}
-
-				//turn off for Voronoi
+				//TODO: turn off for Voronoi
 				realti = realti/float(weightsum);
 				imgti = imgti/float(weightsum);
 
@@ -246,7 +233,6 @@ void calculate_q(py::dict& atoms,
 			q[ti].emplace_back(summ);
 		}
 	}
-
     atoms[py::str("qlm_real")] = qlm_real;
     atoms[py::str("qlm_img")] = qlm_img;
     atoms[py::str("q")] = q;
