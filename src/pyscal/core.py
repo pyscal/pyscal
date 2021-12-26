@@ -12,6 +12,7 @@ from ase.io import write
 import uuid
 import gzip
 import io
+from scipy.special import sph_harm
 
 import pyscal.csystem as pc
 import pyscal.traj_process as ptp
@@ -686,3 +687,75 @@ class System:
             self.box = backupbox
         '''
         self.neighbors_found = True
+
+    def calculate_q(self, q, use_c=False):
+        """
+        Find the Steinhardt parameter q_l for all atoms.
+
+        Parameters
+        ----------
+        q_l : int or list of ints
+            A list of all Steinhardt parameters to be found.
+        
+        use_c: bool, optional
+            If False, use Python for calculations.
+
+        Returns
+        -------
+        q : list of floats
+            calculated q values
+
+        Notes
+        -----
+        Enables calculation of the Steinhardt parameters [1] q. The type of
+        q values depend on the method used to calculate neighbors. See the description
+        :func:`~pyscal.core.System.find_neighbors` for more details. 
+
+        The option `use_c` specifies which backend to use for calculations. If True,
+        scipy is used to perform the calculations. If False, an algorithm [3] implemented in C++
+        backend is used. The C++ algorithm is faster is a large, consecutive number of q values
+        are to be calculated.
+
+        This function creates three new attributes for this class: `qx`, `qx_real` and `qx_imag`,
+        where `stands` for the q number.   
+
+        References
+        ----------
+        .. [1] Steinhardt, PJ, Nelson, DR, Ronchetti, M. Phys Rev B 28, 1983
+        .. [2] Lechner, W, Dellago, C, J Chem Phys, 2013
+        """
+        if isinstance(q, int):
+            qq = [q]
+        else:
+            qq = q
+
+        if not neighbors_found:
+            raise RuntimeError("Q calculation needs neighbor calculation first.")
+
+        theta = np.array(self.atoms["theta"])
+        phi = np.array(self.atoms["phi"])
+
+        qvals = []
+
+        for val in qq:
+            shs = []
+            sh = sph_harm(0, val, phi, theta)
+            shs.append(np.mean(sh, axis=1))
+            for m in range(1, val+1):
+                sh = sph_harm(m, val, phi, theta)
+                shs.append(np.mean(sh, axis=1))
+                sh = sh*(-1)**(-m)
+                shs.append(np.mean(sh, axis=1))
+            shs = np.array(shs)
+            q_real = np.real(shs)
+            q_imag = np.imag(shs)
+            shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
+            factor = (4.0*np.pi/(2*l+1))
+            qval = (factor*shs_sum)**0.5
+            qvals.append(qval)    
+            self.atoms["q%d"%val] = qval
+            self.atoms["q%d_real"%val] = q_real
+            self.atoms["q%d_imag"%val] = q_imag
+        
+        return qvals
+
