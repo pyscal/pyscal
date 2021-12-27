@@ -740,16 +740,17 @@ class System:
         else:
             theta = np.array(self.atoms["theta"])
             phi = np.array(self.atoms["phi"])
+            weights = np.array(self.atoms["neighborweight"])
             qvals = []
             for val in qq:
                 shs = []
                 sh = sph_harm(0, val, phi, theta)
-                shs.append(np.mean(sh, axis=1))
+                shs.append(np.average(sh, axis=1, weights=weights))
                 for m in range(1, val+1):
                     sh = sph_harm(m, val, phi, theta)
-                    shs.append(np.mean(sh, axis=1))
+                    shs.append(np.average(sh, axis=1, weights=weights))
                     sh = sh*(-1)**(-m)
-                    shs.append(np.mean(sh, axis=1))
+                    shs.append(np.average(sh, axis=1, weights=weights))
                 shs = np.array(shs)
                 q_real = np.real(shs)
                 q_imag = np.imag(shs)
