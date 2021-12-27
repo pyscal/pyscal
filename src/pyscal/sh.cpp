@@ -233,7 +233,27 @@ void calculate_q(py::dict& atoms,
 			q[ti].emplace_back(summ);
 		}
 	}
-    atoms[py::str("qlm_real")] = qlm_real;
-    atoms[py::str("qlm_img")] = qlm_img;
-    atoms[py::str("q")] = q;
+
+	string key1, key2, key3;
+	vector<double> qtemp;
+	vector<vector<double>> qtemp1, qtemp2;
+
+	for(int l=0; l<=lm; l++){
+		key1 = "q"+to_string(l);
+		key2 = "q"+to_string(l)+"_real";
+		key3 = "q"+to_string(l)+"_imag";
+
+		qtemp.clear();
+		qtemp1.clear();
+		qtemp2.clear();
+
+		for (int ti=0; ti<nop; ti++){
+			qtemp.emplace_back(q[ti][l]);
+			qtemp1.emplace_back(qlm_real[ti][l]);
+			qtemp2.emplace_back(qlm_img[ti][l]);
+		}
+	    atoms[py::str(key1)] = qtemp;
+	    atoms[py::str(key2)] = qtemp1;
+	    atoms[py::str(key3)] = qtemp2;
+	}
 }

@@ -732,30 +732,34 @@ class System:
         if not neighbors_found:
             raise RuntimeError("Q calculation needs neighbor calculation first.")
 
-        theta = np.array(self.atoms["theta"])
-        phi = np.array(self.atoms["phi"])
+        if use_c:
+            lm = max(qq)
+            pc.calculate_q(self.atoms, lm)
+            qvals = [self.atoms["q%d"%x] for x in qq]
 
-        qvals = []
-
-        for val in qq:
-            shs = []
-            sh = sph_harm(0, val, phi, theta)
-            shs.append(np.mean(sh, axis=1))
-            for m in range(1, val+1):
-                sh = sph_harm(m, val, phi, theta)
+        else:
+            theta = np.array(self.atoms["theta"])
+            phi = np.array(self.atoms["phi"])
+            qvals = []
+            for val in qq:
+                shs = []
+                sh = sph_harm(0, val, phi, theta)
                 shs.append(np.mean(sh, axis=1))
-                sh = sh*(-1)**(-m)
-                shs.append(np.mean(sh, axis=1))
-            shs = np.array(shs)
-            q_real = np.real(shs)
-            q_imag = np.imag(shs)
-            shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
-            factor = (4.0*np.pi/(2*l+1))
-            qval = (factor*shs_sum)**0.5
-            qvals.append(qval)    
-            self.atoms["q%d"%val] = qval
-            self.atoms["q%d_real"%val] = q_real
-            self.atoms["q%d_imag"%val] = q_imag
+                for m in range(1, val+1):
+                    sh = sph_harm(m, val, phi, theta)
+                    shs.append(np.mean(sh, axis=1))
+                    sh = sh*(-1)**(-m)
+                    shs.append(np.mean(sh, axis=1))
+                shs = np.array(shs)
+                q_real = np.real(shs)
+                q_imag = np.imag(shs)
+                shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
+                factor = (4.0*np.pi/(2*l+1))
+                qval = (factor*shs_sum)**0.5
+                qvals.append(qval)    
+                self.atoms["q%d"%val] = qval
+                self.atoms["q%d_real"%val] = q_real
+                self.atoms["q%d_imag"%val] = q_imag
         
         return qvals
 
