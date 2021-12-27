@@ -508,6 +508,7 @@ class System:
         self.atoms["theta"] = []
         self.atoms["phi"] = []
         self.atoms["cutoff"] = []
+        self.neighbors_found = False
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, 
             filter=None, voroexp=1, padding=1.2, nlimit=6, 
@@ -738,29 +739,86 @@ class System:
             qvals = [self.atoms["q%d"%x] for x in qq]
 
         else:
-            theta = np.array(self.atoms["theta"])
-            phi = np.array(self.atoms["phi"])
-            weights = np.array(self.atoms["neighborweight"])
-            qvals = []
-            for val in qq:
-                shs = []
-                sh = sph_harm(0, val, phi, theta)
-                shs.append(np.average(sh, axis=1, weights=weights))
-                for m in range(1, val+1):
-                    sh = sph_harm(m, val, phi, theta)
-                    shs.append(np.average(sh, axis=1, weights=weights))
-                    sh = sh*(-1)**(-m)
-                    shs.append(np.average(sh, axis=1, weights=weights))
-                shs = np.array(shs)
-                q_real = np.real(shs)
-                q_imag = np.imag(shs)
-                shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
-                factor = (4.0*np.pi/(2*val+1))
-                qval = (factor*shs_sum)**0.5
-                qvals.append(qval)    
-                self.atoms["q%d"%val] = qval
-                self.atoms["q%d_real"%val] = q_real
-                self.atoms["q%d_imag"%val] = q_imag
-        
+            qvals = self._calculate_q(qq)
+
         return qvals
 
+    def _calculate_q(self, qq):
+        """
+        Private method for calculation of qvals
+        """
+        theta = np.array(self.atoms["theta"])
+        phi = np.array(self.atoms["phi"])
+        weights = np.array(self.atoms["neighborweight"])
+        qvals = []
+        for val in qq:
+            shs = []
+            sh = sph_harm(0, val, phi, theta)
+            shs.append(np.average(sh, axis=1, weights=weights))
+            for m in range(1, val+1):
+                sh = sph_harm(m, val, phi, theta)
+                shs.append(np.average(sh, axis=1, weights=weights))
+                sh = sh*(-1)**(-m)
+                shs.append(np.average(sh, axis=1, weights=weights))
+            shs = np.array(shs)
+            q_real = np.real(shs)
+            q_imag = np.imag(shs)
+            shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
+            factor = (4.0*np.pi/(2*val+1))
+            qval = (factor*shs_sum)**0.5
+            qvals.append(qval)    
+            self.atoms["q%d"%val] = qval
+            self.atoms["q%d_real"%val] = q_real
+            self.atoms["q%d_imag"%val] = q_imag
+    
+        return qvals
+
+    def _calculate_aq(self, qq):
+        """
+        Private method for calculation of avged qvals
+        """
+
+        todo_q = []
+        for q in qq:
+            keys = ["q%d"%q, "q%d_real"%q, "q%d_imag"%q]
+            prod = []
+            for key in keys:
+                if key in self.atoms.keys():
+                    prod.append(True)
+                else:
+                    prod.append(False)
+            prod = np.prod(prod)
+            if not prod:
+                todo_q.append(q)
+
+        _ = self._calculate_q(todo_q)
+
+        #now all qs are calculated
+        avg_qvals = []
+
+        nn = len(self.atoms["positions"])
+
+        #loop over atoms
+        for val in qq:
+            qval_arr = []
+            for n in range(nn):
+            #loop over each q
+                real_key = 'q%d_real'%val
+                imag_key = 'q%d_imag'%val
+                summ = 0
+                for m in range(0, 2*val+1):
+                    realti = self.atoms[real_key][m][n]
+                    imagti = self.atoms[imag_key][m][n]
+                    for p in self.atoms["neighbors"][n]:
+                        realti += self.atoms[real_key][m][p]
+                        imagti += self.atoms[imag_key][m][p]
+                    realti = realti/(len(self.atoms["neighbors"][n])+1)
+                    imagti = imagti/(len(self.atoms["neighbors"][n])+1)
+                    summ += realti**2 + imagti**2
+                factor = (4.0*np.pi/(2*val+1))
+                qval = (factor*summ)**0.5
+                qval_arr.append(qval)
+            avg_qvals.append(qval_arr)
+            self.atoms["avg_q%d"%val] = qval_arr
+
+        return avg_qvals
