@@ -729,7 +729,7 @@ class System:
         else:
             qq = q
 
-        if not neighbors_found:
+        if not self.neighbors_found:
             raise RuntimeError("Q calculation needs neighbor calculation first.")
 
         if use_c:
@@ -754,7 +754,7 @@ class System:
                 q_real = np.real(shs)
                 q_imag = np.imag(shs)
                 shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
-                factor = (4.0*np.pi/(2*l+1))
+                factor = (4.0*np.pi/(2*val+1))
                 qval = (factor*shs_sum)**0.5
                 qvals.append(qval)    
                 self.atoms["q%d"%val] = qval
