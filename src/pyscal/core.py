@@ -689,14 +689,17 @@ class System:
         '''
         self.neighbors_found = True
 
-    def calculate_q(self, q, use_c=False):
+    def calculate_q(self, q, averaged=False, use_c=False):
         """
         Find the Steinhardt parameter q_l for all atoms.
 
         Parameters
         ----------
-        q_l : int or list of ints
+        q : int or list of ints
             A list of all Steinhardt parameters to be found.
+
+        averaged : bool, optional
+            If True, return the averaged q values, default False
         
         use_c: bool, optional
             If False, use Python for calculations.
@@ -733,14 +736,16 @@ class System:
         if not self.neighbors_found:
             raise RuntimeError("Q calculation needs neighbor calculation first.")
 
-        if use_c:
-            lm = max(qq)
-            pc.calculate_q(self.atoms, lm)
-            qvals = [self.atoms["q%d"%x] for x in qq]
+        if averaged:
+            qvals = self._calculate_aq(qq)
+        else:    
+            if use_c:
+                lm = max(qq)
+                pc.calculate_q(self.atoms, lm)
+                qvals = [self.atoms["q%d"%x] for x in qq]
 
-        else:
-            qvals = self._calculate_q(qq)
-
+            else:
+                qvals = self._calculate_q(qq)
         return qvals
 
     def _calculate_q(self, qq):
