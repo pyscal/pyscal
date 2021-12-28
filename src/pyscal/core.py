@@ -689,14 +689,17 @@ class System:
         '''
         self.neighbors_found = True
 
-    def calculate_q(self, q, use_c=False):
+    def calculate_q(self, q, averaged=False, use_c=False):
         """
         Find the Steinhardt parameter q_l for all atoms.
 
         Parameters
         ----------
-        q_l : int or list of ints
+        q : int or list of ints
             A list of all Steinhardt parameters to be found.
+
+        averaged : bool, optional
+            If True, return the averaged q values, default False
         
         use_c: bool, optional
             If False, use Python for calculations.
@@ -733,14 +736,16 @@ class System:
         if not self.neighbors_found:
             raise RuntimeError("Q calculation needs neighbor calculation first.")
 
-        if use_c:
-            lm = max(qq)
-            pc.calculate_q(self.atoms, lm)
+        if averaged:
+            self._calculate_aq(qq)
+            qvals = [self.atoms["avg_q%d"%x] for x in qq]
+        else:    
+            if use_c:
+                lm = max(qq)
+                pc.calculate_q(self.atoms, lm)
+            else:
+                self._calculate_q(qq)
             qvals = [self.atoms["q%d"%x] for x in qq]
-
-        else:
-            qvals = self._calculate_q(qq)
-
         return qvals
 
     def _calculate_q(self, qq):
@@ -750,7 +755,6 @@ class System:
         theta = np.array(self.atoms["theta"])
         phi = np.array(self.atoms["phi"])
         weights = np.array(self.atoms["neighborweight"])
-        qvals = []
         for val in qq:
             shs = []
             sh = sph_harm(0, val, phi, theta)
@@ -766,12 +770,9 @@ class System:
             shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
             factor = (4.0*np.pi/(2*val+1))
             qval = (factor*shs_sum)**0.5
-            qvals.append(qval)    
             self.atoms["q%d"%val] = qval
             self.atoms["q%d_real"%val] = q_real
             self.atoms["q%d_imag"%val] = q_imag
-    
-        return qvals
 
     def _calculate_aq(self, qq):
         """
@@ -794,8 +795,6 @@ class System:
         _ = self._calculate_q(todo_q)
 
         #now all qs are calculated
-        avg_qvals = []
-
         nn = len(self.atoms["positions"])
 
         #loop over atoms
@@ -818,7 +817,4 @@ class System:
                 factor = (4.0*np.pi/(2*val+1))
                 qval = (factor*summ)**0.5
                 qval_arr.append(qval)
-            avg_qvals.append(qval_arr)
             self.atoms["avg_q%d"%val] = qval_arr
-
-        return avg_qvals
