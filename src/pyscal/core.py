@@ -280,6 +280,74 @@ class System:
 
         return atoms
 
+    def apply_mask(self, masks, mask_type='secondary'):
+        """
+        Apply mask to an atom
+
+        Parameters
+        ----------
+        masks : list of bools
+            list of mask to be applied
+
+        mask_type: string, optional
+            type of mask to be applied, either `primary`, `secondary` or `all`
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Masks can be used to exclude atoms from neighbor calculations. An atom for which
+        mask is set to True is excluded from the calculation. There are two types of masks,
+        `primary` or `secondary`. For example, neighbors are being calculated for a central
+        atom `i`. The neighbor atom is denoted as `j`. If `primary` mask of `i` is True, no neighbor
+        calculation is carried out for `i`. If it is False, `i` is considered. Now if `secondary`
+        mask of `j` is True, it will not included in the list of neighbors of `i` even if it is within
+        the cutoff distance. The `primary` mask of `j` has no effect in this situation.
+
+        An example situation can be to calculate the local concentration around Ni atoms in a NiAl
+        structure. In this case, the `primary` mask of all Al atoms can be set to True so that
+        only `Ni` atoms are considered. Now, in a second case, the task is to count the number of Al
+        atoms around each Ni atom. For this case, the `primary` mask of all Al atoms can be set to True,
+        and the `secondary` mask of all Ni atoms can be set to True.
+
+        The masks for ghost atoms are copied from the corresponding mask for real atoms.
+        """
+        #check if length of mask is equal to length of real atoms
+        if len(masks) != self.natoms:
+            raise ValueError("Length of masks should be equal to number of atoms in the system")
+
+        #apply masks
+        if (mask_type == 'primary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_1"][i] = masks[self.atoms["head"][i]]
+        if (mask_type == 'secondary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_2"][i] = masks[self.atoms["head"][i]]
+
+
+    def remove_mask(self, mask_type='primary'):
+        """
+        Remove applied masks
+
+        Parameters
+        ----------
+        mask_type: string, optional
+            type of mask to be applied, either `primary`, `secondary` or `all`
+
+        Returns
+        -------
+        None
+        """
+        #remove masks
+        if (mask_type == 'primary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_1"][i] = False
+        if (mask_type == 'secondary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_2"][i] = False
+
 
     def embed_in_cubic_box(self,):
         """
