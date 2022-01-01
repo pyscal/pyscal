@@ -79,6 +79,8 @@ void get_all_neighbors_cells(py::dict&,
     const vector<double>&);
 
 void get_temp_neighbors_brute(const vector<vector<double>>& positions,
+    const vector<bool>& mask_1,
+    const vector<bool>& mask_2,
     vector<vector<datom>>& temp_neighbors,
     const int& triclinic,
     const double neighbordistance, 
@@ -87,6 +89,8 @@ void get_temp_neighbors_brute(const vector<vector<double>>& positions,
     const vector<double>& box);
 
 void get_temp_neighbors_cells(const vector<vector<double>>& positions,
+    const vector<bool>& mask_1,
+    const vector<bool>& mask_2,
     vector<vector<datom>>& temp_neighbors,
     const int& triclinic,
     const double neighbordistance, 

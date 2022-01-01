@@ -601,7 +601,7 @@ class System:
         self.neighbors_found = False
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, 
-            filter=None, voroexp=1, padding=1.2, nlimit=6, 
+            voroexp=1, padding=1.2, nlimit=6, 
             cells=None, nmax=12, assign_neighbor=True):
         """
 
@@ -622,11 +622,6 @@ class System:
 
         threshold : float, optional
             only used if ``cutoff=adaptive``. A threshold which is used as safe limit for calculation of cutoff.
-
-        filter : {'None', 'type', 'type_r'}, optional
-            apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
-            `type`, only atoms of the same type would be included in the neighbor calculations. 
-            If `type_r`, only atoms of a different type will be included in the calculation. Default None.
 
         voroexp : int, optional
             only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards
@@ -716,17 +711,12 @@ class System:
         if cells is None:
             cells = (len(self.positions) > 250)
 
-        if filter == 'type':
-            self.filter = 1
-        elif filter == 'type_r':
-            self.filter = 2
-
         if method == 'cutoff':            
             if cutoff=='sann':    
                 finished = False
                 for i in range(1, 10):
                     finished = pc.get_all_neighbors_sann(self.atoms, 0.0, 
-                        self.triclinic, self.filter, self.rot, self.rotinv,
+                        self.triclinic, self.rot, self.rotinv,
                         self.boxdims, threshold*i, cells)
                     if finished:
                         if i>1:
@@ -739,21 +729,21 @@ class System:
             
             elif cutoff=='adaptive' or cutoff==0:
                 finished = pc.get_all_neighbors_adaptive(self.atoms, 0.0,
-                    self.triclinic, self.filter, self.rot, self.rotinv,
+                    self.triclinic, self.rot, self.rotinv,
                     self.boxdims, threshold, nlimit, padding, cells)
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")
             else:
                 if cells:
                     pc.get_all_neighbors_cells(self.atoms, cutoff,
-                        self.triclinic, self.filter, self.rot, self.rotinv, self.boxdims)
+                        self.triclinic, self.rot, self.rotinv, self.boxdims)
                 else:
                     pc.get_all_neighbors_normal(self.atoms, cutoff,
-                        self.triclinic, self.filter, self.rot, self.rotinv, self.boxdims)
+                        self.triclinic, self.rot, self.rotinv, self.boxdims)
 
         elif method == 'number':
             finished = pc.get_all_neighbors_bynumber(self.atoms, 0.0, 
-                self.triclinic, self.filter, self.rot, self.rotinv,
+                self.triclinic, self.rot, self.rotinv,
                 self.boxdims, threshold, nmax, cells, assign_neighbor)
             if not finished:
                 raise RuntimeError("Could not find enough neighbors - try increasing threshold")
