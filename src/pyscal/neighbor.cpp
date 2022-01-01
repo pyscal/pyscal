@@ -124,11 +124,9 @@ void convert_to_spherical_coordinates(double x,
 void get_all_neighbors_normal(py::dict& atoms,
     const double neighbordistance,
     const int triclinic,
-    const int filter, 
     const vector<vector<double>> rot, 
     const vector<vector<double>> rotinv,
-    const vector<double> box,
-    const int filter)
+    const vector<double> box)
     {
     
     double d;
@@ -162,14 +160,7 @@ void get_all_neighbors_normal(py::dict& atoms,
             d = get_abs_distance(positions[ti], positions[tj],
                 triclinic, rot, rotinv, box, 
                 diffx, diffy, diffz);
-            if (d < neighbordistance){
-                //if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                //    continue;
-                //}
-                //else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
-                 //   continue;
-                //}
-                
+            if (d < neighbordistance){                
                 neighbors[ti].emplace_back(tj);
                 neighbors[tj].emplace_back(ti);
 
@@ -335,11 +326,9 @@ vector<cell> set_up_cells(const vector<vector<double>>& positions,
 void get_all_neighbors_cells(py::dict& atoms,
     const double& neighbordistance,
     const int& triclinic,
-    const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
-    const vector<double>& box,
-    const int filter){
+    const vector<double>& box){
 
     double d;
     double diffx,diffy,diffz;
@@ -382,12 +371,6 @@ void get_all_neighbors_cells(py::dict& atoms,
                             triclinic, rot, rotinv, box, 
                             diffx, diffy, diffz);
                         if (d < neighbordistance){
-                            //if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                            //    continue;
-                            //}
-                            //else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
-                            //    continue;
-                            //}
                             neighbors[ti].emplace_back(tj);
                             neighbors[tj].emplace_back(ti);
 
@@ -526,7 +509,6 @@ void get_temp_neighbors_cells(const vector<vector<double>>& positions,
 int get_all_neighbors_bynumber(py::dict& atoms,
     double& neighbordistance,
     const int& triclinic,
-    const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
     const vector<double>& box,
@@ -655,8 +637,7 @@ int get_all_neighbors_bynumber(py::dict& atoms,
 
 int get_all_neighbors_sann(py::dict& atoms,
     double& neighbordistance,
-    const int& triclinic,
-    const int& filter, 
+    const int& triclinic, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
     const vector<double>& box,
@@ -832,7 +813,6 @@ int get_all_neighbors_sann(py::dict& atoms,
 int get_all_neighbors_adaptive(py::dict& atoms,
     double& neighbordistance,
     const int& triclinic,
-    const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
     const vector<double>& box,
