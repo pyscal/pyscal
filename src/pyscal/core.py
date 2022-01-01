@@ -126,6 +126,12 @@ class System:
             atoms['types'] = [1 for x in range(nop)]
         if not 'ghost' in atoms.keys():
             atoms['ghost'] = [False for x in range(nop)]
+        if not 'mask_1' in atoms.keys():
+            atoms['mask_1'] = [False for x in range(nop)]
+        if not 'mask_2' in atoms.keys():
+            atoms['mask_2'] = [False for x in range(nop)]
+        if not 'condition' in atoms.keys():
+            atoms['condition'] = [True for x in range(nop)]
 
         if(len(atoms['positions']) < 200):
             #we need to estimate a rough idea
@@ -138,7 +144,7 @@ class System:
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
             atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True)
-
+        
         self._atoms = atoms
 
     #iterator for atoms
@@ -229,18 +235,24 @@ class System:
         ids = []
         types = []
         ghosts = []
+        mask_1 = []
+        mask_2 = []
+        condition = []
 
         for i in range(x1, x2):
             for j in range(y1, y2):
                 for k in range(z1, z2):
                     if (i==j==k==0):
                         continue
-                    for pos in atoms['positions']:
+                    for count, pos in enumerate(atoms['positions']):
                         pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
                         positions.append(pos)
                         ids.append(idstart)
                         idstart += 1
-                        types.append(tp)
+                        types.append(atoms['types'][count])
+                        mask_1.append(atoms['mask_1'][count])
+                        mask_2.append(atoms['mask_2'][count])
+                        condition.append(atoms['condition'][count])
                         ghosts.append(ghost)
 
         if scale_box:
@@ -255,6 +267,9 @@ class System:
         atoms['ids'] = [*atoms['ids'], *ids]
         atoms['types'] = [*atoms['types'], *types]
         atoms['ghost'] = [*atoms['ghost'], *ghosts]
+        atoms['mask_1'] = [*atoms['mask_1'], *ghosts]
+        atoms['mask_2'] = [*atoms['mask_2'], *ghosts]
+        atoms['condition'] = [*atoms['condition'], *ghosts]
 
         return atoms
 
@@ -818,3 +833,6 @@ class System:
                 qval = (factor*summ)**0.5
                 qval_arr.append(qval)
             self.atoms["avg_q%d"%val] = qval_arr
+
+
+    def apply_mask

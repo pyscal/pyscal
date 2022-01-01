@@ -127,7 +127,8 @@ void get_all_neighbors_normal(py::dict& atoms,
     const int filter, 
     const vector<vector<double>> rot, 
     const vector<vector<double>> rotinv,
-    const vector<double> box)
+    const vector<double> box,
+    const int filter)
     {
     
     double d;
@@ -137,6 +138,7 @@ void get_all_neighbors_normal(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<int> types = atoms[py::str("types")].cast<vector<int>>();
     //auto positions = atoms[py::str("positions")].cast<py::array_t<double>>();
 
     int nop = positions.size();
@@ -331,7 +333,8 @@ void get_all_neighbors_cells(py::dict& atoms,
     const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
-    const vector<double>& box){
+    const vector<double>& box,
+    const int filter){
 
     double d;
     double diffx,diffy,diffz;
