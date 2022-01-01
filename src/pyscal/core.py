@@ -132,6 +132,8 @@ class System:
             atoms['mask_2'] = [False for x in range(nop)]
         if not 'condition' in atoms.keys():
             atoms['condition'] = [True for x in range(nop)]
+        if not 'head' in atoms.keys():
+            atoms['head'] = [x for x in range(nop)]
 
         if(len(atoms['positions']) < 200):
             #we need to estimate a rough idea
@@ -238,6 +240,7 @@ class System:
         mask_1 = []
         mask_2 = []
         condition = []
+        head = []
 
         for i in range(x1, x2):
             for j in range(y1, y2):
@@ -245,15 +248,18 @@ class System:
                     if (i==j==k==0):
                         continue
                     for count, pos in enumerate(atoms['positions']):
-                        pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                        positions.append(pos)
-                        ids.append(idstart)
-                        idstart += 1
-                        types.append(atoms['types'][count])
-                        mask_1.append(atoms['mask_1'][count])
-                        mask_2.append(atoms['mask_2'][count])
-                        condition.append(atoms['condition'][count])
-                        ghosts.append(ghost)
+                        #we should create ghost images for only real atoms
+                        if not atoms["ghost"][count]:
+                            pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
+                            positions.append(pos)
+                            ids.append(idstart)
+                            idstart += 1
+                            types.append(atoms['types'][count])
+                            mask_1.append(atoms['mask_1'][count])
+                            mask_2.append(atoms['mask_2'][count])
+                            condition.append(atoms['condition'][count])
+                            ghosts.append(ghost)
+                            head.append(count)
 
         if scale_box:
             box[0] = xs*np.array(box[0])
@@ -270,6 +276,7 @@ class System:
         atoms['mask_1'] = [*atoms['mask_1'], *ghosts]
         atoms['mask_2'] = [*atoms['mask_2'], *ghosts]
         atoms['condition'] = [*atoms['condition'], *ghosts]
+        atoms['head'] = [*atoms['head'], *head]
 
         return atoms
 
@@ -834,5 +841,3 @@ class System:
                 qval_arr.append(qval)
             self.atoms["avg_q%d"%val] = qval_arr
 
-
-    def apply_mask
