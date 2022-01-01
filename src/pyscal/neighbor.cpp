@@ -124,7 +124,6 @@ void convert_to_spherical_coordinates(double x,
 void get_all_neighbors_normal(py::dict& atoms,
     const double neighbordistance,
     const int triclinic,
-    const int filter, 
     const vector<vector<double>> rot, 
     const vector<vector<double>> rotinv,
     const vector<double> box)
@@ -137,6 +136,8 @@ void get_all_neighbors_normal(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
+    vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
     //auto positions = atoms[py::str("positions")].cast<py::array_t<double>>();
 
     int nop = positions.size();
@@ -151,18 +152,15 @@ void get_all_neighbors_normal(py::dict& atoms,
 
     //now loop and calculate things
     for (int ti=0; ti<nop; ti++){
+        //only consider ti if mask_1 is false
+        if (mask_1[ti]) continue;
         for (int tj=ti+1; tj<nop; tj++){
+            //mask 2 is applied here
+            if (mask_2[tj]) continue;
             d = get_abs_distance(positions[ti], positions[tj],
                 triclinic, rot, rotinv, box, 
                 diffx, diffy, diffz);
-            if (d < neighbordistance){
-                //if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                //    continue;
-                //}
-                //else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
-                 //   continue;
-                //}
-                
+            if (d < neighbordistance){                
                 neighbors[ti].emplace_back(tj);
                 neighbors[tj].emplace_back(ti);
 
@@ -328,7 +326,6 @@ vector<cell> set_up_cells(const vector<vector<double>>& positions,
 void get_all_neighbors_cells(py::dict& atoms,
     const double& neighbordistance,
     const int& triclinic,
-    const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
     const vector<double>& box){
@@ -341,6 +338,8 @@ void get_all_neighbors_cells(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
+    vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -362,24 +361,20 @@ void get_all_neighbors_cells(py::dict& atoms,
         for(size_t mi=0; mi<cells[i].members.size(); mi++){
             //now go through the neighbors
             ti = cells[i].members[mi];
+            if (mask_1[ti]) continue;
             for(size_t j=0 ; j<cells[i].neighbor_cells.size(); j++){
                //loop through members of j
                subcell = cells[i].neighbor_cells[j];
                for(size_t mj=0; mj<cells[subcell].members.size(); mj++){
                     //now we have mj -> members/compare with
                     tj = cells[subcell].members[mj];
+                    if (mask_2[tj]) continue;
                     //compare ti and tj and add
                     if (ti < tj){
                         d = get_abs_distance(positions[ti], positions[tj],
                             triclinic, rot, rotinv, box, 
                             diffx, diffy, diffz);
                         if (d < neighbordistance){
-                            //if ((filter == 1) && (atoms[ti].type != atoms[tj].type)){
-                            //    continue;
-                            //}
-                            //else if ((filter == 2) && (atoms[ti].type == atoms[tj].type)){
-                            //    continue;
-                            //}
                             neighbors[ti].emplace_back(tj);
                             neighbors[tj].emplace_back(ti);
 
@@ -437,6 +432,8 @@ void get_all_neighbors_cells(py::dict& atoms,
 
 
 void get_temp_neighbors_brute(const vector<vector<double>>& positions,
+    const vector<bool>& mask_1,
+    const vector<bool>& mask_2,
     vector<vector<datom>>& temp_neighbors,
     const int& triclinic,
     const double neighbordistance, 
@@ -450,7 +447,9 @@ void get_temp_neighbors_brute(const vector<vector<double>>& positions,
     temp_neighbors.resize(nop);
 
     for (int ti=0; ti<nop; ti++){
+        if (mask_1[ti]) continue;
         for (int tj=ti+1; tj<nop; tj++){
+            if (mask_2[tj]) continue;
             d = get_abs_distance(positions[ti], positions[tj],
                 triclinic, rot, rotinv, box, 
                 diffx, diffy, diffz);
@@ -466,6 +465,8 @@ void get_temp_neighbors_brute(const vector<vector<double>>& positions,
 
 
 void get_temp_neighbors_cells(const vector<vector<double>>& positions,
+    const vector<bool>& mask_1,
+    const vector<bool>& mask_2,
     vector<vector<datom>>& temp_neighbors,
     const int& triclinic,
     const double neighbordistance, 
@@ -490,12 +491,14 @@ void get_temp_neighbors_cells(const vector<vector<double>>& positions,
         for(size_t mi=0; mi<cells[i].members.size(); mi++){
             //now go through the neighbors
             ti = cells[i].members[mi];
+            if (mask_1[ti]) continue;
             for(size_t j=0 ; j<cells[i].neighbor_cells.size(); j++){
                //loop through members of j
                subcell = cells[i].neighbor_cells[j];
                for(size_t mj=0; mj<cells[subcell].members.size(); mj++){
                     //now we have mj -> members/compare with
                     tj = cells[subcell].members[mj];
+                    if (mask_2[tj]) continue;
                     //compare ti and tj and add
                     if (ti < tj){
                         d = get_abs_distance(positions[ti], positions[tj],
@@ -518,7 +521,6 @@ void get_temp_neighbors_cells(const vector<vector<double>>& positions,
 int get_all_neighbors_bynumber(py::dict& atoms,
     double& neighbordistance,
     const int& triclinic,
-    const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
     const vector<double>& box,
@@ -536,6 +538,8 @@ int get_all_neighbors_bynumber(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
+    vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -580,10 +584,10 @@ int get_all_neighbors_bynumber(py::dict& atoms,
     neighbordistance = guessdist;
     vector<vector<datom>> temp_neighbors;
     if (usecells){
-        get_temp_neighbors_cells(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
+        get_temp_neighbors_cells(positions, mask_1, mask_2, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
     else{
-        get_temp_neighbors_brute(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
+        get_temp_neighbors_brute(positions, mask_1, mask_2, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
     for (int ti=0; ti<nop; ti++){
         if (int(temp_neighbors[ti].size()) < nns){
@@ -647,8 +651,7 @@ int get_all_neighbors_bynumber(py::dict& atoms,
 
 int get_all_neighbors_sann(py::dict& atoms,
     double& neighbordistance,
-    const int& triclinic,
-    const int& filter, 
+    const int& triclinic, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
     const vector<double>& box,
@@ -664,6 +667,8 @@ int get_all_neighbors_sann(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
+    vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -712,10 +717,10 @@ int get_all_neighbors_sann(py::dict& atoms,
     vector<vector<datom>> temp_neighbors;
 
     if (usecells){
-        get_temp_neighbors_cells(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
+        get_temp_neighbors_cells(positions, mask_1, mask_2, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
     else{
-        get_temp_neighbors_brute(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
+        get_temp_neighbors_brute(positions, mask_1, mask_2, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
     
     for (int ti=0; ti<nop; ti++){
@@ -824,7 +829,6 @@ int get_all_neighbors_sann(py::dict& atoms,
 int get_all_neighbors_adaptive(py::dict& atoms,
     double& neighbordistance,
     const int& triclinic,
-    const int& filter, 
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
     const vector<double>& box,
@@ -841,6 +845,8 @@ int get_all_neighbors_adaptive(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
+    vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
+    vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -889,10 +895,10 @@ int get_all_neighbors_adaptive(py::dict& atoms,
     vector<vector<datom>> temp_neighbors;
 
     if (usecells){
-        get_temp_neighbors_cells(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
+        get_temp_neighbors_cells(positions, mask_1, mask_2, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
     else{
-        get_temp_neighbors_brute(positions, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
+        get_temp_neighbors_brute(positions, mask_1, mask_2, temp_neighbors, triclinic, neighbordistance, rot, rotinv, box);
     }
     
     for (int ti=0; ti<nop; ti++){

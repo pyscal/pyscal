@@ -126,6 +126,14 @@ class System:
             atoms['types'] = [1 for x in range(nop)]
         if not 'ghost' in atoms.keys():
             atoms['ghost'] = [False for x in range(nop)]
+        if not 'mask_1' in atoms.keys():
+            atoms['mask_1'] = [False for x in range(nop)]
+        if not 'mask_2' in atoms.keys():
+            atoms['mask_2'] = [False for x in range(nop)]
+        if not 'condition' in atoms.keys():
+            atoms['condition'] = [True for x in range(nop)]
+        if not 'head' in atoms.keys():
+            atoms['head'] = [x for x in range(nop)]
 
         if(len(atoms['positions']) < 200):
             #we need to estimate a rough idea
@@ -138,7 +146,7 @@ class System:
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
             atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True)
-
+        
         self._atoms = atoms
 
     #iterator for atoms
@@ -229,19 +237,29 @@ class System:
         ids = []
         types = []
         ghosts = []
+        mask_1 = []
+        mask_2 = []
+        condition = []
+        head = []
 
         for i in range(x1, x2):
             for j in range(y1, y2):
                 for k in range(z1, z2):
                     if (i==j==k==0):
                         continue
-                    for pos in atoms['positions']:
-                        pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                        positions.append(pos)
-                        ids.append(idstart)
-                        idstart += 1
-                        types.append(tp)
-                        ghosts.append(ghost)
+                    for count, pos in enumerate(atoms['positions']):
+                        #we should create ghost images for only real atoms
+                        if not atoms["ghost"][count]:
+                            pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
+                            positions.append(pos)
+                            ids.append(idstart)
+                            idstart += 1
+                            types.append(atoms['types'][count])
+                            mask_1.append(atoms['mask_1'][count])
+                            mask_2.append(atoms['mask_2'][count])
+                            condition.append(atoms['condition'][count])
+                            ghosts.append(ghost)
+                            head.append(count)
 
         if scale_box:
             box[0] = xs*np.array(box[0])
@@ -255,8 +273,80 @@ class System:
         atoms['ids'] = [*atoms['ids'], *ids]
         atoms['types'] = [*atoms['types'], *types]
         atoms['ghost'] = [*atoms['ghost'], *ghosts]
+        atoms['mask_1'] = [*atoms['mask_1'], *ghosts]
+        atoms['mask_2'] = [*atoms['mask_2'], *ghosts]
+        atoms['condition'] = [*atoms['condition'], *ghosts]
+        atoms['head'] = [*atoms['head'], *head]
 
         return atoms
+
+    def apply_mask(self, masks, mask_type='secondary'):
+        """
+        Apply mask to an atom
+
+        Parameters
+        ----------
+        masks : list of bools
+            list of mask to be applied
+
+        mask_type: string, optional
+            type of mask to be applied, either `primary`, `secondary` or `all`
+
+        Returns
+        -------
+        None
+
+        Notes
+        -----
+        Masks can be used to exclude atoms from neighbor calculations. An atom for which
+        mask is set to True is excluded from the calculation. There are two types of masks,
+        `primary` or `secondary`. For example, neighbors are being calculated for a central
+        atom `i`. The neighbor atom is denoted as `j`. If `primary` mask of `i` is True, no neighbor
+        calculation is carried out for `i`. If it is False, `i` is considered. Now if `secondary`
+        mask of `j` is True, it will not included in the list of neighbors of `i` even if it is within
+        the cutoff distance. The `primary` mask of `j` has no effect in this situation.
+
+        An example situation can be to calculate the local concentration around Ni atoms in a NiAl
+        structure. In this case, the `primary` mask of all Al atoms can be set to True so that
+        only `Ni` atoms are considered. Now, in a second case, the task is to count the number of Al
+        atoms around each Ni atom. For this case, the `primary` mask of all Al atoms can be set to True,
+        and the `secondary` mask of all Ni atoms can be set to True.
+
+        The masks for ghost atoms are copied from the corresponding mask for real atoms.
+        """
+        #check if length of mask is equal to length of real atoms
+        if len(masks) != self.natoms:
+            raise ValueError("Length of masks should be equal to number of atoms in the system")
+
+        #apply masks
+        if (mask_type == 'primary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_1"][i] = masks[self.atoms["head"][i]]
+        if (mask_type == 'secondary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_2"][i] = masks[self.atoms["head"][i]]
+
+
+    def remove_mask(self, mask_type='primary'):
+        """
+        Remove applied masks
+
+        Parameters
+        ----------
+        mask_type: string, optional
+            type of mask to be applied, either `primary`, `secondary` or `all`
+
+        Returns
+        -------
+        None
+        """
+        #remove masks
+        if (mask_type == 'primary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_1"][i] = False
+        if (mask_type == 'secondary') or (mask_type == 'all'):
+            for i in range(len(self.atoms["positions"])):
+                self.atoms["mask_2"][i] = False
 
 
     def embed_in_cubic_box(self,):
@@ -511,7 +601,7 @@ class System:
         self.neighbors_found = False
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, 
-            filter=None, voroexp=1, padding=1.2, nlimit=6, 
+            voroexp=1, padding=1.2, nlimit=6, 
             cells=None, nmax=12, assign_neighbor=True):
         """
 
@@ -532,11 +622,6 @@ class System:
 
         threshold : float, optional
             only used if ``cutoff=adaptive``. A threshold which is used as safe limit for calculation of cutoff.
-
-        filter : {'None', 'type', 'type_r'}, optional
-            apply a filter to nearest neighbor calculation. If the `filter` keyword is set to
-            `type`, only atoms of the same type would be included in the neighbor calculations. 
-            If `type_r`, only atoms of a different type will be included in the calculation. Default None.
 
         voroexp : int, optional
             only used if ``method=voronoi``. Power of the neighbor weight used to weight the contribution of each atom towards
@@ -626,17 +711,12 @@ class System:
         if cells is None:
             cells = (len(self.positions) > 250)
 
-        if filter == 'type':
-            self.filter = 1
-        elif filter == 'type_r':
-            self.filter = 2
-
         if method == 'cutoff':            
             if cutoff=='sann':    
                 finished = False
                 for i in range(1, 10):
                     finished = pc.get_all_neighbors_sann(self.atoms, 0.0, 
-                        self.triclinic, self.filter, self.rot, self.rotinv,
+                        self.triclinic, self.rot, self.rotinv,
                         self.boxdims, threshold*i, cells)
                     if finished:
                         if i>1:
@@ -649,21 +729,21 @@ class System:
             
             elif cutoff=='adaptive' or cutoff==0:
                 finished = pc.get_all_neighbors_adaptive(self.atoms, 0.0,
-                    self.triclinic, self.filter, self.rot, self.rotinv,
+                    self.triclinic, self.rot, self.rotinv,
                     self.boxdims, threshold, nlimit, padding, cells)
                 if not finished:
                     raise RuntimeError("Could not find adaptive cutoff")
             else:
                 if cells:
                     pc.get_all_neighbors_cells(self.atoms, cutoff,
-                        self.triclinic, self.filter, self.rot, self.rotinv, self.boxdims)
+                        self.triclinic, self.rot, self.rotinv, self.boxdims)
                 else:
                     pc.get_all_neighbors_normal(self.atoms, cutoff,
-                        self.triclinic, self.filter, self.rot, self.rotinv, self.boxdims)
+                        self.triclinic, self.rot, self.rotinv, self.boxdims)
 
         elif method == 'number':
             finished = pc.get_all_neighbors_bynumber(self.atoms, 0.0, 
-                self.triclinic, self.filter, self.rot, self.rotinv,
+                self.triclinic, self.rot, self.rotinv,
                 self.boxdims, threshold, nmax, cells, assign_neighbor)
             if not finished:
                 raise RuntimeError("Could not find enough neighbors - try increasing threshold")
@@ -818,3 +898,4 @@ class System:
                 qval = (factor*summ)**0.5
                 qval_arr.append(qval)
             self.atoms["avg_q%d"%val] = qval_arr
+
