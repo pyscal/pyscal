@@ -138,7 +138,8 @@ void get_all_neighbors_normal(py::dict& atoms,
 
     //access positions and put it in an array
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
-    vector<int> types = atoms[py::str("types")].cast<vector<int>>();
+    vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
+    vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
     //auto positions = atoms[py::str("positions")].cast<py::array_t<double>>();
 
     int nop = positions.size();
@@ -153,7 +154,11 @@ void get_all_neighbors_normal(py::dict& atoms,
 
     //now loop and calculate things
     for (int ti=0; ti<nop; ti++){
+        //only consider ti if mask_1 is false
+        if (mask_1[ti]) continue;
         for (int tj=ti+1; tj<nop; tj++){
+            //mask 2 is applied here
+            if (mask_2[tj]) continue;
             d = get_abs_distance(positions[ti], positions[tj],
                 triclinic, rot, rotinv, box, 
                 diffx, diffy, diffz);
