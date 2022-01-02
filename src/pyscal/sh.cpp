@@ -337,3 +337,47 @@ void calculate_q_single(py::dict& atoms,
     atoms[py::str(key3)] = qlm_img;
 	
 }
+
+void calculate_aq_single(py::dict& atoms,
+	const int lm){
+
+    double realti, imgti;
+    double summ;
+    int nns;
+
+    string key1, key2;
+	key1 = "q"+to_string(lm)+"_real";
+	key2 = "q"+to_string(lm)+"_imag";
+
+    vector<vector<double>> q_real = atoms[py::str(key1)].cast<vector<vector<double>>>();
+    vector<vector<double>> q_imag = atoms[py::str(key2)].cast<vector<vector<double>>>();
+    vector<vector<int>> neighbors = atoms[py::str("neighbors")].cast<vector<vector<int>>>();
+    vector<double> q;
+ 
+    for (int ti= 0;ti<nop;ti++){
+        summ = 0;
+        for (int mi = 0;mi<2*q+1;mi++){
+            realti = q_real[ti][mi];
+            imgti = q_imag[ti][mi];
+            
+            nns = 0;
+            for (int ci = 0;ci<nn;ci++){
+            	realti += q_real[neighbors[ti][ci]][mi];
+            	imgti += q_imag[neighbors[ti][ci]][mi];
+                nns += 1;
+        }
+        
+        realti = realti/(double(nns+1));
+        imgti = imgti/(double(nns+1));
+
+        summ+= realti*realti + imgti*imgti;
+        
+        }
+        
+        //normalise summ
+        summ = pow(((4.0*PI/(2*lm+1)) * summ),0.5);
+        q.emplace_back(summ);
+    }
+    key1 = "avg_q"+to_string(lm);
+    atoms[py::str(key1)] = q;
+}

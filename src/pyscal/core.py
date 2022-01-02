@@ -856,28 +856,6 @@ class System:
 
         _ = self._calculate_q(todo_q)
 
-        #now all qs are calculated
-        nn = len(self.atoms["positions"])
-
         #loop over atoms
         for val in qq:
-            qval_arr = []
-            for n in range(nn):
-            #loop over each q
-                real_key = 'q%d_real'%val
-                imag_key = 'q%d_imag'%val
-                summ = 0
-                for m in range(0, 2*val+1):
-                    realti = self.atoms[real_key][m][n]
-                    imagti = self.atoms[imag_key][m][n]
-                    for p in self.atoms["neighbors"][n]:
-                        realti += self.atoms[real_key][m][p]
-                        imagti += self.atoms[imag_key][m][p]
-                    realti = realti/(len(self.atoms["neighbors"][n])+1)
-                    imagti = imagti/(len(self.atoms["neighbors"][n])+1)
-                    summ += realti**2 + imagti**2
-                factor = (4.0*np.pi/(2*val+1))
-                qval = (factor*summ)**0.5
-                qval_arr.append(qval)
-            self.atoms["avg_q%d"%val] = qval_arr
-
+            pc.calculate_aq_single(self.atoms, val)

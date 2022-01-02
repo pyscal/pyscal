@@ -170,3 +170,6 @@ void calculate_qlm(const int l,
 
 void calculate_q_single(py::dict& atoms,
     const int lm);
+
+void calculate_aq_single(py::dict& atoms,
+    const int lm);
