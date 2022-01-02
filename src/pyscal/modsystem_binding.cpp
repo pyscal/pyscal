@@ -29,6 +29,7 @@ PYBIND11_MODULE(csystem, m) {
     m.def("calculate_aq_single", &calculate_aq_single);
     m.def("calculate_disorder", &calculate_disorder);
     m.def("calculate_bonds", &calculate_bonds);
+    m.def("find_clusters", &find_clusters);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
