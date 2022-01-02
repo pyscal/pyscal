@@ -261,6 +261,52 @@ void calculate_q(py::dict& atoms,
 /**********************************************************************
 New set of functions that use the old algorithm
 **********************************************************************/
+double plm(const int l,
+	const int m,
+	const double theta){
+
+	double x = cos(theta);
+    double fact,pll,pmm,pmmp1,somx2;
+    int i,ll;
+    pll = 0.0;
+    if (m < 0 || m > l || fabs(x) > 1.0)
+        cerr << "impossible combination of l and m" << "\n";
+    pmm=1.0;
+    if (m > 0){
+        somx2=sqrt((1.0-x)*(1.0+x));
+        fact=1.0;
+        for (i=1;i<=m;i++){
+            pmm *= -fact*somx2;
+            fact += 2.0;
+        }
+    }
+
+    if (l == m)
+        return pmm;
+    else{
+        pmmp1=x*(2*m+1)*pmm;
+        if (l == (m+1))
+            return pmmp1;
+        else{
+            for (ll=m+2;ll<=l;ll++){
+            pll=(x*(2*ll-1)*pmmp1-(ll+m-1)*pmm)/(ll-m);
+            pmm=pmmp1;
+            pmmp1=pll;
+            }
+        return pll;
+        }
+    }	
+}
+
+double sph_legendre(const int l,
+	const int m,
+	const double theta){
+
+	double factor = ((2.0*double(l) + 1.0)/ (4.0*PI))*dfactorial(l,m);
+	double m_plm = plm(l, m, theta);
+	return sqrt(factor)*m_plm;
+
+}
 
 void calculate_qlm(const int l, 
 	const int m, 

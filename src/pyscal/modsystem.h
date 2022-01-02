@@ -161,6 +161,14 @@ vector<vector<vector<vector<double>>>> calculate_q_atom(const int lm,
 void calculate_q(py::dict& atoms,
     const int lm);
 
+double plm(const int l,
+    const int m,
+    const double theta);
+
+double sph_legendre(const int l,
+    const int m,
+    const double theta);
+
 void calculate_qlm(const int l, 
     const int m, 
     const double theta, 

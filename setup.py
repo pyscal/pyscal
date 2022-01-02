@@ -32,7 +32,7 @@ setup(
             "pyscal.csystem",
             ["src/pyscal/neighbor.cpp", "src/pyscal/sh.cpp", "src/pyscal/modsystem_binding.cpp",],
             language='c++',
-            extra_compile_args=['-std=c++17'],
+            #extra_compile_args=['-std=c++17'],
         ),
 
         #Pybind11Extension(
