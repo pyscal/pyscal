@@ -356,6 +356,42 @@ class System:
             for i in range(len(self.atoms["positions"])):
                 self.atoms["mask_2"][i] = False
 
+    def apply_condition(self, condition):
+        """
+        Apply a condition on atom which will be used for clustering
+
+        Parameters
+        ----------
+        condition : list of bools
+            list of condition to be applied
+
+        Returns
+        -------
+        None
+
+        """
+        if len(condition) != self.natoms:
+            raise ValueError("Length of masks should be equal to number of atoms in the system")
+
+        for i in range(len(self.atoms["positions"])):
+            self.atoms["condition"][i] = condition[self.atoms["head"][i]]
+
+
+    def remove_condition(self):
+        """
+        Remove a condition on atom which will be used for clustering
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        for i in range(len(self.atoms["positions"])):
+            self.atoms["condition"][i] = True
+
 
     def embed_in_cubic_box(self,):
         """
@@ -1069,4 +1105,73 @@ class System:
         pc.calculate_bonds(self.atoms, q, 
             threshold, avgthreshold, bonds, 
             compare_criteria, criteria)
+
+        if cluster:
+            lc = self.cluster_atoms(self.solid, largest=True)
+            return lc
+
+    def find_largest_cluster(self):
+        """
+        Find largest cluster among given clusters
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        lc : int
+            Size of the largest cluster.
+        """
+        if not "cluster" in self.atoms.keys():
+            raise RuntimeError("cluster_atoms needs to be called first")
+
+        clusterlist = [x for x in self.cluster if x != -1]
+        xx, xxcounts = np.unique(clusterlist, return_counts=True)
+        arg = np.argsort(xxcounts)[-1]
+        largest_cluster_size = xxcounts[arg]
+        largest_cluster_id = xx[arg]
+
+        self.atoms["largest_cluster"] = [True if self.atoms["cluster"][x]==largest_cluster_id else False for x in range(len(self.atoms["cluster"]))]
+        return largest_cluster_size
+
+
+    def cluster_atoms(self, condition, largest = True, cutoff=0):
+        """
+        Cluster atoms based on a property
+        
+        Parameters
+        ----------
+        condition : callable or atom property
+            Either function which should take an :class:`~Atom` object, and give a True/False output
+            or an attribute of atom class which has value or 1 or 0.
+        
+        largest : bool, optional
+            If True returns the size of the largest cluster. Default False.
+        
+        cutoff : float, optional
+            If specified, use this cutoff for calculation of clusters. By default uses the cutoff
+            used for neighbor calculation.
+        
+        Returns
+        -------
+        lc : int
+            Size of the largest cluster. Returned only if `largest` is True.
+        
+        Notes
+        -----
+        This function helps to cluster atoms based on a defined property. This property
+        is defined by the user through the argument `condition` which is passed as a parameter.
+        `condition` should be a boolean array the same length as number of atoms in the system.
+        """
+        
+        self.apply_condition(condition)
+        pc.find_clusters(self.atoms, cutoff)
+
+        #done!
+        lc = self.find_largest_cluster()
+        #pcs.System.get_largest_cluster_atoms(self)
+
+        if largest:
+            return lc
 

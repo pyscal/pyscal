@@ -124,3 +124,60 @@ void calculate_bonds(py::dict& atoms,
     atoms[py::str("solid")] = solid;
 }
 
+void extract_cluster(int ti,
+	int clusterindex,
+	vector<bool>& condition,
+	vector<bool>& ghost,
+	vector<vector<int>>& neighbors,
+	vector<vector<double>>& neighbordist,
+	vector<double>& cutoff,
+	vector<int>& cluster){
+
+	int cc;
+	for(int tj=0; tj<neighbors[ti].size(); tj++){
+		cc = neighbors[ti][tj];
+  		if (!condition[cc]) continue;
+  		if (ghost[cc]) continue;
+  		if(!(neighbordist[ti][tj] <= cutoff[ti])) continue;
+  		if (cluster[cc] == -1){
+  			cluster[cc] = clusterindex;
+  			extract_cluster(cc, clusterindex, condition, ghost, neighbors, neighbordist, cutoff, cluster);
+  		}
+	}
+}
+
+void find_clusters(py::dict& atoms,
+	double clustercutoff){
+
+    vector<bool> condition = atoms[py::str("condition")].cast<vector<bool>>();
+    vector<bool> ghost = atoms[py::str("ghost")].cast<vector<bool>>();
+    vector<double> cutoff = atoms[py::str("cutoff")].cast<vector<double>>();
+    vector<vector<int>> neighbors = atoms[py::str("neighbors")].cast<vector<vector<int>>>();
+    vector<vector<double>> neighbordist = atoms[py::str("neighbordist")].cast<vector<vector<double>>>();
+
+    int nop = neighbors.size();
+    vector<int> cluster;
+    int clusterindex = 0;
+
+    if (clustercutoff != 0){
+    	for(int ti=0; ti<nop; ti++){
+        	cutoff[ti] = clustercutoff;
+    	}
+  	}
+
+  	for(int ti=0; ti<nop; ti++){
+  		cluster.emplace_back(-1);
+  	}
+
+  	for(int ti=0; ti<nop; ti++){
+  		if (!condition[ti]) continue;
+  		if (ghost[ti]) continue;
+  		if (cluster[ti] == -1){
+  			clusterindex += 1;
+  			cluster[ti] = clusterindex;
+  			extract_cluster(ti, clusterindex, condition, ghost, neighbors, neighbordist, cutoff, cluster);		
+  		}
+  	}
+
+  	atoms[py::str("cluster")] = cluster;
+}
