@@ -835,24 +835,32 @@ class System:
         theta = np.array(self.atoms["theta"])
         phi = np.array(self.atoms["phi"])
         weights = np.array(self.atoms["neighborweight"])
+        qvals = []
+        q_reals = []
+        q_imgs = []
         for val in qq:
-            shs = []
-            sh = sph_harm(0, val, phi, theta)
-            shs.append(np.average(sh, axis=1, weights=weights))
-            for m in range(1, val+1):
-                sh = sph_harm(m, val, phi, theta)
-                shs.append(np.average(sh, axis=1, weights=weights))
-                sh = sh*(-1)**(-m)
-                shs.append(np.average(sh, axis=1, weights=weights))
-            shs = np.array(shs)
-            q_real = np.real(shs)
-            q_imag = np.imag(shs)
-            shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
-            factor = (4.0*np.pi/(2*val+1))
-            qval = (factor*shs_sum)**0.5
-            self.atoms["q%d"%val] = qval
-            self.atoms["q%d_real"%val] = q_real
-            self.atoms["q%d_imag"%val] = q_imag
+            for k in range(len(theta)):
+                shs = []
+                sh = sph_harm(0, val, phi[k], theta[k])
+                #shs.append(np.average(sh, axis=1, weights=weights))
+                shs.append(sh)
+                for m in range(1, val+1):
+                    sh = sph_harm(m, val, phi[k], theta[k])
+                    shs.append(np.average(sh, axis=1, weights=weights))
+                    sh = sh*(-1)**(-m)
+                    shs.append(np.average(sh, axis=1, weights=weights))
+                shs = np.array(shs)
+                q_real = np.real(shs)
+                q_imag = np.imag(shs)
+                shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
+                factor = (4.0*np.pi/(2*val+1))
+                qval = (factor*shs_sum)**0.5
+                qvals.append(qval)
+                q_reals.append(q_real)
+                q_imags.append(q_imag)
+            self.atoms["q%d"%val] = qvals
+            self.atoms["q%d_real"%val] = q_reals
+            self.atoms["q%d_imag"%val] = q_imags
 
     def _calculate_aq(self, qq):
         """

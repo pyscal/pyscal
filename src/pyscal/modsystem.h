@@ -160,3 +160,13 @@ vector<vector<vector<vector<double>>>> calculate_q_atom(const int lm,
 
 void calculate_q(py::dict& atoms,
     const int lm);
+
+void calculate_qlm(const int l, 
+    const int m, 
+    const double theta, 
+    const double phi, 
+    double &ylm_real, 
+    double &ylm_imag);
+
+void calculate_q_single(py::dict& atoms,
+    const int lm);

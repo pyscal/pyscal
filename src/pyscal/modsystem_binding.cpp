@@ -25,6 +25,7 @@ PYBIND11_MODULE(csystem, m) {
     m.def("get_all_neighbors_adaptive", &get_all_neighbors_adaptive);
     m.def("calculate_q", &calculate_q);
     m.def("calculate_q_atom", &calculate_q_atom);
+    m.def("calculate_q_single", &calculate_q_single);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

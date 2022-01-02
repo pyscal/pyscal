@@ -257,3 +257,78 @@ void calculate_q(py::dict& atoms,
 	    atoms[py::str(key3)] = qtemp2;
 	}
 }
+
+/**********************************************************************
+New set of functions that use the old algorithm
+**********************************************************************/
+
+void calculate_qlm(const int l, 
+	const int m, 
+	const double theta, 
+	const double phi, 
+	double &ylm_real, 
+	double &ylm_imag){
+
+    double factor;
+    double m_plm;
+
+    m_plm = sph_legendre(l, m, cos(theta));
+    factor = ((2.0*double(l) + 1.0)/(4.0*PI))*dfactorial(l,m);
+    ylm_real = sqrt(factor)*m_plm*cos(double(m)*phi);
+    ylm_imag  = sqrt(factor)*m_plm*sin(double(m)*phi);
+}
+
+
+void calculate_q_single(py::dict& atoms,
+	const int lm){
+
+	//we need theta and pi
+    vector<vector<double>> theta = atoms[py::str("theta")].cast<vector<vector<double>>>();
+    vector<vector<double>> phi = atoms[py::str("phi")].cast<vector<vector<double>>>();
+    vector<vector<double>> weights = atoms[py::str("neighborweight")].cast<vector<vector<double>>>();
+    
+    int nop = theta.size();
+    vector<vector<double>> qlm_real(nop);
+    vector<vector<double>> qlm_img(nop);
+    vector<double> q(nop);
+
+    int nn;
+    double summ, weightsum;
+    double realti, imgti;
+    double realylm, imgylm;
+	
+    for (int ti=0; ti<nop; ti++){
+		summ = 0;
+		for (int mi=-lm; mi<lm+1; mi++){
+            realti = 0.0;
+            imgti = 0.0;
+            weightsum = 0;
+			for(int ci=0; ci<theta[ti].size(); ci++){
+				calculate_qlm(lm, mi, theta[ti][ci], phi[ti][ci], realylm, imgylm);
+				realti += weights[ti][ci]*realylm;
+				imgti += weights[ti][ci]*imgylm;
+				weightsum += weights[ti][ci];
+			}
+			realti = realti/float(weightsum);
+			imgti = imgti/float(weightsum);
+
+			qlm_real[ti].emplace_back(realti);
+			qlm_img[ti].emplace_back(imgti);
+
+			summ += realti*realti + imgti*imgti;
+		}
+		summ = pow(((4.0*PI/(2*lm+1)) * summ),0.5);
+		q.emplace_back(summ);
+    }
+
+	string key1, key2, key3;
+
+	key1 = "q"+to_string(lm);
+	key2 = "q"+to_string(lm)+"_real";
+	key3 = "q"+to_string(lm)+"_imag";
+
+    atoms[py::str(key1)] = q;
+    atoms[py::str(key2)] = qlm_real;
+    atoms[py::str(key3)] = qlm_img;
+	
+}
