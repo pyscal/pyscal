@@ -1066,7 +1066,7 @@ class System:
         self.calculate_q(q)
 
         #calculate solid neighs
-        pc.calculate_solid_bonds(self.atoms, q, 
+        pc.calculate_bonds(self.atoms, q, 
             threshold, avgthreshold, bonds, 
             compare_criteria, criteria)
 
