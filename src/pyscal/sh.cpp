@@ -272,10 +272,11 @@ void calculate_qlm(const int l,
     double factor;
     double m_plm;
 
-    m_plm = sph_legendre(l, m, cos(theta));
-    factor = ((2.0*double(l) + 1.0)/(4.0*PI))*dfactorial(l,m);
-    ylm_real = sqrt(factor)*m_plm*cos(double(m)*phi);
-    ylm_imag  = sqrt(factor)*m_plm*sin(double(m)*phi);
+    m_plm = sph_legendre(l, abs(m), theta);
+    //factor = ((2.0*double(l) + 1.0)/(4.0*PI))*dfactorial(l,m);
+    //factor = (1.0/dfactorial(l,m));
+    ylm_real = m_plm*cos(double(m)*phi);
+    ylm_imag  = m_plm*sin(double(m)*phi);
 }
 
 
@@ -290,7 +291,7 @@ void calculate_q_single(py::dict& atoms,
     int nop = theta.size();
     vector<vector<double>> qlm_real(nop);
     vector<vector<double>> qlm_img(nop);
-    vector<double> q(nop);
+    vector<double> q;
 
     int nn;
     double summ, weightsum;
@@ -317,7 +318,11 @@ void calculate_q_single(py::dict& atoms,
 
 			summ += realti*realti + imgti*imgti;
 		}
-		summ = pow(((4.0*PI/(2*lm+1)) * summ),0.5);
+		//cout<<summ<<endl;
+		summ = pow(((4.0*PI/(2*lm+1))*summ),0.5);
+
+		//cout<<summ<<endl;
+
 		q.emplace_back(summ);
     }
 

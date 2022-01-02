@@ -769,7 +769,7 @@ class System:
         '''
         self.neighbors_found = True
 
-    def calculate_q(self, q, averaged=False, use_c=False):
+    def calculate_q(self, q, averaged=False, continuous_algorithm=False):
         """
         Find the Steinhardt parameter q_l for all atoms.
 
@@ -820,7 +820,7 @@ class System:
             self._calculate_aq(qq)
             qvals = [self.atoms["avg_q%d"%x] for x in qq]
         else:    
-            if use_c:
+            if continuous_algorithm:
                 lm = max(qq)
                 pc.calculate_q(self.atoms, lm)
             else:
@@ -832,35 +832,9 @@ class System:
         """
         Private method for calculation of qvals
         """
-        theta = np.array(self.atoms["theta"])
-        phi = np.array(self.atoms["phi"])
-        weights = np.array(self.atoms["neighborweight"])
-        qvals = []
-        q_reals = []
-        q_imgs = []
         for val in qq:
-            for k in range(len(theta)):
-                shs = []
-                sh = sph_harm(0, val, phi[k], theta[k])
-                #shs.append(np.average(sh, axis=1, weights=weights))
-                shs.append(sh)
-                for m in range(1, val+1):
-                    sh = sph_harm(m, val, phi[k], theta[k])
-                    shs.append(np.average(sh, axis=1, weights=weights))
-                    sh = sh*(-1)**(-m)
-                    shs.append(np.average(sh, axis=1, weights=weights))
-                shs = np.array(shs)
-                q_real = np.real(shs)
-                q_imag = np.imag(shs)
-                shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
-                factor = (4.0*np.pi/(2*val+1))
-                qval = (factor*shs_sum)**0.5
-                qvals.append(qval)
-                q_reals.append(q_real)
-                q_imags.append(q_imag)
-            self.atoms["q%d"%val] = qvals
-            self.atoms["q%d_real"%val] = q_reals
-            self.atoms["q%d_imag"%val] = q_imags
+            pc.calculate_q_single(self.atoms, val)
+  
 
     def _calculate_aq(self, qq):
         """
