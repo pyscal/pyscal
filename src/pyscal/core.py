@@ -356,6 +356,42 @@ class System:
             for i in range(len(self.atoms["positions"])):
                 self.atoms["mask_2"][i] = False
 
+    def apply_condition(self, condition):
+        """
+        Apply a condition on atom which will be used for clustering
+
+        Parameters
+        ----------
+        condition : list of bools
+            list of condition to be applied
+
+        Returns
+        -------
+        None
+
+        """
+        if len(condition) != self.natoms:
+            raise ValueError("Length of masks should be equal to number of atoms in the system")
+
+        for i in range(len(self.atoms["positions"])):
+            self.atoms["condition"][i] = condition[self.atoms["head"][i]]
+
+
+    def remove_condition(self):
+        """
+        Remove a condition on atom which will be used for clustering
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+        for i in range(len(self.atoms["positions"])):
+            self.atoms["condition"][i] = True
+
 
     def embed_in_cubic_box(self,):
         """
@@ -956,3 +992,186 @@ class System:
             #average the disorder
             avg_arr = self.average_over_neighbors("disorder")
             self.atoms["avg_disorder"] = avg_arr
+
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, 
+                          cluster=True, q=6, cutoff=0, right=True):
+        """
+        Distinguish solid and liquid atoms in the system.
+        Parameters
+        ----------
+        bonds : int or float, optional
+            Minimum number of solid bonds for an atom to be identified as
+            a solid if the value is an integer. Minimum fraction of neighbors
+            of an atom that should be solid for an atom to be solid if the
+            value is float between 0-1. Default 0.5.
+        
+        threshold : double, optional
+            Solid bond cutoff value. Default 0.5.
+        
+        avgthreshold : double, optional
+            Value required for Averaged solid bond cutoff for an atom to be identified
+            as solid. Default 0.6.
+        
+        cluster : bool, optional
+            If True, cluster the solid atoms and return the number of atoms in the largest
+            cluster.
+        
+        q : int, optional
+            The Steinhardt parameter value over which the bonds have to be calculated.
+            Default 6.
+        
+        cutoff : double, optional
+            Separate value used for cluster classification. If not specified, cutoff used
+            for finding neighbors is used.
+        
+        right: bool, optional
+            If true, greater than comparison is to be used for finding solid particles. 
+            default True.
+        
+        Returns
+        -------
+        solid : int
+            Size of the largest solid cluster. Returned only if `cluster=True`.
+        
+        Notes
+        -----
+        The neighbors should be calculated before running this function.
+        Check :func:`~pyscal.core.System.find_neighbors` method.
+        
+        `bonds` define the number of solid bonds of an atom to be identified as solid.
+        Two particles are said to be 'bonded' if [1],
+        .. math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
+        where `threshold` values is also an optional parameter.
+        
+        If the value of `bonds` is a fraction between 0 and 1, at least that much of an atom's neighbors
+        should be solid for the atom to be solid.
+        
+        An additional parameter `avgthreshold` is an additional parameter to improve solid-liquid distinction.
+        
+        In addition to having a the specified number of `bonds`,
+        
+        .. math::  \langle s_{ij} \\rangle > avgthreshold
+        
+        also needs to be satisfied. In case another q value has to be used for calculation of S_ij, it can be
+        set used the `q` attribute. In the above formulations, `>` comparison for `threshold` and `avgthreshold`
+        can be changed to `<` by setting the keyword `right` to False.
+        
+        If `cluster` is True, a clustering is done for all solid particles. See :func:`~pyscal.csystem.find_clusters`
+        for more details. 
+        
+        References
+        ----------
+        .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
+        """
+        #check if neighbors are found
+        if not self.neighbors_found:
+            raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
+
+        if not isinstance(q, int):
+            raise TypeError("q should be interger value")
+
+        if not isinstance(threshold, (int, float)):
+            raise TypeError("threshold should be a float value")
+        else:
+            if not ((threshold >= 0 ) and (threshold <= 1 )):
+                raise ValueError("Value of threshold should be between 0 and 1")
+
+        if not isinstance(avgthreshold, (int, float)):
+            raise TypeError("avgthreshold should be a float value")
+        else:
+            if not ((avgthreshold >= 0 ) and (avgthreshold <= 1 )):
+                raise ValueError("Value of avgthreshold should be between 0 and 1")
+
+        #start identification routine
+        #check the value of bonds and set criteria depending on that
+        if isinstance(bonds, int):
+            criteria = 0
+        elif isinstance(bonds, float):
+            if ((bonds>=0) and (bonds<=1.0)):
+                criteria = 1
+            else:
+                raise TypeError("bonds if float should have value between 0-1")
+        else:
+             raise TypeError("bonds should be interger/float value")
+
+        if right:
+            compare_criteria = 0
+        else:
+            compare_criteria = 1
+
+        self.calculate_q(q)
+
+        #calculate solid neighs
+        pc.calculate_bonds(self.atoms, q, 
+            threshold, avgthreshold, bonds, 
+            compare_criteria, criteria)
+
+        if cluster:
+            lc = self.cluster_atoms(self.solid, largest=True)
+            return lc
+
+    def find_largest_cluster(self):
+        """
+        Find largest cluster among given clusters
+        
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        lc : int
+            Size of the largest cluster.
+        """
+        if not "cluster" in self.atoms.keys():
+            raise RuntimeError("cluster_atoms needs to be called first")
+
+        clusterlist = [x for x in self.cluster if x != -1]
+        xx, xxcounts = np.unique(clusterlist, return_counts=True)
+        arg = np.argsort(xxcounts)[-1]
+        largest_cluster_size = xxcounts[arg]
+        largest_cluster_id = xx[arg]
+
+        self.atoms["largest_cluster"] = [True if self.atoms["cluster"][x]==largest_cluster_id else False for x in range(len(self.atoms["cluster"]))]
+        return largest_cluster_size
+
+
+    def cluster_atoms(self, condition, largest = True, cutoff=0):
+        """
+        Cluster atoms based on a property
+        
+        Parameters
+        ----------
+        condition : callable or atom property
+            Either function which should take an :class:`~Atom` object, and give a True/False output
+            or an attribute of atom class which has value or 1 or 0.
+        
+        largest : bool, optional
+            If True returns the size of the largest cluster. Default False.
+        
+        cutoff : float, optional
+            If specified, use this cutoff for calculation of clusters. By default uses the cutoff
+            used for neighbor calculation.
+        
+        Returns
+        -------
+        lc : int
+            Size of the largest cluster. Returned only if `largest` is True.
+        
+        Notes
+        -----
+        This function helps to cluster atoms based on a defined property. This property
+        is defined by the user through the argument `condition` which is passed as a parameter.
+        `condition` should be a boolean array the same length as number of atoms in the system.
+        """
+        
+        self.apply_condition(condition)
+        pc.find_clusters(self.atoms, cutoff)
+
+        #done!
+        lc = self.find_largest_cluster()
+        #pcs.System.get_largest_cluster_atoms(self)
+
+        if largest:
+            return lc
+

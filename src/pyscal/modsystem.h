@@ -184,3 +184,23 @@ void calculate_aq_single(py::dict& atoms,
 
 void calculate_disorder(py::dict& atoms,
     const int lm);
+
+void calculate_bonds(py::dict& atoms,
+    const int lm,
+    const double threshold,
+    const double avgthreshold,
+    const double minbonds,
+    const int comparecriteria,
+    const int criteria);
+
+void extract_cluster(int ti,
+    int clusterindex,
+    vector<bool>& condition,
+    vector<bool>& ghost,
+    vector<vector<int>>& neighbors,
+    vector<vector<double>>& neighbordist,
+    vector<double>& cutoff,
+    vector<int>& cluster);
+
+void find_clusters(py::dict& atoms,
+    double clustercutoff);
