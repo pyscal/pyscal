@@ -956,3 +956,117 @@ class System:
             #average the disorder
             avg_arr = self.average_over_neighbors("disorder")
             self.atoms["avg_disorder"] = avg_arr
+
+
+    def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, 
+                          cluster=True, q=6, cutoff=0, right=True):
+        """
+        Distinguish solid and liquid atoms in the system.
+        Parameters
+        ----------
+        bonds : int or float, optional
+            Minimum number of solid bonds for an atom to be identified as
+            a solid if the value is an integer. Minimum fraction of neighbors
+            of an atom that should be solid for an atom to be solid if the
+            value is float between 0-1. Default 0.5.
+        
+        threshold : double, optional
+            Solid bond cutoff value. Default 0.5.
+        
+        avgthreshold : double, optional
+            Value required for Averaged solid bond cutoff for an atom to be identified
+            as solid. Default 0.6.
+        
+        cluster : bool, optional
+            If True, cluster the solid atoms and return the number of atoms in the largest
+            cluster.
+        
+        q : int, optional
+            The Steinhardt parameter value over which the bonds have to be calculated.
+            Default 6.
+        
+        cutoff : double, optional
+            Separate value used for cluster classification. If not specified, cutoff used
+            for finding neighbors is used.
+        
+        right: bool, optional
+            If true, greater than comparison is to be used for finding solid particles. 
+            default True.
+        
+        Returns
+        -------
+        solid : int
+            Size of the largest solid cluster. Returned only if `cluster=True`.
+        
+        Notes
+        -----
+        The neighbors should be calculated before running this function.
+        Check :func:`~pyscal.core.System.find_neighbors` method.
+        
+        `bonds` define the number of solid bonds of an atom to be identified as solid.
+        Two particles are said to be 'bonded' if [1],
+        .. math:: s_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i) \geq threshold
+        where `threshold` values is also an optional parameter.
+        
+        If the value of `bonds` is a fraction between 0 and 1, at least that much of an atom's neighbors
+        should be solid for the atom to be solid.
+        
+        An additional parameter `avgthreshold` is an additional parameter to improve solid-liquid distinction.
+        
+        In addition to having a the specified number of `bonds`,
+        
+        .. math::  \langle s_{ij} \\rangle > avgthreshold
+        
+        also needs to be satisfied. In case another q value has to be used for calculation of S_ij, it can be
+        set used the `q` attribute. In the above formulations, `>` comparison for `threshold` and `avgthreshold`
+        can be changed to `<` by setting the keyword `right` to False.
+        
+        If `cluster` is True, a clustering is done for all solid particles. See :func:`~pyscal.csystem.find_clusters`
+        for more details. 
+        
+        References
+        ----------
+        .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
+        """
+        #check if neighbors are found
+        if not self.neighbors_found:
+            raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
+
+        if not isinstance(q, int):
+            raise TypeError("q should be interger value")
+
+        if not isinstance(threshold, (int, float)):
+            raise TypeError("threshold should be a float value")
+        else:
+            if not ((threshold >= 0 ) and (threshold <= 1 )):
+                raise ValueError("Value of threshold should be between 0 and 1")
+
+        if not isinstance(avgthreshold, (int, float)):
+            raise TypeError("avgthreshold should be a float value")
+        else:
+            if not ((avgthreshold >= 0 ) and (avgthreshold <= 1 )):
+                raise ValueError("Value of avgthreshold should be between 0 and 1")
+
+        #start identification routine
+        #check the value of bonds and set criteria depending on that
+        if isinstance(bonds, int):
+            criteria = 0
+        elif isinstance(bonds, float):
+            if ((bonds>=0) and (bonds<=1.0)):
+                criteria = 1
+            else:
+                raise TypeError("bonds if float should have value between 0-1")
+        else:
+             raise TypeError("bonds should be interger/float value")
+
+        self.calculate_q(q)
+
+        #calculate solid neighs
+        self.set_nucsize_parameters(bonds, threshold, avgthreshold)
+        self.calculate_frenkelnumbers()
+        #now find solids
+        self.find_solid_atoms()
+
+        if cluster:
+            lc = self.cluster_atoms("solid", largest=True, cutoff=cutoff)
+            return lc

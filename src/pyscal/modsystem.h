@@ -184,3 +184,8 @@ void calculate_aq_single(py::dict& atoms,
 
 void calculate_disorder(py::dict& atoms,
     const int lm);
+
+void calculate_bonds(py::dict& atoms,
+    const int lm,
+    const double threshold,
+    const int comparecriteria);
