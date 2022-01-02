@@ -9,5 +9,5 @@ dependencies:
   - ipywidgets
   - pytest
   - pytest-cov
-  - h5py
   - pybind11
+  - scipy

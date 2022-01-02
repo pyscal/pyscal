@@ -193,6 +193,14 @@ class System:
             atoms['types'] = [1 for x in range(nop)]
         if not 'ghost' in atoms.keys():
             atoms['ghost'] = [False for x in range(nop)]
+        if not 'mask_1' in atoms.keys():
+            atoms['mask_1'] = [False for x in range(nop)]
+        if not 'mask_2' in atoms.keys():
+            atoms['mask_2'] = [False for x in range(nop)]
+        if not 'condition' in atoms.keys():
+            atoms['condition'] = [True for x in range(nop)]
+        if not 'head' in atoms.keys():
+            atoms['head'] = [self.natoms+x for x in range(nop)]
 
         for key in self.atoms.keys():
             self.atoms[key] = [*self.atoms[key], *atoms[key]]
@@ -273,9 +281,9 @@ class System:
         atoms['ids'] = [*atoms['ids'], *ids]
         atoms['types'] = [*atoms['types'], *types]
         atoms['ghost'] = [*atoms['ghost'], *ghosts]
-        atoms['mask_1'] = [*atoms['mask_1'], *ghosts]
-        atoms['mask_2'] = [*atoms['mask_2'], *ghosts]
-        atoms['condition'] = [*atoms['condition'], *ghosts]
+        atoms['mask_1'] = [*atoms['mask_1'], *mask_1]
+        atoms['mask_2'] = [*atoms['mask_2'], *mask_2]
+        atoms['condition'] = [*atoms['condition'], *condition]
         atoms['head'] = [*atoms['head'], *head]
 
         return atoms
@@ -769,7 +777,7 @@ class System:
         '''
         self.neighbors_found = True
 
-    def calculate_q(self, q, averaged=False, use_c=False):
+    def calculate_q(self, q, averaged=False, continuous_algorithm=False):
         """
         Find the Steinhardt parameter q_l for all atoms.
 
@@ -820,7 +828,7 @@ class System:
             self._calculate_aq(qq)
             qvals = [self.atoms["avg_q%d"%x] for x in qq]
         else:    
-            if use_c:
+            if continuous_algorithm:
                 lm = max(qq)
                 pc.calculate_q(self.atoms, lm)
             else:
@@ -832,27 +840,9 @@ class System:
         """
         Private method for calculation of qvals
         """
-        theta = np.array(self.atoms["theta"])
-        phi = np.array(self.atoms["phi"])
-        weights = np.array(self.atoms["neighborweight"])
         for val in qq:
-            shs = []
-            sh = sph_harm(0, val, phi, theta)
-            shs.append(np.average(sh, axis=1, weights=weights))
-            for m in range(1, val+1):
-                sh = sph_harm(m, val, phi, theta)
-                shs.append(np.average(sh, axis=1, weights=weights))
-                sh = sh*(-1)**(-m)
-                shs.append(np.average(sh, axis=1, weights=weights))
-            shs = np.array(shs)
-            q_real = np.real(shs)
-            q_imag = np.imag(shs)
-            shs_sum = np.sum(q_real**2, axis=0) + np.sum(q_imag**2, axis=0)
-            factor = (4.0*np.pi/(2*val+1))
-            qval = (factor*shs_sum)**0.5
-            self.atoms["q%d"%val] = qval
-            self.atoms["q%d_real"%val] = q_real
-            self.atoms["q%d_imag"%val] = q_imag
+            pc.calculate_q_single(self.atoms, val)
+  
 
     def _calculate_aq(self, qq):
         """
@@ -874,28 +864,6 @@ class System:
 
         _ = self._calculate_q(todo_q)
 
-        #now all qs are calculated
-        nn = len(self.atoms["positions"])
-
         #loop over atoms
         for val in qq:
-            qval_arr = []
-            for n in range(nn):
-            #loop over each q
-                real_key = 'q%d_real'%val
-                imag_key = 'q%d_imag'%val
-                summ = 0
-                for m in range(0, 2*val+1):
-                    realti = self.atoms[real_key][m][n]
-                    imagti = self.atoms[imag_key][m][n]
-                    for p in self.atoms["neighbors"][n]:
-                        realti += self.atoms[real_key][m][p]
-                        imagti += self.atoms[imag_key][m][p]
-                    realti = realti/(len(self.atoms["neighbors"][n])+1)
-                    imagti = imagti/(len(self.atoms["neighbors"][n])+1)
-                    summ += realti**2 + imagti**2
-                factor = (4.0*np.pi/(2*val+1))
-                qval = (factor*summ)**0.5
-                qval_arr.append(qval)
-            self.atoms["avg_q%d"%val] = qval_arr
-
+            pc.calculate_aq_single(self.atoms, val)
