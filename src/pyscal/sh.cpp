@@ -353,15 +353,16 @@ void calculate_aq_single(py::dict& atoms,
     vector<vector<double>> q_imag = atoms[py::str(key2)].cast<vector<vector<double>>>();
     vector<vector<int>> neighbors = atoms[py::str("neighbors")].cast<vector<vector<int>>>();
     vector<double> q;
+    int nop = neighbors.size();
  
     for (int ti= 0;ti<nop;ti++){
         summ = 0;
-        for (int mi = 0;mi<2*q+1;mi++){
+        for (int mi = 0;mi<2*lm+1;mi++){
             realti = q_real[ti][mi];
             imgti = q_imag[ti][mi];
             
             nns = 0;
-            for (int ci = 0;ci<nn;ci++){
+            for (int ci = 0;ci<neighbors[ti].size();ci++){
             	realti += q_real[neighbors[ti][ci]][mi];
             	imgti += q_imag[neighbors[ti][ci]][mi];
                 nns += 1;
