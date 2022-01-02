@@ -824,8 +824,8 @@ class System:
         averaged : bool, optional
             If True, return the averaged q values, default False
         
-        use_c: bool, optional
-            If False, use Python for calculations.
+        continuous_algorithm: bool, optional
+            See Notes for description.
 
         Returns
         -------
@@ -838,9 +838,8 @@ class System:
         q values depend on the method used to calculate neighbors. See the description
         :func:`~pyscal.core.System.find_neighbors` for more details. 
 
-        The option `use_c` specifies which backend to use for calculations. If True,
-        scipy is used to perform the calculations. If False, an algorithm [3] implemented in C++
-        backend is used. The C++ algorithm is faster is a large, consecutive number of q values
+        The option `continuous_algorithm` specifies which algorithm to use for calculations. If False, 
+        an algorithm [3] is used. The C++ algorithm is faster is a large, consecutive number of q values (> 200)
         are to be calculated.
 
         This function creates three new attributes for this class: `qx`, `qx_real` and `qx_imag`,
@@ -925,10 +924,14 @@ class System:
         .. math::
             D_j = \\frac{1}{N_b^j} \sum_{i=1}^{N_b} [ S_{jj} + S_{kk} -2S_{jk}]
         where .. math:: S_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i)
-        The keyword `averaged` is True, the disorder value is averaged over the atom and its neighbors. The disorder value
-        can be accessed using :attr:`~pyscal.catom.disorder` and the averaged version can be accessed using
-        :attr:`~pyscal.catom.avg_disorder`. For ordered systems, the value of disorder would be zero which would increase
+        
+        Any q value other than six can also be used. This can be specified using the `q` argument.
+
+        The keyword `averaged` is True, the disorder value is averaged over the atom and its neighbors. 
+        For ordered systems, the value of disorder would be zero which would increase
         and reach one for disordered systems.
+
+        This function creates two new attributes for this class: `disorder` and `avg_disorder`.
         
         References
         ----------
