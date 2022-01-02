@@ -193,6 +193,14 @@ class System:
             atoms['types'] = [1 for x in range(nop)]
         if not 'ghost' in atoms.keys():
             atoms['ghost'] = [False for x in range(nop)]
+        if not 'mask_1' in atoms.keys():
+            atoms['mask_1'] = [False for x in range(nop)]
+        if not 'mask_2' in atoms.keys():
+            atoms['mask_2'] = [False for x in range(nop)]
+        if not 'condition' in atoms.keys():
+            atoms['condition'] = [True for x in range(nop)]
+        if not 'head' in atoms.keys():
+            atoms['head'] = [self.natoms+x for x in range(nop)]
 
         for key in self.atoms.keys():
             self.atoms[key] = [*self.atoms[key], *atoms[key]]
