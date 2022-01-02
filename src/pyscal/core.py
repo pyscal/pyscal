@@ -578,6 +578,41 @@ class System:
         """
         return convert_snap(self, species=species)
 
+    def average_over_neighbors(self, key, include_self=True):
+        """
+        Perform a simple average over neighbor atoms
+
+        Parameters
+        ----------
+        key: string
+            atom property
+
+        include_self: bool, optional
+            If True, include the host atom in the calculation
+
+        Returns
+        -------
+
+        """
+        if not key in self.atoms.keys():
+            raise KeyError("required property not found!")
+
+        test = self.atoms[key][0]
+
+        if isinstance(test, list):
+            raise TypeError("Averaging can only be done over 1D quantities")
+
+        avgarr = []
+        for i in range(len(self.atoms["positions"])):
+            arr = []
+            if include_self:
+                arr.append(self.atoms[key][i])
+            for j in self.atoms["neighbors"][i]:
+                arr.append(self.atoms[key][j])
+            avgarr.append(np.mean(arr))
+        
+        return avgarr 
+
     def reset_neighbors(self):
         """
 
@@ -867,3 +902,54 @@ class System:
         #loop over atoms
         for val in qq:
             pc.calculate_aq_single(self.atoms, val)
+
+    def calculate_disorder(self, averaged=False, q=6):
+        """
+        Calculate the disorder criteria for each atom
+        
+        Parameters
+        ----------
+        averaged : bool, optional
+            If True, calculate the averaged disorder. Default False.
+        q : int, optional
+            The Steinhardt parameter value over which the bonds have to be calculated.
+            Default 6.
+        
+        Returns
+        -------
+        None
+        
+        Notes
+        -----
+        Calculate the disorder criteria as introduced in [1]. The disorder criteria value for each atom is defined by,
+        .. math::
+            D_j = \\frac{1}{N_b^j} \sum_{i=1}^{N_b} [ S_{jj} + S_{kk} -2S_{jk}]
+        where .. math:: S_{ij} = \sum_{m=-6}^6 q_{6m}(i) q_{6m}^*(i)
+        The keyword `averaged` is True, the disorder value is averaged over the atom and its neighbors. The disorder value
+        can be accessed using :attr:`~pyscal.catom.disorder` and the averaged version can be accessed using
+        :attr:`~pyscal.catom.avg_disorder`. For ordered systems, the value of disorder would be zero which would increase
+        and reach one for disordered systems.
+        
+        References
+        ----------
+        .. [1] Kawasaki, T, Onuki, A, J. Chem. Phys. 135, 2011
+        """
+        #now routine for calculation of disorder
+
+        keys = ["q%d_real"%q, "q%d_imag"%q]
+        prod = []
+        for key in keys:
+            if key in self.atoms.keys():
+                prod.append(True)
+            else:
+                prod.append(False)
+        prod = np.prod(prod)
+        if not prod:
+            self.calculate_q(q)
+
+        pc.calculate_disorder(self.atoms, q)
+
+        if averaged:
+            #average the disorder
+            avg_arr = self.average_over_neighbors("disorder")
+            self.atoms["avg_disorder"] = avg_arr
