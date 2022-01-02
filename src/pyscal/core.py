@@ -273,9 +273,9 @@ class System:
         atoms['ids'] = [*atoms['ids'], *ids]
         atoms['types'] = [*atoms['types'], *types]
         atoms['ghost'] = [*atoms['ghost'], *ghosts]
-        atoms['mask_1'] = [*atoms['mask_1'], *ghosts]
-        atoms['mask_2'] = [*atoms['mask_2'], *ghosts]
-        atoms['condition'] = [*atoms['condition'], *ghosts]
+        atoms['mask_1'] = [*atoms['mask_1'], *mask_1]
+        atoms['mask_2'] = [*atoms['mask_2'], *mask_2]
+        atoms['condition'] = [*atoms['condition'], *condition]
         atoms['head'] = [*atoms['head'], *head]
 
         return atoms
