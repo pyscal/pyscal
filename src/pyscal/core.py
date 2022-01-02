@@ -957,7 +957,6 @@ class System:
             avg_arr = self.average_over_neighbors("disorder")
             self.atoms["avg_disorder"] = avg_arr
 
-
     def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, 
                           cluster=True, q=6, cutoff=0, right=True):
         """
@@ -1059,14 +1058,15 @@ class System:
         else:
              raise TypeError("bonds should be interger/float value")
 
+        if right:
+            compare_criteria = 0
+        else:
+            compare_criteria = 1
+
         self.calculate_q(q)
 
         #calculate solid neighs
-        self.set_nucsize_parameters(bonds, threshold, avgthreshold)
-        self.calculate_frenkelnumbers()
-        #now find solids
-        self.find_solid_atoms()
+        pc.calculate_solid_bonds(self.atoms, q, 
+            threshold, avgthreshold, bonds, 
+            compare_criteria, criteria)
 
-        if cluster:
-            lc = self.cluster_atoms("solid", largest=True, cutoff=cutoff)
-            return lc

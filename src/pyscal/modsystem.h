@@ -188,4 +188,7 @@ void calculate_disorder(py::dict& atoms,
 void calculate_bonds(py::dict& atoms,
     const int lm,
     const double threshold,
-    const int comparecriteria);
+    const double avgthreshold,
+    const double minbonds,
+    const int comparecriteria,
+    const int criteria);

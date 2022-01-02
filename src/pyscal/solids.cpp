@@ -44,7 +44,10 @@ double get_number_from_bond(const int lm,
 void calculate_bonds(py::dict& atoms,
 	const int lm,
 	const double threshold,
-	const int comparecriteria){
+	const double avgthreshold,
+	const double minbonds,
+	const int comparecriteria,
+	const int criteria){
     
     int frenkelcons;
     double scalar;
@@ -87,8 +90,37 @@ void calculate_bonds(py::dict& atoms,
         avg_sij.emplace_back(tempsij);
     }
 
+    vector<double> solid;
+    int issolid;
+    double tfrac;
+
+    if (criteria == 0){
+    	for (int ti= 0;ti<nop;ti++){
+    		if (comparecriteria==0){
+    			issolid = ((bonds[ti] > minbonds) && (avg_sij[ti] > avgthreshold));
+    		}
+    		else{
+    			issolid = ((bonds[ti] > minbonds) && (avg_sij[ti] < avgthreshold));
+    		}
+    		solid.emplace_back(issolid);
+    	}
+    }
+    else {
+    	for (int ti= 0;ti<nop;ti++){
+    		tfrac = (bonds[ti]/double(neighbors[ti].size()) > minbonds);
+    		if (comparecriteria==0){
+    			issolid = (tfrac && (avg_sij[ti] > avgthreshold));
+    		}
+    		else{
+    			issolid = (tfrac && (avg_sij[ti] < avgthreshold));	
+    		}
+    		solid.emplace_back(issolid);    		
+    	}
+    }
+
     atoms[py::str("bonds")] = bonds;
     atoms[py::str("sij")] = sij;
     atoms[py::str("avg_sij")] = avg_sij;
+    atoms[py::str("solid")] = solid;
 }
 
