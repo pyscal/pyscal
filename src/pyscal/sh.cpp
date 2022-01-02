@@ -382,3 +382,64 @@ void calculate_aq_single(py::dict& atoms,
     key1 = "avg_q"+to_string(lm);
     atoms[py::str(key1)] = q;
 }
+
+
+void calculate_disorder(py::dict& atoms,
+	const int lm){
+    
+    double sum2ti, sum2tj;
+    double realdotproduct, imgdotproduct;
+    double connection;
+    double dis;
+
+    string key1, key2;
+	key1 = "q"+to_string(lm)+"_real";
+	key2 = "q"+to_string(lm)+"_imag";
+
+    vector<vector<double>> q_real = atoms[py::str(key1)].cast<vector<vector<double>>>();
+    vector<vector<double>> q_imag = atoms[py::str(key2)].cast<vector<vector<double>>>();
+    vector<vector<int>> neighbors = atoms[py::str("neighbors")].cast<vector<vector<int>>>();
+    vector<double> sii;
+    vector<double> disorder;
+    int nop = neighbors.size();
+
+    for(int ti=0; ti<nop; ti++){
+
+        sum2ti = 0.0;
+        realdotproduct = 0.0;
+        imgdotproduct = 0.0;
+
+        for (int mi = 0;mi < 2*lm+1 ; mi++){
+            sum2ti += q_real[ti][mi]*q_real[ti][mi] + q_imag[ti][mi]*q_imag[ti][mi];
+            realdotproduct += q_real[ti][mi]*q_real[ti][mi];
+            imgdotproduct  += q_imag[ti][mi]*q_imag[ti][mi];
+        }
+        connection = (realdotproduct+imgdotproduct)/(sqrt(sum2ti)*sqrt(sum2ti));
+        sii.emplace_back(connection);
+    }
+
+    //first round is over
+    //now find cross terms
+    for(int ti=0; ti<nop; ti++){
+
+        sum2ti = 0.0;
+        sum2tj = 0.0;
+        realdotproduct = 0.0;
+        imgdotproduct = 0.0;
+        dis = 0;
+
+        for(int tj=0; tj<neighbors[ti].size(); tj++){
+            for (int mi = 0; mi<2*lm+1 ; mi++){
+                sum2ti += q_real[ti][mi]*q_real[ti][mi] + q_imag[ti][mi]*q_imag[ti][mi];
+                sum2tj += q_real[tj][mi]*q_real[tj][mi] + q_imag[tj][mi]*q_imag[tj][mi];
+                realdotproduct += q_real[ti][mi]*q_real[tj][mi];
+                imgdotproduct  += q_imag[ti][mi]*q_imag[tj][mi];
+            }
+            connection = (realdotproduct+imgdotproduct)/(sqrt(sum2tj)*sqrt(sum2ti));
+            dis += (sii[ti] + sii[tj] - 2*connection);
+        }
+        disorder.emplace_back(dis/float(neighbors[ti].size()));
+    }
+
+    atoms[py::str("disorder")] = disorder;
+}
