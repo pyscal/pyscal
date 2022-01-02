@@ -83,7 +83,7 @@ void calculate_bonds(py::dict& atoms,
         }
 
         bonds.emplace_back(frenkelcons);
-        tempsij = tempsij/double(neighbors[ti].size);
+        tempsij = tempsij/double(neighbors[ti].size());
         avg_sij.emplace_back(tempsij);
     }
 
