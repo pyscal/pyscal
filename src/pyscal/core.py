@@ -105,7 +105,7 @@ class System:
         """
         Volume of box
         """
-        vol = np.dot(np.cross(self.rot[0], self.rot[1]), self.rot[2])
+        vol = np.dot(np.cross(self._box[0], self._box[1]), self._box[2])
         return vol
 
     @property
@@ -1208,9 +1208,10 @@ class System:
             radius in distance units
         """
         self.find_neighbors(method="cutoff", cutoff=rmax)
-        distances = np.array(self.neighbordist).flatten()
+        distances = list(itertools.chain(*self.neighbordist))
 
-        hist, bin_edges = np.histogram(distances, bins=bins, range=(rmin, rmax))
+        hist, bin_edges = np.histogram(distances, bins=bins, 
+            range=(rmin, rmax), density=True)
         edgewidth = np.abs(bin_edges[1]-bin_edges[0])
         hist = hist.astype(float)
         r = bin_edges[:-1]
