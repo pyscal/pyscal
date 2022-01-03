@@ -86,6 +86,24 @@ double get_abs_distance(vector<double> pos1, vector<double> pos2,
     return abs;
 }
 
+vector<double> get_distance_vector(vector<double> pos1, 
+    vector<double> pos2, 
+    const int& triclinic, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box){
+
+    double diffx, diffy, diffz, dist;
+
+    dist = get_abs_distance(pos1, pos2, triclinic, rot, rotinv, box, diffx, diffy, diffz);
+
+    vector<double> dvec;
+    dvec.emplace_back(diffx);
+    dvec.emplace_back(diffy);
+    dvec.emplace_back(diffz);
+    return dvec;
+} 
+
 void reset_all_neighbors(py::dict& atoms){
     /*
     Reset all neighbors

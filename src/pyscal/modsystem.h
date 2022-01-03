@@ -52,6 +52,13 @@ double get_abs_distance(vector<double>, vector<double>,
     const vector<double>&, 
     double&, double&, double&);
 
+vector<double> get_distance_vector(vector<double> pos1, 
+    vector<double> pos2, 
+    const int& triclinic, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
+
 void reset_all_neighbors(py::dict&);
 
 void convert_to_spherical_coordinates(double, double, double, 

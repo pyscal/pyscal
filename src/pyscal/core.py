@@ -466,6 +466,38 @@ class System:
         return pc.get_abs_distance(pos1, pos2, self.triclinic, 
             self.rot, self.rotinv, self.boxdims, 0.0, 0.0, 0.0)
 
+    def get_distance(self, pos1, pos2, vector=False):
+        """
+        Get the distance between two atoms.
+
+        Parameters
+        ----------
+        pos1 : list
+                first atom position
+        pos2 : list
+                second atom position
+        vector: bool, optional
+            If True, return the vector between two atoms
+
+        Returns
+        -------
+        distance : double
+                distance between the first and second atom.
+
+        Notes
+        -----
+        Periodic boundary conditions are assumed by default.
+        """
+        
+        diff = pc.get_distance_vector(pos1, pos2, self.triclinic,
+            self.rot, self.rotinv, self.boxdims)
+        dist = np.linalg.norm(diff)
+        
+        if vector:
+            return dist, diff
+        else:
+            return dist
+
     def get_concentration(self):
         """
         Return a dict containing the concentration of the system
@@ -622,44 +654,8 @@ class System:
         """
         return convert_snap(self, species=species)
 
-    def average_over_neighbors(self, key, include_self=True):
-        """
-        Perform a simple average over neighbor atoms
-
-        Parameters
-        ----------
-        key: string
-            atom property
-
-        include_self: bool, optional
-            If True, include the host atom in the calculation
-
-        Returns
-        -------
-
-        """
-        if not key in self.atoms.keys():
-            raise KeyError("required property not found!")
-
-        test = self.atoms[key][0]
-
-        if isinstance(test, list):
-            raise TypeError("Averaging can only be done over 1D quantities")
-
-        avgarr = []
-        for i in range(len(self.atoms["positions"])):
-            arr = []
-            if include_self:
-                arr.append(self.atoms[key][i])
-            for j in self.atoms["neighbors"][i]:
-                arr.append(self.atoms[key][j])
-            avgarr.append(np.mean(arr))
-        
-        return avgarr 
-
     def reset_neighbors(self):
         """
-
         Reset the neighbors of all atoms in the system.
 
         Parameters
@@ -686,6 +682,51 @@ class System:
         self.atoms["phi"] = []
         self.atoms["cutoff"] = []
         self.neighbors_found = False
+
+    def _check_neighbors(self):
+        """
+        Check if neighbors are calculated
+        """
+        if not self.neighbors_found:
+            raise ValueError("This calculation needs neighbors to be calculated")
+
+    def average_over_neighbors(self, key, include_self=True):
+        """
+        Perform a simple average over neighbor atoms
+
+        Parameters
+        ----------
+        key: string
+            atom property
+
+        include_self: bool, optional
+            If True, include the host atom in the calculation
+
+        Returns
+        -------
+
+        """
+
+        self._check_neighbors()
+
+        if not key in self.atoms.keys():
+            raise KeyError("required property not found!")
+
+        test = self.atoms[key][0]
+
+        if isinstance(test, list):
+            raise TypeError("Averaging can only be done over 1D quantities")
+
+        avgarr = []
+        for i in range(len(self.atoms["positions"])):
+            arr = []
+            if include_self:
+                arr.append(self.atoms[key][i])
+            for j in self.atoms["neighbors"][i]:
+                arr.append(self.atoms[key][j])
+            avgarr.append(np.mean(arr))
+        
+        return avgarr 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, 
             voroexp=1, padding=1.2, nlimit=6, 
@@ -899,8 +940,7 @@ class System:
         else:
             qq = q
 
-        if not self.neighbors_found:
-            raise RuntimeError("Q calculation needs neighbor calculation first.")
+        self._check_neighbors()
 
         if averaged:
             self._calculate_aq(qq)
@@ -1072,8 +1112,7 @@ class System:
         .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
         """
         #check if neighbors are found
-        if not self.neighbors_found:
-            raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
+        self._check_neighbors()
 
         if not isinstance(q, int):
             raise TypeError("q should be interger value")
@@ -1223,3 +1262,134 @@ class System:
         #now divide to get final value
         rdf = shell_rho/rho
         return rdf, r
+
+    def calculate_angularcriteria(self):
+        """
+        Calculate the angular criteria for each atom
+        
+        Parameters
+        ----------
+        None
+        
+        Returns
+        -------
+        None
+        
+        Notes
+        -----
+        Calculates the angular criteria for each atom as defined in [1]_. Angular criteria is
+        useful for identification of diamond cubic structures. Angular criteria is defined by,
+        
+        .. math::
+            A = \sum_{i=1}^6 (\cos(\\theta_i) + \\frac{1}{3})^2
+        
+        where cos(theta) is the angle size suspended by each pair of neighbors of the central
+        atom. A will have a value close to 0 for structures if the angles are close to 109 degrees.
+        The calculated A parameter for each atom can be accessed by system.angular
+        
+        References
+        ----------
+        .. [1] Uttormark, MJ, Thompson, MO, Clancy, P, Phys. Rev. B 47, 1993
+        """
+        self._check_neighbors()
+        angulars = []
+
+        for count, pos1 in enumerate(self.atoms["positions"]):
+            
+            dists = []
+            distneighs = []
+            distvectors = []
+
+            for neigh in self.atoms["neighbors"][count]:
+                pos2 = self.atoms["positions"][neigh]
+                dist, vectors = self.get_distance(pos1, pos2, vector=True)
+                dists.append(dist)
+                distneighs.append(neigh)
+                distvectors.append(vectors)
+
+            args = np.argsort(dists)
+            #find top four
+            topfourargs = np.array(args)[:4]
+
+            combos = list(itertools.combinations(topfourargs, 2))
+            costhetasum = 0
+
+            for combo in combos:
+                vec1 = distvectors[combo[0]]
+                vec2 = distvectors[combo[1]]
+                modvec1 = np.sqrt(np.sum([x**2 for x in vec1]))
+                modvec2 = np.sqrt(np.sum([x**2 for x in vec2]))
+                costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
+                costhetasum += (costheta +(1./3.))**2
+            angulars.append(costhetasum)
+
+        self.atoms["angular"] = angulars
+
+    def calculate_chiparams(self, angles=False):
+        """
+        Calculate the chi param vector for each atom
+        
+        Parameters
+        ----------
+        angles : bool, optional
+            If True, return the list of cosines of all neighbor pairs
+        
+        Returns
+        -------
+        angles : array of floats
+            list of all cosine values, returned only if `angles` is True.
+        
+        Notes
+        -----
+        This method tries to distinguish between crystal structures by finding the cosines of angles
+        formed by an atom with its neighbors. These cosines are then historgrammed with bins
+        `[-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]` to find a vector for
+        each atom that is indicative of its local coordination. Compared to chi parameters from chi_0 to
+        chi_7 in the associated publication, the vector here is from chi_0 to chi_8. This is due to an additional
+        chi parameter which measures the number of neighbors between cosines -0.705 to -0.195.
+        Parameter `nlimit` specifies the number of nearest neighbors to be included in the analysis to find the cutoff.
+        If parameter `angles` is true, an array of all cosine values is returned. The publication further provides
+        combinations of chi parameters for structural identification which is not implemented here. The calculated
+        chi params can be accessed using :attr:`~pyscal.catom.chiparams`.
+        
+        References
+        ----------
+        .. [1] Ackland, Jones, Phys. Rev. B 73, 2006
+        """
+
+        self._check_neighbors()
+
+        bins = [-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]
+        chiparams = []
+        cosines = []
+
+        for count, pos in enumerate(self.atoms["positions"]):
+
+            dists = self.atoms["neighbordist"][count]
+            neighs = self.atoms["neighbors"][count]
+
+            args = range(len(dists))
+            combos = list(itertools.combinations(args, 2))
+            costhetas = []
+            
+            for combo in combos:
+                pos1 = self.atoms["positions"][neighs[combo[0]]]
+                pos2 = self.atoms["positions"][neighs[combo[1]]]
+                _, vec1 = self.get_distance(pos, pos1, vector=True) 
+                _, vec2 = self.get_distance(pos, pos2, vector=True)
+                modvec1 = np.linalg.norm(vec1)
+                modvec2 = np.linalg.norm(vec2)
+                costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
+                #found costheta
+                costhetas.append(costheta)
+
+
+            #now add according to classification in paper
+            chivector = np.histogram(costhetas, bins=bins)
+            chiparams.append(chivector[0])
+            if angles:
+                cosines.append(costhetas)
+        
+        self.atoms["chiparams"] = chiparams
+        if angles:
+            self.atoms["cosines"] = cosines
