@@ -654,41 +654,6 @@ class System:
         """
         return convert_snap(self, species=species)
 
-    def average_over_neighbors(self, key, include_self=True):
-        """
-        Perform a simple average over neighbor atoms
-
-        Parameters
-        ----------
-        key: string
-            atom property
-
-        include_self: bool, optional
-            If True, include the host atom in the calculation
-
-        Returns
-        -------
-
-        """
-        if not key in self.atoms.keys():
-            raise KeyError("required property not found!")
-
-        test = self.atoms[key][0]
-
-        if isinstance(test, list):
-            raise TypeError("Averaging can only be done over 1D quantities")
-
-        avgarr = []
-        for i in range(len(self.atoms["positions"])):
-            arr = []
-            if include_self:
-                arr.append(self.atoms[key][i])
-            for j in self.atoms["neighbors"][i]:
-                arr.append(self.atoms[key][j])
-            avgarr.append(np.mean(arr))
-        
-        return avgarr 
-
     def reset_neighbors(self):
         """
         Reset the neighbors of all atoms in the system.
@@ -717,6 +682,51 @@ class System:
         self.atoms["phi"] = []
         self.atoms["cutoff"] = []
         self.neighbors_found = False
+
+    def _check_neighbors(self):
+        """
+        Check if neighbors are calculated
+        """
+        if not self.neighbors_found:
+            raise ValueError("This calculation needs neighbors to be calculated")
+
+    def average_over_neighbors(self, key, include_self=True):
+        """
+        Perform a simple average over neighbor atoms
+
+        Parameters
+        ----------
+        key: string
+            atom property
+
+        include_self: bool, optional
+            If True, include the host atom in the calculation
+
+        Returns
+        -------
+
+        """
+
+        self._check_neighbors()
+
+        if not key in self.atoms.keys():
+            raise KeyError("required property not found!")
+
+        test = self.atoms[key][0]
+
+        if isinstance(test, list):
+            raise TypeError("Averaging can only be done over 1D quantities")
+
+        avgarr = []
+        for i in range(len(self.atoms["positions"])):
+            arr = []
+            if include_self:
+                arr.append(self.atoms[key][i])
+            for j in self.atoms["neighbors"][i]:
+                arr.append(self.atoms[key][j])
+            avgarr.append(np.mean(arr))
+        
+        return avgarr 
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, 
             voroexp=1, padding=1.2, nlimit=6, 
@@ -930,8 +940,7 @@ class System:
         else:
             qq = q
 
-        if not self.neighbors_found:
-            raise RuntimeError("Q calculation needs neighbor calculation first.")
+        self._check_neighbors()
 
         if averaged:
             self._calculate_aq(qq)
@@ -1103,8 +1112,7 @@ class System:
         .. [1] Auer, S, Frenkel, D. Adv Polym Sci 173, 2005
         """
         #check if neighbors are found
-        if not self.neighbors_found:
-            raise RuntimeError("neighbors should be calculated before finding solid atoms. Run System.find_neighbors.")
+        self._check_neighbors()
 
         if not isinstance(q, int):
             raise TypeError("q should be interger value")
@@ -1283,18 +1291,18 @@ class System:
         ----------
         .. [1] Uttormark, MJ, Thompson, MO, Clancy, P, Phys. Rev. B 47, 1993
         """
+        self._check_neighbors()
+        angulars = []
 
-        atoms = self.atoms
-
-        for atom in atoms:
+        for count, pos1 in enumerate(self.atoms["positions"]):
+            
             dists = []
             distneighs = []
             distvectors = []
 
-            neighs = atom.neighbors
-
-            for neigh in neighs:
-                dist, vectors = self.get_distance(atom, atoms[neigh], vector=True)
+            for neigh in self.atoms["neighbors"][count]:
+                pos2 = self.atoms["positions"][neigh]
+                dist, vectors = self.get_distance(pos1, pos2, vector=True)
                 dists.append(dist)
                 distneighs.append(neigh)
                 distvectors.append(vectors)
@@ -1313,6 +1321,6 @@ class System:
                 modvec2 = np.sqrt(np.sum([x**2 for x in vec2]))
                 costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
                 costhetasum += (costheta +(1./3.))**2
-            atom.angular = costhetasum
+            angulars.append(costhetasum)
 
-        self.atoms = atoms
+        self.atoms["angular"] = angulars
