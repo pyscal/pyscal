@@ -77,3 +77,10 @@ def test_composition():
 	c = sys.composition
 	assert c['1'] == 8
 	assert c['2'] == 24
+
+def test_volume():
+	atoms, boxdims = pcs.make_crystal('fcc', repetitions = [10, 10, 10])
+	sys = pc.System()
+	sys.box = boxdims
+	sys.atoms = atoms
+	assert sys.volume == 1000
