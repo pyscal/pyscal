@@ -1303,7 +1303,7 @@ class System:
             for count2, neigh in enumerate(self.atoms["neighbors"][count]):
                 pos2 = self.atoms["positions"][neigh]
                 dist = self.atoms["neighbordist"][count][count2]
-                vectors = self.atoms["diffs"][count][count2]
+                vectors = self.atoms["diff"][count][count2]
                 dists.append(dist)
                 distneighs.append(neigh)
                 distvectors.append(vectors)
@@ -1374,10 +1374,8 @@ class System:
             costhetas = []
             
             for combo in combos:
-                pos1 = self.atoms["positions"][neighs[combo[0]]]
-                pos2 = self.atoms["positions"][neighs[combo[1]]]
-                _, vec1 = self.get_distance(pos, pos1, vector=True) 
-                _, vec2 = self.get_distance(pos, pos2, vector=True)
+                vec1 = self.atoms["diff"][count][combo[0]]
+                vec2 = self.atoms["diff"][count][combo[1]]
                 modvec1 = np.linalg.norm(vec1)
                 modvec2 = np.linalg.norm(vec2)
                 costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
