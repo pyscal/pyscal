@@ -31,6 +31,13 @@ PYBIND11_MODULE(csystem, m) {
     m.def("calculate_disorder", &calculate_disorder);
     m.def("calculate_bonds", &calculate_bonds);
     m.def("find_clusters", &find_clusters);
+    m.def("get_cna_neighbors", &get_cna_neighbors);
+    m.def("get_acna_neighbors_cn12", &get_acna_neighbors_cn12);
+    m.def("get_acna_neighbors_cn14", &get_acna_neighbors_cn14);
+    m.def("get_common_neighbors", &get_common_neighbors);
+    m.def("get_common_bonds", &get_common_bonds);
+    m.def("identify_cn12", &identify_cn12);
+    m.def("identify_cn14", &identify_cn14);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
