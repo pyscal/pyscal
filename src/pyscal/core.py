@@ -1285,7 +1285,7 @@ class System:
         
         where cos(theta) is the angle size suspended by each pair of neighbors of the central
         atom. A will have a value close to 0 for structures if the angles are close to 109 degrees.
-        The calculated A parameter for each atom is stored in :attr:`~pyscal.catom.Atom.angular`.
+        The calculated A parameter for each atom can be accessed by system.angular
         
         References
         ----------
@@ -1324,3 +1324,72 @@ class System:
             angulars.append(costhetasum)
 
         self.atoms["angular"] = angulars
+
+    def calculate_chiparams(self, angles=False):
+        """
+        Calculate the chi param vector for each atom
+        
+        Parameters
+        ----------
+        angles : bool, optional
+            If True, return the list of cosines of all neighbor pairs
+        
+        Returns
+        -------
+        angles : array of floats
+            list of all cosine values, returned only if `angles` is True.
+        
+        Notes
+        -----
+        This method tries to distinguish between crystal structures by finding the cosines of angles
+        formed by an atom with its neighbors. These cosines are then historgrammed with bins
+        `[-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]` to find a vector for
+        each atom that is indicative of its local coordination. Compared to chi parameters from chi_0 to
+        chi_7 in the associated publication, the vector here is from chi_0 to chi_8. This is due to an additional
+        chi parameter which measures the number of neighbors between cosines -0.705 to -0.195.
+        Parameter `nlimit` specifies the number of nearest neighbors to be included in the analysis to find the cutoff.
+        If parameter `angles` is true, an array of all cosine values is returned. The publication further provides
+        combinations of chi parameters for structural identification which is not implemented here. The calculated
+        chi params can be accessed using :attr:`~pyscal.catom.chiparams`.
+        
+        References
+        ----------
+        .. [1] Ackland, Jones, Phys. Rev. B 73, 2006
+        """
+
+        self._check_neighbors()
+
+        bins = [-1.0, -0.945, -0.915, -0.755, -0.705, -0.195, 0.195, 0.245, 0.795, 1.0]
+        chiparams = []
+        cosines = []
+
+        for count, pos in enumerate(self.atoms["positions"]):
+
+            dists = self.atoms["neighbordist"][count]
+            neighs = self.atoms["neighbors"][count]
+
+            args = range(len(dists))
+            combos = list(itertools.combinations(args, 2))
+            costhetas = []
+            
+            for combo in combos:
+                pos1 = self.atoms["positions"][neighs[combo[0]]]
+                pos2 = self.atoms["positions"][neighs[combo[1]]]
+                _, vec1 = self.get_distance(pos, pos1, vector=True) 
+                _, vec2 = self.get_distance(pos, pos2, vector=True)
+                modvec1 = np.linalg.norm(vec1)
+                modvec2 = np.linalg.norm(vec2)
+                costheta = np.dot(vec1, vec2)/(modvec1*modvec2)
+                #found costheta
+                costhetas.append(costheta)
+
+
+            #now add according to classification in paper
+            chivector = np.histogram(costhetas, bins=bins)
+            chiparams.append(chivector[0])
+            if angles:
+                cosines.append(costhetas)
+        
+        self.atoms["chiparams"] = chiparams
+        if angles:
+            self.atoms["cosines"] = cosines
