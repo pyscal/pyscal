@@ -1300,9 +1300,10 @@ class System:
             distneighs = []
             distvectors = []
 
-            for neigh in self.atoms["neighbors"][count]:
+            for count2, neigh in enumerate(self.atoms["neighbors"][count]):
                 pos2 = self.atoms["positions"][neigh]
-                dist, vectors = self.get_distance(pos1, pos2, vector=True)
+                dist = self.atoms["neighbordist"][count][count2]
+                vectors = self.atoms["diffs"][count][count2]
                 dists.append(dist)
                 distneighs.append(neigh)
                 distvectors.append(vectors)
