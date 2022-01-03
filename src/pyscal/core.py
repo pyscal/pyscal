@@ -101,6 +101,14 @@ class System:
         self._box = userbox
 
     @property
+    def volume(self):
+        """
+        Volume of box
+        """
+        vol = np.dot(np.cross(self.rot[0], self.rot[1]), self.rot[2])
+        return vol
+
+    @property
     def atoms(self):
         """
         Atom access
@@ -1175,3 +1183,42 @@ class System:
         if largest:
             return lc
 
+
+    def calculate_rdf(self, rmin=0, rmax=5.00, bins=100):
+        """
+        Calculate the radial distribution function.
+        
+        Parameters
+        ----------
+        rmin : float, optional
+            minimum value of the distance histogram. Default 0.0.
+        
+        rmax : float, optional
+            maximum value of the distance histogram. Default 5.0
+
+        bins : int
+            number of bins in the histogram
+                
+        Returns
+        -------
+        rdf : array of ints
+            Radial distribution function
+        
+        r : array of floats
+            radius in distance units
+        """
+        self.find_neighbors(method="cutoff", cutoff=rmax)
+        distances = np.array(self.neighbordist).flatten()
+
+        hist, bin_edges = np.histogram(distances, bins=bins, range=(rmin, rmax))
+        edgewidth = np.abs(bin_edges[1]-bin_edges[0])
+        hist = hist.astype(float)
+        r = bin_edges[:-1]
+
+        #get box density
+        rho = self.natoms/self.volume
+        shell_vols = (4./3.)*np.pi*((r+edgewidth)**3 - r**3)
+        shell_rho = hist/shell_vols
+        #now divide to get final value
+        rdf = shell_rho/rho
+        return rdf, r
