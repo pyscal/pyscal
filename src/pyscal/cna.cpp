@@ -212,7 +212,7 @@ void get_acna_neighbors_cn14(py::dict& atoms,
 void get_common_neighbors(const int& triclinic,
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
-    const vector<double>& box
+    const vector<double>& box,
     const int ti,
     const vector<vector<double>>& positions,
     const vector<double>& cutoff,
@@ -256,7 +256,7 @@ void get_common_neighbors(const int& triclinic,
 void get_common_bonds(const int& triclinic,
     const vector<vector<double>>& rot, 
     const vector<vector<double>>& rotinv,
-    const vector<double>& box
+    const vector<double>& box,
     const int ti,
     const vector<vector<double>>& positions,
     const vector<double>& cutoff,
@@ -282,7 +282,7 @@ void get_common_bonds(const int& triclinic,
                 c1 = common[ti][k][l];
                 c2 = common[ti][k][m];
                 
-                d = get_abs_distance(positions[m], positions[n],
+                d = get_abs_distance(positions[c1], positions[c2],
                     triclinic, rot, rotinv, box, 
                     diffx, diffy, diffz);
                 
@@ -329,15 +329,15 @@ void identify_cn12(py::dict& atoms,
     for(int ti=0; ti<nop; ti++){
         if(structure[ti] == 0){
             get_common_neighbors(triclinic, rot, rotinv, box, ti, positions,
-                neighbors, cutoff, cna, common);
+                cutoff, neighbors, cna, common);
             get_common_bonds(triclinic, rot, rotinv, box, ti, positions,
-                neighbors, cutoff, cna, common, bonds);
+                cutoff, neighbors, cna, common, bonds);
 
             nfcc = 0;
             nhcp = 0;
             nico = 0;
 
-            for(int k=0; k<neighbors[ti]size(); k++){
+            for(int k=0; k<neighbors[ti].size(); k++){
                 
                 c1 = cna[ti][k][0];
                 c2 = cna[ti][k][1];
@@ -392,14 +392,14 @@ void identify_cn14(py::dict& atoms,
     for(int ti=0; ti<nop; ti++){
         if(structure[ti] == 0){
             get_common_neighbors(triclinic, rot, rotinv, box, ti, positions,
-                neighbors, cutoff, cna, common);
+                cutoff, neighbors, cna, common);
             get_common_bonds(triclinic, rot, rotinv, box, ti, positions,
-                neighbors, cutoff, cna, common, bonds);
+                cutoff, neighbors, cna, common, bonds);
 
             nbcc1 = 0;
             nbcc2 = 0;
 
-            for(int k=0; k<neighbors[ti]size(); k++){
+            for(int k=0; k<neighbors[ti].size(); k++){
                 
                 c1 = cna[ti][k][0];
                 c2 = cna[ti][k][1];
