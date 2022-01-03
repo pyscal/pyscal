@@ -29,8 +29,8 @@ void get_cna_neighbors(py::dict& atoms,
     vector<double> diffi, diffj;
 
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
-    vector<vector<int>> atom_temp_neighbors = atoms[py::str("atom_temp_neighbors")].cast<vector<vector<int>>>();;
-    vector<vector<double>> atom_temp_neighbordist = atoms[py::str("atom_temp_neighbordist")].cast<vector<vector<double>>>();;
+    vector<vector<int>> atom_temp_neighbors = atoms[py::str("temp_neighbors")].cast<vector<vector<int>>>();;
+    vector<vector<double>> atom_temp_neighbordist = atoms[py::str("temp_neighbordist")].cast<vector<vector<double>>>();;
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -101,8 +101,8 @@ void get_acna_neighbors_cn12(py::dict& atoms,
     vector<double> diffi, diffj;
 
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
-    vector<vector<int>> atom_temp_neighbors = atoms[py::str("atom_temp_neighbors")].cast<vector<vector<int>>>();;
-    vector<vector<double>> atom_temp_neighbordist = atoms[py::str("atom_temp_neighbordist")].cast<vector<vector<double>>>();;
+    vector<vector<int>> atom_temp_neighbors = atoms[py::str("temp_neighbors")].cast<vector<vector<int>>>();;
+    vector<vector<double>> atom_temp_neighbordist = atoms[py::str("temp_neighbordist")].cast<vector<vector<double>>>();;
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
@@ -159,8 +159,8 @@ void get_acna_neighbors_cn14(py::dict& atoms,
     vector<double> diffi, diffj;
 
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
-    vector<vector<int>> atom_temp_neighbors = atoms[py::str("atom_temp_neighbors")].cast<vector<vector<int>>>();;
-    vector<vector<double>> atom_temp_neighbordist = atoms[py::str("atom_temp_neighbordist")].cast<vector<vector<double>>>();;
+    vector<vector<int>> atom_temp_neighbors = atoms[py::str("temp_neighbors")].cast<vector<vector<int>>>();;
+    vector<vector<double>> atom_temp_neighbordist = atoms[py::str("temp_neighbordist")].cast<vector<vector<double>>>();;
 
     int nop = positions.size();
     vector<vector<int>> neighbors(nop);
