@@ -211,3 +211,62 @@ void extract_cluster(int ti,
 
 void find_clusters(py::dict& atoms,
     double clustercutoff);
+
+/*-----------------------------------------------------
+    CNA Methods
+-----------------------------------------------------*/
+
+void get_cna_neighbors(py::dict& atoms,
+    const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
+    double lattice_constant,
+    int style);
+
+void get_acna_neighbors_cn12(py::dict& atoms,
+    const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
+
+void get_acna_neighbors_cn14(py::dict& atoms,
+    const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
+
+void get_common_neighbors(const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box
+    const int ti,
+    const vector<vector<double>>& positions,
+    const vector<double>& cutoff,
+    const vector<vector<int>>& neighbors,
+    vector<vector<vector<int>>>& cna,
+    vector<vector<vector<int>>>& common);
+
+void get_common_bonds(const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box
+    const int ti,
+    const vector<vector<double>>& positions,
+    const vector<double>& cutoff,
+    const vector<vector<int>>& neighbors,
+    vector<vector<vector<int>>>& cna,
+    vector<vector<vector<int>>>& common,
+    vector<vector<vector<int>>>& bonds);
+
+void identify_cn12(py::dict& atoms,
+    const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
+
+void identify_cn14(py::dict& atoms,
+    const int& triclinic,
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
