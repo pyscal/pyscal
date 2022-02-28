@@ -20,7 +20,17 @@ from pyscal.formats.ase import convert_snap
 
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
-
+class AttrClass:
+    def __init__(self, head):
+        self.head = head
+        self.mapdict = {}
+    def __dir__(self):
+        return list(self.mapdict.keys())
+    def __getattr__(self, name):
+        if name in self.mapdict.keys():
+            return getattr(self.head, self.mapdict[name])
+        else:
+            raise AttributeError("Attribute not found")
 
 class System:
     """
@@ -47,6 +57,9 @@ class System:
             return res            
         else:
             raise AttributeError("Attribute %s not found"%name)
+
+    def __dir__(self):
+        return list(self.__dict__.keys())+list(self.atoms.keys())
 
     @property
     def natoms(self):
