@@ -25,12 +25,16 @@ class AttrClass:
         self.head = head
         self.mapdict = {}
     def __dir__(self):
-        return list(self.mapdict.keys())
+        actual_keys = list(self.__dict__.keys())
+        actual_keys.remove('head')
+        actual_keys.remove('mapdict')
+        return list(self.mapdict.keys()) + actual_keys
     def __getattr__(self, name):
         if name in self.mapdict.keys():
             return getattr(self.head, self.mapdict[name])
         else:
             raise AttributeError("Attribute not found")
+
 
 class System:
     """
@@ -49,6 +53,7 @@ class System:
         self.boxdims = [0,0,0]
         self.triclinic = 0
         self._atoms = {}
+        self.atom = AttrClass(self)
 
     #overload get methods
     def __getattr__(self, name):
@@ -57,9 +62,6 @@ class System:
             return res            
         else:
             raise AttributeError("Attribute %s not found"%name)
-
-    def __dir__(self):
-        return list(self.__dict__.keys())+list(self.atoms.keys())
 
     @property
     def natoms(self):
@@ -170,6 +172,16 @@ class System:
         
         self._atoms = atoms
 
+        #try adding key mapping;
+        self.atom = AttrClass(self)
+        self.atom.mapdict["positions"] = "positions"
+        self.atom.mapdict["ghost"] = "ghost"
+        self.atom.mapdict["ids"] = "ids"
+        self.atom.mapdict["condition"] = "condition"
+        self.atom.mask = AttrClass(self)
+        self.atom.mask.mapdict = {"primary": "mask_1",
+        "secondary": "mask_2"}
+
     #iterator for atoms
     def iter_atoms(self):
         """
@@ -225,6 +237,7 @@ class System:
 
         for key in self.atoms.keys():
             self.atoms[key] = [*self.atoms[key], *atoms[key]]
+
 
     def repeat(self, reps, atoms=None, ghost=False, scale_box=True):
         """
@@ -685,7 +698,7 @@ class System:
 
         """
         self.atoms["neighbors"] = []
-        self.atoms["neighbor_dist"] = []
+        self.atoms["neighbordist"] = []
         self.atoms["temp_neighbors"] = []
         self.atoms["temp_neighbordist"] = []
         self.atoms["neighborweight"] = []
@@ -695,6 +708,29 @@ class System:
         self.atoms["phi"] = []
         self.atoms["cutoff"] = []
         self.neighbors_found = False
+
+        
+        self.atom.mapdict = {"positions":"positions", 
+        "ghost":"ghost", "ids":"ids", "condition":"condition"}
+        self.atom.mask = AttrClass(self)
+        self.atom.mask.mapdict = {"primary": "mask_1",
+        "secondary": "mask_2"}
+
+        self.atom.neighbors = AttrClass(self)
+        self.atom.neighbors.mapdict["index"] = "neighbors"
+        self.atom.neighbors.mapdict["distance"] = "neighbordist"
+        self.atom.neighbors.mapdict["weight"] = "neighborweight"
+        self.atom.neighbors.mapdict["displacement"] = "diff"
+        self.atom.neighbors.mapdict["cutoff"] = "cutoff"
+
+        self.atom.neighbors.angle = AttrClass(self)
+        self.atom.neighbors.angle.mapdict["polar"] = "theta"
+        self.atom.neighbors.angle.mapdict["azimuthal"] = "phi"
+
+        self.atom.neighbors.temporary = AttrClass(self)
+        self.atom.neighbors.temporary.mapdict["index"] = "temp_neighbors"
+        self.atom.neighbors.temporary.mapdict["distance"] = "temp_neighbordist"
+
 
     def _check_neighbors(self):
         """
