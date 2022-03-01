@@ -414,6 +414,7 @@ void identify_cn14(py::dict& atoms,
                 }
 
             }
+            cout<<nbcc1<<" "<<nbcc2<<endl;
             if((nbcc1==6) && (nbcc2==8)){
                 structure[ti] = 3;   
             }
