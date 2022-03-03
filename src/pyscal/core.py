@@ -1410,8 +1410,12 @@ class System:
 
         self.atoms["angular"] = angulars
         
-        self.atom.angular_parameters = AttrClass(self)
-        self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
+        try:
+            self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
+        except AttributeError:
+            self.atom.angular_parameters = AttrClass(self)
+            self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
+        
 
     def calculate_chiparams(self, angles=False):
         """
@@ -1477,7 +1481,12 @@ class System:
                 cosines.append(costhetas)
         
         self.atoms["chiparams"] = chiparams
-        self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
+        
+        try:
+            self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
+        except AttributeError:
+            self.atom.angular_parameters = AttrClass(self)
+            self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
         
         if angles:
             self.atoms["cosines"] = cosines

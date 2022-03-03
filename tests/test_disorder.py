@@ -11,7 +11,9 @@ def test_ordered_disorder():
     sys.calculate_disorder(averaged=True)
     assert np.mean(sys.disorder) < 0.50
     assert np.mean(sys.avg_disorder) < 0.50
-
+    assert np.mean(sys.atom.steinhardt.disorder.norm) < 0.50
+    assert np.mean(sys.atom.steinhardt.disorder.average) < 0.50
+    
 def test_disordered_disorder():
     sys = pc.System()
     sys.read_inputfile('tests/files/conf.lqd.dump')

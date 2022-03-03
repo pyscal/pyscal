@@ -13,6 +13,7 @@ def test_chiparamsbcc():
     chip = sys.chiparams[2]
     chip2 = [3, 0, 0, 0, 36, 12, 0, 36, 0]
     assert np.sum(np.array(chip)-np.array(chip2)) == 0
+    assert np.sum(np.array(sys.atom.angular_parameters.chi_params[2])-np.array(chip2)) == 0
 
 
 def test_chiparamsfcc():
