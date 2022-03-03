@@ -1225,6 +1225,13 @@ class System:
             threshold, avgthreshold, bonds, 
             compare_criteria, criteria)
 
+        self.atom.steinhardt.order = AttrClass(self)
+        self.atom.steinhardt.order.mapdict["bonds"] = "bonds"
+        self.atom.steinhardt.order.sij = AttrClass(self)
+        self.atom.steinhardt.order.sij.mapdict["norm"] = "sij"
+        self.atom.steinhardt.order.sij.mapdict["average"] = "avg_sij"
+        self.atom.steinhardt.order.mapdict["solid"] = "solid"
+        
         if cluster:
             lc = self.cluster_atoms(self.solid, largest=True)
             return lc
@@ -1252,6 +1259,8 @@ class System:
         largest_cluster_id = xx[arg]
 
         self.atoms["largest_cluster"] = [True if self.atoms["cluster"][x]==largest_cluster_id else False for x in range(len(self.atoms["cluster"]))]
+        self.atom.cluster.mapdict["largest"] = "largest_cluster"
+
         return largest_cluster_size
 
 
@@ -1286,6 +1295,9 @@ class System:
         
         self.apply_condition(condition)
         pc.find_clusters(self.atoms, cutoff)
+
+        self.atom.cluster = AttrClass(self)
+        self.atom.cluster.mapdict["id"] = "cluster"
 
         #done!
         lc = self.find_largest_cluster()
@@ -1397,6 +1409,9 @@ class System:
             angulars.append(costhetasum)
 
         self.atoms["angular"] = angulars
+        
+        self.atom.angular_parameters = AttrClass(self)
+        self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
 
     def calculate_chiparams(self, angles=False):
         """
@@ -1462,5 +1477,8 @@ class System:
                 cosines.append(costhetas)
         
         self.atoms["chiparams"] = chiparams
+        self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
+        
         if angles:
             self.atoms["cosines"] = cosines
+            self.atom.angular_parameters.mapdict["cosines"] = "cosines"
