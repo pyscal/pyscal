@@ -710,12 +710,6 @@ class System:
         self.neighbors_found = False
 
         
-        self.atom.mapdict = {"positions":"positions", 
-        "ghost":"ghost", "ids":"ids", "condition":"condition"}
-        self.atom.mask = AttrClass(self)
-        self.atom.mask.mapdict = {"primary": "mask_1",
-        "secondary": "mask_2"}
-
         self.atom.neighbors = AttrClass(self)
         self.atom.neighbors.mapdict["index"] = "neighbors"
         self.atom.neighbors.mapdict["distance"] = "neighbordist"
@@ -1011,6 +1005,18 @@ class System:
             pc.calculate_q_single(self.atoms, val)
   
 
+        self.atom.steinhardt = AttrClass(self)
+        self.atom.steinhardt.generic = AttrClass(self)
+        for val in qq:
+            key1a = "q%d_norm"%val
+            key1b = "q%d"%val
+            key2 = "q%d_real"%val
+            key3 = "q%d_imag"%val
+            self.atom.steinhardt.generic.mapdict[key1a] = key1b
+            self.atom.steinhardt.generic.mapdict[key2] = key2
+            self.atom.steinhardt.generic.mapdict[key3] = key3
+
+
     def _calculate_aq(self, qq):
         """
         Private method for calculation of avged qvals
@@ -1034,6 +1040,18 @@ class System:
         #loop over atoms
         for val in qq:
             pc.calculate_aq_single(self.atoms, val)
+
+        self.atom.steinhardt.average = AttrClass(self)
+        for val in qq:
+            key1a = "q%d_norm"%val
+            key1b = "q%d"%val
+            key2 = "q%d_real"%val
+            key3 = "q%d_imag"%val
+            self.atom.steinhardt.average.mapdict[key1a] = key1b
+            self.atom.steinhardt.average.mapdict[key2] = key2
+            self.atom.steinhardt.average.mapdict[key3] = key3
+
+
 
     def calculate_disorder(self, averaged=False, q=6):
         """
@@ -1085,10 +1103,15 @@ class System:
 
         pc.calculate_disorder(self.atoms, q)
 
+        self.atom.steinhardt.disorder = AttrClass(self)
+        self.atom.steinhardt.disorder.mapdict["norm"] = "disorder"
+
         if averaged:
             #average the disorder
             avg_arr = self.average_over_neighbors("disorder")
             self.atoms["avg_disorder"] = avg_arr
+            self.atom.steinhardt.disorder.mapdict["average"] = "avg_disorder"
+
 
     def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, 
                           cluster=True, q=6, cutoff=0, right=True):
