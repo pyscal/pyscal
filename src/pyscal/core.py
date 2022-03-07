@@ -771,9 +771,9 @@ class System:
         
         return avgarr 
 
-    def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, 
+    def find_neighbors(self, method='cutoff', cutoff=0, threshold=2, 
             voroexp=1, padding=1.2, nlimit=6, 
-            cells=0, nmax=12, assign_neighbor=True):
+            cells=None, nmax=12, assign_neighbor=True):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
