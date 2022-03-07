@@ -773,7 +773,7 @@ class System:
 
     def find_neighbors(self, method='cutoff', cutoff=None, threshold=2, 
             voroexp=1, padding=1.2, nlimit=6, 
-            cells=None, nmax=12, assign_neighbor=True):
+            cells=0, nmax=12, assign_neighbor=True):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
@@ -833,7 +833,7 @@ class System:
         Method cutoff and specifying a cutoff radius uses the traditional approach being the one in which the neighbors of an atom
         are the ones that lie in the cutoff distance around it.
 
-        In order to reduce time during the distance sorting during the adaptive methods, pyscal sets an initial guess for a cutoff distance.
+        In order to reduce time during the distance sorting during thefind_neighbors adaptive methods, pyscal sets an initial guess for a cutoff distance.
         This is calculated as,
 
         .. math:: r_{initial} = threshold * (simulation~box~volume/ number~of~particles)^{(1/3)}

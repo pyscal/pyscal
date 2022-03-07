@@ -342,11 +342,11 @@ vector<cell> set_up_cells(const vector<vector<double>>& positions,
 
 
 void get_all_neighbors_cells(py::dict& atoms,
-    const double& neighbordistance,
-    const int& triclinic,
-    const vector<vector<double>>& rot, 
-    const vector<vector<double>>& rotinv,
-    const vector<double>& box){
+    const double neighbordistance,
+    const int triclinic,
+    const vector<vector<double>> rot, 
+    const vector<vector<double>> rotinv,
+    const vector<double> box){
 
     double d;
     double diffx,diffy,diffz;

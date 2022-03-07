@@ -78,12 +78,12 @@ vector<cell> set_up_cells(const vector<vector<double>>&,
     const vector<double>&,
     const double);
 
-void get_all_neighbors_cells(py::dict&,
-    const double&,
-    const int&,
-    const vector<vector<double>>&, 
-    const vector<vector<double>>&,
-    const vector<double>&);
+void get_all_neighbors_cells(py::dict& atoms,
+    const double neighbordistance,
+    const int triclinic,
+    const vector<vector<double>> rot,
+    const vector<vector<double>> rotinv,
+    const vector<double> box);
 
 void get_temp_neighbors_brute(const vector<vector<double>>& positions,
     const vector<bool>& mask_1,
