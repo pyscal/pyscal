@@ -32,6 +32,7 @@ PYBIND11_MODULE(csystem, m) {
     m.def("calculate_disorder", &calculate_disorder);
     m.def("calculate_bonds", &calculate_bonds);
     m.def("find_clusters", &find_clusters);
+    m.def("get_all_neighbors_voronoi", &get_all_neighbors_voronoi);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;
