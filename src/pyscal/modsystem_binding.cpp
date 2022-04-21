@@ -18,6 +18,7 @@ PYBIND11_MODULE(csystem, m) {
     options.disable_function_signatures();
     m.def("get_abs_distance", &get_abs_distance);
     m.def("get_distance_vector", &get_distance_vector);
+    m.def("remap_atom_into_box", &remap_atom_into_box);
     m.def("reset_all_neighbors", &reset_all_neighbors);
     m.def("get_all_neighbors_normal", &get_all_neighbors_normal);
     m.def("get_all_neighbors_cells", &get_all_neighbors_cells);

@@ -104,6 +104,72 @@ vector<double> get_distance_vector(vector<double> pos1,
     return dvec;
 } 
 
+vector<double> remap_atom_into_box(vector<double> pos, 
+    const int& triclinic, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box){
+
+    double dx, dy, dz;
+    double abs, ax, ay, az;
+
+    dx = pos[0];
+    dy = pos[1];
+    dz = pos[2];
+
+    if (triclinic == 1){
+
+        //convert to the triclinic system
+        ax = rotinv[0][0]*dx + rotinv[0][1]*dy + rotinv[0][2]*dz;
+        ay = rotinv[1][0]*dx + rotinv[1][1]*dy + rotinv[1][2]*dz;
+        az = rotinv[2][0]*dx + rotinv[2][1]*dy + rotinv[2][2]*dz;
+
+        //scale to match the triclinic box size
+        dx = ax*box[0];
+        dy = ay*box[1];
+        dz = az*box[2];
+
+        //now check pbc
+        //nearest image
+        if (dx> box[0]/2.0) {dx-=box[0];};
+        if (dx<-box[0]/2.0) {dx+=box[0];};
+        if (dy> box[1]/2.0) {dy-=box[1];};
+        if (dy<-box[1]/2.0) {dy+=box[1];};
+        if (dz> box[2]/2.0) {dz-=box[2];};
+        if (dz<-box[2]/2.0) {dz+=box[2];};
+
+        //now divide by box vals - scale down the size
+        dx = dx/box[0];
+        dy = dy/box[1];
+        dz = dz/box[2];
+
+        //now transform back to normal system
+        ax = rot[0][0]*dx + rot[0][1]*dy + rot[0][2]*dz;
+        ay = rot[1][0]*dx + rot[1][1]*dy + rot[1][2]*dz;
+        az = rot[2][0]*dx + rot[2][1]*dy + rot[2][2]*dz;
+
+        //now assign to diffs and calculate distnace
+        dx = ax;
+        dy = ay;
+        dz = az;
+    }
+    else{
+        //nearest image
+        if (dx < 0) {dx+=box[0];};
+        if (dx >= box[0]) {dx-=box[0];};
+        if (dy < 0) {dy+=box[1];};
+        if (dy >= box[1]) {dy-=box[1];};
+        if (dz < 0) {dz+=box[2];};
+        if (dz >= box[2]) {dz-=box[2];};
+    }
+    
+    vector<double> rpos;
+    rpos.emplace_back(dx);
+    rpos.emplace_back(dy);
+    rpos.emplace_back(dz);
+    return rpos;
+} 
+
 void reset_all_neighbors(py::dict& atoms){
     /*
     Reset all neighbors
