@@ -929,7 +929,9 @@ class System:
                     atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True)
                     self._atoms = atoms
                     self.embed_in_cubic_box()
-            self.get_all_neighbors_voronoi()
+            pc.get_all_neighbors_voronoi(self.atoms, 0.0,
+                self.triclinic, self.rot, self.rotinv,
+                self.boxdims, voroexp)
             
             if self.triclinic:
                 self._box = self.box_backup

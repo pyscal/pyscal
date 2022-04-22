@@ -55,8 +55,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
 
     //specific properties related to  Voronoi
     vector<double> volume(nop);
-    vector<int> face_vertices(nop);
-    vector<double> face_perimeters(nop);
+    vector<vector<int>> face_vertices(nop);
+    vector<vector<double>> face_perimeters(nop);
     vector<vector<double>> vertex_vectors(nop);
     vector<vector<int>> vertex_numbers(nop);
     vector<vector<vector<double>>> vertex_positions(nop);
@@ -64,7 +64,7 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     pre_container pcon(0.00, box[0], 0.00, box[1], 0.0, box[2], true, true, true);
     for(int i=0; i<nop; i++){
         pos = positions[i];
-        pos = remap_atom_into_box(pos);
+        pos = remap_atom_into_box(pos, triclinic, rot, rotinv, box);
         pcon.put(i, pos[0], pos[1], pos[2]);
     }
     pcon.guess_optimal(tnx, tny, tnz);
