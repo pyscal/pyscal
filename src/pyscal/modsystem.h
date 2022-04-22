@@ -65,6 +65,13 @@ vector<double> remap_atom_into_box(vector<double> pos,
     const vector<vector<double>>& rotinv,
     const vector<double>& box);
 
+vector<double> remap_and_displace_atom(vector<double> pos, 
+    const int& triclinic, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box,
+    const vector<double>& perturbation);
+
 void reset_all_neighbors(py::dict&);
 
 void convert_to_spherical_coordinates(double, double, double, 
