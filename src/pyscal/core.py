@@ -937,15 +937,15 @@ class System:
                 self._box = self.box_backup
 
             #assign extra options
-            self.atom.neighbors.voronoi = AttrClass(self)
-            self.atom.neighbors.voronoi.mapdict["volume"] = "volume"
-            self.atom.neighbors.voronoi.face = AttrClass(self)
-            self.atom.neighbors.voronoi.face.mapdict["vertices"] = "face_vertices"
-            self.atom.neighbors.voronoi.face.mapdict["perimeters"] = "face_perimeters"
-            self.atom.neighbors.voronoi.vertex = AttrClass(self)
-            self.atom.neighbors.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
-            self.atom.neighbors.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
-            self.atom.neighbors.voronoi.vertex.mapdict["positions"] = "vertex_positions"
+            self.atom.voronoi = AttrClass(self)
+            self.atom.voronoi.mapdict["volume"] = "volume"
+            self.atom.voronoi.face = AttrClass(self)
+            self.atom.voronoi.face.mapdict["vertices"] = "face_vertices"
+            self.atom.voronoi.face.mapdict["perimeters"] = "face_perimeters"
+            self.atom.voronoi.vertex = AttrClass(self)
+            self.atom.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
+            self.atom.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
+            self.atom.voronoi.vertex.mapdict["positions"] = "vertex_positions"
         
         self.neighbors_found = True
 
