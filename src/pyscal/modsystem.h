@@ -59,6 +59,12 @@ vector<double> get_distance_vector(vector<double> pos1,
     const vector<vector<double>>& rotinv,
     const vector<double>& box);
 
+vector<double> remap_atom_into_box(vector<double> pos, 
+    const int& triclinic, 
+    const vector<vector<double>>& rot, 
+    const vector<vector<double>>& rotinv,
+    const vector<double>& box);
+
 void reset_all_neighbors(py::dict&);
 
 void convert_to_spherical_coordinates(double, double, double, 
@@ -136,6 +142,13 @@ int get_all_neighbors_adaptive(py::dict& atoms,
     double padding, 
     int usecells);
 
+void get_all_neighbors_voronoi(py::dict& atoms,
+    const double neighbordistance,
+    const int triclinic,
+    const vector<vector<double>> rot, 
+    const vector<vector<double>> rotinv,
+    const vector<double> box,
+    const double face_area_exponent);
 
 /*-----------------------------------------------------
     Steinhardt Methods

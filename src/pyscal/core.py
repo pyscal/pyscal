@@ -467,6 +467,7 @@ class System:
         
         self.newbox = newbox
         self.box = newbox
+        self.box_backup = backupbox
         self.actual_box = None
 
     def get_distance(self, pos1, pos2):
@@ -919,25 +920,33 @@ class System:
             if not finished:
                 raise RuntimeError("Could not find enough neighbors - try increasing threshold")
 
-        '''
+        
         elif method == 'voronoi':
-            
-            self.voroexp = int(voroexp)
-
             #copy the simulation cell
             backupbox = self._box.copy()
             if self.triclinic:
                 if not self.ghosts_created:
-                    atoms  = self.get_atoms()
-                    atoms = self.repeat((1, 1, 1), atoms=atoms, ghost=True, scale_box=True)
-                    self.set_atoms(atoms)
+                    atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True)
+                    self._atoms = atoms
                     self.embed_in_cubic_box()
-            #self.embed_in_cubic_box()
-            self.get_all_neighbors_voronoi()
+            pc.get_all_neighbors_voronoi(self.atoms, 0.0,
+                self.triclinic, self.rot, self.rotinv,
+                self.boxdims, voroexp)
+            
+            if self.triclinic:
+                self._box = self.box_backup
 
-            #replace box
-            self.box = backupbox
-        '''
+            #assign extra options
+            self.atom.voronoi = AttrClass(self)
+            self.atom.voronoi.mapdict["volume"] = "voronoi_volume"
+            self.atom.voronoi.face = AttrClass(self)
+            self.atom.voronoi.face.mapdict["vertices"] = "face_vertices"
+            self.atom.voronoi.face.mapdict["perimeters"] = "face_perimeters"
+            self.atom.voronoi.vertex = AttrClass(self)
+            self.atom.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
+            self.atom.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
+            self.atom.voronoi.vertex.mapdict["positions"] = "vertex_positions"
+        
         self.neighbors_found = True
 
     def calculate_q(self, q, averaged=False, continuous_algorithm=False):
