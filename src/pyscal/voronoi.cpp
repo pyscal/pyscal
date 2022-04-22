@@ -150,7 +150,7 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     atoms[py::str("theta")] = theta;
     atoms[py::str("phi")] = phi;
     atoms[py::str("cutoff")] = cutoff;
-    atoms[py::str("volume")] = volume;
+    atoms[py::str("voronoi_volume")] = volume;
     atoms[py::str("face_vertices")] = face_vertices;
     atoms[py::str("face_perimeters")] = face_perimeters;
     atoms[py::str("vertex_vectors")] = vertex_vectors;

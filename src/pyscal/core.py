@@ -938,7 +938,7 @@ class System:
 
             #assign extra options
             self.atom.voronoi = AttrClass(self)
-            self.atom.voronoi.mapdict["volume"] = "volume"
+            self.atom.voronoi.mapdict["volume"] = "voronoi_volume"
             self.atom.voronoi.face = AttrClass(self)
             self.atom.voronoi.face.mapdict["vertices"] = "face_vertices"
             self.atom.voronoi.face.mapdict["perimeters"] = "face_perimeters"
