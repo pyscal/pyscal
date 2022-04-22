@@ -30,9 +30,9 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     double d;
     double diffx,diffy,diffz;
     double tempr,temptheta,tempphi;
-    vector<double> diffi, diffj;
+    vector<double> diffi, diffj, pos;
     int tnx,tny,tnz, ti, tj, nverts;
-    double rx,ry,rz,tsum, fa, x, y, z, vol;
+    double rx,ry,rz,tsum, fa, x, y, z, vol, weightsum;
 
     vector<int> neigh,f_vert, vert_nos;
     vector<double> facearea, v, faceperimeters;
@@ -55,8 +55,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
 
     //specific properties related to  Voronoi
     vector<double> volume(nop);
-    vector<int> facevertices(nop);
-    vector<double> faceperimeters(nop);
+    vector<int> face_vertices(nop);
+    vector<double> face_perimeters(nop);
     vector<vector<double>> vertex_vectors(nop);
     vector<vector<int>> vertex_numbers(nop);
     vector<vector<vector<double>>> vertex_positions(nop);
@@ -108,7 +108,7 @@ void get_all_neighbors_voronoi(py::dict& atoms,
                 temp.emplace_back(v[vi]+pos[li]);
                 li++;
             }
-            vertex_positions[ti].emplace_back(temp)
+            vertex_positions[ti].emplace_back(temp);
 
         }
 
@@ -121,8 +121,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
             neighbordist[ti].emplace_back(d);
             neighborweight[ti].emplace_back(pow(facearea[tj], face_area_exponent)/weightsum);
 
-            facevertices[ti].emplace_back(f_vert[tj]);
-            faceperimeters[ti].emplace_back(faceperimeters[tj]);
+            face_vertices[ti].emplace_back(f_vert[tj]);
+            face_perimeters[ti].emplace_back(faceperimeters[tj]);
 
             diffi.clear();
             diffi.emplace_back(diffx);
@@ -151,8 +151,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     atoms[py::str("phi")] = phi;
     atoms[py::str("cutoff")] = cutoff;
     atoms[py::str("volume")] = volume;
-    atoms[py::str("facevertices")] = facevertices;
-    atoms[py::str("faceperimeters")] = faceperimeters;
+    atoms[py::str("face_vertices")] = face_vertices;
+    atoms[py::str("face_perimeters")] = face_perimeters;
     atoms[py::str("vertex_vectors")] = vertex_vectors;
     atoms[py::str("vertex_numbers")] = vertex_numbers;
     atoms[py::str("vertex_positions")] = vertex_positions; 
