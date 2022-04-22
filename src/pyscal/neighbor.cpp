@@ -131,12 +131,12 @@ vector<double> remap_atom_into_box(vector<double> pos,
 
         //now check pbc
         //nearest image
-        if (dx> box[0]/2.0) {dx-=box[0];};
-        if (dx<-box[0]/2.0) {dx+=box[0];};
-        if (dy> box[1]/2.0) {dy-=box[1];};
-        if (dy<-box[1]/2.0) {dy+=box[1];};
-        if (dz> box[2]/2.0) {dz-=box[2];};
-        if (dz<-box[2]/2.0) {dz+=box[2];};
+        if (dx < 0) {dx+=box[0];};
+        if (dx >= box[0]) {dx-=box[0];};
+        if (dy < 0) {dy+=box[1];};
+        if (dy >= box[1]) {dy-=box[1];};
+        if (dz < 0) {dz+=box[2];};
+        if (dz >= box[2]) {dz-=box[2];};
 
         //now divide by box vals - scale down the size
         dx = dx/box[0];
