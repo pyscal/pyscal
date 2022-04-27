@@ -204,7 +204,7 @@ void clean_voronoi_vertices(py::dict& atoms,
         }
     }
     
-    atoms[py::str("vertex_positions_all")] = vertex_positions_all;
-    atoms[py::str("to_remove")] = to_remove;
+    atoms[py::str("vertex_positions_all_skipcheck")] = vertex_positions_all;
+    atoms[py::str("to_remove_skipcheck")] = to_remove;
     
 }	

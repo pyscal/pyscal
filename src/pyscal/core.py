@@ -31,10 +31,7 @@ class AttrClass:
         return list(self.mapdict.keys()) + actual_keys
     def __getattr__(self, name):
         if name in self.mapdict.keys():
-            try:
-                return getattr(self.head, self.mapdict[name])
-            except:
-                return self.head.atoms.get(self.mapdict[name])
+            return getattr(self.head, self.mapdict[name])
         else:
             raise AttributeError("Attribute not found")
 
@@ -61,7 +58,11 @@ class System:
     #overload get methods
     def __getattr__(self, name):
         if name in self.atoms.keys():
-            res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
+            namesplit = name.split('_')
+            if namesplit[-1] == "skipcheck":
+                res = self.atoms[name]
+            else:
+                res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
             return res            
         else:
             raise AttributeError("Attribute %s not found"%name)
@@ -1068,13 +1069,13 @@ class System:
 
                 #now get unique positions
                 unique_positions = []
-                for count, val in enumerate(self.atoms["vertex_positions_all"]):
-                    if count not in self.atoms["to_remove"]:
+                for count, val in enumerate(self.atoms["vertex_positions_all_skipcheck"]):
+                    if count not in self.atoms["to_remove_skipcheck"]:
                         unique_positions.append(val)
 
-                del self.atoms["vertex_positions_all"]
-                del self.atoms["to_remove"]
-                self.atoms["vertex_positions_unique"] = unique_positions
+                del self.atoms["vertex_positions_all_skipcheck"]
+                del self.atoms["to_remove_skipcheck"]
+                self.atoms["vertex_positions_unique_skipcheck"] = unique_positions
 
             #assign extra options
             self.atom.voronoi = AttrClass(self)
@@ -1086,7 +1087,7 @@ class System:
             self.atom.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
             self.atom.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
             self.atom.voronoi.vertex.mapdict["positions"] = "vertex_positions"
-            #self.atom.voronoi.vertex.mapdict["unique_positions"] = "vertex_positions_unique"
+            self.atom.voronoi.vertex.mapdict["unique_positions"] = "vertex_positions_unique_skipcheck"
         
         self.neighbors_found = True
 
