@@ -34,6 +34,7 @@ PYBIND11_MODULE(csystem, m) {
     m.def("calculate_bonds", &calculate_bonds);
     m.def("find_clusters", &find_clusters);
     m.def("get_all_neighbors_voronoi", &get_all_neighbors_voronoi);
+    m.def("clean_voronoi_vertices", &clean_voronoi_vertices);
 
 #ifdef VERSION_INFO
     m.attr("__version__") = VERSION_INFO;

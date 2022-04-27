@@ -24,8 +24,7 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     const vector<vector<double>> rot, 
     const vector<vector<double>> rotinv,
     const vector<double> box,
-    const double face_area_exponent,
-    const double distance_cutoff)
+    const double face_area_exponent)
     {
 
     double d;
@@ -61,7 +60,6 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     vector<vector<double>> vertex_vectors(nop);
     vector<vector<int>> vertex_numbers(nop);
     vector<vector<vector<double>>> vertex_positions(nop);
-    vector<vector<double>> vertex_positions_all;
 
     pre_container pcon(0.00, box[0], 0.00, box[1], 0.0, box[2], true, true, true);
     for(int i=0; i<nop; i++){
@@ -110,7 +108,6 @@ void get_all_neighbors_voronoi(py::dict& atoms,
                 temp.emplace_back(v[vi]+pos[li]);
                 li++;
             }
-            vertex_positions_all.emplace_back(temp);
             vertex_positions[ti].emplace_back(temp);
         }
 
@@ -145,18 +142,7 @@ void get_all_neighbors_voronoi(py::dict& atoms,
 
 
     //get unique vertex positions
-    vector<int> to_remove;
-    
-    for(int ii=0; ii<vertex_positions_all.size(); ii++){
-        for(int jj=ii+1; jj<vertex_positions_all.size(); jj++){
-            d = get_abs_distance(vertex_positions_all[ii], vertex_positions_all[jj],
-                triclinic, rot, rotinv, box, 
-                diffx, diffy, diffz);
-            if (d < distance_cutoff){
-                to_remove.emplace_back(jj);
-            }
-        }
-    }
+
 
     //calculation over lets assign
     atoms[py::str("neighbors")] = neighbors;
@@ -173,7 +159,52 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     atoms[py::str("vertex_vectors")] = vertex_vectors;
     atoms[py::str("vertex_numbers")] = vertex_numbers;
     atoms[py::str("vertex_positions")] = vertex_positions;
+} 
+
+
+void clean_voronoi_vertices(py::dict& atoms,
+    const double neighbordistance,
+    const int triclinic,
+    const vector<vector<double>> rot, 
+    const vector<vector<double>> rotinv,
+    const vector<double> box,
+    const double distance_cutoff){
+
+    vector<vector<vector<double>>> positions = atoms[py::str("vertex_positions")].cast<vector<vector<vector<double>>>>();
+    vector<bool> ghost = atoms[py::str("ghost")].cast<vector<bool>>();
+    int nop = positions.size();
+
+    vector<vector<double>> vertex_positions_all;
+    vector<int> to_remove;
+
+    double d, diffx, diffy, diffz;
+
+    for(int ti=0; ti<nop; ti++){
+        if (ghost[ti]==true) continue;
+        for(int vi=0; vi<positions[ti].size(); vi++){
+            auto pos = remap_atom_into_box(positions[ti][vi], triclinic, rot, rotinv, box);
+            if ((pos[0] < 0) || (pos[0] > box[0])) continue;
+            if ((pos[1] < 0) || (pos[1] > box[1])) continue;
+            if ((pos[2] < 0) || (pos[2] > box[2])) continue;
+            vertex_positions_all.emplace_back(pos);
+        }        
+
+    }
+
+    for(int ii=0; ii<vertex_positions_all.size(); ii++){
+        auto pos1 = vertex_positions_all[ii];
+        for(int jj=ii+1; jj<vertex_positions_all.size(); jj++){
+            auto pos2 = vertex_positions_all[jj];
+                d = get_abs_distance(pos1, pos2,
+                    triclinic, rot, rotinv, box, 
+                    diffx, diffy, diffz);
+                if (d < distance_cutoff){
+                    to_remove.emplace_back(jj);            
+                }
+        }
+    }
+    
     atoms[py::str("vertex_positions_all")] = vertex_positions_all;
     atoms[py::str("to_remove")] = to_remove;
-
-} 	
+    
+}	

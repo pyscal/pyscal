@@ -238,7 +238,10 @@ class System:
             atoms['head'] = [self.natoms+x for x in range(nop)]
 
         for key in self.atoms.keys():
-            self.atoms[key] = [*self.atoms[key], *atoms[key]]
+            if key in atoms.keys():
+                self.atoms[key] = [*self.atoms[key], *atoms[key]]
+            else:
+                warnings.warn("Key %s is not present, please recalculate"%key)
 
 
     #def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=True):
@@ -514,15 +517,19 @@ class System:
             self.atoms["condition"][i] = True
 
 
-    def embed_in_cubic_box(self,):
+    def embed_in_cubic_box(self, inputbox=None, return_box=False):
         """
         Embedded the triclinic box in a cubic box
         """
         #first task is to create a box representation
         
-        box = self._box
-        backupbox = box.copy()
-        
+        if inputbox is None:
+            box = self._box
+            backupbox = box.copy()
+        else:
+            box = inputbox
+            backupbox = inputbox.copy
+
         a = np.array(box[0])
         b = np.array(box[1])
         c = np.array(box[2])
@@ -552,10 +559,13 @@ class System:
 
         newbox = np.array([[xhi_bound-xlo_bound, 0, 0], [0, yhi_bound-ylo_bound, 0], [0, 0, zhi_bound-zlo_bound]])
         
-        self.newbox = newbox
-        self.box = newbox
-        self.box_backup = backupbox
-        self.actual_box = None
+        if not return_box:
+            self.newbox = newbox
+            self.box = newbox
+            self.box_backup = backupbox
+            self.actual_box = None
+        else:
+            return newbox
 
     def get_distance(self, pos1, pos2):
         """
@@ -861,7 +871,7 @@ class System:
 
     def find_neighbors(self, method='cutoff', cutoff=0, threshold=2, 
             voroexp=1, padding=1.2, nlimit=6, 
-            cells=None, nmax=12, assign_neighbor=True):
+            cells=None, nmax=12, assign_neighbor=True, clean_vertices=True):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
@@ -1018,20 +1028,53 @@ class System:
                     self.embed_in_cubic_box()
             pc.get_all_neighbors_voronoi(self.atoms, 0.0,
                 self.triclinic, self.rot, self.rotinv,
-                self.boxdims, voroexp, cutoff)
+                self.boxdims, voroexp)
             
             if self.triclinic:
                 self._box = backupbox
 
-            #now get unique positions
-            unique_positions = []
-            for count, val in enumerate(self.atoms["vertex_positions_all"]):
-                if count not in self.atoms["to_remove"]:
-                    unique_positions.append(val)
 
-            del self.atoms["vertex_positions_all"]
-            del self.atoms["to_remove"]
-            self.atoms["vertex_positions_unique"] = unique_positions
+            #now clean up
+            if clean_vertices:
+                #we need to call the method
+                #this means alles good
+                if self.actual_box is None:
+                    if self.triclinic:
+                        new_box = self.embed_in_cubic_box(inputbox=self._box, return_box=True)
+                        rot = np.array(new_box).T
+                        rotinv = np.linalg.inv(rot)
+                    else:
+                        new_box = self._box
+                        rot = [[0,0,0], [0,0,0], [0,0,0]]
+                        rotinv = [[0,0,0], [0,0,0], [0,0,0]]
+                #ghosts are present
+                else:
+                    if self.triclinic:
+                        new_box = self.embed_in_cubic_box(inputbox=self.actual_box, return_box=True)
+                        rot = np.array(new_box).T
+                        rotinv = np.linalg.inv(rot)
+                    else:
+                        new_box = self.actual_box
+                        rot = [[0,0,0], [0,0,0], [0,0,0]]
+                        rotinv = [[0,0,0], [0,0,0], [0,0,0]]
+
+                boxdims = [0,0,0]
+                boxdims[0] = np.sum(np.array(new_box[0])**2)**0.5
+                boxdims[1] = np.sum(np.array(new_box[1])**2)**0.5
+                boxdims[2] = np.sum(np.array(new_box[2])**2)**0.5
+                pc.clean_voronoi_vertices(self.atoms, 0.0,
+                    self.triclinic, rot, rotinv,
+                    boxdims, cutoff)
+
+                #now get unique positions
+                unique_positions = []
+                for count, val in enumerate(self.atoms["vertex_positions_all"]):
+                    if count not in self.atoms["to_remove"]:
+                        unique_positions.append(val)
+
+                del self.atoms["vertex_positions_all"]
+                del self.atoms["to_remove"]
+                self.atoms["vertex_positions_unique"] = unique_positions
 
             #assign extra options
             self.atom.voronoi = AttrClass(self)
@@ -1043,7 +1086,7 @@ class System:
             self.atom.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
             self.atom.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
             self.atom.voronoi.vertex.mapdict["positions"] = "vertex_positions"
-            self.atom.voronoi.vertex.mapdict["unique_positions"] = "vertex_positions_unique"
+            #self.atom.voronoi.vertex.mapdict["unique_positions"] = "vertex_positions_unique"
         
         self.neighbors_found = True
 
