@@ -31,8 +31,10 @@ class AttrClass:
         return list(self.mapdict.keys()) + actual_keys
     def __getattr__(self, name):
         if name in self.mapdict.keys():
-            #return getattr(self.head, self.mapdict[name])
-            return self.head.atoms.get(self.mapdict[name])
+            try:
+                return getattr(self.head, self.mapdict[name])
+            except:
+                return self.head.atoms.get(self.mapdict[name])
         else:
             raise AttributeError("Attribute not found")
 
@@ -239,9 +241,10 @@ class System:
             self.atoms[key] = [*self.atoms[key], *atoms[key]]
 
 
-    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=True):
+    #def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=True):
         """
         Frac greater than one will be converted to int
+        """
         """
         if isinstance(reps, list):
             if not len(reps)==3:
@@ -259,9 +262,9 @@ class System:
             self._atoms = atoms
         else:
             return atoms
+        """
 
-
-    def _repeat_full_box(self, reps, atoms=None, ghost=False, scale_box=True):
+    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False):
         """
         """
         
@@ -327,10 +330,10 @@ class System:
             atoms[key] = [*atoms[key], *datadict[key]]
         return atoms
 
-    def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
+    #def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
         """
         """
-        
+    """
         box = self.box        
         self.actual_box = box.copy()
 
@@ -405,7 +408,7 @@ class System:
             self.ghosts_created = True                    
 
         return atoms
-
+    """
     def apply_mask(self, masks, mask_type='secondary'):
         """
         Apply mask to an atom
