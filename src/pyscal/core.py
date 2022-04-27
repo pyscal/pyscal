@@ -31,7 +31,8 @@ class AttrClass:
         return list(self.mapdict.keys()) + actual_keys
     def __getattr__(self, name):
         if name in self.mapdict.keys():
-            return getattr(self.head, self.mapdict[name])
+            #return getattr(self.head, self.mapdict[name])
+            return self.head.atoms.get(self.mapdict[name])
         else:
             raise AttributeError("Attribute not found")
 
@@ -168,10 +169,9 @@ class System:
 
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
-            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True)
-        
-        self._atoms = atoms
+            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False)
 
+        self._atoms = atoms
         #try adding key mapping;
         self.atom = AttrClass(self)
         self.atom.mapdict["positions"] = "positions"
@@ -239,20 +239,30 @@ class System:
             self.atoms[key] = [*self.atoms[key], *atoms[key]]
 
 
-    def repeat(self, reps, atoms=None, ghost=False, scale_box=True):
+    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=True):
         """
-        Replicate simulation cell
-        
-        Parameters
-        ----------
-        reps : list of ints of size 3
-            repetitions in each direction
-        
-        atoms : list of atoms, optional
-            if not provided, use atoms that are assigned
+        Frac greater than one will be converted to int
+        """
+        if isinstance(reps, list):
+            if not len(reps)==3:
+                raise ValueError("repetitions should be [nx, ny, nz]")
+        else:
+            reps = [reps, reps, reps]
 
-        ghost : bool, optional
-            If True, assign the new atoms as ghost instead of actual atoms
+        isfrac = np.prod([True if (0<rep<1) else False for rep in reps])
+        if isfrac:
+            atoms = self._repeat_partial_box(reps, atoms=atoms, ghost=ghost, scale_box=scale_box)
+        else:
+            atoms = self._repeat_full_box(reps, atoms=atoms, ghost=ghost, scale_box=scale_box)
+
+        if assign:
+            self._atoms = atoms
+        else:
+            return atoms
+
+
+    def _repeat_full_box(self, reps, atoms=None, ghost=False, scale_box=True):
+        """
         """
         
         box = self.box        
@@ -273,16 +283,16 @@ class System:
         xs = 2*reps[0] + 1
         ys = 2*reps[1] + 1
         zs = 2*reps[2] + 1
-        tp = atoms['types'][0]
-
+        
+        datadict = {key:[] for key in atoms.keys()}
+        del datadict['positions']
+        del datadict['ids']
+        del datadict['head']
+        del datadict['ghost']
         positions = []
         ids = []
-        types = []
-        ghosts = []
-        mask_1 = []
-        mask_2 = []
-        condition = []
         head = []
+        ghosts = []
 
         for i in range(x1, x2):
             for j in range(y1, y2):
@@ -293,15 +303,13 @@ class System:
                         #we should create ghost images for only real atoms
                         if not atoms["ghost"][count]:
                             pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                            positions.append(pos)
+                            positions.append(list(pos))
                             ids.append(idstart)
-                            idstart += 1
-                            types.append(atoms['types'][count])
-                            mask_1.append(atoms['mask_1'][count])
-                            mask_2.append(atoms['mask_2'][count])
-                            condition.append(atoms['condition'][count])
-                            ghosts.append(ghost)
                             head.append(count)
+                            ghosts.append(ghost)
+                            idstart += 1
+                            for key in datadict.keys():
+                                datadict[key].append(atoms[key][count])
 
         if scale_box:
             box[0] = xs*np.array(box[0])
@@ -313,12 +321,88 @@ class System:
 
         atoms['positions'] = [*atoms['positions'], *positions]
         atoms['ids'] = [*atoms['ids'], *ids]
-        atoms['types'] = [*atoms['types'], *types]
         atoms['ghost'] = [*atoms['ghost'], *ghosts]
-        atoms['mask_1'] = [*atoms['mask_1'], *mask_1]
-        atoms['mask_2'] = [*atoms['mask_2'], *mask_2]
-        atoms['condition'] = [*atoms['condition'], *condition]
         atoms['head'] = [*atoms['head'], *head]
+        for key in datadict.keys():
+            atoms[key] = [*atoms[key], *datadict[key]]
+        return atoms
+
+    def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
+        """
+        """
+        
+        box = self.box        
+        self.actual_box = box.copy()
+
+        if atoms is None:
+            atoms = self.atoms
+
+        idstart = len(atoms) + 1
+        
+        for index, rep in enumerate(reps):
+            if not (0 < rep < 1):
+                raise ValueError("Fractional repetition should be 0<rep<1")
+
+            left = rep*self.boxdims[index]
+            right = (1-rep)*self.boxdims[index]
+
+            datadict = {key:[] for key in atoms.keys()}
+            del datadict['positions']
+            del datadict['ids']
+            del datadict['head']
+            del datadict['ghost']
+            positions = []
+            ids = []
+            head = []
+            ghosts = []
+            disc = 0
+
+            for count, pos in enumerate(atoms['positions']):                
+                if (pos[index] <= left):
+                    displacement = [0, 0, 0]
+                    displacement[index] = 1.0                    
+                    displace = True    
+                elif (pos[index] > right):
+                    displacement = [0, 0, 0]
+                    displacement[index] = -1.0
+                    displace = True
+                else:
+                    displace = False
+
+                if displace:
+                    disc += 1
+                    pos = pc.remap_and_displace_atom(pos, self.triclinic,
+                        self.rot, self.rotinv,
+                        self.boxdims, displacement)
+                    positions.append(list(pos))
+                    ids.append(idstart)
+                    head.append(count)
+                    ghosts.append(ghost)
+                    idstart += 1
+                    for key in datadict.keys():
+                        datadict[key].append(atoms[key][count])
+            
+            print(len(atoms['positions']))
+            print("displaced %d"%disc)
+            atoms['positions'] = [*atoms['positions'], *positions]
+            atoms['ids'] = [*atoms['ids'], *ids]
+            atoms['ghost'] = [*atoms['ghost'], *ghosts]
+            atoms['head'] = [*atoms['head'], *head]
+            for key in datadict.keys():
+                atoms[key] = [*atoms[key], *datadict[key]]
+
+            if scale_box:
+                print(box[index])
+                box[index] = np.array(box[index])+2*rep*np.array(box[index])
+                print(box[index])
+
+        if scale_box:
+            print("here")
+            print(box)
+            self.box = box
+        print(self.box)
+        if ghost:
+            self.ghosts_created = True                    
 
         return atoms
 
@@ -926,15 +1010,25 @@ class System:
             backupbox = self._box.copy()
             if self.triclinic:
                 if not self.ghosts_created:
-                    atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True)
+                    atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False)
                     self._atoms = atoms
                     self.embed_in_cubic_box()
             pc.get_all_neighbors_voronoi(self.atoms, 0.0,
                 self.triclinic, self.rot, self.rotinv,
-                self.boxdims, voroexp)
+                self.boxdims, voroexp, cutoff)
             
             if self.triclinic:
-                self._box = self.box_backup
+                self._box = backupbox
+
+            #now get unique positions
+            unique_positions = []
+            for count, val in enumerate(self.atoms["vertex_positions_all"]):
+                if count not in self.atoms["to_remove"]:
+                    unique_positions.append(val)
+
+            del self.atoms["vertex_positions_all"]
+            del self.atoms["to_remove"]
+            self.atoms["vertex_positions_unique"] = unique_positions
 
             #assign extra options
             self.atom.voronoi = AttrClass(self)
@@ -946,6 +1040,7 @@ class System:
             self.atom.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
             self.atom.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
             self.atom.voronoi.vertex.mapdict["positions"] = "vertex_positions"
+            self.atom.voronoi.vertex.mapdict["unique_positions"] = "vertex_positions_unique"
         
         self.neighbors_found = True
 

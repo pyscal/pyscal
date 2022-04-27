@@ -24,7 +24,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     const vector<vector<double>> rot, 
     const vector<vector<double>> rotinv,
     const vector<double> box,
-    const double face_area_exponent)
+    const double face_area_exponent,
+    const double distance_cutoff)
     {
 
     double d;
@@ -60,6 +61,7 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     vector<vector<double>> vertex_vectors(nop);
     vector<vector<int>> vertex_numbers(nop);
     vector<vector<vector<double>>> vertex_positions(nop);
+    vector<vector<double>> vertex_positions_all;
 
     pre_container pcon(0.00, box[0], 0.00, box[1], 0.0, box[2], true, true, true);
     for(int i=0; i<nop; i++){
@@ -108,8 +110,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
                 temp.emplace_back(v[vi]+pos[li]);
                 li++;
             }
+            vertex_positions_all.emplace_back(temp);
             vertex_positions[ti].emplace_back(temp);
-
         }
 
 
@@ -141,6 +143,21 @@ void get_all_neighbors_voronoi(py::dict& atoms,
 
     } while (cl.inc());
 
+
+    //get unique vertex positions
+    vector<int> to_remove;
+    
+    for(int ii=0; ii<vertex_positions_all.size(); ii++){
+        for(int jj=ii+1; jj<vertex_positions_all.size(); jj++){
+            d = get_abs_distance(vertex_positions_all[ii], vertex_positions_all[jj],
+                triclinic, rot, rotinv, box, 
+                diffx, diffy, diffz);
+            if (d < distance_cutoff){
+                to_remove.emplace_back(jj);
+            }
+        }
+    }
+
     //calculation over lets assign
     atoms[py::str("neighbors")] = neighbors;
     atoms[py::str("neighbordist")] = neighbordist;
@@ -155,5 +172,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     atoms[py::str("face_perimeters")] = face_perimeters;
     atoms[py::str("vertex_vectors")] = vertex_vectors;
     atoms[py::str("vertex_numbers")] = vertex_numbers;
-    atoms[py::str("vertex_positions")] = vertex_positions; 
+    atoms[py::str("vertex_positions")] = vertex_positions;
+    atoms[py::str("vertex_positions_all")] = vertex_positions_all;
+    atoms[py::str("to_remove")] = to_remove;
+
 } 	

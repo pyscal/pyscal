@@ -155,7 +155,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
     const vector<vector<double>> rot, 
     const vector<vector<double>> rotinv,
     const vector<double> box,
-    const double face_area_exponent);
+    const double face_area_exponent,
+    const double distance_cutoff);
 
 /*-----------------------------------------------------
     Steinhardt Methods
