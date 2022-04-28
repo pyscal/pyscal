@@ -1067,15 +1067,13 @@ class System:
                     self.triclinic, rot, rotinv,
                     boxdims, cutoff)
 
-                #now get unique positions
-                unique_positions = []
-                for count, val in enumerate(self.atoms["vertex_positions_all_skipcheck"]):
-                    if count not in self.atoms["to_remove_skipcheck"]:
-                        unique_positions.append(val)
+                #unique_vertices = []
+                #for i in range(len(self.vertex_is_unique)):
+                #    for j in range(len(self.vertex_is_unique[i])):
+                #        if self.vertex_is_unique[i][j]:
+                #            unique_vertices.append(self.vertex_positions[i][j])
 
-                del self.atoms["vertex_positions_all_skipcheck"]
-                del self.atoms["to_remove_skipcheck"]
-                self.atoms["vertex_positions_unique_skipcheck"] = unique_positions
+                #self.atoms["vertex_positions_unique_skipcheck"] = unique_vertices
 
             #assign extra options
             self.atom.voronoi = AttrClass(self)

@@ -165,6 +165,9 @@ void clean_voronoi_vertices(py::dict& atoms,
     const vector<double> box,
     const double distance_cutoff);
 
+bool check_if_in_box(const vector<double>& pos,
+    const vector<double>& box);
+
 /*-----------------------------------------------------
     Steinhardt Methods
 -----------------------------------------------------*/
