@@ -34,8 +34,8 @@ setup(
             "src/pyscal/solids.cpp", "src/pyscal/voronoi.cpp", 
             "src/pyscal/modsystem_binding.cpp", "lib/voro++/voro++.cc"],
             language='c++',
-            include_dirs=['lib/voro++']
-            #extra_compile_args=['-std=c++17'],
+            include_dirs=['lib/voro++'],
+            extra_compile_args=['-O3'],
         ),
 
         #Pybind11Extension(
