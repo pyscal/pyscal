@@ -40,8 +40,8 @@ void get_all_neighbors_voronoi(py::dict& atoms,
 
 
     vector<vector<double>> positions = atoms[py::str("positions")].cast<vector<vector<double>>>();
-    vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
-    vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
+    //vector<bool> mask_1 = atoms[py::str("mask_1")].cast<vector<bool>>();
+    //vector<bool> mask_2 = atoms[py::str("mask_2")].cast<vector<bool>>();
     vector<bool> ghost = atoms[py::str("ghost")].cast<vector<bool>>();
 
     int nop = positions.size();
@@ -167,12 +167,13 @@ void get_all_neighbors_voronoi(py::dict& atoms,
 bool check_if_in_box(const vector<double>& pos,
     const vector<double>& box){
     if ((pos[0] < -0.01) || (pos[0] > box[0]+0.01)) return false;
-    else if ((pos[1] < -0.01) || (pos[1] > box[1]+0.01)) return false;
-    else if ((pos[2] < -0.01) || (pos[2] > box[2]+0.01)) return false;
+    else if ((pos[1] < -0.0001) || (pos[1] > box[1])) return false;
+    else if ((pos[2] < -0.0001) || (pos[2] > box[2])) return false;
     else return true;
 }
 
 void clean_voronoi_vertices(py::dict& atoms,
+    py::dict& all_atoms,
     const double neighbordistance,
     const int triclinic,
     const vector<vector<double>> rot, 
@@ -209,6 +210,7 @@ void clean_voronoi_vertices(py::dict& atoms,
             }
             for(int tj=0; tj<neighbors[ti].size(); tj++){
                 nn = neighbors[ti][tj];
+                if (ti==nn) continue;
                 if (ghost[nn]) continue;
                 for(int vj=0; vj<positions[nn].size(); vj++){
                     if (!vertex_unique[nn][vj]) continue;
@@ -235,5 +237,6 @@ void clean_voronoi_vertices(py::dict& atoms,
             }
         }
     }
-    atoms[py::str("vertex_positions_unique_skipcheck")] = unique_positions;    
+    
+    all_atoms[py::str("vertex_positions_unique_skipcheck")] = unique_positions;    
 }	

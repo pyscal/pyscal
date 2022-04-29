@@ -13,6 +13,7 @@ import uuid
 import gzip
 import io
 from scipy.special import sph_harm
+import copy
 
 import pyscal.csystem as pc
 import pyscal.traj_process as ptp
@@ -872,7 +873,7 @@ class System:
 
     def find_neighbors(self, method='cutoff', cutoff=0, threshold=2, 
             voroexp=1, padding=1.2, nlimit=6, 
-            cells=None, nmax=12, assign_neighbor=True, clean_vertices=True):
+            cells=None, nmax=12, assign_neighbor=True):
         """
 
         Find neighbors of all atoms in the :class:`~pyscal.core.System`.
@@ -1020,23 +1021,27 @@ class System:
 
         
         elif method == 'voronoi':
-            #copy the simulation cell
-            backupbox = self._box.copy()
-            if self.triclinic:
-                if not self.ghosts_created:
-                    atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False)
-                    self._atoms = atoms
-                    self.embed_in_cubic_box()
-            pc.get_all_neighbors_voronoi(self.atoms, 0.0,
-                self.triclinic, self.rot, self.rotinv,
-                self.boxdims, voroexp)
+            clean_vertices = (cutoff>0)
             
-            if self.triclinic:
-                self._box = backupbox
+            if not clean_vertices:
+                #copy the simulation cell
+                backupbox = self._box.copy()
+                if self.triclinic:
+                    if not self.ghosts_created:
+                        atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False)
+                        self._atoms = atoms
+                        self.embed_in_cubic_box()
+                pc.get_all_neighbors_voronoi(self.atoms, 0.0,
+                    self.triclinic, self.rot, self.rotinv,
+                    self.boxdims, voroexp)
 
+                if self.triclinic:
+                    self._box = backupbox
 
             #now clean up
-            if clean_vertices:
+            else:
+                real_atomdict = {"positions":copy.copy(self.positions), 
+                 "ghost":copy.copy(self.ghost)}
                 #we need to call the method
                 #this means alles good
                 if self.actual_box is None:
@@ -1063,7 +1068,13 @@ class System:
                 boxdims[0] = np.sum(np.array(new_box[0])**2)**0.5
                 boxdims[1] = np.sum(np.array(new_box[1])**2)**0.5
                 boxdims[2] = np.sum(np.array(new_box[2])**2)**0.5
-                pc.clean_voronoi_vertices(self.atoms, 0.0,
+                
+                pc.get_all_neighbors_voronoi(real_atomdict, 0.0,
+                    self.triclinic, rot, rotinv,
+                    boxdims, 1)                
+                
+                pc.clean_voronoi_vertices(real_atomdict, 
+                    self.atoms, 0.0,
                     self.triclinic, rot, rotinv,
                     boxdims, cutoff)
 
