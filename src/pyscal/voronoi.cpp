@@ -184,7 +184,7 @@ void clean_voronoi_vertices(py::dict& atoms,
     vector<vector<vector<double>>> positions = atoms[py::str("vertex_positions")].cast<vector<vector<vector<double>>>>();
     vector<vector<bool>> vertex_unique = atoms[py::str("vertex_is_unique")].cast<vector<vector<bool>>>();
     vector<vector<int>> neighbors = atoms[py::str("neighbors")].cast<vector<vector<int>>>();
-    vector<bool> ghost = atoms[py::str("ghost")].cast<vector<bool>>();
+    //vector<bool> ghost = atoms[py::str("ghost")].cast<vector<bool>>();
     
     int nop = positions.size();
 
@@ -192,7 +192,7 @@ void clean_voronoi_vertices(py::dict& atoms,
     int nn;
 
     for(int ti=0; ti<nop; ti++){
-        if (ghost[ti]) continue;
+        //if (ghost[ti]) continue;
         for(int vi=0; vi<positions[ti].size(); vi++){
             if (!vertex_unique[ti][vi]) continue;
             if (!check_if_in_box(positions[ti][vi], box)){
@@ -211,7 +211,7 @@ void clean_voronoi_vertices(py::dict& atoms,
             for(int tj=0; tj<neighbors[ti].size(); tj++){
                 nn = neighbors[ti][tj];
                 if (ti==nn) continue;
-                if (ghost[nn]) continue;
+                //if (ghost[nn]) continue;
                 for(int vj=0; vj<positions[nn].size(); vj++){
                     if (!vertex_unique[nn][vj]) continue;
                     if (!check_if_in_box(positions[nn][vj], box)){
