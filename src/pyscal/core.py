@@ -63,7 +63,7 @@ class System:
             if namesplit[-1] == "skipcheck":
                 res = self.atoms[name]
             elif namesplit[0] == "unmasked":
-                name = namesplit[0]
+                name = namesplit[1]
                 res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if (self.atoms["ghost"][x]==False and self.atoms["mask_1"][x]==False)]
             else:
                 res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
