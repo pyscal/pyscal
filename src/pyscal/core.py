@@ -64,6 +64,7 @@ class System:
                 res = self.atoms[name]
             elif namesplit[0] == "unmasked":
                 name = namesplit[1]
+                print(name)
                 res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if (self.atoms["ghost"][x]==False and self.atoms["mask_1"][x]==False)]
             else:
                 res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
