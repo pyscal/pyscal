@@ -60,6 +60,7 @@ class System:
     def __getattr__(self, name):
         if name in self.atoms.keys():
             namesplit = name.split('_')
+            print(namesplit)
             if namesplit[-1] == "skipcheck":
                 res = self.atoms[name]
             elif namesplit[0] == "unmasked":
