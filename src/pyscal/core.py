@@ -60,17 +60,18 @@ class System:
     def __getattr__(self, name):
         if name in self.atoms.keys():
             namesplit = name.split('_')
-            print(namesplit)
             if namesplit[-1] == "skipcheck":
                 res = self.atoms[name]
-            elif namesplit[0] == "unmasked":
-                name = namesplit[1]
-                print(name)
-                res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if (self.atoms["ghost"][x]==False and self.atoms["mask_1"][x]==False)]
             else:
                 res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
             return res            
         else:
+            namesplit = name.split('_')
+            if namesplit[1] in self.atoms.keys():
+                if namesplit[0] == "unmasked":
+                    name = namesplit[1]
+                    res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if (self.atoms["ghost"][x]==False and self.atoms["mask_1"][x]==False)]
+                    return res
             raise AttributeError("Attribute %s not found"%name)
 
     @property
