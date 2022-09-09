@@ -4,7 +4,7 @@ from pyscal.formats.ase import convert_snap
 import pyscal.core as pc
 #import h5py
 import warnings
-
+import random
 
 #def hdf_to_dump(infile, outfile, keys=None):
 """
@@ -107,7 +107,6 @@ class Timeslice:
             return self
         else:
             return self.__add__(ntraj)
-
 
     def to_system(self, customkeys=None):
         """
@@ -345,6 +344,50 @@ class Trajectory:
         #set load list to False
         self.loadlist = [False for x in range(self.nblocks)]
         self.data = [None for x in range(self.nblocks)]
+
+    def _yield(self, index, output):
+        if output == "index":
+            return index
+        elif output == "system":
+            return  Timeslice(self, [index]).to_system()[0]
+
+
+    #iterator for index
+    def iter(self, method="ascending", n_slices=None, output="index"):
+        """
+        Iterate and provide slices from the trajectory
+
+        Parameters
+        ----------
+        method: str, how to provide slices
+            ascending: from 0 to Nblocks
+            descending: from Nblocks to 0
+            random: randomly between 0 and N
+
+        n_slices: int, number of slices to provide
+            if None, nblocks is the maximum
+
+        output: string, output format
+            index: provide index number
+            system: provide pyscal system
+        """
+        if n_slices is None:
+            n_slices = self.nblocks
+
+        if method == "ascending":
+            for i in range(n_slices):
+                yield self._yield(i, output)
+        elif method == "descending":
+            for i in range(n_slices):
+                yield self._yield(self.nblocks-i, output)
+        
+        elif method == "random":
+            slice_list = np.arange(0, self.nblocks, 1).astype(int)
+            random.shuffle(slice_list)
+            for i in slice_list[:n_slices]:
+                yield self._yield(i, output)
+        else:
+            raise ValueError("Unknown method")
 
     def get_block(self, blockno):
         """
