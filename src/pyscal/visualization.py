@@ -5,14 +5,13 @@ pyscal visualization module
 Used for visualization of system objects in jupyter notebooks and lab. Uses plotly.
 """
 import numpy as np
-from plotly import graph_objs as go
+import itertools
 
 try:
     import ipywidgets as widgets
+    from plotly import graph_objs as go
 except:
-    raise ImportError("please install ipywidgets")
-    
-import itertools
+    raise ImportError("please install ipywidgets and plotly")
 
 def create_box_plot(box, origin=[0,0,0]):
     """
