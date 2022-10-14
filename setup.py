@@ -7,7 +7,7 @@ with open('README.rst') as readme_file:
 
 setup(
     name='pyscal',
-    version='2.10.16',
+    version='2.10.17',
     author='Sarath Menon',
     author_email='sarath.menon@pyscal.org',
     description='Python library written in C++ for calculation of local atomic structural environment',
