@@ -6,7 +6,12 @@ Used for visualization of system objects in jupyter notebooks and lab. Uses plot
 """
 import numpy as np
 from plotly import graph_objs as go
-import ipywidgets as widgets
+
+try:
+    import ipywidgets as widgets
+except:
+    raise ImportError("please install ipywidgets")
+    
 import itertools
 
 def create_box_plot(box, origin=[0,0,0]):
