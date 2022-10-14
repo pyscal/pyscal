@@ -1,6 +1,5 @@
 import numpy as np
 import gzip
-import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
@@ -36,19 +35,15 @@ def read_snap(mdobject, check_triclinic=False):
     typedict = dict(zip(atomsymbols, atomtypes))
 
     #now start parsing atoms
-    atoms = []
     positions = mdobject.xyz[0]
-    for count, position in enumerate(positions):
-        atom = pca.Atom()
-        atom.pos = list(position)
-        atom.id = count+1
-        atom.type = typedict[chems[count]]
-        atom.loc = count
+    ids = [count+1 for count in range(len(positions))]
+    species = [chems[count] for count in range(len(positions))]
 
-        customdict = {'species': chems[count]}
-        atom.custom = customdict
-        atoms.append(atom)
-
+    atoms = {}
+    atoms['positions'] = positions
+    atoms['ids'] = ids
+    atoms['species'] = species
+    atoms['ghost'] = [False for x in range(len(types))]
     return atoms, box
 
 def write_snap(**kwargs):

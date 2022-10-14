@@ -18,10 +18,10 @@ def test_create_multislice_dump():
 
     atoms2, boxdims2 = pcs.make_crystal('bcc', repetitions=[6,6,6])
     #modify the coordinates of one atom
-    x  = atoms2["positions"][0]
+    x  = atoms2[0].pos
     x[0] += 0.01
-    atoms2["positions"][0] = x
-    assert len(atoms2["positions"]) == 432
+    atoms2[0].pos = x
+    assert len(atoms2) == 432
     #write it out
     sys2 = pc.System()
     sys2.box = boxdims2

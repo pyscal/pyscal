@@ -2,7 +2,6 @@
 pyscal module for creating crystal structures.
 """
 
-import pyscal.catom as pc
 import numpy as np
 import warnings
 
@@ -251,7 +250,10 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
 
     m = 0
     co = 1
-    atoms = []
+    positions = []
+    types = []
+    ids = []
+
     xh = nx*lattice_constant*xfact
     yh = ny*lattice_constant*yfact
     zh = nz*lattice_constant*zfact
@@ -270,12 +272,15 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                         posx = np.random.normal(loc=posx, scale=noise)
                         posy = np.random.normal(loc=posy, scale=noise)
                         posz = np.random.normal(loc=posz, scale=noise)
-                    atom = pc.Atom()
-                    atom.pos = [posx, posy, posz]
-                    atom.id = co
-                    atom.type = atomtype[l-1]
-                    atom.loc = co-1
-                    atoms.append(atom)
+                    
+                    positions.append([posx, posy, posz])
+                    ids.append(co)
+                    types.append(atomtype[l-1])
                     co += 1
+    atoms = {}
+    atoms['positions'] = positions
+    atoms['ids'] = ids
+    atoms['types'] = types
+    atoms['ghost'] = [False for x in range(len(types))]
 
     return atoms, box

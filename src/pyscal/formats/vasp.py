@@ -1,6 +1,5 @@
 import numpy as np
 import gzip
-import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
@@ -88,17 +87,16 @@ def write_poscar(sys, outfile, comments="pyscal"):
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[1][0], vecs[1][1], vecs[1][2]))
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[2][0], vecs[2][1], vecs[2][2]))
 
-    atoms = sys.atoms
-    atypes = [atom.type for atom in atoms]
+    atypes = sys.atoms['types']
     
     tt, cc  = np.unique(atypes, return_counts=True)
     
     atomgroups = [[] for x in range(len(tt))]
     
     for count, t in enumerate(tt):
-        for atom in atoms:
-            if int(atom.type) == t:
-                atomgroups[count].append(atom)
+        for cc, pos in enumerate(sys.atoms['positions']):
+            if int(atypes[cc]) == t:
+                atomgroups[count].append(pos)
 
     fout.write("  ")
     for c in cc:
@@ -108,8 +106,7 @@ def write_poscar(sys, outfile, comments="pyscal"):
     fout.write("Cartesian\n")
 
     for i in range(len(atomgroups)):
-        for atom in atomgroups[i]:
-            pos = atom.pos
+        for pos in atomgroups[i]:
             fout.write(" %1.14f %1.14f %1.14f\n"%(pos[0], pos[1], pos[2]))
 
     fout.close()

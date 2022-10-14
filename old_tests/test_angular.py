@@ -10,8 +10,8 @@ def test_angular():
     sys.box = boxdims
     sys.atoms = atoms
 
-    sys.find_neighbors(method = 'cutoff', cutoff=0)
+    sys.find_neighbors(method = 'voronoi')
     sys.calculate_angularcriteria()
 
-    assert np.round(np.mean(np.array(sys.angular)), decimals=2) == 0.00
-    assert np.round(np.mean(np.array(sys.atom.angular_parameters.diamond_angle)), decimals=2) == 0.00
+    q = [atom.angular for atom in sys.atoms]
+    assert np.round(np.mean(np.array(q)), decimals=2) == 0.00

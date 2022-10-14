@@ -6,13 +6,13 @@ import pyscal.crystal_structures as pcs
 
 def test_complex_system():
     sys = pc.System()
-    sys.read_inputfile('tests/files/cluster.dump')
+    sys.read_inputfile('examples/cluster.dump')
     sys.find_neighbors(method='cutoff', cutoff=3.63)
     assert 176 == sys.find_solids(bonds=6, threshold=0.5, avgthreshold=0.6, cluster=True)
 
 def test_cluster():
     sys = pc.System()
-    sys.read_inputfile('tests/files/cluster.dump')
+    sys.read_inputfile('examples/cluster.dump')
     sys.find_neighbors(method='cutoff', cutoff=3.63)
     sys.find_solids(cluster=False)
     val = sys.cluster_atoms(sys.solid, largest = True)
@@ -20,7 +20,7 @@ def test_cluster():
 
 def test_cluster_cutoff():
     sys = pc.System()
-    sys.read_inputfile('tests/files/cluster.dump')
+    sys.read_inputfile('examples/cluster.dump')
     sys.find_neighbors(method='cutoff', cutoff=3.63)
     sys.find_solids(cluster=False)
     val = sys.cluster_atoms(sys.solid, largest = True, cutoff=3.63)

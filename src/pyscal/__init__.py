@@ -1,2 +1,2 @@
-from pyscal.core import Atom, System
-from pyscal.trajectory import Trajectory
+#from pyscal.core import Atom, System
+#from pyscal.trajectory import Trajectory

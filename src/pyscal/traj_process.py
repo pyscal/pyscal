@@ -1,8 +1,3 @@
-
-
-
-
-
 """
 pyscal module containing methods for processing of a trajectory. Methods for
 reading of input files formats, writing of output files etc are provided in
@@ -11,7 +6,6 @@ this module.
 """
 import numpy as np
 import gzip
-import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
@@ -54,7 +48,7 @@ def read_file(filename, format="lammps-dump",
     customread = (len(customkeys) > 0)
 
     if format=='lammps-dump':
-        atoms, box, is_triclinic = ptlammps.read_snap(filename, compressed=compressed, check_triclinic=True, customkeys=customkeys)
+        atoms, box = ptlammps.read_snap(filename, compressed=compressed, customkeys=customkeys)
     elif format == 'ase':
         atoms, box = ptase.read_snap(filename)
     elif format == 'mdtraj':

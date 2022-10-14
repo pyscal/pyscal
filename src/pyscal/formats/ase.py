@@ -1,6 +1,5 @@
 import numpy as np
 import gzip
-import pyscal.catom as pca
 from ase import Atom, Atoms
 import gzip
 import io
@@ -36,18 +35,22 @@ def read_snap(aseobject, check_triclinic=False):
     typedict = dict(zip(atomsymbols, atomtypes))
 
     #now start parsing atoms
-    atoms = []
     positions = aseobject.positions
-    for count, position in enumerate(positions):
-        atom = pca.Atom()
-        atom.pos = list(position)
-        atom.id = (count+1)
-        atom.type = typedict[chems[count]]
-        atom.loc = count
+    ids = []
+    types = []
+    species = []
 
-        customdict = {'species': chems[count]}
-        atom.custom = customdict
-        atoms.append(atom)
+    for count, position in enumerate(positions):
+        ids.append(count+1)
+        types.append(typedict[chems[count]])
+        species.append(chems[count])
+
+    atoms = {}
+    atoms['positions'] = positions
+    atoms['ids'] = ids
+    atoms['types'] = types
+    atoms['species'] = species
+    atoms['ghost'] = [False for x in range(len(types))]
 
     return atoms, box
 
@@ -88,37 +91,23 @@ def convert_snap(sys, species=None):
     #we can change this later depending on if ASE is to be treated
     #as a full dependency
     
-
-    atoms = sys.atoms
     #get element strings
-    if 'species' not in atoms[0].custom.keys():
+    if 'species' not in sys.atoms.keys():
         if species is None:
             raise ValueError("Species was not known! To convert to ase, species need to be provided using the species keyword")
         #otherwise we know the species
-        types = [atom.type for atom in atoms]
+        types = sys.types
         unique_types = np.unique(types)
         if not (len(unique_types) == len(species)):
             raise ValueError("Length of species and number of types found in system are different. Maybe you specified \"Au\" instead of [\"Au\"]")
         #now assign the species to custom
-        
-        for atom in atoms:
-            custom = atom.custom
-            custom['species'] = species[int(atom.type-1)]
-        #we should also get the unique species key
-        specieskey = "".join(species)
+        atomspecies = []        
+        for cc, typ in enumerate(types):
+            atomspecies.append(species[int(typ-1)])
     else:
         #now if species are already there in custom
         #we can safely ignore any input
-        types = [atom.type for atom in atoms]
-        unique_types = np.unique(types)
-        #now we know how many types are there
-        species = []
-        for ut in unique_types:
-            for atom in atoms:
-                if ut == atom.type:
-                    species.append(atom.custom['species'])
-                    break
-        specieskey = "".join(species)
+        atomspecies = sys.species
       
     cell = sys.box
     pbc = [1, 1, 1]
@@ -130,8 +119,9 @@ def convert_snap(sys, species=None):
     
     #thats everything pretty much
     #now create ase Atom
-    for atom in atoms:
-        aseatom = Atom(atom.custom['species'], atom.pos)
+    for count, pos in enumerate(sys.positions):
+        aseatom = Atom(atomspecies[count], pos)
         aseobject.append(aseatom)
+    
     #done
     return aseobject

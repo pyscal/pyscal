@@ -78,7 +78,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     //-------------------------------------------------------
     // Basic Atom properties
     //-------------------------------------------------------
-    .def_property("pos", &Atom::gx, &Atom::sx, R"mydelimiter(
+    .def_readwrite("pos", &Atom::pos, R"mydelimiter(
         *List of floats of the type [x, y, z], default [0, 0, 0]*.
         Position of the atom.
     )mydelimiter")
@@ -126,24 +126,24 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
     //-------------------------------------------------------
     // Neighbor related properties
     //-------------------------------------------------------
-    .def_property("neighbors",&Atom::gneighbors, &Atom::sneighbors, R"mydelimiter(
+    .def_readwrite("neighbors",&Atom::neighbors, R"mydelimiter(
         *List of ints*.
         List of neighbors of the atom. The list contains indices of neighbor
         atoms which indicate their position in the list of all atoms.
     )mydelimiter")
 
-    .def_property("neighbor_distance",&Atom::gneighdist, &Atom::sneighdist, R"mydelimiter(
+    .def_readwrite("neighbor_distance", &Atom::neighbordist, R"mydelimiter(
         *List of floats*.
         List of neighbor distances of the atom.
     )mydelimiter")
 
-    .def_readonly("coordination", &Atom::n_neighbors, R"mydelimiter(
+    .def_readwrite("coordination", &Atom::n_neighbors, R"mydelimiter(
         *int*.
         coordination number of the atom. Coordination will only be updated
         after neighbors are calculated using :func:`~pyscal.core.System.find_neighbors`.
     )mydelimiter")
 
-    .def_property("neighbor_weights",&Atom::gneighborweights, &Atom::sneighborweights, R"mydelimiter(
+    .def_readwrite("neighbor_weights",&Atom::neighborweight, R"mydelimiter(
         *List of floats*.
         Used to weight the contribution of each neighbor atom towards the value of
         Steinhardt's parameters. By default, each atom has a weight of 1 each. However,
@@ -156,303 +156,7 @@ py::class_<Atom>(m,"Atom", R"mydelimiter(
         *double*.
         cutoff used for finding neighbors for each atom.
     )mydelimiter")
-
-   .def_readwrite("next_neighbors", &Atom::next_neighbors, R"mydelimiter(
-        *double*.
-        cutoff used for finding neighbors for each atom.
-    )mydelimiter")
-
-   .def_readwrite("next_neighbor_distances", &Atom::next_neighbor_distances, R"mydelimiter(
-        *double*.
-        cutoff used for finding neighbors for each atom.
-    )mydelimiter")
-
-    .def_property("neighbor_vector",&Atom::gdistvecs, &Atom::sdistvecs, R"mydelimiter(
-        *List of floats of length 3*.
-        List of vectors connecting an atom to its neighbors.
-    )mydelimiter")
-
-    .def_property("local_angles",&Atom::glocalangles, &Atom::slocalangles, R"mydelimiter(
-        *List of floats of length 2*.
-        List of longitude and colatitude of an atom to its neighbors.
-    )mydelimiter")
-
-    //-------------------------------------------------------
-    // Q parameter properties
-    //-------------------------------------------------------
-    .def_property("allq",&Atom::gallq,&Atom::sallq, R"mydelimiter(
-        *list of floats*.
-        list of all q values of the atom.
-    )mydelimiter")
-
-    .def_property("allaq",&Atom::gallaq,&Atom::sallaq, R"mydelimiter(
-        *list of floats*.
-        list of all averaged q values of the atom.
-    )mydelimiter")
-
-    .def_property("sij", &Atom::gsij, &Atom::ssij, R"mydelimiter(
-          *float*. Value of s_ij which is used for identification of solid atoms. s_ij is defined by
-
-          .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
-
-    )mydelimiter")
-
-    .def_readwrite("avg_sij", &Atom::avq6q6, R"mydelimiter(
-          *float*. Value of averaged s_ij which is used for identification of solid atoms. s_ij is defined by
-
-          .. math:: s_{ij} = \sum_{m=-l}^l q_{lm}(i) q_{lm}^*(i)
-
-    )mydelimiter")
-    .def("get_q", (double (Atom::*) (int q, bool))  &Atom::gq_big,  py::arg(), py::arg("averaged")=false, R"mydelimiter(
-          Calculate the steinhardt parameter q_l value.
-
-          Parameters
-          ----------
-          q : int or list of ints
-              number of the required q_l - from 2-12
-
-          averaged : bool, optional
-              If True, return the averaged q values,
-              If False, return the non averaged ones
-              default False
-
-          Returns
-          -------
-          q_l : float or list of floats
-              the value(s) of the queried Steinhardt parameter(s).
-
-          Notes
-          -----
-          Please check this `link <https://pyscal.readthedocs.io/en/latest/steinhardtparameters.html>`_
-          for more details about Steinhardts parameters and the averaged versions.
-
-          Meaningful values are only returned if :func:`~pyscal.core.System.calculate_q` is used.
-    )mydelimiter")
-
-    .def("get_q", (vector<double> (Atom::*) (vector<int>, bool))  &Atom::gq_big, py::arg(), py::arg("averaged")=false )
-
-    .def("set_q", (void (Atom::*) (int, double, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false, R"mydelimiter(
-
-          Set the value of steinhardt parameter q_l.
-
-          Parameters
-          ----------
-          q : int or list of ints
-              number of the required q_l - from 2-12
-
-          val : float or list of floats
-              value(s) of Steinhardt parameter(s).
-
-          averaged : bool, optional
-              If True, return the averaged q values,
-              If False, return the non averaged ones
-              default False
-
-          Returns
-          -------
-          None
-
-    )mydelimiter")
-
-    .def("set_q", (void (Atom::*) (vector<int>, vector<double>, bool))  &Atom::sq_big, py::arg(), py::arg(), py::arg("averaged")=false)
-    
-    .def_readwrite("disorder", &Atom::disorder, R"mydelimiter(
-        *Float*.
-        The value of disorder parameter.
-    )mydelimiter")
-
-    .def_readwrite("avg_disorder", &Atom::avgdisorder, R"mydelimiter(
-        *Float*.
-        The value of averaged disorder parameter.
-    )mydelimiter")
-
-    .def("get_qlm", &Atom::get_qcomps, py::arg(), py::arg("averaged")=false, R"mydelimiter(
-          Get the q_lm values.
-
-          Parameters
-          ----------
-          q : int
-              number of the required q_l - from 2-12
-
-          averaged : bool, optional
-              If True, return the averaged qlm values,
-              If False, return the non averaged ones
-              default False
-
-          Returns
-          -------
-          q_lm : complex vector
-              vector of complex numbers.
-
-          Meaningful values are only returned if :func:`~pyscal.core.System.calculate_q` is used.
-    )mydelimiter")
-
-    //-------------------------------------------------------
-    // Solid related properties
-    //-------------------------------------------------------
-    .def_readwrite("cluster", &Atom::belongsto, R"mydelimiter(
-        *int*.
-        identification number of the cluster that the atom belongs to.
-    )mydelimiter")
-
-    .def_readwrite("bonds", &Atom::frenkelnumber, R"mydelimiter(
-        *Int*.
-        The number of solid bonds of an atom.
-    )mydelimiter")
-
-    .def_readwrite("solid", &Atom::issolid, R"mydelimiter(
-        *bool*.
-        True if the atom is solid, False otherwise. Solid atoms are only identified
-        after using the :func:`~pyscal.core.System.find_solids` function.
-    )mydelimiter")
-
-    .def_readwrite("surface", &Atom::issurface, R"mydelimiter(
-        *bool*.
-        True if the atom has at least one liquid neighbor, False otherwise. Surface atoms are only identified
-        after using the :func:`~pyscal.core.System.find_solids` function.
-
-    )mydelimiter")
-
-    .def_readwrite("largest_cluster", &Atom::lcluster, R"mydelimiter(
-        *bool*.
-        True if the atom belongs to the largest cluster, False otherwise. Largest cluster is only identified
-        after using the :func:`~pyscal.core.System.cluster_atoms` function.
-    )mydelimiter")
-
-    .def_readwrite("structure", &Atom::structure, R"mydelimiter(
-        *int*.
-        Indicates the structure of atom. Not used currently.
-    )mydelimiter")
-
-    //-------------------------------------------------------
-    // Voronoi related properties
-    //-------------------------------------------------------
-    .def_readwrite("volume", &Atom::volume, R"mydelimiter(
-        *float*. Voronoi volume of the atom. The Voronoi volume is only calculated if neighbors
-        are found using the :func:`~pyscal.core.System.find_neighbors` using the `method='voronoi'`
-        option.
-    )mydelimiter")
-
-    .def_readwrite("avg_volume", &Atom::avgvolume, R"mydelimiter(
-        *float*. Averaged version of the Voronoi volume which is calculated as an average over
-        itself and its neighbors. Only calculated when the :func:`~pyscal.core.System.find_neighbors`
-        using the `method='voronoi'` option is used.
-    )mydelimiter")
-
-    .def_property("face_vertices", &Atom::gfacevertices, &Atom::sfacevertices, R"mydelimiter(
-          *list of floats*. A list of the number of vertices shared between an atom and its
-          neighbors.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
-          using the `method='voronoi'` option is used.
-    )mydelimiter")
-
-    .def_property("face_perimeters", &Atom::gfaceperimeters, &Atom::sfaceperimeters, R"mydelimiter(
-          *list of floats*. List consisting of the perimeters of each Voronoi face of an atom.
-          Only calculated when the :func:`~pyscal.core.System.find_neighbors`
-          using the `method='voronoi'` option is used.
-    )mydelimiter")
-
-    .def_readwrite("vertex_numbers", &Atom::vertex_numbers, R"mydelimiter(
-          *list of floats*. For each Voronoi face of the atom, this values includes a List
-          of vertices that constitute the face.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
-          using the `method='voronoi'` option is used.
-    )mydelimiter")
-
-    .def_readwrite("vertex_vectors", &Atom::vertex_vectors, R"mydelimiter(
-          *list of floats*. A list of positions of each vertex of the Voronoi polyhedra of
-          the atom.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
-          using the `method='voronoi'` option is used.
-    )mydelimiter")
-
-    .def_property("vertex_positions", &Atom::gvertexpositions, &Atom::svertexpositions, R"mydelimiter(
-          *list of list of floats*. Positions of Voronoi vertices.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
-          using the `method='voronoi'` option is used.
-    )mydelimiter")
-
-
-    .def_property("edge_lengths", &Atom::gedgelengths, &Atom::sedgelengths, R"mydelimiter(
-          *list of floats*. For each face, this vector contains the lengths of edges
-          that make up the Voronoi polyhedra of the atom.  Only calculated when the :func:`~pyscal.core.System.find_neighbors`
-          using the `method='voronoi'` option is used.
-    )mydelimiter")
-
-    .def_property("vorovector", &Atom::gvorovector, &Atom::svorovector, R"mydelimiter(
-          *list of ints*. A vector of the form `(n3, n4, n5, n6)` where n3 is the number of faces with 3 vertices,
-          n4 is the number of faces with 4 vertices and so on. This can be used to identify structures [1][2].
-          Vorovector is calculated if the :func:`~pyscal.core.System.calculate_vorovector` method is used.
-
-          References
-          ----------
-          .. [1] Finney, JL, Proc. Royal Soc. Lond. A 319, 1970
-          .. [2] Tanemura, M, Hiwatari, Y, Matsuda, H,Ogawa, T, Ogita, N, Ueda, A. Prog. Theor. Phys. 58, 1977
-
-    )mydelimiter")
-
-
-    //-------------------------------------------------------
-    // Angle related properties
-    //-------------------------------------------------------
-    .def_readwrite("angular", &Atom::angular, R"mydelimiter(
-        *Float*.
-        The value of angular parameter A of an atom. The angular parameter measures the tetrahedral coordination of an atom.
-        Meaningful values are only returned if the property is calculated using :func:`~pyscal.core.System.calculate_angularcriteria`.
-    )mydelimiter")
-
-    .def_readwrite("avg_angular", &Atom::avg_angular, R"mydelimiter(
-        *Float*.
-        The average angular parameter value. Not used currently.
-    )mydelimiter")
-
-    .def_readwrite("chiparams", &Atom::chiparams, R"mydelimiter(
-        *Float*.
-        The value of chiparameter of an atom. The return value is a vector of length 8.
-        Meaningful values are only returned if chi params are calculated using :func:`~pyscal.core.System.calculate_chiparams`.
-    )mydelimiter")
-
-    //-------------------------------------------------------
-    // CNA parameters
-    //-------------------------------------------------------
-    .def_readwrite("cna", &Atom::cna, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("common", &Atom::common, R"mydelimiter(
-    )mydelimiter")
-
-    .def_readwrite("bonds", &Atom::bonds, R"mydelimiter(
-    )mydelimiter")
-
-    //-------------------------------------------------------
-    // Other order parameters
-    //-------------------------------------------------------
-    .def_readwrite("sro", &Atom::sro, R"mydelimiter(
-        *Float*.
-        The value of short range order parameter.
-    )mydelimiter")
-
-    .def_readwrite("centrosymmetry", &Atom::centrosymmetry, R"mydelimiter(
-        *Float*.
-        The value of centrosymmetry parameter.
-    )mydelimiter")
-
-    .def_readwrite("entropy", &Atom::entropy, R"mydelimiter(
-        *Float*.
-        Value of entropy parameter.
-    )mydelimiter")
-
-    .def_readwrite("avg_entropy", &Atom::avg_entropy, R"mydelimiter(
-        *Float*.
-        Value of averaged entropy parameter.
-    )mydelimiter")
-
-    .def_readwrite("energy", &Atom::energy, R"mydelimiter(
-        *Float*.
-        Value of energy.
-    )mydelimiter")
-
-    .def_readwrite("avg_energy", &Atom::avg_energy, R"mydelimiter(
-        *Float*.
-        Value of averaged energy.
-    )mydelimiter")
-
+   
     ;
 
 
