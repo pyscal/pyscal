@@ -5,7 +5,7 @@ dependencies:
   - numpy
   - matplotlib
   - ase
-  - plotly
+  #- plotly
   #- ipywidgets
   - pytest
   - pytest-cov
