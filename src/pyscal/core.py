@@ -17,7 +17,6 @@ from ase.io import write
 import uuid
 import gzip
 import io
-import pyscal.visualization as pv
 
 #------------------------------------------------------------------------------------------------------------
 """
@@ -2209,5 +2208,6 @@ class System(pc.System):
         -------
         None  
         """
+        import pyscal.visualization as pv
         pv.plot_system(self, colorby=colorby, filterby=filterby)                
 
