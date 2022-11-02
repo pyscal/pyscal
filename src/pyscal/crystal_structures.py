@@ -5,6 +5,62 @@ pyscal module for creating crystal structures.
 import numpy as np
 import warnings
 
+structures = {'simple_cubic': {'natoms': 1,
+  'species': [1],
+  'scaling_factors': [1.0, 1.0, 1.0],
+  'positions': [[0.0, 0.0, 0.0]]},
+ 'bcc': {'natoms': 2,
+  'species': [1, 1],
+  'scaling_factors': [1.0, 1.0, 1.0],
+  'positions': [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]]},
+ 'fcc': {'natoms': 4,
+  'species': [1, 1, 1, 1],
+  'scaling_factors': [1.0, 1.0, 1.0],
+  'positions': [[0.0, 0.0, 0.0],
+   [0.5, 0.0, 0.5],
+   [0.0, 0.5, 0.5],
+   [0.5, 0.5, 0.0]]},
+ 'hcp': {'natoms': 4,
+  'species': [1, 1, 1, 1],
+  'scaling_factors': [1.0, 1.7320508075688772, 1.633],
+  'positions': [[0.0, 0.0, 0.0],
+   [0.5, 0.8660254037844386, 0.0],
+   [0.5, 0.28867513459481287, 0.8165],
+   [0.0, 1.1547005383792517, 0.8165]]},
+ 'diamond': {'natoms': 8,
+  'species': [1, 1, 1, 1, 1, 1, 1, 1],
+  'scaling_factors': [1.0, 1.0, 1.0],
+  'positions': [[0.0, 0.0, 0.0],
+   [0.25, 0.25, 0.25],
+   [0.5, 0.5, 0.0],
+   [0.75, 0.75, 0.25],
+   [0.5, 0.0, 0.5],
+   [0.0, 0.5, 0.5],
+   [0.75, 0.25, 0.75],
+   [0.25, 0.75, 0.75]]},
+ 'a15': {'natoms': 8,
+  'species': [1, 1, 1, 1, 1, 1, 1, 1],
+  'scaling_factors': [1.0, 1.0, 1.0],
+  'positions': [[0.0, 0.0, 0.0],
+   [0.5, 0.5, 0.5],
+   [0.25, 0.5, 0.0],
+   [0.75, 0.5, 0.0],
+   [0.0, 0.25, 0.5],
+   [0.0, 0.75, 0.5],
+   [0.5, 0.0, 0.25],
+   [0.5, 0.0, 0.75]]},
+ 'l12': {'natoms': 4,
+  'species': [1, 2, 2, 2],
+  'scaling_factors': [1.0, 1.0, 1.0],
+  'positions': [[0.0, 0.0, 0.0],
+   [0.5, 0.0, 0.5],
+   [0.0, 0.5, 0.5],
+   [0.5, 0.5, 0.0]]},
+ 'b2': {'natoms': 2,
+  'species': [1, 2],
+  'scaling_factors': [1.0, 1.0, 1.0],
+  'positions': [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]]}}
+
 def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
@@ -48,215 +104,30 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         nx = 1
         ny = 1
         nz = 1
+    elif isinstance(repetitions, int):
+        nx = repetitions
+        ny = repetitions
+        nz = repetitions
     else:
         nx = repetitions[0]
         ny = repetitions[1]
         nz = repetitions[2]
 
-    #if noise > 0.1:
-    #    warnings.warn("Value of noise is rather high. Atom positions might overlap")
-    if structure == 'sc':
-
-        coord_no = 1
-        atomtype = [1,]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = 1.
-        zfact = 1.
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-
-
-    elif structure == 'bcc':
-
-        coord_no = 2
-        atomtype = [1, 1]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = 1.
-        zfact = 1.
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-        unitcellx[1] = 0.5*lattice_constant
-        unitcelly[1] = 0.5*lattice_constant
-        unitcellz[1] = 0.5*lattice_constant
-
-
-    elif structure == 'fcc':
-
-        coord_no = 4
-        atomtype = [1, 1, 1, 1]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = 1.
-        zfact = 1.
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-        unitcellx[1] = 0.5*lattice_constant
-        unitcellz[1] = 0.5*lattice_constant
-        unitcelly[2] = 0.5*lattice_constant
-        unitcellz[2] = 0.5*lattice_constant
-        unitcellx[3] = 0.5*lattice_constant
-        unitcelly[3] = 0.5*lattice_constant
-
-    elif structure == 'hcp':
-
-        coord_no = 4
-        atomtype = [1, 1, 1, 1]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = np.sqrt(3)
-        zfact = ca_ratio
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-        unitcellx[1] = 0.5*lattice_constant
-        unitcelly[1] = 0.5*lattice_constant*yfact
-        unitcellx[2] = 0.5*lattice_constant
-        unitcelly[2] = lattice_constant*(1.0/6.0)*yfact
-        unitcellz[2] = 0.5*lattice_constant*zfact
-        unitcelly[3] = 2.0*lattice_constant*(1.0/yfact)
-        unitcellz[3] = 0.5*lattice_constant*zfact
-
-    elif structure == 'diamond':
-
-        coord_no = 8
-        atomtype = [1, 1, 1, 1, 1, 1, 1, 1]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = 1.
-        zfact = 1.
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-        unitcellx[1]=0.25*lattice_constant
-        unitcelly[1]=0.25*lattice_constant
-        unitcellz[1]=0.25*lattice_constant
-        unitcellx[2]=0.50*lattice_constant
-        unitcelly[2]=0.50*lattice_constant
-        unitcellz[2]=0.00*lattice_constant
-        unitcellx[3]=0.75*lattice_constant
-        unitcelly[3]=0.75*lattice_constant
-        unitcellz[3]=0.25*lattice_constant
-        unitcellx[4]=0.50*lattice_constant
-        unitcelly[4]=0.00*lattice_constant
-        unitcellz[4]=0.50*lattice_constant
-        unitcellx[5]=0.00*lattice_constant
-        unitcelly[5]=0.50*lattice_constant
-        unitcellz[5]=0.50*lattice_constant
-        unitcellx[6]=0.75*lattice_constant
-        unitcelly[6]=0.25*lattice_constant
-        unitcellz[6]=0.75*lattice_constant
-        unitcellx[7]=0.25*lattice_constant
-        unitcelly[7]=0.75*lattice_constant
-        unitcellz[7]=0.75*lattice_constant
-
-    elif structure == 'a15':
-
-        coord_no = 8
-        atomtype = [1, 1, 1, 1, 1, 1, 1, 1]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = 1.
-        zfact = 1.
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-        unitcellx[1] = 0.50*lattice_constant
-        unitcelly[1] = 0.50*lattice_constant
-        unitcellz[1] = 0.50*lattice_constant
-        unitcellx[2] = 0.25*lattice_constant
-        unitcelly[2] = 0.50*lattice_constant
-        unitcellz[2] = 0.00*lattice_constant
-        unitcellx[3] = 0.75*lattice_constant
-        unitcelly[3] = 0.50*lattice_constant
-        unitcellz[3] = 0.00*lattice_constant
-        unitcellx[4] = 0.00*lattice_constant
-        unitcelly[4] = 0.25*lattice_constant
-        unitcellz[4] = 0.50*lattice_constant
-        unitcellx[5] = 0.00*lattice_constant
-        unitcelly[5] = 0.75*lattice_constant
-        unitcellz[5] = 0.50*lattice_constant
-        unitcellx[6] = 0.50*lattice_constant
-        unitcelly[6] = 0.00*lattice_constant
-        unitcellz[6] = 0.25*lattice_constant
-        unitcellx[7] = 0.50*lattice_constant
-        unitcelly[7] = 0.00*lattice_constant
-        unitcellz[7] = 0.75*lattice_constant
-
-
-    elif structure == 'l12':
-
-        coord_no = 4
-        atomtype = [1, 2, 2, 2]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = 1.
-        zfact = 1.
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-        unitcellx[1] = 0.5*lattice_constant
-        unitcellz[1] = 0.5*lattice_constant
-        unitcelly[2] = 0.5*lattice_constant
-        unitcellz[2] = 0.5*lattice_constant
-        unitcellx[3] = 0.5*lattice_constant
-        unitcelly[3] = 0.5*lattice_constant
-
-    elif structure == 'b2':
-
-        coord_no = 2
-        atomtype = [1, 2]
-
-        natoms = coord_no*nx*ny*nz
-
-        xfact = 1.
-        yfact = 1.
-        zfact = 1.
-
-        unitcellx = np.zeros(coord_no)
-        unitcelly = np.zeros(coord_no)
-        unitcellz = np.zeros(coord_no)
-        unitcellx[1] = 0.5*lattice_constant
-        unitcelly[1] = 0.5*lattice_constant
-        unitcellz[1] = 0.5*lattice_constant
-
+    if structure in structures.keys():
+        sdict = structures[structure]
     else:
         raise ValueError("Unknown crystal structure")
 
     m = 0
     co = 1
+    natoms = sdict["natoms"]*nx*ny*nz
     positions = []
     types = []
     ids = []
 
-    xh = nx*lattice_constant*xfact
-    yh = ny*lattice_constant*yfact
-    zh = nz*lattice_constant*zfact
+    xh = nx*lattice_constant*sdict["scaling_factors"][0]
+    yh = ny*lattice_constant*sdict["scaling_factors"][1]
+    zh = nz*lattice_constant*sdict["scaling_factors"][2]
     box = [[xh, 0, 0], [0, yh, 0], [0, 0, zh]]
 
     #create structure
@@ -265,9 +136,9 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
             for k in range(1, nz+1):
                 for l in range(1, coord_no+1):
                     m += 1
-                    posx = (unitcellx[l-1]+(lattice_constant*xfact*(float(i)-1)))
-                    posy = (unitcelly[l-1]+(lattice_constant*yfact*(float(j)-1)))
-                    posz = (unitcellz[l-1]+(lattice_constant*zfact*(float(k)-1)))
+                    posx = (sdict["positions"][l-1][0]+(lattice_constant*sdict["scaling_factors"][0]*(float(i)-1)))
+                    posy = (sdict["positions"][l-1][1]+(lattice_constant*sdict["scaling_factors"][1]*(float(j)-1)))
+                    posz = (sdict["positions"][l-1][2]+(lattice_constant*sdict["scaling_factors"][2]*(float(k)-1)))
                     if noise > 0:
                         posx = np.random.normal(loc=posx, scale=noise)
                         posy = np.random.normal(loc=posy, scale=noise)
@@ -275,7 +146,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                     
                     positions.append([posx, posy, posz])
                     ids.append(co)
-                    types.append(atomtype[l-1])
+                    types.append(sdict["species"][l-1])
                     co += 1
     atoms = {}
     atoms['positions'] = positions
