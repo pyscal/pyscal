@@ -134,7 +134,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     for i in range(1, nx+1):
         for j in range(1, ny+1):
             for k in range(1, nz+1):
-                for l in range(1, coord_no+1):
+                for l in range(1, sdict["natoms"]+1):
                     m += 1
                     posx = (sdict["positions"][l-1][0]+(lattice_constant*sdict["scaling_factors"][0]*(float(i)-1)))
                     posy = (sdict["positions"][l-1][1]+(lattice_constant*sdict["scaling_factors"][1]*(float(j)-1)))
