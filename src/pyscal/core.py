@@ -21,20 +21,6 @@ from pyscal.formats.ase import convert_snap
 
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
-class AttrClass:
-    def __init__(self, head):
-        self.head = head
-        self.mapdict = {}
-    def __dir__(self):
-        actual_keys = list(self.__dict__.keys())
-        actual_keys.remove('head')
-        actual_keys.remove('mapdict')
-        return list(self.mapdict.keys()) + actual_keys
-    def __getattr__(self, name):
-        if name in self.mapdict.keys():
-            return getattr(self.head, self.mapdict[name])
-        else:
-            raise AttributeError("Attribute not found")
 
 
 class System:
