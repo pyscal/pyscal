@@ -44,6 +44,7 @@ class System:
 
     #overload get methods
     def __getattr__(self, name):
+        ## MOVE TO ATOMS
         if name in self.atoms.keys():
             namesplit = name.split('_')
             if namesplit[-1] == "skipcheck":
@@ -183,6 +184,7 @@ class System:
         """
         Iter over atoms
         """
+        ## MOVE TO ATOMS
         for i in range(len(self.atoms["positions"])):
             if not self.atoms["ghost"][i]:
                 rdict = {}
@@ -202,6 +204,7 @@ class System:
         -------
         None
         """ 
+        ## MOVE TO ATOMS
         if not 'positions' in atoms.keys():
             raise ValueError('positions is a necessary key in atoms')
         nop = len(atoms["positions"])
