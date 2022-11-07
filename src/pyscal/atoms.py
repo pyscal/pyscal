@@ -3,6 +3,9 @@ This file includes the definition of an Atoms class which can be used with
 System
 """
 
+import numpy as np
+import warnings
+
 class AttrSetter:
     def _add_attribute(self, mapdict, head=None):
         """
@@ -146,16 +149,16 @@ class Atoms(dict, AttrSetter):
         return atom_dict
 
     def _delete_atoms(self, indices):
-        del_real = np.sum([1 for x in range(self.ntotal) if not self['ghost'][x]])
-        del_ghost = np.sum([1 for x in range(self.ntotal) if self['ghost'][x]])
+        del_real = np.sum([1 for x in indices if x < self._nreal])
+        del_ghost = np.sum([1 for x in indices if x >= self._nreal])
 
-        for key in self.keys:
-            for index in indices:
+        for key in self.keys():
+            for index in sorted(indices, reverse=True):
                 del self[key][index]
 
         td = len(indices)
-        self._nreal = self.nreal - del_real
-        self._nghost = self.nghost - del_ghost
+        self._nreal = int(self.nreal - del_real)
+        self._nghost = int(self.nghost - del_ghost)
 
 
     def iter_atoms(self):
@@ -163,19 +166,22 @@ class Atoms(dict, AttrSetter):
             atom_dict = {key: self[key][index] for key in self.keys()}
             yield atom_dict
 
-    def _generate_bool_list(ids=None, indices=None, condition=None):
+    def _generate_bool_list(self, ids=None, indices=None, condition=None):
         #necessary checks
         non_nones = sum(x is not None for x in [ids, indices, condition])
         if non_nones > 1:
             raise ValueError("Only one of ids, indices or condition should be provided")
         elif non_nones == 0:
             warnings.warn("No conditions provided, all atoms will be included")
-        
         #generate a list of indices
         if ids is not None:
             if not isinstance(ids, list):
                 ids = [ids]
             indices = [x for x in range(len(self["ids"])) if self["ids"][x] in ids]
+            if len(indices) == 0:
+                raise ValueError("No ids found to delete")
+            if len(indices) != len(ids):
+                warnings.warn("Not all ids were found")
         elif condition is not None:
             indices = [x for x in range(self.nreal) if condition(self._get_natoms(x))]
         elif indices is None:
