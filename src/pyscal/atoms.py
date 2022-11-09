@@ -47,6 +47,12 @@ class Atoms(dict, AttrSetter):
     def __repr__(self):
         dictrepr = dict.__repr__(self)
         return '%s(%s)' % (type(self).__name__, dictrepr)
+
+    def _repr_json(self):
+        #convert to atom base dict
+        disp_atoms = {f"atom {x}": self._get_atoms(x) for x in range(self.natoms)}
+        return disp_atoms
+
         
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
