@@ -15,6 +15,7 @@ import io
 from scipy.special import sph_harm
 import copy
 
+from pyscal.atoms import Atoms
 import pyscal.csystem as pc
 import pyscal.traj_process as ptp
 from pyscal.formats.ase import convert_snap
@@ -39,43 +40,19 @@ class System:
         self.rotinv = [[0,0,0], [0,0,0], [0,0,0]]
         self.boxdims = [0,0,0]
         self.triclinic = 0
-        self._atoms = {}
-        self.atom = AttrClass(self)
-
-    #overload get methods
-    def __getattr__(self, name):
-        ## MOVE TO ATOMS
-        if name in self.atoms.keys():
-            namesplit = name.split('_')
-            if namesplit[-1] == "skipcheck":
-                res = self.atoms[name]
-            else:
-                res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
-            return res            
-        else:
-            namesplit = name.split('_')
-            if namesplit[1] in self.atoms.keys():
-                if namesplit[0] == "unmasked":
-                    name = namesplit[1]
-                    res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if (self.atoms["ghost"][x]==False and self.atoms["mask_1"][x]==False)]
-                    return res
-            raise AttributeError("Attribute %s not found"%name)
+        self._atoms = Atoms()
 
     @property
     def natoms(self):
-        if 'positions' in self.atoms.keys():
-            nop = np.sum([1 for x in range(len(self.atoms["positions"])) if self.atoms["ghost"][x]==False])
-            return nop
-        else:
-            return 0
+        return self.atoms.natoms
 
     @property
     def concentration(self):
-        return self.get_concentration()
+        return self.atoms.composition
 
     @property
     def composition(self):
-        return self.get_concentration()
+        return self.atoms.composition
 
     @property
     def box(self):
@@ -123,39 +100,13 @@ class System:
 
     @property
     def atoms(self):
-        """
-        Atom access
-        """
         return self._atoms
-
+    
     @atoms.setter
     def atoms(self, atoms):
         """
         Set atoms
         """
-        #we need to check atoms and add necessary keys
-        if not 'positions' in atoms.keys():
-            raise ValueError('positions is a necessary key in atoms')
-        nop = len(atoms["positions"])
-        for key, val in atoms.items():
-            if not (len(val)==nop):
-                raise ValueError("All times in the atoms dict should have same length as positions")
-        #now add necessary keys-ids, types, ghost
-        if not 'ids' in atoms.keys():
-            atoms['ids'] = [x+1 for x in range(nop)]
-        if not 'types' in atoms.keys():
-            atoms['types'] = [1 for x in range(nop)]
-        if not 'ghost' in atoms.keys():
-            atoms['ghost'] = [False for x in range(nop)]
-        if not 'mask_1' in atoms.keys():
-            atoms['mask_1'] = [False for x in range(nop)]
-        if not 'mask_2' in atoms.keys():
-            atoms['mask_2'] = [False for x in range(nop)]
-        if not 'condition' in atoms.keys():
-            atoms['condition'] = [True for x in range(nop)]
-        if not 'head' in atoms.keys():
-            atoms['head'] = [x for x in range(nop)]
-
         if(len(atoms['positions']) < 200):
             #we need to estimate a rough idea
             needed_atoms = 200 - len(atoms)
@@ -169,28 +120,7 @@ class System:
             atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False)
 
         self._atoms = atoms
-        #try adding key mapping;
-        self.atom = AttrClass(self)
-        self.atom.mapdict["positions"] = "positions"
-        self.atom.mapdict["ghost"] = "ghost"
-        self.atom.mapdict["ids"] = "ids"
-        self.atom.mapdict["condition"] = "condition"
-        self.atom.mask = AttrClass(self)
-        self.atom.mask.mapdict = {"primary": "mask_1",
-        "secondary": "mask_2"}
 
-    #iterator for atoms
-    def iter_atoms(self):
-        """
-        Iter over atoms
-        """
-        ## MOVE TO ATOMS
-        for i in range(len(self.atoms["positions"])):
-            if not self.atoms["ghost"][i]:
-                rdict = {}
-                for key in self.atoms.keys():
-                    rdict[key] = self.atoms[key][i]
-            yield rdict 
 
     def add_atoms(self, atoms):
         """
@@ -205,41 +135,7 @@ class System:
         None
         """ 
         ## MOVE TO ATOMS
-        if not 'positions' in atoms.keys():
-            raise ValueError('positions is a necessary key in atoms')
-        nop = len(atoms["positions"])
-        for key, val in atoms.items():
-            if not (len(val)==nop):
-                raise ValueError("All times in the atoms dict should have same length as positions")
-        
-        #now add necessary keys-ids, types, ghost
-        maxid = max(self.atoms["ids"])
-        if not 'ids' in atoms.keys():
-            atoms['ids'] = [maxid+x+1 for x in range(nop)]
-        else:
-            for i in atoms['ids']:
-                if i in self.atoms['ids']:
-                    raise ValueError("Atom id already exists, unique ID is required")
-
-        if not 'types' in atoms.keys():
-            atoms['types'] = [1 for x in range(nop)]
-        if not 'ghost' in atoms.keys():
-            atoms['ghost'] = [False for x in range(nop)]
-        if not 'mask_1' in atoms.keys():
-            atoms['mask_1'] = [False for x in range(nop)]
-        if not 'mask_2' in atoms.keys():
-            atoms['mask_2'] = [False for x in range(nop)]
-        if not 'condition' in atoms.keys():
-            atoms['condition'] = [True for x in range(nop)]
-        if not 'head' in atoms.keys():
-            atoms['head'] = [self.natoms+x for x in range(nop)]
-
-        for key in self.atoms.keys():
-            if key in atoms.keys():
-                self.atoms[key] = [*self.atoms[key], *atoms[key]]
-            else:
-                warnings.warn("Key %s is not present, please recalculate"%key)
-
+        self._atoms.add_atoms(atoms)
 
     #def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=True):
         """
@@ -322,12 +218,12 @@ class System:
         if ghost:
             self.ghosts_created = True
 
-        atoms['positions'] = [*atoms['positions'], *positions]
-        atoms['ids'] = [*atoms['ids'], *ids]
-        atoms['ghost'] = [*atoms['ghost'], *ghosts]
-        atoms['head'] = [*atoms['head'], *head]
+        atoms['positions'].extend(positions)
+        atoms['ids'].extend(ids)
+        atoms['ghost'].extend(ghosts)
+        atoms['head'].extend(head)
         for key in datadict.keys():
-            atoms[key] = [*atoms[key], *datadict[key]]
+            atoms[key].extend(datadict[key])
         return atoms
 
     #def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
@@ -409,21 +305,8 @@ class System:
 
         return atoms
     """
-    def apply_mask(self, masks, mask_type='secondary'):
+    def mask(self, mask_type="primary", ids=None, indices=None, condition=None):
         """
-        Apply mask to an atom
-
-        Parameters
-        ----------
-        masks : list of bools
-            list of mask to be applied
-
-        mask_type: string, optional
-            type of mask to be applied, either `primary`, `secondary` or `all`
-
-        Returns
-        -------
-        None
 
         Notes
         -----
@@ -444,19 +327,10 @@ class System:
         The masks for ghost atoms are copied from the corresponding mask for real atoms.
         """
         #check if length of mask is equal to length of real atoms
-        if len(masks) != self.natoms:
-            raise ValueError("Length of masks should be equal to number of atoms in the system")
+        self._atoms.mask(mask_type=mask_type, ids=ids, 
+            indices=indices, condition=condition)
 
-        #apply masks
-        if (mask_type == 'primary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_1"][i] = masks[self.atoms["head"][i]]
-        if (mask_type == 'secondary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_2"][i] = masks[self.atoms["head"][i]]
-
-
-    def remove_mask(self, mask_type='primary'):
+    def unmask(self, mask_type="primary", ids=None, indices=None, condition=None):
         """
         Remove applied masks
 
@@ -469,49 +343,17 @@ class System:
         -------
         None
         """
-        #remove masks
-        if (mask_type == 'primary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_1"][i] = False
-        if (mask_type == 'secondary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_2"][i] = False
+        self._atoms.unmask(mask_type=mask_type, ids=ids, 
+            indices=indices, condition=condition)
 
-    def apply_condition(self, condition):
-        """
-        Apply a condition on atom which will be used for clustering
-
-        Parameters
-        ----------
-        condition : list of bools
-            list of condition to be applied
-
-        Returns
-        -------
-        None
-
-        """
-        if len(condition) != self.natoms:
-            raise ValueError("Length of masks should be equal to number of atoms in the system")
-
-        for i in range(len(self.atoms["positions"])):
-            self.atoms["condition"][i] = condition[self.atoms["head"][i]]
-
-
-    def remove_condition(self):
-        """
-        Remove a condition on atom which will be used for clustering
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-        for i in range(len(self.atoms["positions"])):
-            self.atoms["condition"][i] = True
+    def select(self, ids=None, indices=None, condition=None):
+        self._atoms.select(ids=ids, indices=indices, condition=condition)    
+    
+    def unselect(self, ids=None, indices=None, condition=None):
+        self._atoms.unselect(ids=ids, indices=indices, condition=condition)
+    
+    def delete(self, ids=None, indices=None, condition=None):
+        self._atoms.delete(ids=ids, indices=indices, condition=condition)
 
 
     def embed_in_cubic_box(self, inputbox=None, return_box=False):
@@ -564,29 +406,6 @@ class System:
         else:
             return newbox
 
-    def get_distance(self, pos1, pos2):
-        """
-        Get the distance between two atoms.
-
-        Parameters
-        ----------
-        pos1 : list
-                first atom position
-        pos2 : list
-                second atom position
-
-        Returns
-        -------
-        distance : double
-                distance between the first and second atom.
-
-        Notes
-        -----
-        Periodic boundary conditions are assumed by default.
-        """
-        return pc.get_abs_distance(pos1, pos2, self.triclinic, 
-            self.rot, self.rotinv, self.boxdims, 0.0, 0.0, 0.0)
-
     def get_distance(self, pos1, pos2, vector=False):
         """
         Get the distance between two atoms.
@@ -632,12 +451,7 @@ class System:
         condict : dict
             dict of concentration values
         """
-        typelist = [self.atoms["types"][x] for x in range(len(self.atoms["positions"])) if self.atoms["ghost"][x]==False]
-        types, typecounts = np.unique(typelist, return_counts=True)
-        concdict = {}
-        for c, t in enumerate(types):
-            concdict[str(t)] = typecounts[c]
-        return concdict
+        return self.concentration
 
 
     def read_inputfile(self, filename, format="lammps-dump", 
@@ -696,7 +510,6 @@ class System:
         self.rotinv = [[0,0,0], [0,0,0], [0,0,0]]
         self.boxdims = [0,0,0]
         self.triclinic = 0
-        self._atoms = {}
 
         atoms, box = ptp.read_file(filename, format=format, 
                                     compressed=compressed, customkeys=customkeys,)

@@ -1,6 +1,11 @@
 """
 This file includes the definition of an Atoms class which can be used with
 System
+
+TODO
+----
+- Iterators for masked/unmasked atoms
+- Iterators for selected/unselected atoms
 """
 
 import numpy as np
@@ -149,6 +154,19 @@ class Atoms(dict, AttrSetter):
         for key, val in atoms.items():
             self[key] = val
         self._nreal = len(val)
+
+        #add attributes
+        mapdict = {"positions": "positions",
+        "ids": "ids",
+        "types": "types",
+        "species": "types",
+        "mask": {"primary": "mask_1", "secondary": "mask_2"},
+        "selection": "condition",
+        "condition": "condition",
+        "head": "head"}
+
+        self._add_attribute(mapdict)
+
         
     def _get_atoms(self, index):
         atom_dict = {key: self[key][index] for key in self.keys()}
@@ -239,3 +257,12 @@ class Atoms(dict, AttrSetter):
         delete_list = [masks[self["head"][x]] for x in range(self.ntotal)]
         delete_ids = [x for x in range(self.ntotal) if masks[x]]
         self._delete_atoms(delete_ids)
+
+    @property
+    def composition(self):
+        typelist = self["types"][:self.nreal]
+        types, typecounts = np.unique(typelist, return_counts=True)
+        concdict = {str(t): typecounts[c] for c, t in enumerate(types)}
+        return concdict
+
+    
