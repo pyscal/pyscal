@@ -15,7 +15,7 @@ import io
 from scipy.special import sph_harm
 import copy
 
-from pyscal.atoms import Atoms
+from pyscal.atoms import Atoms, AttrSetter
 import pyscal.csystem as pc
 import pyscal.traj_process as ptp
 from pyscal.formats.ase import convert_snap
@@ -618,20 +618,21 @@ class System:
         self.neighbors_found = False
 
         
-        self.atom.neighbors = AttrClass(self)
-        self.atom.neighbors.mapdict["index"] = "neighbors"
-        self.atom.neighbors.mapdict["distance"] = "neighbordist"
-        self.atom.neighbors.mapdict["weight"] = "neighborweight"
-        self.atom.neighbors.mapdict["displacement"] = "diff"
-        self.atom.neighbors.mapdict["cutoff"] = "cutoff"
+        mapdict = {}
+        mapdict["neighbors"] = {}
+        mapdict["neighbors"]["index"] = "neighbors"
+        mapdict["neighbors"]["distance"] = "neighbordist"
+        mapdict["neighbors"]["weight"] = "neighborweight"
+        mapdict["neighbors"]["displacement"] = "diff"
+        mapdict["neighbors"]["cutoff"] = "cutoff"
 
-        self.atom.neighbors.angle = AttrClass(self)
-        self.atom.neighbors.angle.mapdict["polar"] = "theta"
-        self.atom.neighbors.angle.mapdict["azimuthal"] = "phi"
+        mapdict["neighbors"]["angle"] = {}
+        mapdict["neighbors"]["angle"]["polar"] = "theta"
+        mapdict["neighbors"]["angle"]["azimuthal"] = "phi"
 
-        self.atom.neighbors.temporary = AttrClass(self)
-        self.atom.neighbors.temporary.mapdict["index"] = "temp_neighbors"
-        self.atom.neighbors.temporary.mapdict["distance"] = "temp_neighbordist"
+        mapdict["neighbors"]["temporary"] = {}
+        mapdict["neighbors"]["temporary"]["index"] = "temp_neighbors"
+        mapdict["neighbors"]["temporary"]["distance"] = "temp_neighbordist"
 
 
     def _check_neighbors(self):
@@ -663,7 +664,7 @@ class System:
         if not key in self.atoms.keys():
             raise KeyError("required property not found!")
 
-        test = self.atoms[key][0]
+        test = gettattr(self.atoms, key)[0]
 
         if isinstance(test, list):
             raise TypeError("Averaging can only be done over 1D quantities")

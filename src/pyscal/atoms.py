@@ -26,6 +26,7 @@ class AttrSetter:
                 getattr(self, key)._add_attribute(val, head=head)
             elif val in head.keys():
                 setattr(self, key, self._filter_ghost(head, val))
+                setattr(self, f"_all_{key}", head[val])
     
     def _filter_ghost(self, head, val):
         return head[val][:head.natoms]             
