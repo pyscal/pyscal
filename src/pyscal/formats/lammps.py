@@ -290,12 +290,12 @@ def write_snap(sys, outfile, compressed = False,
 
     dump.write(title_str)
 
-    for cc, pos in enumerate(sys.positions):
+    for cc, pos in enumerate(sys.atoms.positions):
         if len(customkeys) > 0:
             cval_atom = " ".join(np.array(list(cvals[cc])).astype(str))
-            atomline = ("%d %d %f %f %f %s\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2], cval_atom)
+            atomline = ("%d %d %f %f %f %s\n")%(sys.atoms.ids[cc], sys.atoms.types[cc], pos[0], pos[1], pos[2], cval_atom)
         else:
-            atomline = ("%d %d %f %f %f\n")%(sys.atoms['ids'][cc], sys.atoms['types'][cc], pos[0], pos[1], pos[2])
+            atomline = ("%d %d %f %f %f\n")%(sys.atoms.ids[cc], sys.atoms.types[cc], pos[0], pos[1], pos[2])
 
         dump.write(atomline)
 

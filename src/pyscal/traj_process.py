@@ -16,7 +16,7 @@ import pyscal.formats.ase as ptase
 import pyscal.formats.lammps as ptlammps
 import pyscal.formats.mdtraj as ptmdtraj
 import pyscal.formats.vasp as ptvasp
-
+import pyscal.atoms as patoms
 
 def read_file(filename, format="lammps-dump",
     compressed = False, customkeys=None):
@@ -64,7 +64,9 @@ def read_file(filename, format="lammps-dump",
         except:
             raise TypeError("format recieved an unknown option %s"%format)
 
-    return atoms, box       
+    pyscal_atoms = patoms.Atoms()
+    pyscal_atoms.from_dict(atoms)
+    return pyscal_atoms, box       
 
 def write_file(sys, outfile, format="lammps-dump", compressed = False, 
     customkeys=None, customvals=None, timestep=0, species=None):

@@ -4,6 +4,7 @@ pyscal module for creating crystal structures.
 
 import numpy as np
 import warnings
+from pyscal.atoms import Atoms
 
 structures = {'simple_cubic': {'natoms': 1,
   'species': [1],
@@ -153,5 +154,6 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     atoms['ids'] = ids
     atoms['types'] = types
     atoms['ghost'] = [False for x in range(len(types))]
-
-    return atoms, box
+    patoms = Atoms()
+    patoms.from_dict(atoms)
+    return patoms, box
