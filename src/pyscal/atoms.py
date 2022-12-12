@@ -10,27 +10,10 @@ TODO
 
 import numpy as np
 import warnings
+from pyscal.attributes import generate_class
 
-class AttrSetter:
-    def _add_attribute(self, mapdict, head=None):
-        """
-        Add mapping of attributes 
-        """
-        if head is None:
-            head = self
-        for key, val in mapdict.items():
-            #here nesting is needed
-            if isinstance(val, dict):
-                #we have to create a nested class
-                setattr(self, key, AttrSetter())
-                getattr(self, key)._add_attribute(val, head=head)
-            elif val in head.keys():
-                setattr(self, key, self._filter_ghost(head, val))
-                setattr(self, f"_all_{key}", head[val])
-    
-    def _filter_ghost(self, head, val):
-        return head[val][:head.natoms]             
-                
+AttrSetter = generate_class()
+
 class Atoms(dict, AttrSetter):
     def __init__(self, *args, **kwargs):
         self.update(*args, **kwargs)

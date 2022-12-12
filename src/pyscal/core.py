@@ -634,6 +634,7 @@ class System:
         mapdict["neighbors"]["temporary"]["index"] = "temp_neighbors"
         mapdict["neighbors"]["temporary"]["distance"] = "temp_neighbordist"
 
+        self.atoms._add_attribute(mapdict)
 
     def _check_neighbors(self):
         """
@@ -670,12 +671,12 @@ class System:
             raise TypeError("Averaging can only be done over 1D quantities")
 
         avgarr = []
-        for i in range(len(self.atoms["positions"])):
+        for i in range(len(self.atoms._all_positions)):
             arr = []
             if include_self:
-                arr.append(self.atoms[key][i])
-            for j in self.atoms["neighbors"][i]:
-                arr.append(self.atoms[key][j])
+                arr.append(gettattr(self.atoms, key)[i])
+            for j in self.atoms._all_neighbors[i]:
+                arr.append(gettattr(self.atoms, key)[j])
             avgarr.append(np.mean(arr))
         
         return avgarr 
@@ -789,7 +790,7 @@ class System:
             raise ValueError("value of threshold should be at least 1.00")
 
         if cells is None:
-            cells = (len(self.positions) > 250)
+            cells = (self.natoms > 250)
 
         if method == 'cutoff':            
             if cutoff=='sann':    
@@ -849,8 +850,8 @@ class System:
 
             #now clean up
             else:
-                real_atomdict = {"positions":copy.copy(self.positions), 
-                 "ghost":copy.copy(self.ghost)}
+                real_atomdict = {"positions":copy.copy(self.atoms._all_positions), 
+                 "ghost":copy.copy(self.atoms._all_ghost)}
                 #we need to call the method
                 #this means alles good
                 if self.actual_box is None:
