@@ -897,17 +897,19 @@ class System:
                 #self.atoms["vertex_positions_unique_skipcheck"] = unique_vertices
 
             #assign extra options
-            self.atom.voronoi = AttrClass(self)
-            self.atom.voronoi.mapdict["volume"] = "voronoi_volume"
-            self.atom.voronoi.face = AttrClass(self)
-            self.atom.voronoi.face.mapdict["vertices"] = "face_vertices"
-            self.atom.voronoi.face.mapdict["perimeters"] = "face_perimeters"
-            self.atom.voronoi.vertex = AttrClass(self)
-            self.atom.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
-            self.atom.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
-            self.atom.voronoi.vertex.mapdict["positions"] = "vertex_positions"
-            self.atom.voronoi.vertex.mapdict["unique_positions"] = "vertex_positions_unique_skipcheck"
-        
+            mapdict = {}
+            mapdict["voronoi"] = {}
+            mapdict["voronoi"]["volume"] = "voronoi_volume"
+            mapdict["voronoi"]["face"] = {}
+            mapdict["voronoi"]["face"]["vertices"] = "face_vertices"
+            mapdict["voronoi"]["face"]["perimeters"] = "face_perimeters"
+            mapdict["voronoi"]["vertex"] = {}
+            mapdict["voronoi"]["vertex"]["vectors"] = "vertex_vectors"
+            mapdict["voronoi"]["vertex"]["numbers"] = "vertex_numbers"
+            mapdict["voronoi"]["vertex"]["positions"] = "vertex_positions"
+            mapdict["voronoi"]["vertex"]["unique_positions"] = "vertex_positions_unique_skipcheck"
+            self.atoms._add_attribute(mapdict)
+
         self.neighbors_found = True
 
     def calculate_q(self, q, averaged=False, continuous_algorithm=False):
@@ -974,17 +976,18 @@ class System:
         for val in qq:
             pc.calculate_q_single(self.atoms, val)
   
-
-        self.atom.steinhardt = AttrClass(self)
-        self.atom.steinhardt.generic = AttrClass(self)
+        mapdict = {}
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["generic"] = {}
         for val in qq:
             key1a = "q%d_norm"%val
             key1b = "q%d"%val
             key2 = "q%d_real"%val
             key3 = "q%d_imag"%val
-            self.atom.steinhardt.generic.mapdict[key1a] = key1b
-            self.atom.steinhardt.generic.mapdict[key2] = key2
-            self.atom.steinhardt.generic.mapdict[key3] = key3
+            mapdict["steinhardt"]["generic"][key1a] = key1b
+            mapdict["steinhardt"]["generic"][key2] = key2
+            mapdict["steinhardt"]["generic"][key3] = key3
+        self.atoms._add_attribute(mapdict)
 
 
     def _calculate_aq(self, qq):
@@ -1011,6 +1014,7 @@ class System:
         for val in qq:
             pc.calculate_aq_single(self.atoms, val)
 
+        mapdict = {}
         self.atom.steinhardt.average = AttrClass(self)
         for val in qq:
             key1a = "q%d_norm"%val

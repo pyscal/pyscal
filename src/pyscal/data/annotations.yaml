@@ -1,0 +1,21 @@
+positions:
+  doc: The positions of an atom in three dimensions in Cartesian coordinates.
+ids:
+  doc: A unique number which is used as an identifier for an atom. 
+types:
+  doc: An integer indicating the chemical species of an atom. Unique for each chemical species.
+species:
+  doc: An integer indicating the chemical species of an atom. Unique for each chemical species.
+mask:
+  doc: Masking for atoms
+  is_nested: True
+  primary:
+    doc: Mask of an atom
+  secondary:
+    doc: Mask of an atom
+selection:
+  doc: Selection
+condition:
+  doc: Condition
+head:
+  doc: Head

@@ -4,63 +4,12 @@ pyscal module for creating crystal structures.
 
 import numpy as np
 import warnings
-from pyscal.atoms import Atoms
+import os
 
-structures = {'simple_cubic': {'natoms': 1,
-  'species': [1],
-  'scaling_factors': [1.0, 1.0, 1.0],
-  'positions': [[0.0, 0.0, 0.0]]},
- 'bcc': {'natoms': 2,
-  'species': [1, 1],
-  'scaling_factors': [1.0, 1.0, 1.0],
-  'positions': [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]]},
- 'fcc': {'natoms': 4,
-  'species': [1, 1, 1, 1],
-  'scaling_factors': [1.0, 1.0, 1.0],
-  'positions': [[0.0, 0.0, 0.0],
-   [0.5, 0.0, 0.5],
-   [0.0, 0.5, 0.5],
-   [0.5, 0.5, 0.0]]},
- 'hcp': {'natoms': 4,
-  'species': [1, 1, 1, 1],
-  'scaling_factors': [1.0, 1.7320508075688772, 1.633],
-  'positions': [[0.0, 0.0, 0.0],
-   [0.5, 0.8660254037844386, 0.0],
-   [0.5, 0.28867513459481287, 0.8165],
-   [0.0, 1.1547005383792517, 0.8165]]},
- 'diamond': {'natoms': 8,
-  'species': [1, 1, 1, 1, 1, 1, 1, 1],
-  'scaling_factors': [1.0, 1.0, 1.0],
-  'positions': [[0.0, 0.0, 0.0],
-   [0.25, 0.25, 0.25],
-   [0.5, 0.5, 0.0],
-   [0.75, 0.75, 0.25],
-   [0.5, 0.0, 0.5],
-   [0.0, 0.5, 0.5],
-   [0.75, 0.25, 0.75],
-   [0.25, 0.75, 0.75]]},
- 'a15': {'natoms': 8,
-  'species': [1, 1, 1, 1, 1, 1, 1, 1],
-  'scaling_factors': [1.0, 1.0, 1.0],
-  'positions': [[0.0, 0.0, 0.0],
-   [0.5, 0.5, 0.5],
-   [0.25, 0.5, 0.0],
-   [0.75, 0.5, 0.0],
-   [0.0, 0.25, 0.5],
-   [0.0, 0.75, 0.5],
-   [0.5, 0.0, 0.25],
-   [0.5, 0.0, 0.75]]},
- 'l12': {'natoms': 4,
-  'species': [1, 2, 2, 2],
-  'scaling_factors': [1.0, 1.0, 1.0],
-  'positions': [[0.0, 0.0, 0.0],
-   [0.5, 0.0, 0.5],
-   [0.0, 0.5, 0.5],
-   [0.5, 0.5, 0.0]]},
- 'b2': {'natoms': 2,
-  'species': [1, 2],
-  'scaling_factors': [1.0, 1.0, 1.0],
-  'positions': [[0.0, 0.0, 0.0], [0.5, 0.5, 0.5]]}}
+from pyscal.atoms import Atoms
+from pyscal.attributes import read_yaml
+
+structures = read_yaml(os.path.join(os.path.dirname(__file__), "data/structure_data.yaml"))
 
 def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
     """
@@ -154,6 +103,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     atoms['ids'] = ids
     atoms['types'] = types
     atoms['ghost'] = [False for x in range(len(types))]
+
     patoms = Atoms()
     patoms.from_dict(atoms)
     return patoms, box

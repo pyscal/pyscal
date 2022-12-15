@@ -10,9 +10,10 @@ TODO
 
 import numpy as np
 import warnings
-from pyscal.attributes import generate_class
+import os
+from pyscal.attributes import generate_class, read_yaml
 
-AttrSetter = generate_class()
+AttrSetter = generate_class(read_yaml(os.path.join(os.path.dirname(__file__), "data/annotations.yaml")))
 
 class Atoms(dict, AttrSetter):
     def __init__(self, *args, **kwargs):
@@ -209,12 +210,12 @@ class Atoms(dict, AttrSetter):
             for i in range(self.ntotal):
                 self["mask_2"][i] = masks[self["head"][i]]
 
-    def mask(self, mask_type="primary", ids=None, indices=None, condition=None):
+    def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None):
         masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
         self._apply_mask(masks, mask_type)
 
 
-    def unmask(self, mask="primary", ids=None, indices=None, condition=None):
+    def remove_mask(self, mask="primary", ids=None, indices=None, condition=None):
         masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
         masks = [not x for x in masks]
         self._apply_mask(masks, mask_type)
@@ -223,11 +224,11 @@ class Atoms(dict, AttrSetter):
         for i in range(self.ntotal):
             self["condition"][i] = condition[self["head"][i]]
         
-    def select(self, ids=None, indices=None, condition=None):
+    def apply_selection(self, ids=None, indices=None, condition=None):
         masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
         self._apply_selection(masks)
     
-    def unselect(self, ids=None, indices=None, condition=None):
+    def remove_selection(self, ids=None, indices=None, condition=None):
         masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
         masks = [not x for x in masks]
         self._apply_selection(masks)

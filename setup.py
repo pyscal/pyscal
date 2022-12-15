@@ -53,5 +53,7 @@ setup(
     install_requires=['numpy', 'ase', 'plotly', 'ipywidgets'],
     classifiers=[
         'Programming Language :: Python :: 3'
-    ]
+    ],
+    include_package_data=True,
+    #package_data={'': ['*.yaml']},
 )
