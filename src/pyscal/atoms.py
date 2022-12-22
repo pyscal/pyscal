@@ -11,17 +11,23 @@ TODO
 import numpy as np
 import warnings
 import os
-from pyscal.attributes import generate_class, read_yaml
+from pyscal.attributes import AttrSetter, read_yaml, MyList
 
-AttrSetter = generate_class(read_yaml(os.path.join(os.path.dirname(__file__), "data/annotations.yaml")))
+attr_docs = read_yaml(os.path.join(os.path.dirname(__file__), "data/annotations.yaml"))
 
 class Atoms(dict, AttrSetter):
     def __init__(self, *args, **kwargs):
         self.update(*args, **kwargs)
         self._nreal = 0
         self._nghost = 0
-        
+        AttrSetter.__init__(self)
     
+    def __dir__(self):
+        attrs = ["natoms", "nreal", "nghost", 
+        "ntotal", "from_dict", "iter_atoms", "apply_mask", "remove_mask",
+        "apply_selection", "remove_selection", "delete", "composition"]
+        return attrs + list(self._map_dict.keys())
+
     def __getitem__(self, key):
         if isinstance(key, slice):
             return self._get_atoms(key)
@@ -32,7 +38,7 @@ class Atoms(dict, AttrSetter):
             return val
 
     def __setitem__(self, key, val):
-        dict.__setitem__(self, key, val)
+        dict.__setitem__(self, key, MyList(val))
 
     def __repr__(self):
         dictrepr = dict.__repr__(self)
@@ -42,7 +48,6 @@ class Atoms(dict, AttrSetter):
         #convert to atom base dict
         disp_atoms = {f"atom {x}": self._get_atoms(x) for x in range(self.natoms)}
         return disp_atoms
-
         
     def update(self, *args, **kwargs):
         for k, v in dict(*args, **kwargs).items():
@@ -99,7 +104,9 @@ class Atoms(dict, AttrSetter):
             return self
         else:
             return self.__add__(atoms)
-    
+
+    #def _add_attribute()
+      
     @property
     def natoms(self):
         return self._nreal
@@ -137,7 +144,7 @@ class Atoms(dict, AttrSetter):
             atoms['head'] = [x for x in range(nop)]
         
         for key, val in atoms.items():
-            self[key] = val
+            self[key] = MyList(val)
         self._nreal = len(val)
 
         #add attributes
@@ -175,15 +182,17 @@ class Atoms(dict, AttrSetter):
             atom_dict = {key: self[key][index] for key in self.keys()}
             yield atom_dict
 
-    def _generate_bool_list(self, ids=None, indices=None, condition=None):
+    def _generate_bool_list(self, ids=None, indices=None, condition=None, selection=False):
         #necessary checks
         non_nones = sum(x is not None for x in [ids, indices, condition])
         if non_nones > 1:
             raise ValueError("Only one of ids, indices or condition should be provided")
-        elif non_nones == 0:
+        elif ((non_nones == 0) and (selection==False)):
             warnings.warn("No conditions provided, all atoms will be included")
         #generate a list of indices
-        if ids is not None:
+        if selection:
+            indices = [x for x in range(self.nreal) if self["condition"][x]]
+        elif ids is not None:
             if not isinstance(ids, list):
                 ids = [ids]
             indices = [x for x in range(len(self["ids"])) if self["ids"][x] in ids]
@@ -233,12 +242,12 @@ class Atoms(dict, AttrSetter):
         masks = [not x for x in masks]
         self._apply_selection(masks)
 
-    def delete(self, ids=None, indices=None, condition=None):
+    def delete(self, ids=None, indices=None, condition=None, selection=False):
         #delete atoms
         #reassign ids
         #reassign indices
         #reassign heads
-        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
+        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition, selection=selection)
         delete_list = [masks[self["head"][x]] for x in range(self.ntotal)]
         delete_ids = [x for x in range(self.ntotal) if masks[x]]
         self._delete_atoms(delete_ids)

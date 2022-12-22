@@ -11,7 +11,7 @@ def test_system_init():
 	sys.box = box
 	sys.atoms = atoms
 	sys.find_neighbors(method="cutoff", cutoff=3.6)
-	a1 = np.array(sys.neighbordist[0])
+	a1 = np.array(sys.atoms.neighbors.distance)
 	a2 = np.array([2.708061437633939,
  3.127,
  3.126999999999999,

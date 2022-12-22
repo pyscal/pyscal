@@ -13,5 +13,4 @@ def test_angular():
     sys.find_neighbors(method = 'cutoff', cutoff=0)
     sys.calculate_angularcriteria()
 
-    assert np.round(np.mean(np.array(sys.angular)), decimals=2) == 0.00
-    assert np.round(np.mean(np.array(sys.atom.angular_parameters.diamond_angle)), decimals=2) == 0.00
+    assert np.round(np.mean(np.array(sys.atoms.angular_parameters.diamond_angle)), decimals=2) == 0.00

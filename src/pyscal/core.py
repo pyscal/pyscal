@@ -346,14 +346,14 @@ class System:
         self._atoms.unmask(mask_type=mask_type, ids=ids, 
             indices=indices, condition=condition)
 
-    def select(self, ids=None, indices=None, condition=None):
-        self._atoms.select(ids=ids, indices=indices, condition=condition)    
+    def apply_selection(self, ids=None, indices=None, condition=None):
+        self._atoms.apply_selection(ids=ids, indices=indices, condition=condition)    
     
-    def unselect(self, ids=None, indices=None, condition=None):
-        self._atoms.unselect(ids=ids, indices=indices, condition=condition)
+    def remove_selection(self, ids=None, indices=None, condition=None):
+        self._atoms.remove_selection(ids=ids, indices=indices, condition=condition)
     
-    def delete(self, ids=None, indices=None, condition=None):
-        self._atoms.delete(ids=ids, indices=indices, condition=condition)
+    def delete(self, ids=None, indices=None, condition=None, selection=False):
+        self._atoms.delete(ids=ids, indices=indices, condition=condition, selection=selection)
 
 
     def embed_in_cubic_box(self, inputbox=None, return_box=False):
@@ -618,23 +618,23 @@ class System:
         self.neighbors_found = False
 
         
-        mapdict = {}
-        mapdict["neighbors"] = {}
-        mapdict["neighbors"]["index"] = "neighbors"
-        mapdict["neighbors"]["distance"] = "neighbordist"
-        mapdict["neighbors"]["weight"] = "neighborweight"
-        mapdict["neighbors"]["displacement"] = "diff"
-        mapdict["neighbors"]["cutoff"] = "cutoff"
+        #mapdict = {}
+        #mapdict["neighbors"] = {}
+        #mapdict["neighbors"]["index"] = "neighbors"
+        #mapdict["neighbors"]["distance"] = "neighbordist"
+        #mapdict["neighbors"]["weight"] = "neighborweight"
+        #mapdict["neighbors"]["displacement"] = "diff"
+        #mapdict["neighbors"]["cutoff"] = "cutoff"
 
-        mapdict["neighbors"]["angle"] = {}
-        mapdict["neighbors"]["angle"]["polar"] = "theta"
-        mapdict["neighbors"]["angle"]["azimuthal"] = "phi"
+        #mapdict["neighbors"]["angle"] = {}
+        #mapdict["neighbors"]["angle"]["polar"] = "theta"
+        #mapdict["neighbors"]["angle"]["azimuthal"] = "phi"
 
-        mapdict["neighbors"]["temporary"] = {}
-        mapdict["neighbors"]["temporary"]["index"] = "temp_neighbors"
-        mapdict["neighbors"]["temporary"]["distance"] = "temp_neighbordist"
+        #mapdict["neighbors"]["temporary"] = {}
+        #mapdict["neighbors"]["temporary"]["index"] = "temp_neighbors"
+        #mapdict["neighbors"]["temporary"]["distance"] = "temp_neighbordist"
 
-        self.atoms._add_attribute(mapdict)
+        #self.atoms._add_attribute(mapdict)
 
     def _check_neighbors(self):
         """
@@ -897,18 +897,18 @@ class System:
                 #self.atoms["vertex_positions_unique_skipcheck"] = unique_vertices
 
             #assign extra options
-            mapdict = {}
-            mapdict["voronoi"] = {}
-            mapdict["voronoi"]["volume"] = "voronoi_volume"
-            mapdict["voronoi"]["face"] = {}
-            mapdict["voronoi"]["face"]["vertices"] = "face_vertices"
-            mapdict["voronoi"]["face"]["perimeters"] = "face_perimeters"
-            mapdict["voronoi"]["vertex"] = {}
-            mapdict["voronoi"]["vertex"]["vectors"] = "vertex_vectors"
-            mapdict["voronoi"]["vertex"]["numbers"] = "vertex_numbers"
-            mapdict["voronoi"]["vertex"]["positions"] = "vertex_positions"
-            mapdict["voronoi"]["vertex"]["unique_positions"] = "vertex_positions_unique_skipcheck"
-            self.atoms._add_attribute(mapdict)
+            #mapdict = {}
+            #mapdict["voronoi"] = {}
+            #mapdict["voronoi"]["volume"] = "voronoi_volume"
+            #mapdict["voronoi"]["face"] = {}
+            #mapdict["voronoi"]["face"]["vertices"] = "face_vertices"
+            #mapdict["voronoi"]["face"]["perimeters"] = "face_perimeters"
+            #mapdict["voronoi"]["vertex"] = {}
+            #mapdict["voronoi"]["vertex"]["vectors"] = "vertex_vectors"
+            #mapdict["voronoi"]["vertex"]["numbers"] = "vertex_numbers"
+            #mapdict["voronoi"]["vertex"]["positions"] = "vertex_positions"
+            #mapdict["voronoi"]["vertex"]["unique_positions"] = "vertex_positions_unique_skipcheck"
+            #self.atoms._add_attribute(mapdict)
 
         self.neighbors_found = True
 
@@ -1015,17 +1015,17 @@ class System:
             pc.calculate_aq_single(self.atoms, val)
 
         mapdict = {}
-        self.atom.steinhardt.average = AttrClass(self)
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["average"] = {}
         for val in qq:
             key1a = "q%d_norm"%val
             key1b = "q%d"%val
             key2 = "q%d_real"%val
             key3 = "q%d_imag"%val
-            self.atom.steinhardt.average.mapdict[key1a] = key1b
-            self.atom.steinhardt.average.mapdict[key2] = key2
-            self.atom.steinhardt.average.mapdict[key3] = key3
-
-
+            mapdict["steinhardt"]["average"][key1a] = key1b
+            mapdict["steinhardt"]["average"][key2] = key2
+            mapdict["steinhardt"]["average"][key3] = key3
+        self.atoms._add_attribute(mapdict)
 
     def calculate_disorder(self, averaged=False, q=6):
         """
@@ -1077,14 +1077,17 @@ class System:
 
         pc.calculate_disorder(self.atoms, q)
 
-        self.atom.steinhardt.disorder = AttrClass(self)
-        self.atom.steinhardt.disorder.mapdict["norm"] = "disorder"
+        mapdict = {}
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["disorder"] = {}
+        mapdict["steinhardt"]["disorder"]["norm"] = "disorder"
 
         if averaged:
             #average the disorder
             avg_arr = self.average_over_neighbors("disorder")
             self.atoms["avg_disorder"] = avg_arr
-            self.atom.steinhardt.disorder.mapdict["average"] = "avg_disorder"
+            mapdict["steinhardt"]["disorder"]["average"] = "avg_disorder"
+        self.atoms._add_attribute(mapdict)
 
 
     def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, 
@@ -1199,12 +1202,15 @@ class System:
             threshold, avgthreshold, bonds, 
             compare_criteria, criteria)
 
-        self.atom.steinhardt.order = AttrClass(self)
-        self.atom.steinhardt.order.mapdict["bonds"] = "bonds"
-        self.atom.steinhardt.order.sij = AttrClass(self)
-        self.atom.steinhardt.order.sij.mapdict["norm"] = "sij"
-        self.atom.steinhardt.order.sij.mapdict["average"] = "avg_sij"
-        self.atom.steinhardt.order.mapdict["solid"] = "solid"
+        mapdict = {}
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["order"] = {}
+        mapdict["steinhardt"]["order"]["bonds"] = "bonds"
+        mapdict["steinhardt"]["order"]["sij"] = {}
+        mapdict["steinhardt"]["order"]["sij"]["norm"] = "sij"
+        mapdict["steinhardt"]["order"]["sij"]["average"] = "avg_sij"
+        mapdict["steinhardt"]["order"]["sij"]["solid"] = "solid"
+        self.atoms._add_attribute(mapdict)
         
         if cluster:
             lc = self.cluster_atoms(self.solid, largest=True)
@@ -1232,8 +1238,13 @@ class System:
         largest_cluster_size = xxcounts[arg]
         largest_cluster_id = xx[arg]
 
+
         self.atoms["largest_cluster"] = [True if self.atoms["cluster"][x]==largest_cluster_id else False for x in range(len(self.atoms["cluster"]))]
-        self.atom.cluster.mapdict["largest"] = "largest_cluster"
+        
+        mapdict = {}
+        mapdict["cluster"] = {}
+        mapdict["cluster"]["largest"] = "largest_cluster"
+        self.atoms._add_attribute(mapdict)
 
         return largest_cluster_size
 
@@ -1270,8 +1281,10 @@ class System:
         self.apply_condition(condition)
         pc.find_clusters(self.atoms, cutoff)
 
-        self.atom.cluster = AttrClass(self)
-        self.atom.cluster.mapdict["id"] = "cluster"
+        mapdict = {}
+        mapdict["cluster"] = {}
+        mapdict["cluster"]["id"] = "cluster"
+        self.atoms._add_attribute(mapdict)
 
         #done!
         lc = self.find_largest_cluster()
@@ -1384,12 +1397,10 @@ class System:
 
         self.atoms["angular"] = angulars
         
-        try:
-            self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
-        except AttributeError:
-            self.atom.angular_parameters = AttrClass(self)
-            self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
-        
+        mapdict = {}
+        mapdict["angular_parameters"] = {}
+        mapdict["angular_parameters"]["diamond_angle"] = "angular"
+        self.atoms._add_attribute(mapdict)
 
     def calculate_chiparams(self, angles=False):
         """
@@ -1456,12 +1467,12 @@ class System:
         
         self.atoms["chiparams"] = chiparams
         
-        try:
-            self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
-        except AttributeError:
-            self.atom.angular_parameters = AttrClass(self)
-            self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
+        mapdict = {}
+        mapdict["angular_parameters"] = {}
+        mapdict["angular_parameters"]["chi_params"] = "chiparams"
         
         if angles:
             self.atoms["cosines"] = cosines
-            self.atom.angular_parameters.mapdict["cosines"] = "cosines"
+            mapdict["angular_parameters"]["cosines"] = "cosines"
+
+        self.atoms._add_attribute(mapdict)
