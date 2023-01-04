@@ -3,6 +3,7 @@ import os
 import pyscal.crystal_structures as pcs
 import numpy as np
 from ase.build import bulk
+from pyscal.atoms import Atoms
 
 def test_system_init():
 	atoms, box = pcs.make_crystal(structure='bcc', 
@@ -44,14 +45,14 @@ def test_nop():
 		break
 
 	natoms = {'positions':[[0,0,0]]}
-	sys.add_atoms(natoms)
+	sys.atoms += natoms
 	assert sys.natoms == 17
 
 def test_embed():
 	cu = bulk('Cu')
 	sys = pc.System()
 	sys.box = np.array(cu.cell)
-	sys.atoms = {"positions": cu.positions}
+	sys.atoms = Atoms({"positions": cu.positions})
 	sys.embed_in_cubic_box()
 	assert np.abs(sys.box[0][0] - 15.315932880500618) < 1E-5
 

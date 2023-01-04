@@ -42,6 +42,9 @@ class System:
         self.triclinic = 0
         self._atoms = Atoms()
 
+    def iter_atoms(self):
+        return self.atoms.iter_atoms()
+
     @property
     def natoms(self):
         return self.atoms.natoms

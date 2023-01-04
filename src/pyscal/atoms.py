@@ -16,11 +16,14 @@ from pyscal.attributes import AttrSetter, read_yaml, MyList
 attr_docs = read_yaml(os.path.join(os.path.dirname(__file__), "data/annotations.yaml"))
 
 class Atoms(dict, AttrSetter):
-    def __init__(self, *args, **kwargs):
-        self.update(*args, **kwargs)
+    def __init__(self, atoms=None):
+        #self.update(atoms=atoms)
         self._nreal = 0
         self._nghost = 0
         AttrSetter.__init__(self)
+
+        if atoms is not None:
+            self.from_dict(atoms)
     
     def __dir__(self):
         attrs = ["natoms", "nreal", "nghost", 
@@ -49,13 +52,11 @@ class Atoms(dict, AttrSetter):
         disp_atoms = {f"atom {x}": self._get_atoms(x) for x in range(self.natoms)}
         return disp_atoms
         
-    def update(self, *args, **kwargs):
-        for k, v in dict(*args, **kwargs).items():
-            self[k] = v
+    #def update(self, atoms):
+    #    for k, v in dict(*args, **kwargs).items():
+    #        self[k] = v
 
     def __add__(self, atoms):
-        if not isinstance(atoms, Atoms):
-            raise TypeError("Only Atoms can be added to Atoms")
         if not 'positions' in atoms.keys():
             raise ValueError('positions is a necessary key in atoms')
         nop = len(atoms["positions"])
@@ -67,6 +68,7 @@ class Atoms(dict, AttrSetter):
         maxid = max(self["ids"])
         if not 'ids' in atoms.keys():
             atoms['ids'] = [maxid+x+1 for x in range(nop)]
+            print(self["ids"], atoms["ids"])
         else:
             if len(set(atoms['ids']).intersection(set(self['ids']))):
                 raise ValueError("Atom id already exists, unique ID is required")
