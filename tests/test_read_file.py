@@ -8,7 +8,7 @@ def test_system_init():
 	sys = pc.System()
 	sys.read_inputfile("tests/files/conf.dump", customkeys=["vx", "vy"])
 	assert sys.natoms == 500
-	assert sys.vx[0] == '0.0394436'
+	assert sys.atoms.vx[0] == '0.0394436'
 
 	sys.read_inputfile("tests/files/conf.dump.gz")
 	assert sys.natoms == 500
@@ -26,9 +26,9 @@ def test_system_init():
 	sys = pc.System()
 	sys.read_inputfile("test.dump", customkeys=["vx"])
 	assert sys.natoms == 500
-	assert sys.vx[0] == '0.0394436'
+	assert sys.atoms.vx[0] == '0.0394436'
 
 	sys = pc.System()
 	sys.read_inputfile("tests/files/conf.dump", customkeys=["vx", "vy"])
 	aseobj = sys.to_ase(species=["Au"])
-	assert np.sum(sys.positions[0]-aseobj.positions[0]) < 1E-5
+	assert np.sum(sys.atoms.positions[0]-aseobj.positions[0]) < 1E-5

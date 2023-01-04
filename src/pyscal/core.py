@@ -618,23 +618,23 @@ class System:
         self.neighbors_found = False
 
         
-        #mapdict = {}
-        #mapdict["neighbors"] = {}
-        #mapdict["neighbors"]["index"] = "neighbors"
-        #mapdict["neighbors"]["distance"] = "neighbordist"
-        #mapdict["neighbors"]["weight"] = "neighborweight"
-        #mapdict["neighbors"]["displacement"] = "diff"
-        #mapdict["neighbors"]["cutoff"] = "cutoff"
+        mapdict = {}
+        mapdict["neighbors"] = {}
+        mapdict["neighbors"]["index"] = "neighbors"
+        mapdict["neighbors"]["distance"] = "neighbordist"
+        mapdict["neighbors"]["weight"] = "neighborweight"
+        mapdict["neighbors"]["displacement"] = "diff"
+        mapdict["neighbors"]["cutoff"] = "cutoff"
 
-        #mapdict["neighbors"]["angle"] = {}
-        #mapdict["neighbors"]["angle"]["polar"] = "theta"
-        #mapdict["neighbors"]["angle"]["azimuthal"] = "phi"
+        mapdict["neighbors"]["angle"] = {}
+        mapdict["neighbors"]["angle"]["polar"] = "theta"
+        mapdict["neighbors"]["angle"]["azimuthal"] = "phi"
 
-        #mapdict["neighbors"]["temporary"] = {}
-        #mapdict["neighbors"]["temporary"]["index"] = "temp_neighbors"
-        #mapdict["neighbors"]["temporary"]["distance"] = "temp_neighbordist"
+        mapdict["neighbors"]["temporary"] = {}
+        mapdict["neighbors"]["temporary"]["index"] = "temp_neighbors"
+        mapdict["neighbors"]["temporary"]["distance"] = "temp_neighbordist"
 
-        #self.atoms._add_attribute(mapdict)
+        self.atoms._add_attribute(mapdict)
 
     def _check_neighbors(self):
         """
@@ -897,18 +897,18 @@ class System:
                 #self.atoms["vertex_positions_unique_skipcheck"] = unique_vertices
 
             #assign extra options
-            #mapdict = {}
-            #mapdict["voronoi"] = {}
-            #mapdict["voronoi"]["volume"] = "voronoi_volume"
-            #mapdict["voronoi"]["face"] = {}
-            #mapdict["voronoi"]["face"]["vertices"] = "face_vertices"
-            #mapdict["voronoi"]["face"]["perimeters"] = "face_perimeters"
-            #mapdict["voronoi"]["vertex"] = {}
-            #mapdict["voronoi"]["vertex"]["vectors"] = "vertex_vectors"
-            #mapdict["voronoi"]["vertex"]["numbers"] = "vertex_numbers"
-            #mapdict["voronoi"]["vertex"]["positions"] = "vertex_positions"
+            mapdict = {}
+            mapdict["voronoi"] = {}
+            mapdict["voronoi"]["volume"] = "voronoi_volume"
+            mapdict["voronoi"]["face"] = {}
+            mapdict["voronoi"]["face"]["vertices"] = "face_vertices"
+            mapdict["voronoi"]["face"]["perimeters"] = "face_perimeters"
+            mapdict["voronoi"]["vertex"] = {}
+            mapdict["voronoi"]["vertex"]["vectors"] = "vertex_vectors"
+            mapdict["voronoi"]["vertex"]["numbers"] = "vertex_numbers"
+            mapdict["voronoi"]["vertex"]["positions"] = "vertex_positions"
             #mapdict["voronoi"]["vertex"]["unique_positions"] = "vertex_positions_unique_skipcheck"
-            #self.atoms._add_attribute(mapdict)
+            self.atoms._add_attribute(mapdict)
 
         self.neighbors_found = True
 

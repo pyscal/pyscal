@@ -249,7 +249,7 @@ def write_snap(sys, outfile, compressed = False,
 
     if len(customkeys) > 0:
         if customvals is None:
-            cvals = [getattr(sys, customkey) for customkey in customkeys]
+            cvals = [getattr(sys.atoms, customkey) for customkey in customkeys]
             cvals = np.array(cvals).T
         else:
             #first check if dim is equal to keys dim

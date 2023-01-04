@@ -157,6 +157,11 @@ class Atoms(dict, AttrSetter):
         "condition": "condition",
         "head": "head"}
 
+        #add extra keys that might be needed; non-standard ones
+        for key, val in atoms.items():
+            if key not in ["positions", "ids", "types", "mask_1", "mask_2", "condition", "head"]:
+                mapdict[key] = key
+
         self._add_attribute(mapdict)
 
         
