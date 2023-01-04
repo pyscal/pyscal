@@ -86,9 +86,9 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
             for k in range(1, nz+1):
                 for l in range(1, sdict["natoms"]+1):
                     m += 1
-                    posx = (sdict["positions"][l-1][0]+(lattice_constant*sdict["scaling_factors"][0]*(float(i)-1)))
-                    posy = (sdict["positions"][l-1][1]+(lattice_constant*sdict["scaling_factors"][1]*(float(j)-1)))
-                    posz = (sdict["positions"][l-1][2]+(lattice_constant*sdict["scaling_factors"][2]*(float(k)-1)))
+                    posx = ((lattice_constant*sdict["positions"][l-1][0])+(lattice_constant*sdict["scaling_factors"][0]*(float(i)-1)))
+                    posy = ((lattice_constant*sdict["positions"][l-1][1])+(lattice_constant*sdict["scaling_factors"][1]*(float(j)-1)))
+                    posz = ((lattice_constant*sdict["positions"][l-1][2])+(lattice_constant*sdict["scaling_factors"][2]*(float(k)-1)))
                     if noise > 0:
                         posx = np.random.normal(loc=posx, scale=noise)
                         posy = np.random.normal(loc=posy, scale=noise)

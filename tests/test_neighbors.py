@@ -27,10 +27,10 @@ def test_system_init():
  2.708061437633937,
  2.7080614376339356])
 	assert np.sum(a1-a2) < 1E-5
-	assert np.sum(sys.atom.neighbors.distance[0]-a2) < 1E-5
+	assert np.sum(sys.atoms.neighbors.distance[0]-a2) < 1E-5
 
 	sys.find_neighbors(method="cutoff", cutoff=3.6)
-	a1 = np.array(sys.neighbordist[0])
+	a1 = np.array(sys.atoms.neighbors.distance[0])
 	a2 = np.array([2.7080614376339356,
  2.708061437633937,
  2.708061437633937,
@@ -48,7 +48,7 @@ def test_system_init():
 	assert np.sum(a1-a2) < 1E-5
 
 	sys.find_neighbors(method="cutoff", cutoff='sann')
-	a1 = np.array(sys.neighbordist[0])
+	a1 = np.array(sys.atoms.neighbors.distance[0])
 	a2 = np.array([2.7080614376339356,
  2.708061437633937,
  2.708061437633937,
@@ -66,7 +66,7 @@ def test_system_init():
 	assert np.sum(a1-a2) < 1E-5
 
 	sys.find_neighbors(method="number", nmax=8)
-	a1 = np.array(sys.neighbordist[0])
+	a1 = np.array(sys.atoms.neighbors.distance[0])
 	a2 = np.array([2.7080614376339356,
  2.708061437633937,
  2.708061437633937,
