@@ -20,6 +20,8 @@ class Atoms(dict, AttrSetter):
         #self.update(atoms=atoms)
         self._nreal = 0
         self._nghost = 0
+        self._lattice_constant = None
+        self._lattice = None
         AttrSetter.__init__(self)
 
         if atoms is not None:

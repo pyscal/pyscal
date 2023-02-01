@@ -19,6 +19,7 @@ from pyscal.atoms import Atoms, AttrSetter
 import pyscal.csystem as pc
 import pyscal.traj_process as ptp
 from pyscal.formats.ase import convert_snap
+import pyscal.crystal_structures as pcs
 
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
@@ -27,7 +28,7 @@ from pyscal.formats.ase import convert_snap
 class System:
     """
     Python class for holding the properties of an atomic configuration 
-    """
+    """    
     def __init__(self):
         self.initialized = True
         self.neighbors_found = False
@@ -41,6 +42,19 @@ class System:
         self.boxdims = [0,0,0]
         self.triclinic = 0
         self._atoms = Atoms()
+    
+    @classmethod
+    def from_structure(cls, structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None, chemical_symbol=None):
+        atoms, box = pcs.make_crystal(structure, lattice_constant=lattice_constant,
+             repetitions=repetitions, ca_ratio=ca_ratio,
+             noise=noise)
+        obj = cls()
+        obj.box = box
+        obj.atoms = atoms
+        obj.atoms["species"] = element
+        obj.atoms._lattice = structure
+        obj.atoms._lattice_constant = lattice_constant
+        return obj
 
     def iter_atoms(self):
         return self.atoms.iter_atoms()
