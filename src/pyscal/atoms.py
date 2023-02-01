@@ -68,7 +68,7 @@ class Atoms(dict, AttrSetter):
         maxid = max(self["ids"])
         if not 'ids' in atoms.keys():
             atoms['ids'] = [maxid+x+1 for x in range(nop)]
-            print(self["ids"], atoms["ids"])
+            #print(self["ids"], atoms["ids"])
         else:
             if len(set(atoms['ids']).intersection(set(self['ids']))):
                 raise ValueError("Atom id already exists, unique ID is required")
@@ -166,10 +166,17 @@ class Atoms(dict, AttrSetter):
 
         self._add_attribute(mapdict)
 
-        
+    def _convert_to_list(self, data):
+        """
+        Check if the given item is a list, if not convert to a single item list
+        """
+        if not isinstance(data, list):
+            data = [data]
+        return data
+       
     def _get_atoms(self, index):
-        atom_dict = {key: self[key][index] for key in self.keys()}
-        return atom_dict
+        atom_dict = {key: self._convert_to_list(self[key][index]) for key in self.keys()}
+        return Atoms(atom_dict)
 
     def _delete_atoms(self, indices):
         del_real = np.sum([1 for x in indices if x < self._nreal])
@@ -187,7 +194,7 @@ class Atoms(dict, AttrSetter):
     def iter_atoms(self):
         for index in range(self.nreal):
             atom_dict = {key: self[key][index] for key in self.keys()}
-            yield atom_dict
+            yield Atoms(atom_dict)
 
     def _generate_bool_list(self, ids=None, indices=None, condition=None, selection=False):
         #necessary checks
@@ -208,7 +215,7 @@ class Atoms(dict, AttrSetter):
             if len(indices) != len(ids):
                 warnings.warn("Not all ids were found")
         elif condition is not None:
-            indices = [x for x in range(self.nreal) if condition(self._get_natoms(x))]
+            indices = [x for x in range(self.nreal) if condition(self._get_atoms(x))]
         elif indices is None:
             indices = [x for x in range(self.nreal)]
         
@@ -226,13 +233,13 @@ class Atoms(dict, AttrSetter):
             for i in range(self.ntotal):
                 self["mask_2"][i] = masks[self["head"][i]]
 
-    def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None):
-        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
+    def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
+        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition, selection=selection)
         self._apply_mask(masks, mask_type)
 
 
-    def remove_mask(self, mask="primary", ids=None, indices=None, condition=None):
-        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
+    def remove_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
+        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition, selection=selection)
         masks = [not x for x in masks]
         self._apply_mask(masks, mask_type)
 

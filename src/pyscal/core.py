@@ -162,7 +162,6 @@ class System:
         else:
             return atoms
         """
-
     def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False):
         """
         """
@@ -308,7 +307,7 @@ class System:
 
         return atoms
     """
-    def mask(self, mask_type="primary", ids=None, indices=None, condition=None):
+    def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
 
         Notes
@@ -330,10 +329,10 @@ class System:
         The masks for ghost atoms are copied from the corresponding mask for real atoms.
         """
         #check if length of mask is equal to length of real atoms
-        self._atoms.mask(mask_type=mask_type, ids=ids, 
-            indices=indices, condition=condition)
+        self.atoms.apply_mask(mask_type=mask_type, ids=ids, 
+            indices=indices, condition=condition, selection=selection)
 
-    def unmask(self, mask_type="primary", ids=None, indices=None, condition=None):
+    def remove_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
         Remove applied masks
 
@@ -346,14 +345,14 @@ class System:
         -------
         None
         """
-        self._atoms.unmask(mask_type=mask_type, ids=ids, 
-            indices=indices, condition=condition)
+        self._atoms.remove_mask(mask_type=mask_type, ids=ids, 
+            indices=indices, condition=condition, selection=selection)
 
-    def apply_selection(self, ids=None, indices=None, condition=None):
-        self._atoms.apply_selection(ids=ids, indices=indices, condition=condition)    
+    def apply_selection(self, ids=None, indices=None, condition=None, selection=False):
+        self._atoms.apply_selection(ids=ids, indices=indices, condition=condition, selection=selection)    
     
-    def remove_selection(self, ids=None, indices=None, condition=None):
-        self._atoms.remove_selection(ids=ids, indices=indices, condition=condition)
+    def remove_selection(self, ids=None, indices=None, condition=None, selection=False):
+        self._atoms.remove_selection(ids=ids, indices=indices, condition=condition, selection=selection)
     
     def delete(self, ids=None, indices=None, condition=None, selection=False):
         self._atoms.delete(ids=ids, indices=indices, condition=condition, selection=selection)
