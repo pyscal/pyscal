@@ -78,6 +78,8 @@ class Atoms(dict, AttrSetter):
         atoms['ghost'] = [False for x in range(nop)]
         if not 'types' in atoms.keys():
             atoms['types'] = [1 for x in range(nop)]
+        if not 'species' in atoms.keys():
+            atoms['species'] = [None for x in range(nop)]
         if not 'mask_1' in atoms.keys():
             atoms['mask_1'] = [False for x in range(nop)]
         if not 'mask_2' in atoms.keys():
@@ -138,6 +140,8 @@ class Atoms(dict, AttrSetter):
         atoms['ghost'] = [False for x in range(nop)]
         if not 'types' in atoms.keys():
             atoms['types'] = [1 for x in range(nop)]
+        if not 'species' in atoms.keys():
+            atoms['species'] = [None for x in range(nop)]
         if not 'mask_1' in atoms.keys():
             atoms['mask_1'] = [False for x in range(nop)]
         if not 'mask_2' in atoms.keys():
@@ -155,7 +159,7 @@ class Atoms(dict, AttrSetter):
         mapdict = {"positions": "positions",
         "ids": "ids",
         "types": "types",
-        "species": "types",
+        "species": "species",
         "mask": {"primary": "mask_1", "secondary": "mask_2"},
         "selection": "condition",
         "condition": "condition",
@@ -163,7 +167,7 @@ class Atoms(dict, AttrSetter):
 
         #add extra keys that might be needed; non-standard ones
         for key, val in atoms.items():
-            if key not in ["positions", "ids", "types", "mask_1", "mask_2", "condition", "head"]:
+            if key not in ["positions", "ids", "types", "species", "mask_1", "mask_2", "condition", "head"]:
                 mapdict[key] = key
 
         self._add_attribute(mapdict)

@@ -7,7 +7,7 @@ from pyscal.atoms import Atoms
 from pyscal.attributes import read_yaml
 structures = read_yaml(os.path.join(os.path.dirname(__file__), "data/structure_data.yaml"))
 
-def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
+def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.
@@ -63,13 +63,27 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
         sdict = structures[structure]
     else:
         raise ValueError("Unknown crystal structure")
-
+    
+    unique_types = np.unique(sdict["species"])
+    print(element)
+    if element is not None:
+        if isinstance(element, str):
+            element = [element]
+        if not (len(element) == unique_types):
+            raise ValueError("Elements should equal number of species in the system")
+        
+        element_dict = dict([x for x in zip(unique_types, element)])
+    else:
+        element = [None for x in range(len(unique_types))]
+    element_dict = dict([x for x in zip(unique_types, element)])
+        
     m = 0
     co = 1
     natoms = sdict["natoms"]*nx*ny*nz
     positions = []
     types = []
     ids = []
+    species = []
 
     xh = nx*lattice_constant*sdict["scaling_factors"][0]
     yh = ny*lattice_constant*sdict["scaling_factors"][1]
@@ -93,11 +107,13 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
                     positions.append([posx, posy, posz])
                     ids.append(co)
                     types.append(sdict["species"][l-1])
+                    species.append(element_dict[sdict["species"][l-1]])
                     co += 1
     atoms = {}
     atoms['positions'] = positions
     atoms['ids'] = ids
     atoms['types'] = types
+    atoms['species'] = species
     atoms['ghost'] = [False for x in range(len(types))]
 
     patoms = Atoms()

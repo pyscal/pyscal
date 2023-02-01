@@ -52,11 +52,10 @@ class System:
     def from_structure(cls, structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None, chemical_symbol=None):
         atoms, box = pcs.make_crystal(structure, lattice_constant=lattice_constant,
              repetitions=repetitions, ca_ratio=ca_ratio,
-             noise=noise)
+             noise=noise, element=element)
         obj = cls()
         obj.box = box
         obj.atoms = atoms
-        obj.atoms["species"] = element
         obj.atoms._lattice = structure
         obj.atoms._lattice_constant = lattice_constant
         return obj

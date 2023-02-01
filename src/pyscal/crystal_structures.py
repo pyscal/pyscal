@@ -62,7 +62,7 @@ def structure_creator(structure,
     """    
     return System.from_structure(structure, lattice_constant=lattice_constant,
              repetitions=repetitions, ca_ratio=ca_ratio,
-             noise=noise)
+             noise=noise, element=element)
 
 class Structure:
     """
