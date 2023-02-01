@@ -45,8 +45,8 @@ class System:
         self._atoms = Atoms()
         
         if filename is not None:
-            self.read_inputfile(filename, format="lammps-dump", 
-                                            compressed = False)
+            self.read_inputfile(filename, format=format, 
+                                            compressed = compressed)
     
     @classmethod
     def from_structure(cls, structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None, chemical_symbol=None):
