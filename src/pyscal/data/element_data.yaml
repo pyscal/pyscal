@@ -1,0 +1,102 @@
+Ac:
+  lattice_constant: 5.31
+  structure: fcc
+Ag:
+  lattice_constant: 4.09
+  structure: fcc
+Al:
+  lattice_constant: 4.05
+  structure: fcc
+Ar:
+  lattice_constant: 5.26
+  structure: fcc
+Au:
+  lattice_constant: 4.08
+  structure: fcc
+Ba:
+  lattice_constant: 5.02
+  structure: bcc
+Ca:
+  lattice_constant: 5.58
+  structure: fcc
+Ce:
+  lattice_constant: 5.16
+  structure: fcc
+Cr:
+  lattice_constant: 2.88
+  structure: bcc
+Cs:
+  lattice_constant: 6.05
+  structure: bcc
+Cu:
+  lattice_constant: 3.61
+  structure: fcc
+Eu:
+  lattice_constant: 4.61
+  structure: bcc
+Fe:
+  lattice_constant: 2.87
+  structure: bcc
+Ge:
+  lattice_constant: 5.66
+  structure: dia
+Ir:
+  lattice_constant: 3.84
+  structure: fcc
+Kr:
+  lattice_constant: 5.72
+  structure: fcc
+Li:
+  lattice_constant: 3.49
+  structure: bcc
+Mo:
+  lattice_constant: 3.15
+  structure: bcc
+Na:
+  lattice_constant: 4.23
+  structure: bcc
+Nb:
+  lattice_constant: 3.3
+  structure: bcc
+Ne:
+  lattice_constant: 4.43
+  structure: fcc
+Ni:
+  lattice_constant: 3.52
+  structure: fcc
+Pb:
+  lattice_constant: 4.95
+  structure: fcc
+Pd:
+  lattice_constant: 3.89
+  structure: fcc
+Po:
+  lattice_constant: 3.35
+  structure: sc
+Pt:
+  lattice_constant: 3.92
+  structure: fcc
+Rb:
+  lattice_constant: 5.59
+  structure: bcc
+Rh:
+  lattice_constant: 3.8
+  structure: fcc
+Si:
+  lattice_constant: 5.43
+  structure: dia
+Sr:
+  lattice_constant: 6.08
+  structure: fcc
+Ta:
+  lattice_constant: 3.31
+  structure: bcc
+Th:
+  lattice_constant: 5.08
+  structure: fcc
+Xe:
+  lattice_constant: 6.2
+  structure: fcc
+Yb:
+  lattice_constant: 5.49
+  structure: fcc

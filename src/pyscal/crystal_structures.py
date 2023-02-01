@@ -5,13 +5,14 @@ pyscal module for creating crystal structures.
 import numpy as np
 import warnings
 import os
+from mendeleev import element
 
 from pyscal.atoms import Atoms
 from pyscal.attributes import read_yaml
 
 structures = read_yaml(os.path.join(os.path.dirname(__file__), "data/structure_data.yaml"))
 
-def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
+def make_crystal(structure=None, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.
@@ -107,3 +108,38 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     patoms = Atoms()
     patoms.from_dict(atoms)
     return patoms, box
+
+def get_lattice(symbol):
+    chem = element(symbol)
+    mainlat = chem.lattice_structure
+    if mainlat == "HEX":
+        mainlat = "HCP"
+    mainalat = chem.lattice_constant
+    return mainlat.lower(), mainalat
+
+def _update_list_of_elements():
+    """
+    Only run when needed to update database
+    """
+    import mendeleev
+    el_list = dir(mendeleev)
+    el_dict = {}
+
+    for el in el_list:
+        if len(el) == 2:
+            if el=="db":
+                break
+            chem = element(el)
+            struct = chem.lattice_structure
+            lc = chem.lattice_constant
+            if (struct is not None) and (lc is not None):
+                if struct.lower() in ['sc', 'bcc', 'fcc', 'hcp', 'dia']:
+                    el_dict[el] = {}
+                    if struct == "dia":
+                        struct = "diamond"
+                    el_dict[el]["structure"] = str(struct.lower())
+                    el_dict[el]["lattice_constant"] = float(lc)
+    return el_dict
+    
+    
+
