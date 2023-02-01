@@ -29,7 +29,8 @@ class System:
     """
     Python class for holding the properties of an atomic configuration 
     """    
-    def __init__(self):
+    def __init__(self, filename=None, format="lammps-dump", 
+                                            compressed = False):
         self.initialized = True
         self.neighbors_found = False
         self.neighbor_method = None
@@ -42,6 +43,10 @@ class System:
         self.boxdims = [0,0,0]
         self.triclinic = 0
         self._atoms = Atoms()
+        
+        if filename is not None:
+            self.read_inputfile(filename, format="lammps-dump", 
+                                            compressed = False)
     
     @classmethod
     def from_structure(cls, structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None, chemical_symbol=None):
