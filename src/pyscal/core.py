@@ -19,7 +19,7 @@ from pyscal.atoms import Atoms, AttrSetter
 import pyscal.csystem as pc
 import pyscal.traj_process as ptp
 from pyscal.formats.ase import convert_snap
-import pyscal.crystal_structures as pcs
+import pyscal.structure_creator as pcs
 
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
