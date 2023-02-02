@@ -30,7 +30,7 @@ class System:
     Python class for holding the properties of an atomic configuration 
     """    
     def __init__(self, filename=None, format="lammps-dump", 
-                                            compressed = False):
+                                            compressed = False, customkeys=None):
         self.initialized = True
         self.neighbors_found = False
         self.neighbor_method = None
@@ -46,7 +46,7 @@ class System:
         
         if filename is not None:
             self.read_inputfile(filename, format=format, 
-                                            compressed = compressed)
+                                            compressed = compressed, customkeys=customkeys)
     
     @classmethod
     def from_structure(cls, structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None, chemical_symbol=None):
@@ -138,7 +138,7 @@ class System:
 
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
-            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False)
+            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False, return_atoms=True)
 
         self._atoms = atoms
 
@@ -180,7 +180,7 @@ class System:
         else:
             return atoms
         """
-    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False):
+    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
         """
         """
         
@@ -244,7 +244,12 @@ class System:
         atoms['head'].extend(head)
         for key in datadict.keys():
             atoms[key].extend(datadict[key])
-        return atoms
+
+        if return_atoms:
+            return atoms
+        else:
+            self.atoms = atoms
+            return self
 
     #def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
         """
@@ -858,7 +863,7 @@ class System:
                 backupbox = self._box.copy()
                 if self.triclinic:
                     if not self.ghosts_created:
-                        atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False)
+                        atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False, return_atoms=True)
                         self._atoms = atoms
                         self.embed_in_cubic_box()
                 pc.get_all_neighbors_voronoi(self.atoms, 0.0,

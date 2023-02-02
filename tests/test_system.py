@@ -1,17 +1,13 @@
 import pyscal.core as pc
 import os
-import pyscal.crystal_structures as pcs
 import numpy as np
 from ase.build import bulk
 from pyscal.atoms import Atoms
+from pyscal.crystal_structures import Structure
+
 
 def test_system_init():
-	atoms, box = pcs.make_crystal(structure='bcc', 
-                              lattice_constant=3.127, repetitions=(10,10,10),)
-	sys = pc.System()
-	sys.box = box
-	sys.atoms = atoms
-
+	sys = Structure().lattice.bcc(repetitions = [4, 4, 4], lattice_constant=3.127)
 	assert len(sys.atoms["positions"]) == 10*10*10*2
 	assert sys.triclinic == 0
 	assert np.abs(sys.boxdims[0] - box[0][0]) < 1E-5
@@ -31,11 +27,7 @@ def test_system_triclinic():
 	assert np.prod(tb) == 1
 
 def test_nop():
-	atoms, box = pcs.make_crystal(structure='bcc', 
-                              lattice_constant=3.127, repetitions=(2,2,2),)
-	sys = pc.System()
-	sys.box = box
-	sys.atoms = atoms
+	sys = Structure().lattice.bcc(repetitions = [2, 2, 2], lattice_constant=3.127)
 
 	assert sys.natoms == 16
 	assert len(sys.atoms['positions']) == 432
@@ -57,20 +49,12 @@ def test_embed():
 	assert np.abs(sys.box[0][0] - 15.315932880500618) < 1E-5
 
 def test_distance():
-	atoms, box = pcs.make_crystal(structure='bcc', 
-                              lattice_constant=3.127, repetitions=(2,2,2),)
-	sys = pc.System()
-	sys.box = box
-	sys.atoms = atoms
+	sys = Structure().lattice.bcc(repetitions = [2, 2, 2], lattice_constant=3.127)
 	dist = sys.get_distance([0.0, 0.0, 0.0], [1.5635, 1.5635, 1.5635])
 	assert np.abs(dist - 2.708061437633939) < 1E-5	
 
 def test_composition():
-	satoms, box = pcs.make_crystal(structure='l12', 
-                              lattice_constant=3.127, repetitions=(2,2,2),)
-	sys = pc.System()
-	sys.box = box
-	sys.atoms = satoms
+	sys = Structure().lattice.l12(repetitions = [2, 2, 2], lattice_constant=3.127)
 	c = sys.concentration
 	assert c['1'] == 8
 	assert c['2'] == 24
@@ -80,8 +64,5 @@ def test_composition():
 	assert c['2'] == 24
 
 def test_volume():
-	atoms, boxdims = pcs.make_crystal('fcc', repetitions = [10, 10, 10])
-	sys = pc.System()
-	sys.box = boxdims
-	sys.atoms = atoms
+	sys = Structure().lattice.fcc(repetitions = [10, 10, 10])
 	assert sys.volume == 1000

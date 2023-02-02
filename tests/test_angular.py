@@ -2,14 +2,10 @@ import pytest
 import os,sys,inspect
 import numpy as np
 import pyscal.core as pc
-import pyscal.crystal_structures as pcs
+from pyscal.crystal_structures import Structure
 
 def test_angular():
-    atoms, boxdims = pcs.make_crystal('diamond', repetitions = [4, 4, 4])
-    sys = pc.System()
-    sys.box = boxdims
-    sys.atoms = atoms
-
+    sys = Structure().lattice.diamond(repetitions = [4, 4, 4])
     sys.find_neighbors(method = 'cutoff', cutoff=0)
     sys.calculate_angularcriteria()
 
