@@ -15,33 +15,22 @@ import io
 from scipy.special import sph_harm
 import copy
 
+from pyscal.atoms import Atoms, AttrSetter
 import pyscal.csystem as pc
 import pyscal.traj_process as ptp
 from pyscal.formats.ase import convert_snap
+import pyscal.structure_creator as pcs
 
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
-class AttrClass:
-    def __init__(self, head):
-        self.head = head
-        self.mapdict = {}
-    def __dir__(self):
-        actual_keys = list(self.__dict__.keys())
-        actual_keys.remove('head')
-        actual_keys.remove('mapdict')
-        return list(self.mapdict.keys()) + actual_keys
-    def __getattr__(self, name):
-        if name in self.mapdict.keys():
-            return getattr(self.head, self.mapdict[name])
-        else:
-            raise AttributeError("Attribute not found")
 
 
 class System:
     """
     Python class for holding the properties of an atomic configuration 
-    """
-    def __init__(self):
+    """    
+    def __init__(self, filename=None, format="lammps-dump", 
+                                            compressed = False, customkeys=None):
         self.initialized = True
         self.neighbors_found = False
         self.neighbor_method = None
@@ -53,42 +42,38 @@ class System:
         self.rotinv = [[0,0,0], [0,0,0], [0,0,0]]
         self.boxdims = [0,0,0]
         self.triclinic = 0
-        self._atoms = {}
-        self.atom = AttrClass(self)
+        self._atoms = Atoms()
+        
+        if filename is not None:
+            self.read_inputfile(filename, format=format, 
+                                            compressed = compressed, customkeys=customkeys)
+    
+    @classmethod
+    def from_structure(cls, structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None, chemical_symbol=None):
+        atoms, box = pcs.make_crystal(structure, lattice_constant=lattice_constant,
+             repetitions=repetitions, ca_ratio=ca_ratio,
+             noise=noise, element=element)
+        obj = cls()
+        obj.box = box
+        obj.atoms = atoms
+        obj.atoms._lattice = structure
+        obj.atoms._lattice_constant = lattice_constant
+        return obj
 
-    #overload get methods
-    def __getattr__(self, name):
-        if name in self.atoms.keys():
-            namesplit = name.split('_')
-            if namesplit[-1] == "skipcheck":
-                res = self.atoms[name]
-            else:
-                res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if self.atoms["ghost"][x]==False]
-            return res            
-        else:
-            namesplit = name.split('_')
-            if namesplit[1] in self.atoms.keys():
-                if namesplit[0] == "unmasked":
-                    name = namesplit[1]
-                    res = [self.atoms[name][x] for x in range(len(self.atoms[name])) if (self.atoms["ghost"][x]==False and self.atoms["mask_1"][x]==False)]
-                    return res
-            raise AttributeError("Attribute %s not found"%name)
+    def iter_atoms(self):
+        return self.atoms.iter_atoms()
 
     @property
     def natoms(self):
-        if 'positions' in self.atoms.keys():
-            nop = np.sum([1 for x in range(len(self.atoms["positions"])) if self.atoms["ghost"][x]==False])
-            return nop
-        else:
-            return 0
+        return self.atoms.natoms
 
     @property
     def concentration(self):
-        return self.get_concentration()
+        return self.atoms.composition
 
     @property
     def composition(self):
-        return self.get_concentration()
+        return self.atoms.composition
 
     @property
     def box(self):
@@ -136,39 +121,13 @@ class System:
 
     @property
     def atoms(self):
-        """
-        Atom access
-        """
         return self._atoms
-
+    
     @atoms.setter
     def atoms(self, atoms):
         """
         Set atoms
         """
-        #we need to check atoms and add necessary keys
-        if not 'positions' in atoms.keys():
-            raise ValueError('positions is a necessary key in atoms')
-        nop = len(atoms["positions"])
-        for key, val in atoms.items():
-            if not (len(val)==nop):
-                raise ValueError("All times in the atoms dict should have same length as positions")
-        #now add necessary keys-ids, types, ghost
-        if not 'ids' in atoms.keys():
-            atoms['ids'] = [x+1 for x in range(nop)]
-        if not 'types' in atoms.keys():
-            atoms['types'] = [1 for x in range(nop)]
-        if not 'ghost' in atoms.keys():
-            atoms['ghost'] = [False for x in range(nop)]
-        if not 'mask_1' in atoms.keys():
-            atoms['mask_1'] = [False for x in range(nop)]
-        if not 'mask_2' in atoms.keys():
-            atoms['mask_2'] = [False for x in range(nop)]
-        if not 'condition' in atoms.keys():
-            atoms['condition'] = [True for x in range(nop)]
-        if not 'head' in atoms.keys():
-            atoms['head'] = [x for x in range(nop)]
-
         if(len(atoms['positions']) < 200):
             #we need to estimate a rough idea
             needed_atoms = 200 - len(atoms)
@@ -179,30 +138,10 @@ class System:
 
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
-            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False)
+            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False, return_atoms=True)
 
         self._atoms = atoms
-        #try adding key mapping;
-        self.atom = AttrClass(self)
-        self.atom.mapdict["positions"] = "positions"
-        self.atom.mapdict["ghost"] = "ghost"
-        self.atom.mapdict["ids"] = "ids"
-        self.atom.mapdict["condition"] = "condition"
-        self.atom.mask = AttrClass(self)
-        self.atom.mask.mapdict = {"primary": "mask_1",
-        "secondary": "mask_2"}
 
-    #iterator for atoms
-    def iter_atoms(self):
-        """
-        Iter over atoms
-        """
-        for i in range(len(self.atoms["positions"])):
-            if not self.atoms["ghost"][i]:
-                rdict = {}
-                for key in self.atoms.keys():
-                    rdict[key] = self.atoms[key][i]
-            yield rdict 
 
     def add_atoms(self, atoms):
         """
@@ -216,41 +155,8 @@ class System:
         -------
         None
         """ 
-        if not 'positions' in atoms.keys():
-            raise ValueError('positions is a necessary key in atoms')
-        nop = len(atoms["positions"])
-        for key, val in atoms.items():
-            if not (len(val)==nop):
-                raise ValueError("All times in the atoms dict should have same length as positions")
-        
-        #now add necessary keys-ids, types, ghost
-        maxid = max(self.atoms["ids"])
-        if not 'ids' in atoms.keys():
-            atoms['ids'] = [maxid+x+1 for x in range(nop)]
-        else:
-            for i in atoms['ids']:
-                if i in self.atoms['ids']:
-                    raise ValueError("Atom id already exists, unique ID is required")
-
-        if not 'types' in atoms.keys():
-            atoms['types'] = [1 for x in range(nop)]
-        if not 'ghost' in atoms.keys():
-            atoms['ghost'] = [False for x in range(nop)]
-        if not 'mask_1' in atoms.keys():
-            atoms['mask_1'] = [False for x in range(nop)]
-        if not 'mask_2' in atoms.keys():
-            atoms['mask_2'] = [False for x in range(nop)]
-        if not 'condition' in atoms.keys():
-            atoms['condition'] = [True for x in range(nop)]
-        if not 'head' in atoms.keys():
-            atoms['head'] = [self.natoms+x for x in range(nop)]
-
-        for key in self.atoms.keys():
-            if key in atoms.keys():
-                self.atoms[key] = [*self.atoms[key], *atoms[key]]
-            else:
-                warnings.warn("Key %s is not present, please recalculate"%key)
-
+        ## MOVE TO ATOMS
+        self._atoms.add_atoms(atoms)
 
     #def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=True):
         """
@@ -274,8 +180,7 @@ class System:
         else:
             return atoms
         """
-
-    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False):
+    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
         """
         """
         
@@ -333,13 +238,18 @@ class System:
         if ghost:
             self.ghosts_created = True
 
-        atoms['positions'] = [*atoms['positions'], *positions]
-        atoms['ids'] = [*atoms['ids'], *ids]
-        atoms['ghost'] = [*atoms['ghost'], *ghosts]
-        atoms['head'] = [*atoms['head'], *head]
+        atoms['positions'].extend(positions)
+        atoms['ids'].extend(ids)
+        atoms['ghost'].extend(ghosts)
+        atoms['head'].extend(head)
         for key in datadict.keys():
-            atoms[key] = [*atoms[key], *datadict[key]]
-        return atoms
+            atoms[key].extend(datadict[key])
+
+        if return_atoms:
+            return atoms
+        else:
+            self.atoms = atoms
+            return self
 
     #def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
         """
@@ -420,21 +330,8 @@ class System:
 
         return atoms
     """
-    def apply_mask(self, masks, mask_type='secondary'):
+    def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
-        Apply mask to an atom
-
-        Parameters
-        ----------
-        masks : list of bools
-            list of mask to be applied
-
-        mask_type: string, optional
-            type of mask to be applied, either `primary`, `secondary` or `all`
-
-        Returns
-        -------
-        None
 
         Notes
         -----
@@ -455,19 +352,10 @@ class System:
         The masks for ghost atoms are copied from the corresponding mask for real atoms.
         """
         #check if length of mask is equal to length of real atoms
-        if len(masks) != self.natoms:
-            raise ValueError("Length of masks should be equal to number of atoms in the system")
+        self.atoms.apply_mask(mask_type=mask_type, ids=ids, 
+            indices=indices, condition=condition, selection=selection)
 
-        #apply masks
-        if (mask_type == 'primary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_1"][i] = masks[self.atoms["head"][i]]
-        if (mask_type == 'secondary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_2"][i] = masks[self.atoms["head"][i]]
-
-
-    def remove_mask(self, mask_type='primary'):
+    def remove_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
         Remove applied masks
 
@@ -480,49 +368,17 @@ class System:
         -------
         None
         """
-        #remove masks
-        if (mask_type == 'primary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_1"][i] = False
-        if (mask_type == 'secondary') or (mask_type == 'all'):
-            for i in range(len(self.atoms["positions"])):
-                self.atoms["mask_2"][i] = False
+        self._atoms.remove_mask(mask_type=mask_type, ids=ids, 
+            indices=indices, condition=condition, selection=selection)
 
-    def apply_condition(self, condition):
-        """
-        Apply a condition on atom which will be used for clustering
-
-        Parameters
-        ----------
-        condition : list of bools
-            list of condition to be applied
-
-        Returns
-        -------
-        None
-
-        """
-        if len(condition) != self.natoms:
-            raise ValueError("Length of masks should be equal to number of atoms in the system")
-
-        for i in range(len(self.atoms["positions"])):
-            self.atoms["condition"][i] = condition[self.atoms["head"][i]]
-
-
-    def remove_condition(self):
-        """
-        Remove a condition on atom which will be used for clustering
-
-        Parameters
-        ----------
-        None
-
-        Returns
-        -------
-        None
-        """
-        for i in range(len(self.atoms["positions"])):
-            self.atoms["condition"][i] = True
+    def apply_selection(self, ids=None, indices=None, condition=None):
+        self._atoms.apply_selection(ids=ids, indices=indices, condition=condition)    
+    
+    def remove_selection(self, ids=None, indices=None, condition=None):
+        self._atoms.remove_selection(ids=ids, indices=indices, condition=condition)
+    
+    def delete(self, ids=None, indices=None, condition=None, selection=False):
+        self._atoms.delete(ids=ids, indices=indices, condition=condition, selection=selection)
 
 
     def embed_in_cubic_box(self, inputbox=None, return_box=False):
@@ -575,29 +431,6 @@ class System:
         else:
             return newbox
 
-    def get_distance(self, pos1, pos2):
-        """
-        Get the distance between two atoms.
-
-        Parameters
-        ----------
-        pos1 : list
-                first atom position
-        pos2 : list
-                second atom position
-
-        Returns
-        -------
-        distance : double
-                distance between the first and second atom.
-
-        Notes
-        -----
-        Periodic boundary conditions are assumed by default.
-        """
-        return pc.get_abs_distance(pos1, pos2, self.triclinic, 
-            self.rot, self.rotinv, self.boxdims, 0.0, 0.0, 0.0)
-
     def get_distance(self, pos1, pos2, vector=False):
         """
         Get the distance between two atoms.
@@ -643,12 +476,7 @@ class System:
         condict : dict
             dict of concentration values
         """
-        typelist = [self.atoms["types"][x] for x in range(len(self.atoms["positions"])) if self.atoms["ghost"][x]==False]
-        types, typecounts = np.unique(typelist, return_counts=True)
-        concdict = {}
-        for c, t in enumerate(types):
-            concdict[str(t)] = typecounts[c]
-        return concdict
+        return self.concentration
 
 
     def read_inputfile(self, filename, format="lammps-dump", 
@@ -707,7 +535,6 @@ class System:
         self.rotinv = [[0,0,0], [0,0,0], [0,0,0]]
         self.boxdims = [0,0,0]
         self.triclinic = 0
-        self._atoms = {}
 
         atoms, box = ptp.read_file(filename, format=format, 
                                     compressed=compressed, customkeys=customkeys,)
@@ -771,7 +598,7 @@ class System:
             compressed = compressed, customkeys = customkeys, customvals = customvals,
             timestep = timestep, species = species)
 
-    def to_ase(self, species):
+    def to_ase(self, species=None):
         """
         Convert system to an ASE Atoms object
 
@@ -816,21 +643,23 @@ class System:
         self.neighbors_found = False
 
         
-        self.atom.neighbors = AttrClass(self)
-        self.atom.neighbors.mapdict["index"] = "neighbors"
-        self.atom.neighbors.mapdict["distance"] = "neighbordist"
-        self.atom.neighbors.mapdict["weight"] = "neighborweight"
-        self.atom.neighbors.mapdict["displacement"] = "diff"
-        self.atom.neighbors.mapdict["cutoff"] = "cutoff"
+        mapdict = {}
+        mapdict["neighbors"] = {}
+        mapdict["neighbors"]["index"] = "neighbors"
+        mapdict["neighbors"]["distance"] = "neighbordist"
+        mapdict["neighbors"]["weight"] = "neighborweight"
+        mapdict["neighbors"]["displacement"] = "diff"
+        mapdict["neighbors"]["cutoff"] = "cutoff"
 
-        self.atom.neighbors.angle = AttrClass(self)
-        self.atom.neighbors.angle.mapdict["polar"] = "theta"
-        self.atom.neighbors.angle.mapdict["azimuthal"] = "phi"
+        mapdict["neighbors"]["angle"] = {}
+        mapdict["neighbors"]["angle"]["polar"] = "theta"
+        mapdict["neighbors"]["angle"]["azimuthal"] = "phi"
 
-        self.atom.neighbors.temporary = AttrClass(self)
-        self.atom.neighbors.temporary.mapdict["index"] = "temp_neighbors"
-        self.atom.neighbors.temporary.mapdict["distance"] = "temp_neighbordist"
+        mapdict["neighbors"]["temporary"] = {}
+        mapdict["neighbors"]["temporary"]["index"] = "temp_neighbors"
+        mapdict["neighbors"]["temporary"]["distance"] = "temp_neighbordist"
 
+        self.atoms._add_attribute(mapdict)
 
     def _check_neighbors(self):
         """
@@ -855,6 +684,7 @@ class System:
         -------
 
         """
+        print(key)
 
         self._check_neighbors()
 
@@ -986,7 +816,7 @@ class System:
             raise ValueError("value of threshold should be at least 1.00")
 
         if cells is None:
-            cells = (len(self.positions) > 250)
+            cells = (self.natoms > 250)
 
         if method == 'cutoff':            
             if cutoff=='sann':    
@@ -1028,61 +858,61 @@ class System:
         
         elif method == 'voronoi':
             clean_vertices = (cutoff>0)
-            
-            if not clean_vertices:
+            #CLEANING is TURNED OFF
+            #if not clean_vertices:
                 #copy the simulation cell
-                backupbox = self._box.copy()
-                if self.triclinic:
-                    if not self.ghosts_created:
-                        atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False)
-                        self._atoms = atoms
-                        self.embed_in_cubic_box()
-                pc.get_all_neighbors_voronoi(self.atoms, 0.0,
-                    self.triclinic, self.rot, self.rotinv,
-                    self.boxdims, voroexp)
+            backupbox = self._box.copy()
+            if self.triclinic:
+                if not self.ghosts_created:
+                    atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False, return_atoms=True)
+                    self._atoms = atoms
+                    self.embed_in_cubic_box()
+            pc.get_all_neighbors_voronoi(self.atoms, 0.0,
+                self.triclinic, self.rot, self.rotinv,
+                self.boxdims, voroexp)
 
-                if self.triclinic:
-                    self._box = backupbox
+            if self.triclinic:
+                self._box = backupbox
 
             #now clean up
-            else:
-                real_atomdict = {"positions":copy.copy(self.positions), 
-                 "ghost":copy.copy(self.ghost)}
+            #else:
+            #    real_atomdict = {"positions":copy.copy(self.atoms.positions_for_all), 
+            #     "ghost":copy.copy(self.atoms.positions_for_ghost)}
                 #we need to call the method
                 #this means alles good
-                if self.actual_box is None:
-                    if self.triclinic:
-                        new_box = self.embed_in_cubic_box(inputbox=self._box, return_box=True)
-                        rot = np.array(new_box).T
-                        rotinv = np.linalg.inv(rot)
-                    else:
-                        new_box = self._box
-                        rot = [[0,0,0], [0,0,0], [0,0,0]]
-                        rotinv = [[0,0,0], [0,0,0], [0,0,0]]
-                #ghosts are present
-                else:
-                    if self.triclinic:
-                        new_box = self.embed_in_cubic_box(inputbox=self.actual_box, return_box=True)
-                        rot = np.array(new_box).T
-                        rotinv = np.linalg.inv(rot)
-                    else:
-                        new_box = self.actual_box
-                        rot = [[0,0,0], [0,0,0], [0,0,0]]
-                        rotinv = [[0,0,0], [0,0,0], [0,0,0]]
+            #    if self.actual_box is None:
+            #        if self.triclinic:
+            #            new_box = self.embed_in_cubic_box(inputbox=self._box, return_box=True)
+            #            rot = np.array(new_box).T
+            #            rotinv = np.linalg.inv(rot)
+            #        else:
+            #            new_box = self._box
+            #            rot = [[0,0,0], [0,0,0], [0,0,0]]
+            #            rotinv = [[0,0,0], [0,0,0], [0,0,0]]
+            #    #ghosts are present
+            #    else:
+            #        if self.triclinic:
+            #            new_box = self.embed_in_cubic_box(inputbox=self.actual_box, return_box=True)
+            #            rot = np.array(new_box).T
+            #            rotinv = np.linalg.inv(rot)
+            #        else:
+            #            new_box = self.actual_box
+            #            rot = [[0,0,0], [0,0,0], [0,0,0]]
+            #            rotinv = [[0,0,0], [0,0,0], [0,0,0]]
 
-                boxdims = [0,0,0]
-                boxdims[0] = np.sum(np.array(new_box[0])**2)**0.5
-                boxdims[1] = np.sum(np.array(new_box[1])**2)**0.5
-                boxdims[2] = np.sum(np.array(new_box[2])**2)**0.5
+            #    boxdims = [0,0,0]
+            #    boxdims[0] = np.sum(np.array(new_box[0])**2)**0.5
+            #    boxdims[1] = np.sum(np.array(new_box[1])**2)**0.5
+            #    boxdims[2] = np.sum(np.array(new_box[2])**2)**0.5
                 
-                pc.get_all_neighbors_voronoi(real_atomdict, 0.0,
-                    self.triclinic, rot, rotinv,
-                    boxdims, 1)                
+            #    pc.get_all_neighbors_voronoi(real_atomdict, 0.0,
+            #        self.triclinic, rot, rotinv,
+            #        boxdims, 1)                
                 
-                pc.clean_voronoi_vertices(real_atomdict, 
-                    self.atoms, 0.0,
-                    self.triclinic, rot, rotinv,
-                    boxdims, cutoff)
+            #    pc.clean_voronoi_vertices(real_atomdict, 
+            #        self.atoms, 0.0,
+            #        self.triclinic, rot, rotinv,
+            #        boxdims, cutoff)
 
                 #unique_vertices = []
                 #for i in range(len(self.vertex_is_unique)):
@@ -1093,17 +923,19 @@ class System:
                 #self.atoms["vertex_positions_unique_skipcheck"] = unique_vertices
 
             #assign extra options
-            self.atom.voronoi = AttrClass(self)
-            self.atom.voronoi.mapdict["volume"] = "voronoi_volume"
-            self.atom.voronoi.face = AttrClass(self)
-            self.atom.voronoi.face.mapdict["vertices"] = "face_vertices"
-            self.atom.voronoi.face.mapdict["perimeters"] = "face_perimeters"
-            self.atom.voronoi.vertex = AttrClass(self)
-            self.atom.voronoi.vertex.mapdict["vectors"] = "vertex_vectors"
-            self.atom.voronoi.vertex.mapdict["numbers"] = "vertex_numbers"
-            self.atom.voronoi.vertex.mapdict["positions"] = "vertex_positions"
-            self.atom.voronoi.vertex.mapdict["unique_positions"] = "vertex_positions_unique_skipcheck"
-        
+            mapdict = {}
+            mapdict["voronoi"] = {}
+            mapdict["voronoi"]["volume"] = "voronoi_volume"
+            mapdict["voronoi"]["face"] = {}
+            mapdict["voronoi"]["face"]["vertices"] = "face_vertices"
+            mapdict["voronoi"]["face"]["perimeters"] = "face_perimeters"
+            mapdict["voronoi"]["vertex"] = {}
+            mapdict["voronoi"]["vertex"]["vectors"] = "vertex_vectors"
+            mapdict["voronoi"]["vertex"]["numbers"] = "vertex_numbers"
+            mapdict["voronoi"]["vertex"]["positions"] = "vertex_positions"
+            #mapdict["voronoi"]["vertex"]["unique_positions"] = "vertex_positions_unique_nofilter"
+            self.atoms._add_attribute(mapdict)
+
         self.neighbors_found = True
 
     def calculate_q(self, q, averaged=False, continuous_algorithm=False):
@@ -1170,17 +1002,18 @@ class System:
         for val in qq:
             pc.calculate_q_single(self.atoms, val)
   
-
-        self.atom.steinhardt = AttrClass(self)
-        self.atom.steinhardt.generic = AttrClass(self)
+        mapdict = {}
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["generic"] = {}
         for val in qq:
             key1a = "q%d_norm"%val
             key1b = "q%d"%val
             key2 = "q%d_real"%val
             key3 = "q%d_imag"%val
-            self.atom.steinhardt.generic.mapdict[key1a] = key1b
-            self.atom.steinhardt.generic.mapdict[key2] = key2
-            self.atom.steinhardt.generic.mapdict[key3] = key3
+            mapdict["steinhardt"]["generic"][key1a] = key1b
+            mapdict["steinhardt"]["generic"][key2] = key2
+            mapdict["steinhardt"]["generic"][key3] = key3
+        self.atoms._add_attribute(mapdict)
 
 
     def _calculate_aq(self, qq):
@@ -1207,17 +1040,18 @@ class System:
         for val in qq:
             pc.calculate_aq_single(self.atoms, val)
 
-        self.atom.steinhardt.average = AttrClass(self)
+        mapdict = {}
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["average"] = {}
         for val in qq:
             key1a = "q%d_norm"%val
             key1b = "q%d"%val
             key2 = "q%d_real"%val
             key3 = "q%d_imag"%val
-            self.atom.steinhardt.average.mapdict[key1a] = key1b
-            self.atom.steinhardt.average.mapdict[key2] = key2
-            self.atom.steinhardt.average.mapdict[key3] = key3
-
-
+            mapdict["steinhardt"]["average"][key1a] = key1b
+            mapdict["steinhardt"]["average"][key2] = key2
+            mapdict["steinhardt"]["average"][key3] = key3
+        self.atoms._add_attribute(mapdict)
 
     def calculate_disorder(self, averaged=False, q=6):
         """
@@ -1269,14 +1103,17 @@ class System:
 
         pc.calculate_disorder(self.atoms, q)
 
-        self.atom.steinhardt.disorder = AttrClass(self)
-        self.atom.steinhardt.disorder.mapdict["norm"] = "disorder"
+        mapdict = {}
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["disorder"] = {}
+        mapdict["steinhardt"]["disorder"]["norm"] = "disorder"
 
         if averaged:
             #average the disorder
             avg_arr = self.average_over_neighbors("disorder")
             self.atoms["avg_disorder"] = avg_arr
-            self.atom.steinhardt.disorder.mapdict["average"] = "avg_disorder"
+            mapdict["steinhardt"]["disorder"]["average"] = "avg_disorder"
+        self.atoms._add_attribute(mapdict)
 
 
     def find_solids(self, bonds=0.5, threshold=0.5, avgthreshold=0.6, 
@@ -1391,15 +1228,18 @@ class System:
             threshold, avgthreshold, bonds, 
             compare_criteria, criteria)
 
-        self.atom.steinhardt.order = AttrClass(self)
-        self.atom.steinhardt.order.mapdict["bonds"] = "bonds"
-        self.atom.steinhardt.order.sij = AttrClass(self)
-        self.atom.steinhardt.order.sij.mapdict["norm"] = "sij"
-        self.atom.steinhardt.order.sij.mapdict["average"] = "avg_sij"
-        self.atom.steinhardt.order.mapdict["solid"] = "solid"
+        mapdict = {}
+        mapdict["steinhardt"] = {}
+        mapdict["steinhardt"]["order"] = {}
+        mapdict["steinhardt"]["order"]["bonds"] = "bonds"
+        mapdict["steinhardt"]["order"]["sij"] = {}
+        mapdict["steinhardt"]["order"]["sij"]["norm"] = "sij"
+        mapdict["steinhardt"]["order"]["sij"]["average"] = "avg_sij"
+        mapdict["steinhardt"]["order"]["sij"]["solid"] = "solid"
+        self.atoms._add_attribute(mapdict)
         
         if cluster:
-            lc = self.cluster_atoms(self.solid, largest=True)
+            lc = self.cluster_atoms(self.atoms.steinhardt.order.sij.solid, largest=True)
             return lc
 
     def find_largest_cluster(self):
@@ -1418,14 +1258,19 @@ class System:
         if not "cluster" in self.atoms.keys():
             raise RuntimeError("cluster_atoms needs to be called first")
 
-        clusterlist = [x for x in self.cluster if x != -1]
+        clusterlist = [x for x in self.atoms["cluster"] if x != -1]
         xx, xxcounts = np.unique(clusterlist, return_counts=True)
         arg = np.argsort(xxcounts)[-1]
         largest_cluster_size = xxcounts[arg]
         largest_cluster_id = xx[arg]
 
+
         self.atoms["largest_cluster"] = [True if self.atoms["cluster"][x]==largest_cluster_id else False for x in range(len(self.atoms["cluster"]))]
-        self.atom.cluster.mapdict["largest"] = "largest_cluster"
+        
+        mapdict = {}
+        mapdict["cluster"] = {}
+        mapdict["cluster"]["largest"] = "largest_cluster"
+        self.atoms._add_attribute(mapdict)
 
         return largest_cluster_size
 
@@ -1459,16 +1304,18 @@ class System:
         `condition` should be a boolean array the same length as number of atoms in the system.
         """
         
-        self.apply_condition(condition)
+        self.apply_selection(condition=condition)
         pc.find_clusters(self.atoms, cutoff)
 
-        self.atom.cluster = AttrClass(self)
-        self.atom.cluster.mapdict["id"] = "cluster"
+        mapdict = {}
+        mapdict["cluster"] = {}
+        mapdict["cluster"]["id"] = "cluster"
+        self.atoms._add_attribute(mapdict)
 
         #done!
         lc = self.find_largest_cluster()
         #pcs.System.get_largest_cluster_atoms(self)
-
+        self.remove_selection()
         if largest:
             return lc
 
@@ -1497,7 +1344,7 @@ class System:
             radius in distance units
         """
         self.find_neighbors(method="cutoff", cutoff=rmax)
-        distances = list(itertools.chain(*self.neighbordist))
+        distances = list(itertools.chain(*self.atoms["neighbordist"]))
 
         hist, bin_edges = np.histogram(distances, bins=bins, 
             range=(rmin, rmax), density=True)
@@ -1576,12 +1423,10 @@ class System:
 
         self.atoms["angular"] = angulars
         
-        try:
-            self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
-        except AttributeError:
-            self.atom.angular_parameters = AttrClass(self)
-            self.atom.angular_parameters.mapdict["diamond_angle"] = "angular"
-        
+        mapdict = {}
+        mapdict["angular_parameters"] = {}
+        mapdict["angular_parameters"]["diamond_angle"] = "angular"
+        self.atoms._add_attribute(mapdict)
 
     def calculate_chiparams(self, angles=False):
         """
@@ -1648,12 +1493,12 @@ class System:
         
         self.atoms["chiparams"] = chiparams
         
-        try:
-            self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
-        except AttributeError:
-            self.atom.angular_parameters = AttrClass(self)
-            self.atom.angular_parameters.mapdict["chi_params"] = "chiparams"
+        mapdict = {}
+        mapdict["angular_parameters"] = {}
+        mapdict["angular_parameters"]["chi_params"] = "chiparams"
         
         if angles:
             self.atoms["cosines"] = cosines
-            self.atom.angular_parameters.mapdict["cosines"] = "cosines"
+            mapdict["angular_parameters"]["cosines"] = "cosines"
+
+        self.atoms._add_attribute(mapdict)

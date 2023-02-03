@@ -87,14 +87,14 @@ def write_poscar(sys, outfile, comments="pyscal"):
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[1][0], vecs[1][1], vecs[1][2]))
     fout.write("      %1.14f %1.14f %1.14f\n"%(vecs[2][0], vecs[2][1], vecs[2][2]))
 
-    atypes = sys.atoms['types']
+    atypes = sys.atoms.types
     
     tt, cc  = np.unique(atypes, return_counts=True)
     
     atomgroups = [[] for x in range(len(tt))]
     
     for count, t in enumerate(tt):
-        for cc, pos in enumerate(sys.atoms['positions']):
+        for cc, pos in enumerate(sys.atoms.positions):
             if int(atypes[cc]) == t:
                 atomgroups[count].append(pos)
 

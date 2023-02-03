@@ -1,0 +1,99 @@
+positions:
+  doc: The positions of an atom in three dimensions in Cartesian coordinates.
+  map: positions
+ids:
+  doc: A unique number which is used as an identifier for an atom. 
+  map: ids
+types:
+  doc: An integer indicating the chemical species of an atom. Unique for each chemical species.
+  map: types
+species:
+  doc: An integer indicating the chemical species of an atom. Unique for each chemical species.
+  map: types
+mask:
+  doc: Masking for atoms
+  is_nested: True
+  primary:
+    doc: Mask of an atom
+    map: mask_1
+  secondary:
+    doc: Mask of an atom
+    map: mask_2
+selection:
+  doc: Selection
+  map: condition
+condition:
+  doc: Condition
+  map: condition
+head:
+  doc: Head
+  map: head
+neighbors:
+  doc:
+  is_nested: True
+  index:
+    doc:
+    map: neighbors
+  distance:
+    doc:
+    map: neighbordist
+  weight:
+    doc:
+    map: neighborweight
+  displacement:
+    doc:
+    map: diff
+  cutoff:
+    doc:
+    map: cutoff
+  angle:
+    doc:
+    is_nested: True
+    polar:
+      doc:
+      map: theta
+    azimuthal:
+      doc:
+      map: phi
+  temporary:
+    doc:
+    is_nested: True
+    index:
+      doc:
+      map: temp_neighbors
+    distance:
+      doc:
+      map: temp_neighbordist
+voronoi:
+  doc:
+  is_nested: True
+  volume:
+    doc:
+    map: voronoi_volume
+  face:
+    doc:
+    is_nested: True
+    vertices:
+      doc:
+      map: face_vertices
+    perimeters:
+      doc:
+      map: face_perimeters
+  vertex:
+    doc:
+    is_nested: True
+    vectors:
+      doc:
+      map: vertex_vectors
+    numbers:
+      doc:
+      map: vertex_numbers
+    positions:
+      doc:
+      map: vertex_positions
+    unique_positions:
+      doc:
+      map: vertex_positions_unique
+
+
+
