@@ -598,7 +598,7 @@ class System:
             compressed = compressed, customkeys = customkeys, customvals = customvals,
             timestep = timestep, species = species)
 
-    def to_ase(self, species):
+    def to_ase(self, species=None):
         """
         Convert system to an ASE Atoms object
 

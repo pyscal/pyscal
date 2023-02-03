@@ -93,6 +93,9 @@ def convert_snap(sys, species=None):
     
     #get element strings
     if 'species' not in sys.atoms.keys():
+        sys.atoms["species"] = [None for x in range(sys.atoms.ntotal)]
+
+    if sys.atoms.species[0] is None:
         if species is None:
             raise ValueError("Species was not known! To convert to ase, species need to be provided using the species keyword")
         #otherwise we know the species
@@ -105,8 +108,6 @@ def convert_snap(sys, species=None):
         for cc, typ in enumerate(types):
             atomspecies.append(species[int(typ-1)])
     else:
-        #now if species are already there in custom
-        #we can safely ignore any input
         atomspecies = sys.atoms.species
       
     cell = sys.box
