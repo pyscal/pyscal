@@ -1344,7 +1344,7 @@ class System:
             radius in distance units
         """
         self.find_neighbors(method="cutoff", cutoff=rmax)
-        distances = list(itertools.chain(*self.neighbordist))
+        distances = list(itertools.chain(*self.atoms["neighbordist"]))
 
         hist, bin_edges = np.histogram(distances, bins=bins, 
             range=(rmin, rmax), density=True)
