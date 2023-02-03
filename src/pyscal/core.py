@@ -684,24 +684,25 @@ class System:
         -------
 
         """
+        print(key)
 
         self._check_neighbors()
 
         if not key in self.atoms.keys():
             raise KeyError("required property not found!")
 
-        test = gettattr(self.atoms, key)[0]
+        test = self.atoms[key][0]
 
         if isinstance(test, list):
             raise TypeError("Averaging can only be done over 1D quantities")
 
         avgarr = []
-        for i in range(len(self.atoms._all_positions)):
+        for i in range(len(self.atoms["positions"])):
             arr = []
             if include_self:
-                arr.append(gettattr(self.atoms, key)[i])
-            for j in self.atoms._all_neighbors[i]:
-                arr.append(gettattr(self.atoms, key)[j])
+                arr.append(self.atoms[key][i])
+            for j in self.atoms["neighbors"][i]:
+                arr.append(self.atoms[key][j])
             avgarr.append(np.mean(arr))
         
         return avgarr 
