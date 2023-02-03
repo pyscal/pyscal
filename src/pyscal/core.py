@@ -371,11 +371,11 @@ class System:
         self._atoms.remove_mask(mask_type=mask_type, ids=ids, 
             indices=indices, condition=condition, selection=selection)
 
-    def apply_selection(self, ids=None, indices=None, condition=None, selection=False):
-        self._atoms.apply_selection(ids=ids, indices=indices, condition=condition, selection=selection)    
+    def apply_selection(self, ids=None, indices=None, condition=None):
+        self._atoms.apply_selection(ids=ids, indices=indices, condition=condition)    
     
-    def remove_selection(self, ids=None, indices=None, condition=None, selection=False):
-        self._atoms.remove_selection(ids=ids, indices=indices, condition=condition, selection=selection)
+    def remove_selection(self, ids=None, indices=None, condition=None):
+        self._atoms.remove_selection(ids=ids, indices=indices, condition=condition)
     
     def delete(self, ids=None, indices=None, condition=None, selection=False):
         self._atoms.delete(ids=ids, indices=indices, condition=condition, selection=selection)
@@ -1239,7 +1239,7 @@ class System:
         self.atoms._add_attribute(mapdict)
         
         if cluster:
-            lc = self.cluster_atoms(self.solid, largest=True)
+            lc = self.cluster_atoms(self.atoms.steinhardt.order.sij.solid, largest=True)
             return lc
 
     def find_largest_cluster(self):
@@ -1258,7 +1258,7 @@ class System:
         if not "cluster" in self.atoms.keys():
             raise RuntimeError("cluster_atoms needs to be called first")
 
-        clusterlist = [x for x in self.cluster if x != -1]
+        clusterlist = [x for x in self.atoms["cluster"] if x != -1]
         xx, xxcounts = np.unique(clusterlist, return_counts=True)
         arg = np.argsort(xxcounts)[-1]
         largest_cluster_size = xxcounts[arg]
@@ -1304,7 +1304,7 @@ class System:
         `condition` should be a boolean array the same length as number of atoms in the system.
         """
         
-        self.apply_condition(condition)
+        self.apply_selection(condition=condition)
         pc.find_clusters(self.atoms, cutoff)
 
         mapdict = {}
@@ -1315,7 +1315,7 @@ class System:
         #done!
         lc = self.find_largest_cluster()
         #pcs.System.get_largest_cluster_atoms(self)
-
+        self.remove_selection()
         if largest:
             return lc
 

@@ -252,13 +252,32 @@ class Atoms(dict, AttrSetter):
     def _apply_selection(self, condition):
         for i in range(self.ntotal):
             self["condition"][i] = condition[self["head"][i]]
-        
+    
+    def _validate_condition(self, condition):
+        if not (len(condition)==self.nreal):
+            raise ValueError("condition should have same length as atoms")
+        for c, x in enumerate(condition):
+            try:
+                x = bool(x)
+                condition[c] = x
+            except:
+                pass 
+            if not isinstance(x, bool):
+                raise ValueError("Condition elements should be boolean")
+        return condition
+
     def apply_selection(self, ids=None, indices=None, condition=None):
-        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
+        if isinstance(condition, list):
+            masks = self._validate_condition(condition)
+        else:
+            masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
         self._apply_selection(masks)
     
     def remove_selection(self, ids=None, indices=None, condition=None):
-        masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
+        if isinstance(condition, list):
+            masks = self._validate_condition(condition)
+        else:
+            masks = self._generate_bool_list(ids=ids, indices=indices, condition=condition)
         masks = [not x for x in masks]
         self._apply_selection(masks)
 
