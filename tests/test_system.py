@@ -7,10 +7,10 @@ from pyscal.crystal_structures import Structure
 
 
 def test_system_init():
-	sys = Structure().lattice.bcc(repetitions = [4, 4, 4], lattice_constant=3.127)
+	sys = Structure().lattice.bcc(repetitions = [10,10,10], lattice_constant=3.127)
 	assert len(sys.atoms["positions"]) == 10*10*10*2
 	assert sys.triclinic == 0
-	assert np.abs(sys.boxdims[0] - box[0][0]) < 1E-5
+	assert np.abs(sys.boxdims[0] - sys.box[0][0]) < 1E-5
 
 
 def test_system_triclinic():

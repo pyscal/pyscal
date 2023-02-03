@@ -199,7 +199,7 @@ class Atoms(dict, AttrSetter):
 
     def iter_atoms(self):
         for index in range(self.nreal):
-            atom_dict = {key: self[key][index] for key in self.keys()}
+            atom_dict = {key: [self[key][index]] for key in self.keys()}
             yield Atoms(atom_dict)
 
     def _generate_bool_list(self, ids=None, indices=None, condition=None, selection=False):
