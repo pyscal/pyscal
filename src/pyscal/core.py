@@ -858,61 +858,61 @@ class System:
         
         elif method == 'voronoi':
             clean_vertices = (cutoff>0)
-            
-            if not clean_vertices:
+            #CLEANING is TURNED OFF
+            #if not clean_vertices:
                 #copy the simulation cell
-                backupbox = self._box.copy()
-                if self.triclinic:
-                    if not self.ghosts_created:
-                        atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False, return_atoms=True)
-                        self._atoms = atoms
-                        self.embed_in_cubic_box()
-                pc.get_all_neighbors_voronoi(self.atoms, 0.0,
-                    self.triclinic, self.rot, self.rotinv,
-                    self.boxdims, voroexp)
+            backupbox = self._box.copy()
+            if self.triclinic:
+                if not self.ghosts_created:
+                    atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False, return_atoms=True)
+                    self._atoms = atoms
+                    self.embed_in_cubic_box()
+            pc.get_all_neighbors_voronoi(self.atoms, 0.0,
+                self.triclinic, self.rot, self.rotinv,
+                self.boxdims, voroexp)
 
-                if self.triclinic:
-                    self._box = backupbox
+            if self.triclinic:
+                self._box = backupbox
 
             #now clean up
-            else:
-                real_atomdict = {"positions":copy.copy(self.atoms._all_positions), 
-                 "ghost":copy.copy(self.atoms._all_ghost)}
+            #else:
+            #    real_atomdict = {"positions":copy.copy(self.atoms.positions_for_all), 
+            #     "ghost":copy.copy(self.atoms.positions_for_ghost)}
                 #we need to call the method
                 #this means alles good
-                if self.actual_box is None:
-                    if self.triclinic:
-                        new_box = self.embed_in_cubic_box(inputbox=self._box, return_box=True)
-                        rot = np.array(new_box).T
-                        rotinv = np.linalg.inv(rot)
-                    else:
-                        new_box = self._box
-                        rot = [[0,0,0], [0,0,0], [0,0,0]]
-                        rotinv = [[0,0,0], [0,0,0], [0,0,0]]
-                #ghosts are present
-                else:
-                    if self.triclinic:
-                        new_box = self.embed_in_cubic_box(inputbox=self.actual_box, return_box=True)
-                        rot = np.array(new_box).T
-                        rotinv = np.linalg.inv(rot)
-                    else:
-                        new_box = self.actual_box
-                        rot = [[0,0,0], [0,0,0], [0,0,0]]
-                        rotinv = [[0,0,0], [0,0,0], [0,0,0]]
+            #    if self.actual_box is None:
+            #        if self.triclinic:
+            #            new_box = self.embed_in_cubic_box(inputbox=self._box, return_box=True)
+            #            rot = np.array(new_box).T
+            #            rotinv = np.linalg.inv(rot)
+            #        else:
+            #            new_box = self._box
+            #            rot = [[0,0,0], [0,0,0], [0,0,0]]
+            #            rotinv = [[0,0,0], [0,0,0], [0,0,0]]
+            #    #ghosts are present
+            #    else:
+            #        if self.triclinic:
+            #            new_box = self.embed_in_cubic_box(inputbox=self.actual_box, return_box=True)
+            #            rot = np.array(new_box).T
+            #            rotinv = np.linalg.inv(rot)
+            #        else:
+            #            new_box = self.actual_box
+            #            rot = [[0,0,0], [0,0,0], [0,0,0]]
+            #            rotinv = [[0,0,0], [0,0,0], [0,0,0]]
 
-                boxdims = [0,0,0]
-                boxdims[0] = np.sum(np.array(new_box[0])**2)**0.5
-                boxdims[1] = np.sum(np.array(new_box[1])**2)**0.5
-                boxdims[2] = np.sum(np.array(new_box[2])**2)**0.5
+            #    boxdims = [0,0,0]
+            #    boxdims[0] = np.sum(np.array(new_box[0])**2)**0.5
+            #    boxdims[1] = np.sum(np.array(new_box[1])**2)**0.5
+            #    boxdims[2] = np.sum(np.array(new_box[2])**2)**0.5
                 
-                pc.get_all_neighbors_voronoi(real_atomdict, 0.0,
-                    self.triclinic, rot, rotinv,
-                    boxdims, 1)                
+            #    pc.get_all_neighbors_voronoi(real_atomdict, 0.0,
+            #        self.triclinic, rot, rotinv,
+            #        boxdims, 1)                
                 
-                pc.clean_voronoi_vertices(real_atomdict, 
-                    self.atoms, 0.0,
-                    self.triclinic, rot, rotinv,
-                    boxdims, cutoff)
+            #    pc.clean_voronoi_vertices(real_atomdict, 
+            #        self.atoms, 0.0,
+            #        self.triclinic, rot, rotinv,
+            #        boxdims, cutoff)
 
                 #unique_vertices = []
                 #for i in range(len(self.vertex_is_unique)):
@@ -933,7 +933,7 @@ class System:
             mapdict["voronoi"]["vertex"]["vectors"] = "vertex_vectors"
             mapdict["voronoi"]["vertex"]["numbers"] = "vertex_numbers"
             mapdict["voronoi"]["vertex"]["positions"] = "vertex_positions"
-            #mapdict["voronoi"]["vertex"]["unique_positions"] = "vertex_positions_unique_skipcheck"
+            #mapdict["voronoi"]["vertex"]["unique_positions"] = "vertex_positions_unique_nofilter"
             self.atoms._add_attribute(mapdict)
 
         self.neighbors_found = True

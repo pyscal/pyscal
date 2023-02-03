@@ -61,7 +61,7 @@ class AttrSetter:
         #print(stripped_key, search_key, which_type, reverse)
         if (stripped_key == key):
             #this didnt work
-            raise AttributeError("Attribute not found")
+            raise AttributeError(f"Attribute {stripped_key} not found")
 
         else:
             return self._get_key_on_condition(stripped_key, search_key, which_type, reverse)
