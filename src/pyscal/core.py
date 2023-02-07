@@ -20,7 +20,7 @@ import pyscal.csystem as pc
 import pyscal.traj_process as ptp
 from pyscal.formats.ase import convert_snap
 import pyscal.structure_creator as pcs
-
+import pyscal.operations.operations as po
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
 
@@ -183,73 +183,79 @@ class System:
     def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
         """
         """
+        rep = po.Repeat(self, reps)
+        rep.input.atoms = atoms
+        rep.input.ghost = ghost
+        rep.input.scale_box = scale_box
+        rep.input.return_atoms = return_atoms
+        return rep.calculate()
+
+        #box = self.box        
+        #self.actual_box = box.copy()
+
+        #if atoms is None:
+        #    atoms = self.atoms
+
+        #newatoms = []
+        #idstart = len(atoms) + 1
+
+        #x1 = -reps[0]
+        #x2 = reps[0]+1
+        #y1 = -reps[1]
+        #y2 = reps[1]+1
+        #z1 = -reps[2]
+        #z2 = reps[2]+1
+        #xs = 2*reps[0] + 1
+        #ys = 2*reps[1] + 1
+        #zs = 2*reps[2] + 1
         
-        box = self.box        
-        self.actual_box = box.copy()
+        #datadict = {key:[] for key in atoms.keys()}
+        #del datadict['positions']
+        #del datadict['ids']
+        #del datadict['head']
+        #del datadict['ghost']
+        #positions = []
+        #ids = []
+        #head = []
+        #ghosts = []
 
-        if atoms is None:
-            atoms = self.atoms
+        #for i in range(x1, x2):
+        #    for j in range(y1, y2):
+        #        for k in range(z1, z2):
+        #            if (i==j==k==0):
+        #                continue
+        #            for count, pos in enumerate(atoms['positions']):
+        #                #we should create ghost images for only real atoms
+        #                if not atoms["ghost"][count]:
+        #                    pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
+        #                    positions.append(list(pos))
+        #                    ids.append(idstart)
+        #                    head.append(count)
+        #                    ghosts.append(ghost)
+        #                    idstart += 1
+        #                    for key in datadict.keys():
+        #                        datadict[key].append(atoms[key][count])
 
-        newatoms = []
-        idstart = len(atoms) + 1
+        #if scale_box:
+        #    box[0] = xs*np.array(box[0])
+        #    box[1] = ys*np.array(box[1])
+        #    box[2] = zs*np.array(box[2])
+        #    self.box = box
+        #if ghost:
+        #    self.ghosts_created = True
 
-        x1 = -reps[0]
-        x2 = reps[0]+1
-        y1 = -reps[1]
-        y2 = reps[1]+1
-        z1 = -reps[2]
-        z2 = reps[2]+1
-        xs = 2*reps[0] + 1
-        ys = 2*reps[1] + 1
-        zs = 2*reps[2] + 1
-        
-        datadict = {key:[] for key in atoms.keys()}
-        del datadict['positions']
-        del datadict['ids']
-        del datadict['head']
-        del datadict['ghost']
-        positions = []
-        ids = []
-        head = []
-        ghosts = []
+        #atoms['positions'].extend(positions)
+        #atoms['ids'].extend(ids)
+        #atoms['ghost'].extend(ghosts)
+        #atoms['head'].extend(head)
+        #for key in datadict.keys():
+        #    atoms[key].extend(datadict[key])
 
-        for i in range(x1, x2):
-            for j in range(y1, y2):
-                for k in range(z1, z2):
-                    if (i==j==k==0):
-                        continue
-                    for count, pos in enumerate(atoms['positions']):
-                        #we should create ghost images for only real atoms
-                        if not atoms["ghost"][count]:
-                            pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                            positions.append(list(pos))
-                            ids.append(idstart)
-                            head.append(count)
-                            ghosts.append(ghost)
-                            idstart += 1
-                            for key in datadict.keys():
-                                datadict[key].append(atoms[key][count])
-
-        if scale_box:
-            box[0] = xs*np.array(box[0])
-            box[1] = ys*np.array(box[1])
-            box[2] = zs*np.array(box[2])
-            self.box = box
-        if ghost:
-            self.ghosts_created = True
-
-        atoms['positions'].extend(positions)
-        atoms['ids'].extend(ids)
-        atoms['ghost'].extend(ghosts)
-        atoms['head'].extend(head)
-        for key in datadict.keys():
-            atoms[key].extend(datadict[key])
-
-        if return_atoms:
-            return atoms
-        else:
-            self.atoms = atoms
-            return self
+        #if return_atoms:
+        #    return atoms
+        #else:
+        #    self.atoms = atoms
+        #    return self
 
     #def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
         """

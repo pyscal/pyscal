@@ -165,4 +165,77 @@ class AttrSetter:
             else:
                 self._map_dict[key] = val
 
+def generate_input_template():
+    indict = {"attribute_name":{
+        "value": None,
+        "doc": None,
+        "unit": None,
+        "url": None,
+    }}
+    return indict
 
+def _is_sub_input(indict):
+    if "value" in indict.keys():
+        return False
+    return True
+
+def _create_getter(key):
+    def _getter(self):
+        return getattr(self, f"_{key}")
+    return _getter
+
+def _create_setter(key):
+    def _setter(self, value):
+        setattr(self, f"_{key}", value)
+    return _setter
+
+def _get_doc_from_key(keydict):
+    url =  keydict["url"] if "url" in keydict.keys() else None
+    unit =  keydict["unit"] if "unit" in keydict.keys() else None
+    value =  keydict["value"] if "value" in keydict.keys() else None
+    doc =  keydict["doc"] if "doc" in keydict.keys() else None
+    typeinfo =  keydict["type"] if "type" in keydict.keys() else None
+    optional = False if value is None else True    
+
+    doc = f"""
+    {doc}  
+    Unit: {unit}
+    Default: {value}
+    url: {url}
+    Optional: {optional}
+    type: {typeinfo}
+    """
+    return doc
+
+class PropertySetter(type):
+    def __new__(cls, name, bases, dct, input_params):
+        for key, val in input_params.items():
+            if not _is_sub_input(val):
+                dct[key] = property(fget=_create_getter(key), fset=_create_setter(key), doc=_get_doc_from_key(val))
+        x = super().__new__(cls, name, bases, dct)
+        return x
+    
+    def __init__(self, name, bases, dct, input_params):
+        for key, val in input_params.items():
+            if not _is_sub_input(val): 
+                setattr(self, f"_{key}", val["value"])
+        
+class DocumentedKeywords:
+    def _create_input_tree(self, indict, name=None, key=None):
+        if name is None:
+            name = "input"
+            
+        #create the main input
+        _cmain = PropertySetter("CMain", (), {}, input_params=indict)
+        
+        if key is None:
+            setattr(self, name, _cmain())
+        else:
+            head = getattr(self, name)
+            setattr(head, key, _cmain())
+        
+        for key, val in indict.items():
+            if _is_sub_input(val):
+                self._create_input_tree(val, name=name, key=key)
+                name = key
+                
