@@ -92,7 +92,10 @@ class ElementCreator:
     def __getattr__(self, key):
         #this is the element based creater
         if key in self._element_dict.keys():
-            pfunc = partial(structure_creator, self._element_dict[key]['structure'],
+            structure = self._element_dict[key]['structure']
+            if structure == "dia":
+                structure = "diamond"
+            pfunc = partial(structure_creator, structure,
                         lattice_constant=self._element_dict[key]['lattice_constant'],
                         element = key)
             update_wrapper(pfunc, structure_creator)

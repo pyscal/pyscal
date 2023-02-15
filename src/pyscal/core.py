@@ -112,6 +112,19 @@ class System:
         self._box = userbox
 
     @property
+    def box_dimensions(self):
+        return [np.linalg.norm(self.box[x]) for x in range(3)]
+
+    @property
+    def direct_coordinates(self):
+        dims = self.box_dimensions
+        xfrac = np.array(self.atoms.positions)[:,0]/dims[0]
+        yfrac = np.array(self.atoms.positions)[:,1]/dims[1]
+        zfrac = np.array(self.atoms.positions)[:,2]/dims[2]
+        coords = np.column_stack((xfrac, yfrac, zfrac))
+        return coords    
+    
+    @property
     def volume(self):
         """
         Volume of box
