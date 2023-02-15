@@ -69,7 +69,7 @@ def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_rati
     if element is not None:
         if isinstance(element, str):
             element = [element]
-        if not (len(element) == unique_types):
+        if not (len(element) == len(unique_types)):
             raise ValueError("Elements should equal number of species in the system")
         
         element_dict = dict([x for x in zip(unique_types, element)])
