@@ -1,183 +1,80 @@
-Ac:
-  lattice_constant: 5.31
-  structure: fcc
-Ag:
-  lattice_constant: 4.09
-  structure: fcc
-Al:
-  lattice_constant: 4.05
-  structure: fcc
-Ar:
-  lattice_constant: 5.26
-  structure: fcc
-Au:
-  lattice_constant: 4.08
-  structure: fcc
-Ba:
-  lattice_constant: 5.02
-  structure: bcc
-Be:
-  lattice_constant: 2.29
-  structure: hcp
-Ca:
-  lattice_constant: 5.58
-  structure: fcc
-Cd:
-  lattice_constant: 2.98
-  structure: hcp
-Ce:
-  lattice_constant: 5.16
-  structure: fcc
-Co:
-  lattice_constant: 2.51
-  structure: hcp
-Cr:
-  lattice_constant: 2.88
-  structure: bcc
-Cs:
-  lattice_constant: 6.05
-  structure: bcc
-Cu:
-  lattice_constant: 3.61
-  structure: fcc
-Dy:
-  lattice_constant: 3.59
-  structure: hcp
-Er:
-  lattice_constant: 3.56
-  structure: hcp
-Eu:
-  lattice_constant: 4.61
-  structure: bcc
-Fe:
-  lattice_constant: 2.87
-  structure: bcc
-Gd:
-  lattice_constant: 3.64
-  structure: hcp
-Ge:
-  lattice_constant: 5.66
-  structure: diamond
-He:
-  lattice_constant: 3.57
-  structure: hcp
-Hf:
-  lattice_constant: 3.2
-  structure: hcp
-Ho:
-  lattice_constant: 3.58
-  structure: hcp
-Ir:
-  lattice_constant: 3.84
-  structure: fcc
-Kr:
-  lattice_constant: 5.72
-  structure: fcc
-La:
-  lattice_constant: 3.75
-  structure: hcp
-Li:
-  lattice_constant: 3.49
-  structure: bcc
-Lu:
-  lattice_constant: 3.51
-  structure: hcp
-Mg:
-  lattice_constant: 3.21
-  structure: hcp
-Mo:
-  lattice_constant: 3.15
-  structure: bcc
-Na:
-  lattice_constant: 4.23
-  structure: bcc
-Nb:
-  lattice_constant: 3.3
-  structure: bcc
-Nd:
-  lattice_constant: 3.66
-  structure: hcp
-Ne:
-  lattice_constant: 4.43
-  structure: fcc
-Ni:
-  lattice_constant: 3.52
-  structure: fcc
-Os:
-  lattice_constant: 2.74
-  structure: hcp
-Pb:
-  lattice_constant: 4.95
-  structure: fcc
-Pd:
-  lattice_constant: 3.89
-  structure: fcc
-Po:
-  lattice_constant: 3.35
-  structure: sc
-Pr:
-  lattice_constant: 3.67
-  structure: hcp
-Pt:
-  lattice_constant: 3.92
-  structure: fcc
-Rb:
-  lattice_constant: 5.59
-  structure: bcc
-Re:
-  lattice_constant: 2.76
-  structure: hcp
-Rh:
-  lattice_constant: 3.8
-  structure: fcc
-Ru:
-  lattice_constant: 2.7
-  structure: hcp
-Sc:
-  lattice_constant: 3.31
-  structure: hcp
-Se:
-  lattice_constant: 4.36
-  structure: hcp
-Si:
-  lattice_constant: 5.43
-  structure: diamond
-Sr:
-  lattice_constant: 6.08
-  structure: fcc
-Ta:
-  lattice_constant: 3.31
-  structure: bcc
-Tb:
-  lattice_constant: 3.6
-  structure: hcp
-Tc:
-  lattice_constant: 2.74
-  structure: hcp
-Te:
-  lattice_constant: 4.45
-  structure: hcp
-Th:
-  lattice_constant: 5.08
-  structure: fcc
-Ti:
-  lattice_constant: 2.95
-  structure: hcp
-Tl:
-  lattice_constant: 3.46
-  structure: hcp
-Tm:
-  lattice_constant: 3.54
-  structure: hcp
-Xe:
-  lattice_constant: 6.2
-  structure: fcc
-Yb:
-  lattice_constant: 5.49
-  structure: fcc
-Zn:
-  lattice_constant: 2.66
-  structure: hcp
-Zr:
-  lattice_constant: 3.23
-  structure: hcp
+simple_cubic:
+  natoms: 1
+  species: [1]
+  scaling_factors: [1.0, 1.0, 1.0]
+  positions: 
+    - [0.0, 0.0, 0.0]
+
+bcc: 
+  natoms: 2
+  species: [1, 1]
+  scaling_factors: [1.0, 1.0, 1.0]
+  positions: 
+    - [0.0, 0.0, 0.0]
+    - [0.5, 0.5, 0.5]
+
+fcc: 
+  natoms: 4
+  species: [1, 1, 1, 1]
+  scaling_factors: [1.0, 1.0, 1.0]
+  positions: 
+    - [0.0, 0.0, 0.0]
+    - [0.5, 0.0, 0.5]
+    - [0.0, 0.5, 0.5]
+    - [0.5, 0.5, 0.0]
+
+hcp: 
+  natoms: 4
+  species: [1, 1, 1, 1]
+  scaling_factors: [1.0, 1.7320508075688772, 1.633]
+  positions: 
+    - [0.0, 0.0, 0.0]
+    - [0.5, 0.8660254037844386, 0.0]
+    - [0.5, 0.28867513459481287, 0.8165]
+    - [0.0, 1.1547005383792517, 0.8165]
+
+diamond: 
+  natoms: 8
+  species: [1, 1, 1, 1, 1, 1, 1, 1]
+  scaling_factors: [1.0, 1.0, 1.0]
+  positions: 
+    - [0.0, 0.0, 0.0]
+    - [0.25, 0.25, 0.25]
+    - [0.5, 0.5, 0.0]
+    - [0.75, 0.75, 0.25]
+    - [0.5, 0.0, 0.5]
+    - [0.0, 0.5, 0.5]
+    - [0.75, 0.25, 0.75]
+    - [0.25, 0.75, 0.75]
+
+a15: 
+  natoms: 8
+  species: [1, 1, 1, 1, 1, 1, 1, 1]
+  scaling_factors: [1.0, 1.0, 1.0]
+  positions: 
+    - [0.0, 0.0, 0.0]
+    - [0.5, 0.5, 0.5]
+    - [0.25, 0.5, 0.0]
+    - [0.75, 0.5, 0.0]
+    - [0.0, 0.25, 0.5]
+    - [0.0, 0.75, 0.5]
+    - [0.5, 0.0, 0.25]
+    - [0.5, 0.0, 0.75]
+
+l12: 
+  natoms: 4
+  species: [1, 2, 2, 2]
+  scaling_factors: [1.0, 1.0, 1.0]
+  positions: 
+    - [0.0, 0.0, 0.0]
+    - [0.5, 0.0, 0.5]
+    - [0.0, 0.5, 0.5]
+    - [0.5, 0.5, 0.0]
+
+b2: 
+  natoms: 2
+  species: [1, 2]
+  scaling_factors: [1.0, 1.0, 1.0]
+  positions: 
+    - [0.0, 0.0, 0.0] 
+    - [0.5, 0.5, 0.5]

@@ -93,8 +93,6 @@ class ElementCreator:
         #this is the element based creater
         if key in self._element_dict.keys():
             structure = self._element_dict[key]['structure']
-            if structure == "dia":
-                structure = "diamond"
             pfunc = partial(structure_creator, structure,
                         lattice_constant=self._element_dict[key]['lattice_constant'],
                         element = key)
