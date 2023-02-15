@@ -33,6 +33,7 @@ class Repeat(DocumentedKeywords):
         }
 
         self._create_input_tree(_input)
+        self.
         self.input.system = system
         self.input.repetitions = repetitions
 
@@ -44,7 +45,7 @@ class Repeat(DocumentedKeywords):
             atoms = self.input.system.atoms
         else:
             atoms = self.input.atoms
-            
+
         newatoms = []
         idstart = len(atoms) + 1
 
