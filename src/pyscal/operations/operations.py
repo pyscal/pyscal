@@ -1,5 +1,4 @@
 import numpy as np
-
 from pyscal.attributes import DocumentedKeywords
 
 class Repeat(DocumentedKeywords):
@@ -33,7 +32,6 @@ class Repeat(DocumentedKeywords):
         }
 
         self._create_input_tree(_input)
-        self.
         self.input.system = system
         self.input.repetitions = repetitions
 

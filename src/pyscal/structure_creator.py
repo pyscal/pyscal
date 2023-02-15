@@ -125,6 +125,7 @@ def _update_list_of_elements():
     Only run when needed to update database
     """
     import mendeleev
+    from mendeleev import element
     el_list = dir(mendeleev)
     el_dict = {}
 
@@ -136,10 +137,12 @@ def _update_list_of_elements():
             struct = chem.lattice_structure
             lc = chem.lattice_constant
             if (struct is not None) and (lc is not None):
-                if struct.lower() in ['sc', 'bcc', 'fcc', 'hcp', 'dia']:
+                if struct.lower() in ['sc', 'bcc', 'fcc', 'hex', 'dia']:
                     el_dict[el] = {}
-                    if struct == "dia":
+                    if struct.lower() == "dia":
                         struct = "diamond"
+                    elif struct.lower() == "hex":
+                        struct = "hcp"
                     el_dict[el]["structure"] = str(struct.lower())
                     el_dict[el]["lattice_constant"] = float(lc)
     return el_dict
