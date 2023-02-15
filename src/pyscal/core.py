@@ -20,7 +20,7 @@ import pyscal.csystem as pc
 import pyscal.traj_process as ptp
 from pyscal.formats.ase import convert_snap
 import pyscal.structure_creator as pcs
-
+import pyscal.operations.operations as po
 #import pyscal.routines as routines
 #import pyscal.visualization as pv
 
@@ -158,178 +158,16 @@ class System:
         ## MOVE TO ATOMS
         self._atoms.add_atoms(atoms)
 
-    #def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=True):
-        """
-        Frac greater than one will be converted to int
-        """
-        """
-        if isinstance(reps, list):
-            if not len(reps)==3:
-                raise ValueError("repetitions should be [nx, ny, nz]")
-        else:
-            reps = [reps, reps, reps]
-
-        isfrac = np.prod([True if (0<rep<1) else False for rep in reps])
-        if isfrac:
-            atoms = self._repeat_partial_box(reps, atoms=atoms, ghost=ghost, scale_box=scale_box)
-        else:
-            atoms = self._repeat_full_box(reps, atoms=atoms, ghost=ghost, scale_box=scale_box)
-
-        if assign:
-            self._atoms = atoms
-        else:
-            return atoms
-        """
     def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
         """
         """
-        
-        box = self.box        
-        self.actual_box = box.copy()
+        rep = po.Repeat(self, reps)
+        rep.input.atoms = atoms
+        rep.input.ghost = ghost
+        rep.input.scale_box = scale_box
+        rep.input.return_atoms = return_atoms
+        return rep.calculate()
 
-        if atoms is None:
-            atoms = self.atoms
-
-        newatoms = []
-        idstart = len(atoms) + 1
-
-        x1 = -reps[0]
-        x2 = reps[0]+1
-        y1 = -reps[1]
-        y2 = reps[1]+1
-        z1 = -reps[2]
-        z2 = reps[2]+1
-        xs = 2*reps[0] + 1
-        ys = 2*reps[1] + 1
-        zs = 2*reps[2] + 1
-        
-        datadict = {key:[] for key in atoms.keys()}
-        del datadict['positions']
-        del datadict['ids']
-        del datadict['head']
-        del datadict['ghost']
-        positions = []
-        ids = []
-        head = []
-        ghosts = []
-
-        for i in range(x1, x2):
-            for j in range(y1, y2):
-                for k in range(z1, z2):
-                    if (i==j==k==0):
-                        continue
-                    for count, pos in enumerate(atoms['positions']):
-                        #we should create ghost images for only real atoms
-                        if not atoms["ghost"][count]:
-                            pos = (pos + i*np.array(box[0]) + j*np.array(box[1]) + k*np.array(box[2]))
-                            positions.append(list(pos))
-                            ids.append(idstart)
-                            head.append(count)
-                            ghosts.append(ghost)
-                            idstart += 1
-                            for key in datadict.keys():
-                                datadict[key].append(atoms[key][count])
-
-        if scale_box:
-            box[0] = xs*np.array(box[0])
-            box[1] = ys*np.array(box[1])
-            box[2] = zs*np.array(box[2])
-            self.box = box
-        if ghost:
-            self.ghosts_created = True
-
-        atoms['positions'].extend(positions)
-        atoms['ids'].extend(ids)
-        atoms['ghost'].extend(ghosts)
-        atoms['head'].extend(head)
-        for key in datadict.keys():
-            atoms[key].extend(datadict[key])
-
-        if return_atoms:
-            return atoms
-        else:
-            self.atoms = atoms
-            return self
-
-    #def _repeat_partial_box(self, reps, atoms=None, ghost=False, scale_box=True):
-        """
-        """
-    """
-        box = self.box        
-        self.actual_box = box.copy()
-
-        if atoms is None:
-            atoms = self.atoms
-
-        idstart = len(atoms) + 1
-        
-        for index, rep in enumerate(reps):
-            if not (0 < rep < 1):
-                raise ValueError("Fractional repetition should be 0<rep<1")
-
-            left = rep*self.boxdims[index]
-            right = (1-rep)*self.boxdims[index]
-
-            datadict = {key:[] for key in atoms.keys()}
-            del datadict['positions']
-            del datadict['ids']
-            del datadict['head']
-            del datadict['ghost']
-            positions = []
-            ids = []
-            head = []
-            ghosts = []
-            disc = 0
-
-            for count, pos in enumerate(atoms['positions']):                
-                if (pos[index] <= left):
-                    displacement = [0, 0, 0]
-                    displacement[index] = 1.0                    
-                    displace = True    
-                elif (pos[index] > right):
-                    displacement = [0, 0, 0]
-                    displacement[index] = -1.0
-                    displace = True
-                else:
-                    displace = False
-
-                if displace:
-                    disc += 1
-                    pos = pc.remap_and_displace_atom(pos, self.triclinic,
-                        self.rot, self.rotinv,
-                        self.boxdims, displacement)
-                    positions.append(list(pos))
-                    ids.append(idstart)
-                    head.append(count)
-                    ghosts.append(ghost)
-                    idstart += 1
-                    for key in datadict.keys():
-                        datadict[key].append(atoms[key][count])
-            
-            print(len(atoms['positions']))
-            print("displaced %d"%disc)
-            atoms['positions'] = [*atoms['positions'], *positions]
-            atoms['ids'] = [*atoms['ids'], *ids]
-            atoms['ghost'] = [*atoms['ghost'], *ghosts]
-            atoms['head'] = [*atoms['head'], *head]
-            for key in datadict.keys():
-                atoms[key] = [*atoms[key], *datadict[key]]
-
-            if scale_box:
-                print(box[index])
-                box[index] = np.array(box[index])+2*rep*np.array(box[index])
-                print(box[index])
-
-        if scale_box:
-            print("here")
-            print(box)
-            self.box = box
-        print(self.box)
-        if ghost:
-            self.ghosts_created = True                    
-
-        return atoms
-    """
     def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
 
