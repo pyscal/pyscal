@@ -42,6 +42,7 @@ class System:
         self.rotinv = [[0,0,0], [0,0,0], [0,0,0]]
         self.boxdims = [0,0,0]
         self.triclinic = 0
+        self._structure_dict = None
         self._atoms = Atoms()
         
         if filename is not None:
@@ -50,14 +51,15 @@ class System:
     
     @classmethod
     def from_structure(cls, structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None, chemical_symbol=None):
-        atoms, box = pcs.make_crystal(structure, lattice_constant=lattice_constant,
+        atoms, box, sdict = pcs.make_crystal(structure, lattice_constant=lattice_constant,
              repetitions=repetitions, ca_ratio=ca_ratio,
-             noise=noise, element=element)
+             noise=noise, element=element, return_structure_dict=True)
         obj = cls()
         obj.box = box
         obj.atoms = atoms
         obj.atoms._lattice = structure
         obj.atoms._lattice_constant = lattice_constant
+        obj._structure_dict = sdict
         return obj
 
     def iter_atoms(self):

@@ -290,12 +290,31 @@ class Atoms(dict, AttrSetter):
         delete_list = [masks[self["head"][x]] for x in range(self.ntotal)]
         delete_ids = [x for x in range(self.ntotal) if masks[x]]
         self._delete_atoms(delete_ids)
+    
+    @property
+    def _type_dict(self):
+        sp = []
+        types, typecounts = np.unique(self["types"][:self.nreal], return_counts=True)
+        for t in types:
+            for count, tx in enumerate(self["types"][:self.nreal]):
+                if t==tx:
+                    sp.append(self["species"][count])
+                    break
+        return dict([x for x in zip(types, sp)])
+
 
     @property
     def composition(self):
-        typelist = self["types"][:self.nreal]
-        types, typecounts = np.unique(typelist, return_counts=True)
-        concdict = {str(t): typecounts[c] for c, t in enumerate(types)}
+        if self["species"][0] is None:
+            typelist = self["types"][:self.nreal]
+            types, typecounts = np.unique(typelist, return_counts=True)
+            concdict = dict([(t, typecounts[c]/np.sum(typecounts)) for c, t in enumerate(types)])
+        else:
+            typelist = self["species"][:self.nreal]
+            types, typecounts = np.unique(typelist, return_counts=True)
+            concdict = {str(t): typecounts[c]/np.sum(typecounts) for c, t in enumerate(types)}
         return concdict
+
+
 
     

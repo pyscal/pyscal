@@ -78,6 +78,10 @@ class Structure:
     def __init__(self):
         self.element = ElementCreator(elements)
         self.lattice = LatticeCreator(structures)
+        self._structure_dict = structures
+
+    def structure_dict(self, structure):
+        return self._structure_dict[structure]
 
 class ElementCreator:
     """
