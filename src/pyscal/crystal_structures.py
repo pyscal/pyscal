@@ -11,6 +11,7 @@ from functools import update_wrapper
 
 from pyscal.attributes import read_yaml
 from pyscal.core import System
+from pyscal.structure_creator import make_crystal
 
 structures = read_yaml(os.path.join(os.path.dirname(__file__), "data/structure_data.yaml"))
 elements = read_yaml(os.path.join(os.path.dirname(__file__), "data/element_data.yaml"))
@@ -22,8 +23,7 @@ def structure_creator(structure,
              repetitions = None, 
              ca_ratio = 1.633, 
              noise = 0,
-             element=None,
-             chemical_symbol=None):
+             element=None):
     """
     Create a crystal structure and return it as a System object.
 
@@ -47,9 +47,6 @@ def structure_creator(structure,
     
     element : string, optional
         The chemical element
-    
-    chemical_symbol : string, optional
-        The chemical symbol
 
     Returns
     -------
@@ -76,8 +73,13 @@ class Structure:
         create structures by specifying lattice
     """
     def __init__(self):
+        #create by element name
         self.element = ElementCreator(elements)
+        #create by lattice name
         self.lattice = LatticeCreator(structures)
+        #create a general structure
+        self.custom = general_lattice
+        #complete dict
         self._structure_dict = structures
 
     def structure_dict(self, structure):
@@ -112,6 +114,63 @@ class LatticeCreator(ElementCreator):
             pfunc = partial(structure_creator, key)
             update_wrapper(pfunc, structure_creator)
             return pfunc
+
+
+#general structure creator
+def general_lattice(species, positions, 
+    scaling_factors=[1.0, 1.0, 1.0],
+    lattice_constant = 1.00, 
+    repetitions = None, 
+    noise = 0,
+    element=None):
+    """
+    Create a general lattice structure.
+
+    species: list
+        list of per-atom species
+
+    positions:
+        list of relative positions positions of reach atom (between 0-1)
+
+    scaling_fractors:
+        factors with which the unit cell should be scaled, for example hcp could
+        have [1,1.73, 1.63]. Default [1,1,1]
+
+    lattice_constant : float, optional
+        lattice constant of the crystal structure, default 1
+
+    repetitions : list of ints of len 3, optional
+        of type `[nx, ny, nz]`, repetions of the unit cell in x, y and z directions.
+        default `[1, 1, 1]`.
+
+    noise : float, optional
+        If provided add normally distributed noise with standard deviation `noise` to the atomic positions.
+    
+    element : string, optional
+        The chemical element
+    """
+    if not (len(species) == len(positions)):
+        raise ValueError("Species and positions should have same length!")
+
+    sdict = {"custom":
+                {"natoms": len(positions),
+                 "species": species,
+                 "scaling_factors": scaling_factors,
+                 "positions": positions}
+            }
+
+    atoms, box = make_crystal("custom", lattice_constant=lattice_constant,
+        repetitions=repetitions, noise=noise, element=element,
+        structures=sdict)
+
+    sys = System()
+    sys.box = box
+    sys.atoms = atoms
+    sys.atoms._lattice = None
+    sys.atoms._lattice_constant = lattice_constant
+    sys._structure_dict = sdict["custom"]
+    return sys
+
         
 
     
