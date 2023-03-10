@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-pyscal- A python module for structural analysis of atomic environments
-======================================================================
+pyscal
+======
 
 .. image:: https://dev.azure.com/sarathrmenon/pyscal/_apis/build/status/srmnitc.pyscal?branchName=master
     :target: https://dev.azure.com/sarathrmenon/pyscal/_build/latest?definitionId=1&branchName=master
@@ -52,50 +52,16 @@ liquid <https://link.springer.com/chapter/10.1007/b99429>`__. pyscal is
 inspired by
 `BondOrderAnalysis <https://homepage.univie.ac.at/wolfgang.lechner/bondorderparameter.html>`__
 code, but has since incorporated many additions and modifications.
-pyscal module includes the following functionality-
 
-Highlights
-----------
-
--  fast and efficient calculations using C++ and expansion using python.
--  calculation of Steinhardt's order parameters and their `averaged
-   version <https://aip.scitation.org/doi/full/10.1063/1.2977970>`__ and
-   `disorder parameters <https://doi.org/10.1063/1.3656762>`__.
--  links with `Voro++ <http://math.lbl.gov/voro++/>`__ code, for
-   calculation of `Steinhardt parameters weighted using face area of
-   Voronoi
-   polyhedra <https://aip.scitation.org/doi/full/10.1063/1.4774084>`__.
--  classification of atoms as `solid or
-   liquid <https://link.springer.com/chapter/10.1007/b99429>`__.
--  clustering of particles based on a user defined property.
--  methods for calculating radial distribution function, voronoi volume
-   of particles, number of vertices and face area of voronoi polyhedra
-   and coordination number.
--  calculation of angular parameters such as `for identification of
-   diamond
-   structure <https://journals.aps.org/prb/abstract/10.1103/PhysRevB.47.15717>`__
-   and `Ackland-Jones <https://doi.org/10.1103/PhysRevB.73.054104>`__
-   angular parameters.
--  `Centrosymmetry
-   parameter <https://doi.org/10.1103/PhysRevB.58.11085>`__ for
-   identification of defects.
--  `Adaptive common neighbor
-   analysis <https://iopscience.iop.org/article/10.1088/0965-0393/20/4/045021>`__
-   for identification of crystal structures.
-
-Documentation
--------------
 
 .. toctree::
+   :hidden:
+   :maxdepth: 2
 
-    downloadandinstall
-    prologue/news
-    methodsandexamples
-    modules
-    pubsandprojects
-    prologue/extending
-    prologue/helpandsupport
-    prologue/citing
-    prologue/acknowledgements
-    prologue/license
+   Installation <gettingstarted>
+   prologue/extending
+   prologue/helpandsupport
+   prologue/citing
+   prologue/acknowledgements
+   prologue/license
 
