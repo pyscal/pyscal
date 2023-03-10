@@ -60,6 +60,7 @@ code, but has since incorporated many additions and modifications.
 
    Installation <gettingstarted>
    Why version 3? <version3>
+   Examples <examples>
    prologue/extending
    prologue/helpandsupport
    prologue/citing
