@@ -8,7 +8,7 @@ from pyscal.attributes import read_yaml
 structures = read_yaml(os.path.join(os.path.dirname(__file__), "data/structure_data.yaml"))
 
 def make_crystal(structure, lattice_constant = 1.00, repetitions = None, ca_ratio = 1.633, noise = 0, element=None,
-    return_structure_dict=False):
+    return_structure_dict=False, structures=structures):
     """
     Create a basic crystal structure and return it as a list of `Atom` objects
     and box dimensions.

@@ -56,13 +56,17 @@ def test_distance():
 def test_composition():
 	sys = Structure().lattice.l12(repetitions = [2, 2, 2], lattice_constant=3.127)
 	c = sys.concentration
-	assert c['1'] == 8
-	assert c['2'] == 24
+	assert c[1] == 0.25
+	assert c[2] == 0.75
 
 	c = sys.composition
-	assert c['1'] == 8
-	assert c['2'] == 24
+	assert c[1] == 0.25
+	assert c[2] == 0.75
 
 def test_volume():
 	sys = Structure().lattice.fcc(repetitions = [10, 10, 10])
 	assert sys.volume == 1000
+
+def test_system_init():
+	sys = Structure().custom([1], [[0, 0, 0]])
+	assert sys.natoms == 1
