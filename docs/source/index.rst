@@ -59,6 +59,7 @@ code, but has since incorporated many additions and modifications.
    :maxdepth: 2
 
    Installation <gettingstarted>
+   Why version 3? <version3>
    prologue/extending
    prologue/helpandsupport
    prologue/citing
