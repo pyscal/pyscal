@@ -45,7 +45,8 @@ def get_symmetry(system, angle_tolerance=-1.0,
     res = spglib.get_symmetry_dataset((system.box,
         system.direct_coordinates, system.atoms.types))
 
-    results['international_space_group_number'] = results["number"]
-    results['international_symbol'] = results["international"]
-    results['point_group'] = results["pointgroup"]
+    results = {}
+    results['international_space_group_number'] = res["number"]
+    results['international_symbol'] = res["international"]
+    results['point_group'] = res["pointgroup"]
     return results
