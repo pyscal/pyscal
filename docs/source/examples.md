@@ -9,9 +9,15 @@ The gallery of examples below cover different ways in which calphy can be used t
 :link-type: doc
 ```
 
+```{grid-item-card} Creating structures
+:img-top: example01.jpg
+:link: examples/02_creating_structures
+:link-type: doc
+```
+
 ```{grid-item-card} More Atoms methods
 :img-top: example01.jpg
-:link: examples/02_atoms_in_more_detail
+:link: examples/03_atoms_in_more_detail
 :link-type: doc
 ```
 
