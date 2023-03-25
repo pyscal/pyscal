@@ -173,15 +173,13 @@ class System:
         ## MOVE TO ATOMS
         self._atoms.add_atoms(atoms)
 
-    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
+    def repeat(self, repetitions, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
         """
         """
-        rep = po.Repeat(self, reps)
-        rep.input.atoms = atoms
-        rep.input.ghost = ghost
-        rep.input.scale_box = scale_box
-        rep.input.return_atoms = return_atoms
-        return rep.calculate()
+        return po.repeat(self, repetitions, 
+            atoms=atoms, ghost=ghost, 
+            scale_box=scale_box, 
+            return_atoms=return_atoms)
 
     def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
