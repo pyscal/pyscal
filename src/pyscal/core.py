@@ -173,15 +173,13 @@ class System:
         ## MOVE TO ATOMS
         self._atoms.add_atoms(atoms)
 
-    def repeat(self, reps, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
+    def repeat(self, repetitions, atoms=None, ghost=False, scale_box=True, assign=False, return_atoms=False):
         """
         """
-        rep = po.Repeat(self, reps)
-        rep.input.atoms = atoms
-        rep.input.ghost = ghost
-        rep.input.scale_box = scale_box
-        rep.input.return_atoms = return_atoms
-        return rep.calculate()
+        return po.repeat(self, repetitions, 
+            atoms=atoms, ghost=ghost, 
+            scale_box=scale_box, 
+            return_atoms=return_atoms)
 
     def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
@@ -234,55 +232,12 @@ class System:
         self._atoms.delete(ids=ids, indices=indices, condition=condition, selection=selection)
 
 
-    def embed_in_cubic_box(self, inputbox=None, return_box=False):
+    def embed_in_cubic_box(self, input_box=None, return_box=False):
         """
         Embedded the triclinic box in a cubic box
         """
-        #first task is to create a box representation
-        
-        if inputbox is None:
-            box = self._box
-            backupbox = box.copy()
-        else:
-            box = inputbox
-            backupbox = inputbox.copy
-
-        a = np.array(box[0])
-        b = np.array(box[1])
-        c = np.array(box[2])
-
-        cosa = np.dot(b, c)/(np.linalg.norm(b)*np.linalg.norm(c))
-        cosb = np.dot(c, a)/(np.linalg.norm(c)*np.linalg.norm(a))
-        cosc = np.dot(a, b)/(np.linalg.norm(a)*np.linalg.norm(b))
-
-        lx = np.linalg.norm(a)
-        xy = np.linalg.norm(b)*cosc
-        xz = np.linalg.norm(c)*cosb
-        ly = np.sqrt(np.linalg.norm(b)*np.linalg.norm(b) - xy*xy)
-        yz = (np.linalg.norm(b)*np.linalg.norm(c)*cosa - xy*xz)/ly
-        lz = np.sqrt(np.linalg.norm(c)*np.linalg.norm(c) - xz*xz - yz*yz)
-
-        xlo = ylo = zlo = 0
-        xhi = lx
-        yhi = ly
-        zhi = lz
-
-        xlo_bound = xlo + min(0.0,xy,xz,xy+xz)
-        xhi_bound = xhi + max(0.0,xy,xz,xy+xz)
-        ylo_bound = ylo + min(0.0,yz)
-        yhi_bound = yhi + max(0.0,yz)
-        zlo_bound = zlo
-        zhi_bound = zhi
-
-        newbox = np.array([[xhi_bound-xlo_bound, 0, 0], [0, yhi_bound-ylo_bound, 0], [0, 0, zhi_bound-zlo_bound]])
-        
-        if not return_box:
-            self.newbox = newbox
-            self.box = newbox
-            self.box_backup = backupbox
-            self.actual_box = None
-        else:
-            return newbox
+        return po.embed_in_cubic_box(self, input_box=input_box,
+            return_box=return_box) 
 
     def get_distance(self, pos1, pos2, vector=False):
         """
@@ -719,7 +674,7 @@ class System:
                 if not self.ghosts_created:
                     atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False, return_atoms=True)
                     self._atoms = atoms
-                    self.embed_in_cubic_box()
+                    self = self.embed_in_cubic_box()
             pc.get_all_neighbors_voronoi(self.atoms, 0.0,
                 self.triclinic, self.rot, self.rotinv,
                 self.boxdims, voroexp)
