@@ -84,10 +84,12 @@ class GrainBoundary:
     def populate_grain_boundary(self, lattice, repetitions=(1,1,1), lattice_parameter=1, overlap=0.0):
         if lattice in pcs.structures.keys():
             structure = lattice
+            element = None
             basis = pcs.structures[lattice]['positions']
             sdict = pcs.structures[lattice]
         elif lattice in pcs.elements.keys():
             structure = pcs.elements[lattice]['structure']
+            element = lattice
             lattice_parameter = pcs.elements[lattice]['lattice_constant']
             basis = pcs.structures[structure]['positions']
             sdict = pcs.structures[structure]
@@ -99,11 +101,16 @@ class GrainBoundary:
                         dim=repetitions, 
                         overlap=overlap)
         atoms = Atoms()
-        atoms.from_dict({"positions": np.concatenate((atoms1, atoms2))})
+        total_atoms = np.concatenate((atoms1, atoms2))
+        if element is not None:
+            atoms.from_dict({"positions": total_atoms, "species": [element for x in range(len(total_atoms))]})
+        else:
+            atoms.from_dict({"positions": total_atoms})
         sys = System()
         sys.box = box
         sys.atoms = atoms
         sys.atoms._lattice = structure
         sys.atoms._lattice_constant = lattice_parameter
         sys._structure_dict = sdict
+        sys.remap_atoms_into_box()
         return sys

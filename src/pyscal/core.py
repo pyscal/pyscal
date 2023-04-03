@@ -154,11 +154,11 @@ class System:
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
             atoms, box = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False, return_atoms=True)
+            self.actual_box = self.box.copy()
+            self.box = box
 
         self._atoms = atoms
-        self.actual_box = self.box.copy()
-        self.box = box
-
+        
 
 
     def add_atoms(self, atoms):
