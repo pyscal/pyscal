@@ -2,7 +2,7 @@ import numpy as np
 from pyscal.attributes import DocumentedKeywords
 
 def repeat(system, repetitions, ghost = False,
-    scale_box = True, atoms = None, return_atoms = False):
+    scale_box = True, atoms = None, return_atoms = False, return_box=False):
     """
     Repeat the given system
 
@@ -86,7 +86,6 @@ def repeat(system, repetitions, ghost = False,
         box[0] = xs*np.array(box[0])
         box[1] = ys*np.array(box[1])
         box[2] = zs*np.array(box[2])
-        system.box = box
     if ghost:
         system.ghosts_created = True
 
@@ -98,8 +97,10 @@ def repeat(system, repetitions, ghost = False,
         atoms[key].extend(datadict[key])
 
     if return_atoms:
-        return atoms
+        return atoms, box
+
     else:
+        system.box = box
         system.atoms = atoms
         return system
 
