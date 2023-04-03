@@ -314,6 +314,27 @@ def find_orthogonal_cell(uvw, sigma, theta, R, m, n, GB1,
 
     return False, None, None
 
+
+def get_tilt_twist_comp(v1, uvw, m, n, tol=0.001):
+    """
+    returns the tilt and twist components of a given GB plane.
+    arguments:
+    v1 -- given gb plane
+    uvw -- axis of rotation
+    m,n -- the two necessary integers
+    """
+    theta = get_cubic_theta(uvw, m, n)
+    R = rot(uvw, theta)
+    v2 = np.round(dot(R, v1), 6).astype(int)
+    tilt = angv(v1, v2)
+    twist = 0
+    gb_type = ""
+    if abs(tilt - degrees(theta)) < 10e-5:
+        gb_type = "tilt"
+    else:
+        twist = 2 * acos(cos(theta / 2) / cos(radians(tilt / 2)))
+    return tilt, twist
+
 #Helpers
 
 def common_divisor(a):

@@ -11,6 +11,7 @@ class GrainBoundary:
         self._sigma = None
         self._theta = None
         self.gb_index_limit = None
+        self.gb_plane = None
         
         
     @property
@@ -66,6 +67,15 @@ class GrainBoundary:
         self._ortho_2 = ortho_2
         return validity
     
+    def find_gb_character(self):
+        if self.gb_plane is not None:
+            self.gb_index_limit = max(np.abs(self.gb_plane)+1)
+            outs = self.calculate_possible_gb_planes()
+            main_str_array = np.array([" ".join(np.array(x).astype(str)) for x in outs[0]])
+            search_array = " ".join(np.array(self.gb_plane).astype(str))
+            arg = np.argwhere(main_str_array == search_array)
+            return outs[3][arg[0][0]]
+
     def create_grain_boundary(self, axis, 
                               sigma, 
                               gb_plane,
@@ -75,6 +85,7 @@ class GrainBoundary:
         self.axis = axis
         self.sigma = sigma
         self.limit = limit
+        self.gb_plane = gb_plane
         self.gb_index_limit = gb_index_limit
         valid = self.check_if_gb_is_valid(gb_plane)
         if not valid:
