@@ -153,9 +153,12 @@ class System:
 
             if np.sum(self.box) == 0:
                 raise ValueError("Simulation box should be initialized before atoms")
-            atoms = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False, return_atoms=True)
+            atoms, box = self.repeat((nx, nx, nx), atoms=atoms, ghost=True, scale_box=True, assign=False, return_atoms=True)
 
         self._atoms = atoms
+        self.actual_box = self.box.copy()
+        self.box = box
+
 
 
     def add_atoms(self, atoms):
@@ -180,6 +183,21 @@ class System:
             atoms=atoms, ghost=ghost, 
             scale_box=scale_box, 
             return_atoms=return_atoms)
+
+    def remap_atoms_into_box(self):
+        """
+        Go through atoms in the list and remap them into the bix
+        """
+        rot = np.array(self.box).T
+        rotinv = np.linalg.inv(rot)
+
+        for x in range(self.natoms):
+            pos = pc.remap_atom_into_box(self.atoms["positions"][x], 
+                self.triclinic,
+                rot, 
+                rotinv, 
+                self.box_dimensions)
+            self.atoms["positions"][x] = pos        
 
     def apply_mask(self, mask_type="primary", ids=None, indices=None, condition=None, selection=False):
         """
@@ -261,10 +279,6 @@ class System:
         -----
         Periodic boundary conditions are assumed by default.
         """
-        
-        diff = pc.get_distance_vector(pos1, pos2, self.triclinic,
-            self.rot, self.rotinv, self.boxdims)
-        dist = np.linalg.norm(diff)
         
         if vector:
             return dist, diff
@@ -672,7 +686,7 @@ class System:
             backupbox = self._box.copy()
             if self.triclinic:
                 if not self.ghosts_created:
-                    atoms = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False, return_atoms=True)
+                    atoms, box = self.repeat((1, 1, 1), ghost=True, scale_box=True, assign=False, return_atoms=True)
                     self._atoms = atoms
                     self = self.embed_in_cubic_box()
             pc.get_all_neighbors_voronoi(self.atoms, 0.0,
