@@ -1,0 +1,109 @@
+import numpy as np
+import os
+import pyscal.csl as csl
+import pyscal.crystal_structures as pcs
+from pyscal.core import System, Atoms
+
+class GrainBoundary:
+    def __init__(self):
+        self._axis = None
+        self.limit = None
+        self._sigma = None
+        self._theta = None
+        self.gb_index_limit = None
+        
+        
+    @property
+    def axis(self):
+        return self._axis
+    
+    @axis.setter
+    def axis(self, axis):
+        self._axis = np.array(axis)
+    
+    @property
+    def sigma(self):
+        return self._sigma
+    
+    @sigma.setter
+    def sigma(self, val):
+        self._sigma = val
+    
+    def get_possible_sigma(self):
+        if self._axis is not None:
+            sigmas, thetas = csl.get_sigma_list(self._axis, self.limit)
+            return sigmas
+        
+    #theta is calculated; not set
+    @property
+    def theta(self):
+        return np.degrees(self._theta)
+    
+    def calculate_theta(self):
+        theta, m, n = csl.get_theta_m_n_list(self._axis, self._sigma)[0]
+        R = csl.rot(self._axis, theta)
+        M1, M2 = csl.create_minimal_cell_method_1(self._sigma, self._axis, R)
+        self._theta = theta
+        self._m = m
+        self._n = n
+        self._M1 = M1
+        self._M2 = M2
+        self._R = R
+        return self._theta
+    
+    def calculate_possible_gb_planes(self):
+        V1, V2, M, Gb = csl.create_possible_gb_plane_list(self._axis, 
+                            self._m, self._n, self.gb_index_limit)
+        return V1, V2, M, Gb
+
+    def check_if_gb_is_valid(self, gb_vector):
+        if self._theta is None:
+            self.calculate_theta()
+        validity, ortho_1, ortho_2 = csl.find_orthogonal_cell(self._axis, self._sigma, self._theta, 
+                                                                   self._R, self._m, self._n, gb_vector,
+                                                                   self._M1, self._M2, tol = 0.001)
+        self._ortho_1 = ortho_1
+        self._ortho_2 = ortho_2
+        return validity
+    
+    def create_grain_boundary(self, axis, 
+                              sigma, 
+                              gb_plane,
+                              limit=3, 
+                              gb_index_limit=10,
+                              ):
+        self.axis = axis
+        self.sigma = sigma
+        self.limit = limit
+        self.gb_index_limit = gb_index_limit
+        valid = self.check_if_gb_is_valid(gb_plane)
+        if not valid:
+            raise TypeError("GB cannot be created with the given input!")
+        return valid
+    
+    def populate_grain_boundary(self, lattice, repetitions=(1,1,1), lattice_parameter=1, overlap=0.0):
+        if lattice in pcs.structures.keys():
+            structure = lattice
+            basis = pcs.structures[lattice]['positions']
+            sdict = pcs.structures[lattice]
+        elif lattice in pcs.elements.keys():
+            structure = pcs.elements[lattice]['structure']
+            lattice_parameter = pcs.elements[lattice]['lattice_constant']
+            basis = pcs.structures[structure]['positions']
+            sdict = pcs.structures[structure]
+        else:
+            raise ValueError("Unknown lattice type")
+        box, atoms1, atoms2 = csl.populate_gb(self._ortho_1, self._ortho_2, 
+                        np.array(basis),
+                        lattice_parameter,
+                        dim=repetitions, 
+                        overlap=overlap)
+        atoms = Atoms()
+        atoms.from_dict({"positions": np.concatenate((atoms1, atoms2))})
+        sys = System()
+        sys.box = box
+        sys.atoms = atoms
+        sys.atoms._lattice = structure
+        sys.atoms._lattice_constant = lattice_parameter
+        sys._structure_dict = sdict
+        return sys
