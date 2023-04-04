@@ -333,6 +333,17 @@ def get_tilt_twist_comp(v1, uvw, m, n, tol=0.001):
         gb_type = "tilt"
     else:
         twist = 2 * acos(cos(theta / 2) / cos(radians(tilt / 2)))
+    
+    #Assign types
+    MP = np.array([[1, 0, 0],
+                   [0, 1, 0],
+                   [0, 0, 1],
+                   [1, 1, 0],
+                   [0, 1, 1],
+                   [1, 0, 1],
+                   ], dtype='float')
+        
+
     return tilt, twist
 
 #Helpers
