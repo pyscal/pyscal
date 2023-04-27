@@ -6,7 +6,7 @@ with open('README.rst') as readme_file:
     readme = readme_file.read()
 
 setup(
-    name='pyscal',
+    name='pyscal2',
     version='2.10.18',
     author='Sarath Menon',
     author_email='sarath.menon@pyscal.org',
