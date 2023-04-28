@@ -1,0 +1,12 @@
+[build-system]
+requires = [
+    "setuptools",
+    "wheel",
+    "pybind11",
+]
+
+[tool.cibuildwheel]
+skip = "cp36-*"
+
+skip = "cp37-*"
+

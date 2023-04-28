@@ -6,7 +6,7 @@ with open('README.rst') as readme_file:
     readme = readme_file.read()
 
 setup(
-    name='pyscal',
+    name='pyscal3',
     version='3.0.0',
     author='Sarath Menon',
     author_email='sarath.menon@pyscal.org',
@@ -50,7 +50,7 @@ setup(
     zip_safe=False,
     download_url = 'https://anaconda.org/conda-forge/pyscal',
     url = 'https://pyscal.org',
-    install_requires=['numpy', 'ase'],
+    install_requires=['pybind11', 'numpy', 'ase'],
     classifiers=[
         'Programming Language :: Python :: 3'
     ],
