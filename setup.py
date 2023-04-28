@@ -2,16 +2,17 @@ from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import setup, find_packages
 
 
-with open('README.rst') as readme_file:
+with open('README.md') as readme_file:
     readme = readme_file.read()
 
 setup(
-    name='pyscal',
-    version='2.10.18',
+    name='pyscal2',
+    version='2.10.19',
     author='Sarath Menon',
     author_email='sarath.menon@pyscal.org',
     description='Python library written in C++ for calculation of local atomic structural environment',
     long_description=readme,
+    long_description_content_type="text/markdown",
     # tell setuptools to look for any packages under 'src'
     packages=find_packages('src'),
     # tell setuptools that all packages will be under the 'src' directory
@@ -38,7 +39,7 @@ setup(
     zip_safe=False,
     download_url = 'https://anaconda.org/conda-forge/pyscal',
     url = 'https://pyscal.org',
-    install_requires=['numpy', 'ase'],
+    install_requires=['pybind11', 'numpy', 'ase'],
     classifiers=[
         'Programming Language :: Python :: 3'
     ]
