@@ -6,7 +6,5 @@ requires = [
 ]
 
 [tool.cibuildwheel]
-skip = "cp36-*"
-
-skip = "cp37-*"
+skip = ["cp36-*", "cp37-*"]
 
