@@ -7,7 +7,7 @@ with open('README.md') as readme_file:
 
 setup(
     name='pyscal2',
-    version='2.10.19',
+    version='2.10.20',
     author='Sarath Menon',
     author_email='sarath.menon@pyscal.org',
     description='Python library written in C++ for calculation of local atomic structural environment',
