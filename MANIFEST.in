@@ -1,1 +1,7 @@
-LICENSE
+include src/pyscal/atom.cpp
+include src/pyscal/atom.h
+include src/pyscal/atom_binding.cpp
+include src/pyscal/system.cpp
+include src/pyscal/system.h
+include src/pyscal/system_binding.cpp
+include LICENSE
