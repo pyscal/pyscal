@@ -92,10 +92,10 @@ class GrainBoundary:
             raise TypeError("GB cannot be created with the given input!")
         return valid
     
-    def populate_grain_boundary(self, lattice, repetitions=(1,1,1), lattice_parameter=1, overlap=0.0):
+    def populate_grain_boundary(self, lattice, element=None, repetitions=(1,1,1), lattice_parameter=1, overlap=0.0):
         if lattice in pcs.structures.keys():
             structure = lattice
-            element = None
+            element = element
             basis = pcs.structures[lattice]['positions']
             sdict = pcs.structures[lattice]
         elif lattice in pcs.elements.keys():
