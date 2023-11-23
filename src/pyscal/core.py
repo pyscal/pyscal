@@ -305,7 +305,7 @@ class System(pc.System):
         boxvecs = self.box
         vol = np.dot(np.cross(boxvecs[0], boxvecs[1]), boxvecs[2])
         natoms = self.nop
-        rho = natoms/vol
+        rho = int(natoms*(natoms-1)*0.5)/vol
 
         shell_vols = (4./3.)*np.pi*((r+edgewidth)**3 - r**3)
         shell_rho = hist/shell_vols
