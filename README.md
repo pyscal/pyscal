@@ -1,6 +1,7 @@
 
 # pyscal - python Structural Environment Calculator
 
+Check out [pyscal3](https://github.com/pyscal/pyscal3), a completely new pyscal which is faster and can handle a large number of atoms, with a much more user-friendly interface.
 Complete documentation with examples available [here](https://pyscal.org/).
 
 **pyscal** is a python module for the calculation of local atomic structural environments including [Steinhardt's bond orientational order parameters](https://journals.aps.org/prb/abstract/10.1103/PhysRevB.28.784) during post-processing of atomistic simulation data. The core functionality of pyscal is written in C++ with python wrappers using [pybind11](https://pybind11.readthedocs.io/en/stable/intro.html) which allows for fast calculations with possibilities for easy expansion in python.
