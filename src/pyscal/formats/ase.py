@@ -8,14 +8,14 @@ import io
 import os
 
 #new function to wrap over ase objects
-def read_snap(aseobject, check_triclinic=False):
+def read_snap(filename, check_triclinic=False):
     """
     Function to read from a ASE atoms objects
 
     Parameters
     ----------
-    aseobject : ASE Atoms object
-        name of the ASE atoms object
+    filename : str
+	path of the ASE file
 
     triclinic : bool, optional
         True if the configuration is triclinic
@@ -24,7 +24,7 @@ def read_snap(aseobject, check_triclinic=False):
     #We have to process atoms and atomic objects from ase
     #Known issues lammps -dump modified format
     #first get box
-    aseobject = read(aseobject)
+    aseobject = read(filename)
     a = np.array(aseobject.cell[0])
     b = np.array(aseobject.cell[1])
     c = np.array(aseobject.cell[2])
