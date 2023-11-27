@@ -1,6 +1,7 @@
 import numpy as np
 import gzip
 import pyscal.catom as pca
+from ase.io import read
 from ase import Atom, Atoms
 import gzip
 import io
@@ -23,6 +24,7 @@ def read_snap(aseobject, check_triclinic=False):
     #We have to process atoms and atomic objects from ase
     #Known issues lammps -dump modified format
     #first get box
+    aseobject = read(aseobject)
     a = np.array(aseobject.cell[0])
     b = np.array(aseobject.cell[1])
     c = np.array(aseobject.cell[2])
