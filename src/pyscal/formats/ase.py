@@ -24,10 +24,10 @@ def read_snap(filename, check_triclinic=False):
     #We have to process atoms and atomic objects from ase
     #Known issues lammps -dump modified format
     #first get box
-    if os.path.exists(filename):
-        aseobject = read(filename)
-    else:
+    if isinstance(filename, Atoms):
         aseobject = filename
+    else:
+        aseobject = read(filename)
         
     a = np.array(aseobject.cell[0])
     b = np.array(aseobject.cell[1])
