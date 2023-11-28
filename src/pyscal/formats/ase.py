@@ -15,7 +15,7 @@ def read_snap(filename, check_triclinic=False):
     Parameters
     ----------
     filename : str
-	path of the ASE file
+	path of the ASE file or ASE object
 
     triclinic : bool, optional
         True if the configuration is triclinic
@@ -24,7 +24,11 @@ def read_snap(filename, check_triclinic=False):
     #We have to process atoms and atomic objects from ase
     #Known issues lammps -dump modified format
     #first get box
-    aseobject = read(filename)
+    if os.path.exists(filename):
+        aseobject = read(filename)
+    else:
+        aseobject = filename
+        
     a = np.array(aseobject.cell[0])
     b = np.array(aseobject.cell[1])
     c = np.array(aseobject.cell[2])
