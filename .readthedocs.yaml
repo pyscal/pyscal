@@ -21,7 +21,7 @@ build:
     python: "mambaforge-4.10"
 
 conda:
-  environment: .ci_support/environment.yml
+  environment: docs/environment.yml
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
