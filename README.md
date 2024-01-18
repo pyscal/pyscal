@@ -34,3 +34,7 @@ pyscal can be built from the repository by-
 If you use pyscal in your work, the citation of the [following article](https://joss.theoj.org/papers/10.21105/joss.01824) will be greatly appreciated:
 
 Sarath Menon, Grisell Díaz Leines and Jutta Rogal (2019). pyscal: A python module for structural analysis of atomic environments. Journal of Open Source Software, 4(43), 1824, https://doi.org/10.21105/joss.01824
+
+## Works using pyscal
+
+For a complete list of publications which used pyscal, see [here](https://scholar.google.com/scholar?oi=bibs&hl=en&cites=315020929885190486&as_sdt=5).
