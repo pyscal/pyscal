@@ -2,7 +2,7 @@
 # pyscal - python Structural Environment Calculator
 
 > [!TIP]
-> Check out [pyscal3](https://github.com/pyscal/pyscal3), a completely new pyscal which is faster and can handle a large number of atoms, with a much more user-friendly interface.  
+> Check out [pyscal3](https://github.com/pyscal/pyscal3), a completely new pyscal which is faster and can handle a large number of atoms, with a much more user-friendly interface. This repository will continue receiving bug fixes, including any new raised issue. It will also be tested for new python versions. However, new features will only be added to `pyscal3`. 
 
 Complete documentation with examples available [here](https://pyscal.org/).
 
