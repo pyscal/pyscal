@@ -1,8 +1,23 @@
 
 # pyscal - python Structural Environment Calculator
 
-> [!TIP]
-> Check out [pyscal3](https://github.com/pyscal/pyscal3), a completely new pyscal which is faster and can handle a large number of atoms, with a much more user-friendly interface. **This repository will continue receiving bug fixes, including any new raised issue. It will also be tested for new python versions. However, new features will only be added to `pyscal3`**. 
+> [!WARNING]
+> ## 📢 This repository is no longer maintained
+>
+> This repository contains **pyscal v2**. It is no longer actively
+> developed and will not receive bug fixes or new features.
+>
+> The current version of pyscal is **v4**, developed at
+> [**pyscal/pyscal3**](https://github.com/pyscal/pyscal3).
+>
+> - Install: `pip install pyscal3`  *or*  `conda install -c conda-forge pyscal3`
+> - Then: `import pyscal`  *or*  `import pyscal3`  (both work)
+> - Documentation: <https://pyscal.org>
+>
+> New users should start with v4. This repository is kept online so that
+> existing references and citations continue to resolve.
+
+---
 
 Complete documentation with examples available [here](https://pyscal.org/).
 

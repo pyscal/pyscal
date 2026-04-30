@@ -6,6 +6,20 @@
 pyscal- A python module for structural analysis of atomic environments
 ======================================================================
 
+.. warning::
+
+   **This documentation is for pyscal v2, which is no longer maintained.**
+
+   The current version of pyscal is **v4**, developed at
+   `pyscal/pyscal3 <https://github.com/pyscal/pyscal3>`_.
+
+   * Install: ``pip install pyscal3`` or ``conda install -c conda-forge pyscal3``
+   * Then: ``import pyscal`` or ``import pyscal3`` (both work)
+   * Documentation: https://pyscal.org
+
+   New users should start with v4. This page is kept online so that existing
+   references and citations continue to resolve.
+
 .. image:: https://dev.azure.com/sarathrmenon/pyscal/_apis/build/status/srmnitc.pyscal?branchName=master
     :target: https://dev.azure.com/sarathrmenon/pyscal/_build/latest?definitionId=1&branchName=master
     :width: 20%
